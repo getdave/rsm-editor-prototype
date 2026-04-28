@@ -18,6 +18,9 @@ export function AppStateProvider({ children }) {
   
   // Save state
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  
+  // Device preview state
+  const [selectedDevice, setSelectedDevice] = useState('desktop');
 
   // Auto-collapse sidebar when entering editing mode
   useEffect(() => {
@@ -86,7 +89,11 @@ export function AppStateProvider({ children }) {
     // Save state
     hasUnsavedChanges,
     markDirty,
-    save
+    save,
+    
+    // Device preview state
+    selectedDevice,
+    setSelectedDevice
   };
 
   return (

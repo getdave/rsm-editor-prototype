@@ -1,4 +1,5 @@
 import { home, page as pageIcon } from '@wordpress/icons';
+import LiveBadge from './LiveBadge';
 
 function PageRow({ page: pageData, onClick }) {
   const isHome = pageData.id === 'home';
@@ -12,9 +13,7 @@ function PageRow({ page: pageData, onClick }) {
         {pageData.name}
       </span>
       <div className="pi-badges">
-        {pageData.isLive && !pageData.isSystem && (
-          <span className="pi-live-dot"></span>
-        )}
+        {pageData.isLive && !pageData.isSystem && <LiveBadge />}
         {!pageData.isLive && <span className="pb pb-draft">Draft</span>}
         {pageData.inMenu && <span className="pb pb-nav">Menu</span>}
         {pageData.badge === 'System' && <span className="pb pb-sys">System</span>}

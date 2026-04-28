@@ -1,8 +1,10 @@
 import { useAppState } from '../../hooks/useAppState';
+import { Button } from '@wordpress/components';
+import { desktop, tablet, mobile } from '@wordpress/icons';
 import UrlBar from '../shared/UrlBar';
 
 function PreviewView() {
-  const { currentPage, setCurrentView } = useAppState();
+  const { currentPage, setCurrentView, selectedDevice, setSelectedDevice } = useAppState();
 
   return (
     <div className="canvas" style={{ flexDirection: 'column', padding: 0 }}>
@@ -10,12 +12,38 @@ function PreviewView() {
         <div className="ct-space"></div>
         <UrlBar page={currentPage} />
         <div className="ct-space"></div>
-        <button 
+        
+        <div className="ct-view-modes">
+          <Button 
+            className={`ct-view-btn ${selectedDevice === 'desktop' ? 'active' : ''}`}
+            onClick={() => setSelectedDevice('desktop')}
+            label="Desktop view"
+            icon={desktop}
+            iconSize={20}
+          />
+          <Button 
+            className={`ct-view-btn ${selectedDevice === 'tablet' ? 'active' : ''}`}
+            onClick={() => setSelectedDevice('tablet')}
+            label="Tablet view"
+            icon={tablet}
+            iconSize={20}
+          />
+          <Button 
+            className={`ct-view-btn ${selectedDevice === 'mobile' ? 'active' : ''}`}
+            onClick={() => setSelectedDevice('mobile')}
+            label="Mobile view"
+            icon={mobile}
+            iconSize={20}
+          />
+        </div>
+        
+        <Button 
+          variant="primary"
           className="ct-edit" 
           onClick={() => setCurrentView('editing')}
         >
           Edit
-        </button>
+        </Button>
       </div>
       <div className="preview-canvas-area">
         <div className="site-card">

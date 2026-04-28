@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useAppState } from '../../hooks/useAppState';
+import { Button, ButtonGroup } from '@wordpress/components';
+import { undo, redo, desktop, tablet, mobile, drawerRight, moreVertical, plus } from '@wordpress/icons';
 import UrlBar from '../shared/UrlBar';
 import SectionInserter from './SectionInserter';
 
 function EditingView() {
-  const { currentPage, currentView, setCurrentView, hasUnsavedChanges, save } = useAppState();
+  const { currentPage, currentView, setCurrentView, hasUnsavedChanges, save, selectedDevice, setSelectedDevice } = useAppState();
   const [selectedSection, setSelectedSection] = useState(1);
-  const [selectedDevice, setSelectedDevice] = useState('desktop');
 
   const isInserterOpen = currentView === 'inserter';
 
@@ -20,22 +21,25 @@ function EditingView() {
         {/* Canvas toolbar */}
         <div className="canvas-toolbar">
           {/* Left side controls */}
-          <button 
+          <Button 
+            variant="primary"
             className="ct-btn primary" 
             onClick={() => setCurrentView(isInserterOpen ? 'editing' : 'inserter')}
-          >
-            +
-          </button>
-          <button className="ct-btn" title="Undo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.3 11.7c-1.2-1.2-2.8-1.9-4.5-1.9H8.8l2.4-2.4-1.4-1.4-4.5 4.5 4.5 4.5 1.4-1.4-2.4-2.4h5c2.5 0 4.6 2.1 4.6 4.6s-2.1 4.6-4.6 4.6H8v2h5.8c3.6 0 6.5-2.9 6.5-6.5s-2.9-6.5-6.5-6.5-.5 0-.5-.3z"/>
-            </svg>
-          </button>
-          <button className="ct-btn" title="Redo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M15.6 6.5l-1.4 1.4 2.4 2.4h-5c-1.7 0-3.3.7-4.5 1.9-1.2 1.2-1.9 2.8-1.9 4.5s.7 3.3 1.9 4.5c1.2 1.2 2.8 1.9 4.5 1.9H16v-2h-4.2c-1.3 0-2.4-.5-3.2-1.4-.8-.8-1.4-2-1.4-3.2s.5-2.4 1.4-3.2c.8-.8 2-1.4 3.2-1.4h5l-2.4 2.4 1.4 1.4 4.5-4.5-4.7-4.7z"/>
-            </svg>
-          </button>
+            icon={plus}
+            iconSize={20}
+          />
+          <Button 
+            className="ct-btn" 
+            label="Undo"
+            icon={undo}
+            iconSize={20}
+          />
+          <Button 
+            className="ct-btn" 
+            label="Redo"
+            icon={redo}
+            iconSize={20}
+          />
           
           <div className="ct-space"></div>
           <UrlBar page={currentPage} />
@@ -43,60 +47,57 @@ function EditingView() {
           
           {/* Right side controls */}
           <div className="ct-view-modes">
-            <button 
+            <Button 
               className={`ct-view-btn ${selectedDevice === 'desktop' ? 'active' : ''}`}
               onClick={() => setSelectedDevice('desktop')}
-              title="Desktop view"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.5 16h-17A.5.5 0 0 1 3 15.5v-11a.5.5 0 0 1 .5-.5h17a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5zM4.5 3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h7.25v2h-1.5v1.5h4v-1.5h-1.5v-2H20.5a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-16z"/>
-              </svg>
-            </button>
-            <button 
+              label="Desktop view"
+              icon={desktop}
+              iconSize={20}
+            />
+            <Button 
               className={`ct-view-btn ${selectedDevice === 'tablet' ? 'active' : ''}`}
               onClick={() => setSelectedDevice('tablet')}
-              title="Tablet view"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17 4H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm.5 14c0 .3-.2.5-.5.5H7c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v12z"/>
-              </svg>
-            </button>
-            <button 
+              label="Tablet view"
+              icon={tablet}
+              iconSize={20}
+            />
+            <Button 
               className={`ct-view-btn ${selectedDevice === 'mobile' ? 'active' : ''}`}
               onClick={() => setSelectedDevice('mobile')}
-              title="Mobile view"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M15 4H9a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm.5 14c0 .3-.2.5-.5.5H9c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h6c.3 0 .5.2.5.5v12z"/>
-              </svg>
-            </button>
+              label="Mobile view"
+              icon={mobile}
+              iconSize={20}
+            />
           </div>
           
-          <button className="ct-icon-btn" title="Toggle sidebar">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18 5.5H6a.5.5 0 0 0-.5.5v3h13V6a.5.5 0 0 0-.5-.5zm.5 5H10v8h8a.5.5 0 0 0 .5-.5v-7.5zM6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
-            </svg>
-          </button>
+          <Button 
+            className="ct-icon-btn" 
+            label="Toggle settings sidebar"
+            icon={drawerRight}
+            iconSize={20}
+          />
           
-          <button className="ct-icon-btn" title="More options">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"/>
-            </svg>
-          </button>
+          <Button 
+            className="ct-icon-btn" 
+            label="More options"
+            icon={moreVertical}
+            iconSize={20}
+          />
           
           {!hasUnsavedChanges && <span className="ct-saved">Saved</span>}
-          <button 
+          <Button 
+            variant="primary"
             className={`ct-save ${hasUnsavedChanges ? 'show' : ''}`}
             onClick={save}
           >
             Save
-          </button>
-          <button 
+          </Button>
+          <Button 
             className="ct-exit" 
             onClick={() => setCurrentView('preview')}
           >
             Exit
-          </button>
+          </Button>
         </div>
 
         {/* Edit scroll area */}
@@ -112,12 +113,12 @@ function EditingView() {
                 </div>
                 <div className="g-badge">⟳ Global — Header</div>
               </div>
-              <button 
+              <Button 
                 className="add-sec" 
                 onClick={() => setCurrentView('inserter')}
               >
                 + Add section
-              </button>
+              </Button>
             </div>
 
             {/* Hero section */}

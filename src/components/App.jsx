@@ -1,4 +1,5 @@
 import { AppStateProvider, useAppState } from '../hooks/useAppState';
+import { Button } from '@wordpress/components';
 import Topbar from './Topbar';
 import Sidebar from './Sidebar';
 import PreviewView from './views/PreviewView';
@@ -17,9 +18,12 @@ function AppContent() {
       <div className="body">
         <Sidebar />
         {/* Floating sidebar toggle */}
-        <button className="sidebar-toggle" onClick={toggleSidebar}>
-          {sidebarCollapsed ? chevronRight : chevronLeft}
-        </button>
+        <Button 
+          className="sidebar-toggle" 
+          onClick={toggleSidebar}
+          icon={sidebarCollapsed ? chevronRight : chevronLeft}
+          iconSize={20}
+        />
         <main className="main">
           {currentView === 'preview' && <PreviewView />}
           {currentView === 'pages' && <PagesView />}
