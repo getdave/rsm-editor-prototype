@@ -6,20 +6,10 @@ import PagesView from './views/PagesView';
 import EditingView from './views/EditingView';
 import SiteIdentityModal from './modals/SiteIdentityModal';
 import PagesFloatingPanel from './modals/PagesFloatingPanel';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 
 function AppContent() {
   const { currentView, sidebarCollapsed, toggleSidebar } = useAppState();
-
-  const icons = {
-    chevronLeft: 'M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z',
-    chevronRight: 'M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z'
-  };
-
-  const WPIcon = ({ path, ...props }) => (
-    <svg viewBox="0 0 24 24" {...props}>
-      <path d={path} />
-    </svg>
-  );
 
   return (
     <>
@@ -28,10 +18,7 @@ function AppContent() {
         <Sidebar />
         {/* Floating sidebar toggle */}
         <button className="sidebar-toggle" onClick={toggleSidebar}>
-          <WPIcon 
-            path={sidebarCollapsed ? icons.chevronRight : icons.chevronLeft} 
-            style={{ width: 12, height: 12, fill: 'currentColor' }} 
-          />
+          {sidebarCollapsed ? chevronRight : chevronLeft}
         </button>
         <main className="main">
           {currentView === 'preview' && <PreviewView />}
