@@ -6,7 +6,7 @@ import UrlBar from '../shared/UrlBar';
 
 function PreviewView() {
   const navigate = useNavigate();
-  const { currentPage, selectedDevice, setSelectedDevice } = useAppState();
+  const { currentPage, selectedDevice, setSelectedDevice, siteTitle } = useAppState();
 
   return (
     <div className="canvas" style={{ flexDirection: 'column', padding: 0 }}>
@@ -50,7 +50,7 @@ function PreviewView() {
       <div className="preview-canvas-area">
         <div className="site-card">
           <div className="p-header">
-            <span className="p-sitename">My Photography Site</span>
+            <span className="p-sitename">{siteTitle}</span>
             <div className="p-nav">
               <a href="#">Home</a>
               <a href="#">About</a>

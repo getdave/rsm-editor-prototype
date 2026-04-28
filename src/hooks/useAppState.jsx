@@ -10,6 +10,9 @@ export function AppStateProvider({ children }) {
   // Current page
   const [currentPage, setCurrentPage] = useState(pages[0]); // Home page
   
+  // Site identity
+  const [siteTitle, setSiteTitle] = useState('My Photography Site');
+  
   // Modal state
   const [siteIdentityModalOpen, setSiteIdentityModalOpen] = useState(false);
   
@@ -48,6 +51,10 @@ export function AppStateProvider({ children }) {
     // Current page
     currentPage,
     setCurrentPage,
+    
+    // Site identity
+    siteTitle,
+    setSiteTitle,
     
     // Modal state
     siteIdentityModalOpen,

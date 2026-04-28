@@ -9,7 +9,7 @@ import SectionInserter from './SectionInserter';
 function EditingView() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { currentPage, hasUnsavedChanges, save, selectedDevice, setSelectedDevice } = useAppState();
+  const { currentPage, hasUnsavedChanges, save, selectedDevice, setSelectedDevice, siteTitle } = useAppState();
   const [selectedSection, setSelectedSection] = useState(1);
 
   const isInserterOpen = searchParams.get('inserter') === 'true';
@@ -118,7 +118,7 @@ function EditingView() {
             {/* Header (global) */}
             <div className="sec-group">
               <div className="g-el p-header">
-                <span className="p-sitename">My Photography Site</span>
+                <span className="p-sitename">{siteTitle}</span>
                 <div className="p-nav">
                   <a href="#" style={{ color: 'rgba(255,255,255,.6)', fontSize: '11px', textDecoration: 'none' }}>Home</a>
                   <a href="#" style={{ color: 'rgba(255,255,255,.6)', fontSize: '11px', textDecoration: 'none', marginLeft: '14px' }}>About</a>
@@ -206,7 +206,7 @@ function EditingView() {
 
             {/* Footer (global) */}
             <div className="g-el p-footer" style={{ position: 'relative' }}>
-              <span className="p-ft">© 2026 My Photography Site</span>
+              <span className="p-ft">© 2026 {siteTitle}</span>
               <span className="p-ft">Privacy Policy</span>
               <div className="g-badge">⟳ Global — Footer</div>
             </div>

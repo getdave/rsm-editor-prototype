@@ -2,15 +2,26 @@ import { useState } from 'react';
 import { useAppState } from '../../hooks/useAppState';
 
 function SiteIdentityModal() {
-  const { siteIdentityModalOpen, closeSiteIdentityModal } = useAppState();
-  const [siteName, setSiteName] = useState('My Photography Site');
+  const { siteIdentityModalOpen, closeSiteIdentityModal, siteTitle, setSiteTitle } = useAppState();
+  const [editedSiteName, setEditedSiteName] = useState(siteTitle);
 
   if (!siteIdentityModalOpen) return null;
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
+      setEditedSiteName(siteTitle);
       closeSiteIdentityModal();
     }
+  };
+
+  const handleSave = () => {
+    setSiteTitle(editedSiteName);
+    closeSiteIdentityModal();
+  };
+
+  const handleCancel = () => {
+    setEditedSiteName(siteTitle);
+    closeSiteIdentityModal();
   };
 
   return (
@@ -27,8 +38,8 @@ function SiteIdentityModal() {
             <label className="m-lbl">Site name</label>
             <input 
               className="m-input" 
-              value={siteName}
-              onChange={(e) => setSiteName(e.target.value)}
+              value={editedSiteName}
+              onChange={(e) => setEditedSiteName(e.target.value)}
             />
           </div>
           <div className="m-field">
@@ -40,10 +51,10 @@ function SiteIdentityModal() {
           </div>
         </div>
         <div className="modal-footer">
-          <button className="m-cancel" onClick={closeSiteIdentityModal}>
+          <button className="m-cancel" onClick={handleCancel}>
             Cancel
           </button>
-          <button className="m-ok" onClick={closeSiteIdentityModal}>
+          <button className="m-ok" onClick={handleSave}>
             Save changes
           </button>
         </div>

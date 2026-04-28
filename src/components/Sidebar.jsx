@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppState } from '../hooks/useAppState';
+import { Button } from '@wordpress/components';
 import PagesStrip from './PagesStrip';
 import { siteData } from '../data/mockData';
 import { Tooltip } from '@wordpress/components';
@@ -12,13 +14,17 @@ import {
   siteLogo,
   styles,
   settings,
-  arrowLeft
+  arrowLeft,
+  pencil
 } from '@wordpress/icons';
 
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { sidebarCollapsed, toggleSidebar, openSiteIdentityModal } = useAppState();
+  const { sidebarCollapsed, toggleSidebar, openSiteIdentityModal, siteTitle, setSiteTitle } = useAppState();
+  const [isEditingSiteName, setIsEditingSiteName] = useState(false);
+  const [editedSiteName, setEditedSiteName] = useState(siteTitle);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const navItems = [
     { id: 'home', icon: home, label: 'Home', path: '/', tip: "View your site's home page" },
@@ -44,6 +50,27 @@ function Sidebar() {
     return location.pathname.startsWith(itemPath);
   };
 
+  const handleSiteNameClick = () => {
+    setEditedSiteName(siteTitle);
+    setIsEditingSiteName(true);
+  };
+
+  const handleSiteNameSave = () => {
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmChange = () => {
+    setSiteTitle(editedSiteName);
+    setIsEditingSiteName(false);
+    setShowConfirmModal(false);
+  };
+
+  const handleCancelChange = () => {
+    setEditedSiteName(siteTitle);
+    setIsEditingSiteName(false);
+    setShowConfirmModal(false);
+  };
+
   return (
     <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
       {/* Site anchor with W logo */}
@@ -57,7 +84,47 @@ function Sidebar() {
           </div>
           <span className="wp-logo-tip">Edit logo</span>
         </div>
-        <span className="site-name">{siteData.name}</span>
+        {!isEditingSiteName ? (
+          <Tooltip text="Edit site title" placement="right">
+            <div className="site-name-wrapper" onClick={handleSiteNameClick}>
+              <span className="site-name">
+                {siteTitle}
+              </span>
+              <span className="site-name-edit-icon">
+                {pencil}
+              </span>
+            </div>
+          </Tooltip>
+        ) : (
+          <div className="site-name-edit">
+            <input 
+              type="text" 
+              className="site-name-input"
+              value={editedSiteName}
+              onChange={(e) => setEditedSiteName(e.target.value)}
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSiteNameSave();
+                if (e.key === 'Escape') handleCancelChange();
+              }}
+              onBlur={(e) => {
+                // Only cancel if not clicking the Save button
+                if (!e.relatedTarget?.classList.contains('site-name-save-btn')) {
+                  handleCancelChange();
+                }
+              }}
+            />
+            <Button 
+              variant="primary" 
+              size="small"
+              className="site-name-save-btn"
+              onClick={handleSiteNameSave}
+              onMouseDown={(e) => e.preventDefault()}
+            >
+              Save
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Back to Dashboard */}
@@ -103,6 +170,29 @@ function Sidebar() {
       {sidebarCollapsed && (
         <div className="pages-collapsed" data-tip="Pages">
           {pageIcon}
+        </div>
+      )}
+
+      {/* Site name change confirmation modal */}
+      {showConfirmModal && (
+        <div className="modal-overlay" onClick={handleCancelChange}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3 className="modal-title">Change Site Title?</h3>
+            <p className="modal-message">
+              Changing your site title will update it across your entire site, including the header, footer, and browser tab.
+            </p>
+            <p className="modal-new-value">
+              New title: <strong>{editedSiteName}</strong>
+            </p>
+            <div className="modal-actions">
+              <Button onClick={handleCancelChange}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={handleConfirmChange}>
+                Confirm Change
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
