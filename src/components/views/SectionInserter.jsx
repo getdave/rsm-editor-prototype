@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useAppState } from '../../hooks/useAppState';
+import { useSearchParams } from 'react-router-dom';
 import { sections } from '../../data/mockData';
 
 function SectionInserter() {
-  const { currentView, setCurrentView } = useAppState();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const isOpen = currentView === 'inserter';
+  const isOpen = searchParams.get('inserter') === 'true';
 
   const categories = ['All', 'Tell my story', 'Show my work', 'Reviews', 'Contact', 'Posts'];
 
@@ -18,7 +18,13 @@ function SectionInserter() {
   });
 
   const handleSectionClick = () => {
-    setCurrentView('editing');
+    searchParams.delete('inserter');
+    setSearchParams(searchParams);
+  };
+  
+  const closeInserter = () => {
+    searchParams.delete('inserter');
+    setSearchParams(searchParams);
   };
 
   return (
@@ -27,7 +33,7 @@ function SectionInserter() {
         <span className="ins-title">Add a section</span>
         <button 
           className="ins-close" 
-          onClick={() => setCurrentView('editing')}
+          onClick={closeInserter}
         >
           ✕
         </button>

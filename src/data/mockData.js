@@ -43,7 +43,7 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badge: 'WordPress'
+    badges: ['WordPress']
   },
   {
     id: '404',
@@ -53,7 +53,7 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badge: 'Theme'
+    badges: ['Template']
   },
   {
     id: 'cart',
@@ -63,7 +63,7 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badge: 'WooCommerce'
+    badges: ['WooCommerce']
   },
   {
     id: 'checkout',
@@ -73,7 +73,51 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badge: 'WooCommerce'
+    badges: ['WooCommerce']
+  },
+  {
+    id: 'product-list',
+    slug: 'product-list',
+    name: 'Product List',
+    type: 'Dynamic Page',
+    isLive: true,
+    inMenu: false,
+    isSystem: true,
+    isDynamic: true,
+    badges: ['WooCommerce']
+  },
+  {
+    id: 'product-single',
+    slug: 'product-single',
+    name: 'Product Single',
+    type: 'Dynamic Page',
+    isLive: true,
+    inMenu: false,
+    isSystem: true,
+    isDynamic: true,
+    badges: ['WooCommerce']
+  },
+  {
+    id: 'blog-list',
+    slug: 'blog-list',
+    name: 'Blog List',
+    type: 'Dynamic Page',
+    isLive: true,
+    inMenu: false,
+    isSystem: true,
+    isDynamic: true,
+    badges: ['WordPress']
+  },
+  {
+    id: 'blog-single',
+    slug: 'blog-single',
+    name: 'Blog Single',
+    type: 'Dynamic Page',
+    isLive: true,
+    inMenu: false,
+    isSystem: true,
+    isDynamic: true,
+    badges: ['WordPress']
   }
 ];
 

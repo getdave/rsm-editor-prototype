@@ -746,6 +746,11 @@ body {
   color: #2ea27d;
 }
 
+.pb-template {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+}
+
 .pb-woo {
   background: rgba(127, 84, 179, 0.15);
   color: #7f54b3;
@@ -2013,6 +2018,44 @@ body {
 }
 
 .pp-sys-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pp-accordion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  margin: 8px 0 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+  user-select: none;
+}
+
+.pp-accordion-header:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.pp-accordion-icon {
+  display: flex;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+  color: #999;
+}
+
+.pp-accordion-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.pp-accordion-title {
   font-size: 10px;
   font-weight: 700;
   color: #bbb;

@@ -125,12 +125,12 @@ function EditingView() {
                 </div>
                 <div className="g-badge">⟳ Global — Header</div>
               </div>
-              <Button 
+              <button 
                 className="add-sec" 
                 onClick={() => setSearchParams({ inserter: 'true' })}
               >
                 + Add section
-              </Button>
+              </button>
             </div>
 
             {/* Hero section */}
