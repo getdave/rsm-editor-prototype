@@ -192,7 +192,7 @@ body {
   padding: 16px;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;
   position: relative;
 }
 
@@ -767,15 +767,13 @@ body {
   padding: 16px;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .site-card {
   width: 100%;
-  max-width: 800px;
   background: #fff;
-  border-radius: 3px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
   overflow: hidden;
 }
 
@@ -943,7 +941,6 @@ body {
 
 .edit-card {
   width: 100%;
-  max-width: 800px;
   background: #fff;
   border-radius: 3px;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
