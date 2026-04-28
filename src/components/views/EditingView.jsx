@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { Button, ButtonGroup } from '@wordpress/components';
 import { undo, redo, desktop, tablet, mobile, drawerRight, moreVertical, plus } from '@wordpress/icons';
@@ -6,10 +7,21 @@ import UrlBar from '../shared/UrlBar';
 import SectionInserter from './SectionInserter';
 
 function EditingView() {
-  const { currentPage, currentView, setCurrentView, hasUnsavedChanges, save, selectedDevice, setSelectedDevice } = useAppState();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { currentPage, hasUnsavedChanges, save, selectedDevice, setSelectedDevice } = useAppState();
   const [selectedSection, setSelectedSection] = useState(1);
 
-  const isInserterOpen = currentView === 'inserter';
+  const isInserterOpen = searchParams.get('inserter') === 'true';
+  
+  const toggleInserter = () => {
+    if (isInserterOpen) {
+      searchParams.delete('inserter');
+      setSearchParams(searchParams);
+    } else {
+      setSearchParams({ inserter: 'true' });
+    }
+  };
 
   return (
     <div className={`edit-canvas ${true ? 'show' : ''}`}>
@@ -24,7 +36,7 @@ function EditingView() {
           <Button 
             variant="primary"
             className="ct-btn primary" 
-            onClick={() => setCurrentView(isInserterOpen ? 'editing' : 'inserter')}
+            onClick={toggleInserter}
             icon={plus}
             iconSize={20}
           />
@@ -94,7 +106,7 @@ function EditingView() {
           </Button>
           <Button 
             className="ct-exit" 
-            onClick={() => setCurrentView('preview')}
+            onClick={() => navigate('/')}
           >
             Exit
           </Button>
@@ -115,7 +127,7 @@ function EditingView() {
               </div>
               <Button 
                 className="add-sec" 
-                onClick={() => setCurrentView('inserter')}
+                onClick={() => setSearchParams({ inserter: 'true' })}
               >
                 + Add section
               </Button>
@@ -144,7 +156,7 @@ function EditingView() {
               </div>
               <button 
                 className="add-sec" 
-                onClick={() => setCurrentView('inserter')}
+                onClick={() => setSearchParams({ inserter: 'true' })}
               >
                 + Add section
               </button>
@@ -163,7 +175,7 @@ function EditingView() {
               </div>
               <button 
                 className="add-sec" 
-                onClick={() => setCurrentView('inserter')}
+                onClick={() => setSearchParams({ inserter: 'true' })}
               >
                 + Add section
               </button>
@@ -186,7 +198,7 @@ function EditingView() {
               </div>
               <button 
                 className="add-sec" 
-                onClick={() => setCurrentView('inserter')}
+                onClick={() => setSearchParams({ inserter: 'true' })}
               >
                 + Add section
               </button>

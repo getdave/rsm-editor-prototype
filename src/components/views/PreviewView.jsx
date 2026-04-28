@@ -1,10 +1,12 @@
+import { useNavigate } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { Button } from '@wordpress/components';
 import { desktop, tablet, mobile } from '@wordpress/icons';
 import UrlBar from '../shared/UrlBar';
 
 function PreviewView() {
-  const { currentPage, setCurrentView, selectedDevice, setSelectedDevice } = useAppState();
+  const navigate = useNavigate();
+  const { currentPage, selectedDevice, setSelectedDevice } = useAppState();
 
   return (
     <div className="canvas" style={{ flexDirection: 'column', padding: 0 }}>
@@ -40,7 +42,7 @@ function PreviewView() {
         <Button 
           variant="primary"
           className="ct-edit" 
-          onClick={() => setCurrentView('editing')}
+          onClick={() => navigate(`/pages/${currentPage.id}/edit`)}
         >
           Edit
         </Button>

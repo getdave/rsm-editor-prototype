@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useAppState } from '../../hooks/useAppState';
+import { useNavigate } from 'react-router-dom';
 import { Button, ButtonGroup, Tooltip } from '@wordpress/components';
 import { pages } from '../../data/mockData';
 import { home, page as pageIcon, list, grid, help } from '@wordpress/icons';
 
 function PagesView() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
   const [viewMode, setViewMode] = useState('list');
-  const { setCurrentView } = useAppState();
 
   const contentPages = pages.filter(p => !p.isSystem);
   const systemPages = pages.filter(p => p.isSystem);
@@ -22,9 +22,7 @@ function PagesView() {
   const filteredSystemPages = filterPages(systemPages);
 
   const handleEdit = (pageItem) => {
-    if (pageItem.id === 'home') {
-      setCurrentView('editing');
-    }
+    navigate(`/pages/${pageItem.id}/edit`);
   };
 
   return (

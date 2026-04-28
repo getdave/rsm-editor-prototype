@@ -1,3 +1,4 @@
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppState } from '../hooks/useAppState';
 import PagesStrip from './PagesStrip';
 import { siteData } from '../data/mockData';
@@ -15,28 +16,32 @@ import {
 } from '@wordpress/icons';
 
 function Sidebar() {
-  const { sidebarCollapsed, toggleSidebar, currentView, setCurrentView, openSiteIdentityModal } = useAppState();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { sidebarCollapsed, toggleSidebar, openSiteIdentityModal } = useAppState();
 
   const navItems = [
-    { id: 'home', icon: home, label: 'Home', view: 'preview', tip: "View your site's home page" },
-    { id: 'pages', icon: pageIcon, label: 'Pages', view: 'pages', tip: "View your site's Pages" },
-    { id: 'content', icon: postList, label: 'Content', view: null, tip: 'Manage Content on your site' },
-    { id: 'navigation', icon: navigation, label: 'Navigation', view: null, tip: 'Manage your navigation menus' },
-    { id: 'site-identity', icon: siteLogo, label: 'Site Identity', view: null, tip: 'Update your website information' },
-    { id: 'design', icon: styles, label: 'Design', view: null, tip: 'Modify your site design and styling' },
+    { id: 'home', icon: home, label: 'Home', path: '/', tip: "View your site's home page" },
+    { id: 'pages', icon: pageIcon, label: 'Pages', path: '/pages', tip: "View your site's Pages" },
+    { id: 'content', icon: postList, label: 'Content', path: '/content', tip: 'Manage Content on your site' },
+    { id: 'navigation', icon: navigation, label: 'Navigation', path: '/navigation', tip: 'Manage your navigation menus' },
+    { id: 'site-identity', icon: siteLogo, label: 'Site Identity', path: null, tip: 'Update your website information' },
+    { id: 'design', icon: styles, label: 'Design', path: '/design', tip: 'Modify your site design and styling' },
   ];
 
-  const handleNavClick = (view) => {
-    if (view) {
-      setCurrentView(view);
+  const handleNavClick = (item) => {
+    if (item.id === 'site-identity') {
+      openSiteIdentityModal();
+    } else if (item.path) {
+      navigate(item.path);
     }
   };
 
-  const isActive = (itemView) => {
-    if (itemView === 'preview') {
-      return currentView === 'preview' || currentView === 'editing' || currentView === 'inserter';
+  const isActive = (itemPath) => {
+    if (itemPath === '/') {
+      return location.pathname === '/' || location.pathname.includes('/edit');
     }
-    return currentView === itemView;
+    return location.pathname.startsWith(itemPath);
   };
 
   return (
@@ -70,8 +75,8 @@ function Sidebar() {
         {navItems.map((item) => (
           <Tooltip key={item.id} text={item.tip} placement="right">
             <div
-              className={`ni ${isActive(item.view) ? 'on' : ''}`}
-              onClick={() => handleNavClick(item.view)}
+              className={`ni ${isActive(item.path) ? 'on' : ''}`}
+              onClick={() => handleNavClick(item)}
             >
               <span className="ni-ico">
                 {item.icon}
