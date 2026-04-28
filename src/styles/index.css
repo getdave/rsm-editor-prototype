@@ -1892,7 +1892,7 @@ body {
 /* Grid mode - full width */
 .split-view-grid {
   width: 100%;
-  padding: 24px 28px;
+  padding: 24px 16px;
   background: #f5f5f5;
   overflow-y: auto;
 }
@@ -2102,10 +2102,18 @@ body {
   padding: 14px 0 8px;
 }
 
+.pp-accordion-desc {
+  font-size: 13px;
+  color: #666;
+  padding: 0 12px 12px;
+  margin-top: -4px;
+  line-height: 1.5;
+}
+
 /* Grid view */
 .pp-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 16px;
   padding: 16px 0;
 }
@@ -2122,6 +2130,32 @@ body {
 .pp-card:hover {
   border-color: #3858e9;
   box-shadow: 0 2px 8px rgba(56, 88, 233, 0.1);
+}
+
+.pp-card-add {
+  border: 2px dashed #d0d0d0;
+  background: #fafafa;
+}
+
+.pp-card-add:hover {
+  border-color: #3858e9;
+  background: #f8f9ff;
+  box-shadow: 0 2px 8px rgba(56, 88, 233, 0.1);
+}
+
+.pp-card-add .pp-card-thumb {
+  background: transparent;
+  border-bottom: none;
+}
+
+.pp-card-icon-add {
+  color: #3858e9;
+}
+
+.pp-card-add .pp-card-name {
+  color: #3858e9;
+  text-align: center;
+  font-weight: 500;
 }
 
 .pp-card-thumb {

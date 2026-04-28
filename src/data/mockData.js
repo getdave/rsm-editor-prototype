@@ -53,7 +53,7 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badges: ['Template']
+    badges: ['Template', 'Theme']
   },
   {
     id: 'cart',
@@ -63,7 +63,7 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badges: ['WooCommerce']
+    badges: ['Plugin', 'WooCommerce']
   },
   {
     id: 'checkout',
@@ -73,7 +73,7 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badges: ['WooCommerce']
+    badges: ['Plugin', 'WooCommerce']
   },
   {
     id: 'product-list',
