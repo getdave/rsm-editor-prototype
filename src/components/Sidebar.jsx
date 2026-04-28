@@ -15,7 +15,11 @@ import {
   styles,
   settings,
   arrowLeft,
-  pencil
+  pencil,
+  people,
+  chevronRight,
+  layout,
+  symbol
 } from '@wordpress/icons';
 
 function Sidebar() {
@@ -25,6 +29,7 @@ function Sidebar() {
   const [isEditingSiteName, setIsEditingSiteName] = useState(false);
   const [editedSiteName, setEditedSiteName] = useState(siteTitle);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showAdvancedMenu, setShowAdvancedMenu] = useState(false);
 
   const navItems = [
     { id: 'home', icon: home, label: 'Home', path: '/', tip: "View your site's home page" },
@@ -152,19 +157,66 @@ function Sidebar() {
             </div>
           </Tooltip>
         ))}
-        <div className="divider"></div>
-        <Tooltip text="Advanced site settings" placement="right">
-          <div className="ni ni-adv">
-            <span className="ni-ico">
-              {settings}
-            </span>
-            <span className="ni-label">Advanced</span>
-          </div>
-        </Tooltip>
       </nav>
 
       {/* Pages strip */}
       <PagesStrip />
+
+      {/* Advanced menu item with flyout */}
+      <div className="ni-adv-wrapper">
+        <div 
+          className="ni ni-adv"
+          onClick={() => setShowAdvancedMenu(!showAdvancedMenu)}
+        >
+          <span className="ni-label">Advanced</span>
+          <span className="ni-arrow">
+            {chevronRight}
+          </span>
+        </div>
+        
+        {showAdvancedMenu && (
+          <>
+            <div 
+              className="advanced-overlay" 
+              onClick={() => setShowAdvancedMenu(false)}
+            />
+            <div className="advanced-flyout">
+              <Tooltip text="Manage page templates" placement="right">
+                <div className="af-item">
+                  <span className="af-icon">{layout}</span>
+                  <span className="af-label">Templates</span>
+                </div>
+              </Tooltip>
+              <Tooltip text="Manage design patterns" placement="right">
+                <div className="af-item">
+                  <span className="af-icon">{symbol}</span>
+                  <span className="af-label">Patterns</span>
+                </div>
+              </Tooltip>
+              <Tooltip text="Manage template parts" placement="right">
+                <div className="af-item">
+                  <span className="af-icon">{layout}</span>
+                  <span className="af-label">Template Parts</span>
+                </div>
+              </Tooltip>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Bottom section - User profile and Settings */}
+      <div className="sidebar-bottom">
+        <Tooltip text="User profile" placement="top">
+          <div className="sb-user">
+            <div className="sb-avatar">DS</div>
+          </div>
+        </Tooltip>
+        <Tooltip text="Settings" placement="top">
+          <div className="sb-settings">
+            {settings}
+          </div>
+        </Tooltip>
+      </div>
 
       {/* Pages collapsed icon */}
       {sidebarCollapsed && (

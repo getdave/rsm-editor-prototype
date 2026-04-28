@@ -2,25 +2,22 @@ import { useState } from 'react';
 import { useAppState } from '../../hooks/useAppState';
 
 function SiteIdentityModal() {
-  const { siteIdentityModalOpen, closeSiteIdentityModal, siteTitle, setSiteTitle } = useAppState();
-  const [editedSiteName, setEditedSiteName] = useState(siteTitle);
+  const { siteIdentityModalOpen, closeSiteIdentityModal } = useAppState();
 
   if (!siteIdentityModalOpen) return null;
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
-      setEditedSiteName(siteTitle);
       closeSiteIdentityModal();
     }
   };
 
   const handleSave = () => {
-    setSiteTitle(editedSiteName);
+    // Logo save logic would go here
     closeSiteIdentityModal();
   };
 
   const handleCancel = () => {
-    setEditedSiteName(siteTitle);
     closeSiteIdentityModal();
   };
 
@@ -28,25 +25,22 @@ function SiteIdentityModal() {
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <div className="modal-hd">
-          <span className="modal-title">Site Identity</span>
+          <span className="modal-title">Change Site Logo</span>
           <button className="modal-close" onClick={closeSiteIdentityModal}>
             ✕
           </button>
         </div>
         <div className="modal-body">
           <div className="m-field">
-            <label className="m-lbl">Site name</label>
-            <input 
-              className="m-input" 
-              value={editedSiteName}
-              onChange={(e) => setEditedSiteName(e.target.value)}
-            />
-          </div>
-          <div className="m-field">
-            <label className="m-lbl">Site logo</label>
+            <label className="m-lbl">Upload or select a logo for your site</label>
             <div className="m-logo-area">
-              <div className="m-logo-preview"></div>
-              <button className="m-logo-btn">Change logo</button>
+              <div className="m-logo-preview">
+                <div className="m-logo-placeholder">W</div>
+              </div>
+              <div className="m-logo-actions">
+                <button className="m-logo-btn primary">Upload image</button>
+                <button className="m-logo-btn">Choose from library</button>
+              </div>
             </div>
           </div>
         </div>
