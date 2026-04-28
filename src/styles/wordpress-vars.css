@@ -1,0 +1,41 @@
+:root {
+  /* WordPress colors */
+  --wp-blue: #3858e9;
+  --wp-blue-hover: #2a47d4;
+  --wp-green: #00a32a;
+  --wp-red: #f87171;
+  --wp-yellow: #f0b849;
+  --wp-purple: #7f54b3;
+  
+  /* Grays */
+  --wp-gray-900: #1e1e1e;
+  --wp-gray-800: #2a2a2a;
+  --wp-gray-700: #333;
+  --wp-gray-600: #3c3c3c;
+  --wp-gray-500: #555;
+  --wp-gray-400: #666;
+  --wp-gray-300: #777;
+  --wp-gray-200: #888;
+  --wp-gray-100: #999;
+  --wp-gray-50: #aaa;
+  
+  /* Light grays */
+  --wp-light-gray-900: #252525;
+  --wp-light-gray-100: #e0e0e0;
+  --wp-light-gray-50: #f0f0f0;
+  --wp-light-gray-25: #f5f5f5;
+  --wp-light-gray-10: #fafafa;
+  
+  /* Borders */
+  --wp-border: #ddd;
+  --wp-border-light: #e0e0e0;
+  --wp-border-lighter: #eee;
+  
+  /* Backgrounds */
+  --wp-bg-dark: #1e1e1e;
+  --wp-bg-light: #e8e8e8;
+  --wp-bg-card: #fff;
+  
+  /* Font */
+  --wp-font-family: 'DM Sans', sans-serif;
+}
