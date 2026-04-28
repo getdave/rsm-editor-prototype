@@ -4,8 +4,9 @@ import UrlBar from '../shared/UrlBar';
 import SectionInserter from './SectionInserter';
 
 function EditingView() {
-  const { currentPage, currentView, setCurrentView } = useAppState();
+  const { currentPage, currentView, setCurrentView, hasUnsavedChanges, save } = useAppState();
   const [selectedSection, setSelectedSection] = useState(1);
+  const [selectedDevice, setSelectedDevice] = useState('desktop');
 
   const isInserterOpen = currentView === 'inserter';
 
@@ -28,9 +29,40 @@ function EditingView() {
           <button className="ct-btn" title="List view">≡</button>
           <button className="ct-btn" title="Undo">↩</button>
           <button className="ct-btn" title="Redo">↪</button>
+          <div className="ct-sep"></div>
+          <div className="ct-devices">
+            <button 
+              className={`ct-device ${selectedDevice === 'desktop' ? 'on' : ''}`}
+              onClick={() => setSelectedDevice('desktop')}
+              title="Desktop"
+            >
+              ⊡
+            </button>
+            <button 
+              className={`ct-device ${selectedDevice === 'tablet' ? 'on' : ''}`}
+              onClick={() => setSelectedDevice('tablet')}
+              title="Tablet"
+            >
+              ▭
+            </button>
+            <button 
+              className={`ct-device ${selectedDevice === 'mobile' ? 'on' : ''}`}
+              onClick={() => setSelectedDevice('mobile')}
+              title="Mobile"
+            >
+              ▯
+            </button>
+          </div>
           <div className="ct-space"></div>
           <UrlBar page={currentPage} />
           <div className="ct-space"></div>
+          {!hasUnsavedChanges && <span className="ct-saved">✓ Saved</span>}
+          <button 
+            className={`ct-save ${hasUnsavedChanges ? 'show' : ''}`}
+            onClick={save}
+          >
+            Save
+          </button>
           <button 
             className="ct-exit" 
             onClick={() => setCurrentView('preview')}

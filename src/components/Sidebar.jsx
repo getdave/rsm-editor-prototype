@@ -1,5 +1,6 @@
 import { useAppState } from '../hooks/useAppState';
 import PagesStrip from './PagesStrip';
+import { siteData } from '../data/mockData';
 
 // WordPress icon SVG paths
 const icons = {
@@ -22,7 +23,7 @@ const WPIcon = ({ path, ...props }) => (
 );
 
 function Sidebar() {
-  const { sidebarCollapsed, toggleSidebar, currentView, setCurrentView } = useAppState();
+  const { sidebarCollapsed, toggleSidebar, currentView, setCurrentView, openSiteIdentityModal } = useAppState();
 
   const navItems = [
     { id: 'home', icon: icons.home, label: 'Home', view: 'preview', tip: 'Home' },
@@ -48,13 +49,18 @@ function Sidebar() {
 
   return (
     <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
-      {/* Site anchor */}
+      {/* Site anchor with W logo */}
       <div className="site-anchor">
-        <div className="s-thumb"></div>
-        <div className="s-live">
-          <span className="s-live-dot"></span>
-          <span className="s-live-txt">Live</span>
+        <div className="wp-logo" onClick={openSiteIdentityModal}>
+          W
+          <div className="wp-logo-ov">
+            <svg style={{ width: 11, height: 11, fill: '#fff' }} viewBox="0 0 24 24">
+              <path d="M20.1 5.1L16.9 2 6.2 12.7l-1.9 7.1 7.1-1.9L20.1 8.3V5.1zm-1.3 2.8l-3.4 3.4-2.6-2.6 3.4-3.4 2.6 2.6z"/>
+            </svg>
+          </div>
+          <span className="wp-logo-tip">Edit logo</span>
         </div>
+        <span className="site-name">{siteData.name}</span>
         <button className="collapse-btn" onClick={toggleSidebar}>
           <WPIcon path={icons.chevronLeft} style={{ width: 12, height: 12, fill: 'currentColor' }} />
         </button>

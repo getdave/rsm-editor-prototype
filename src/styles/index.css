@@ -21,71 +21,11 @@ body {
   height: 100%;
 }
 
-/* ── TOPBAR ── */
-.topbar {
-  height: 46px;
+/* ── THIN STRIP ── */
+.thin-strip {
+  height: 8px;
   background: #1e1e1e;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 14px;
-  border-bottom: 1px solid #2e2e2e;
   flex-shrink: 0;
-}
-
-.wp-logo {
-  width: 28px;
-  height: 28px;
-  background: #3858e9;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font: 700 12px 'DM Sans', sans-serif;
-  color: #fff;
-  flex-shrink: 0;
-  position: relative;
-  cursor: pointer;
-  overflow: visible;
-}
-
-.wp-logo-ov {
-  position: absolute;
-  inset: 0;
-  background: rgba(56, 88, 233, 0.9);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.15s;
-  z-index: 1;
-}
-
-.wp-logo:hover .wp-logo-ov {
-  opacity: 1;
-}
-
-.wp-logo-tip {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: #fff;
-  font-size: 11px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s;
-  z-index: 200;
-  border: 1px solid #444;
-}
-
-.wp-logo:hover .wp-logo-tip {
-  opacity: 1;
 }
 
 /* URL bar — used in canvas toolbar and preview bar */
@@ -196,51 +136,6 @@ body {
   position: relative;
 }
 
-.tb-space {
-  flex: 1;
-}
-
-.tb-devices {
-  display: flex;
-  gap: 2px;
-}
-
-.d-btn {
-  width: 26px;
-  height: 26px;
-  border: none;
-  background: transparent;
-  color: #666;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 10px;
-}
-
-.d-btn:hover,
-.d-btn.on {
-  background: #333;
-  color: #fff;
-}
-
-.tb-saved {
-  color: #555;
-  font-size: 12px;
-}
-
-.tb-save {
-  padding: 5px 13px;
-  background: #3858e9;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font: 500 12px 'DM Sans', sans-serif;
-  cursor: pointer;
-  display: none;
-}
-
-.tb-save.show {
-  display: block;
-}
 
 /* ── BODY ── */
 .body {
@@ -268,7 +163,7 @@ body {
   min-width: 48px;
 }
 
-/* Site anchor */
+/* Site anchor - W logo and site name */
 .site-anchor {
   padding: 10px 12px;
   border-bottom: 1px solid #2a2a2a;
@@ -278,34 +173,70 @@ body {
   flex-shrink: 0;
 }
 
-.s-thumb {
-  width: 30px;
-  height: 22px;
-  border-radius: 3px;
-  background: linear-gradient(135deg, #3858e9, #764ba2);
-  flex-shrink: 0;
-}
-
-.s-live {
+.wp-logo {
+  width: 28px;
+  height: 28px;
+  background: #3858e9;
+  border-radius: 4px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  flex: 1;
-  min-width: 0;
-}
-
-.s-live-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #00a32a;
+  justify-content: center;
+  font: 700 12px 'DM Sans', sans-serif;
+  color: #fff;
   flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+  overflow: visible;
 }
 
-.s-live-txt {
-  color: #00a32a;
+.wp-logo-ov {
+  position: absolute;
+  inset: 0;
+  background: rgba(56, 88, 233, 0.9);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 1;
+}
+
+.wp-logo:hover .wp-logo-ov {
+  opacity: 1;
+}
+
+.wp-logo-tip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
   font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
   white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 200;
+  border: 1px solid #444;
+}
+
+.wp-logo:hover .wp-logo-tip {
+  opacity: 1;
+}
+
+.site-name {
+  flex: 1;
+  color: #e0e0e0;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .collapse-btn {
@@ -329,7 +260,7 @@ body {
   color: #fff;
 }
 
-.sidebar.collapsed .s-live {
+.sidebar.collapsed .site-name {
   display: none;
 }
 
@@ -1148,6 +1079,58 @@ body {
 .ct-label {
   font-size: 11px;
   color: #757575;
+}
+
+.ct-devices {
+  display: flex;
+  gap: 2px;
+}
+
+.ct-device {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: #666;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+}
+
+.ct-device:hover,
+.ct-device.on {
+  background: #f0f0f0;
+  color: #1e1e1e;
+}
+
+.ct-saved {
+  color: #757575;
+  font-size: 12px;
+  padding: 0 6px;
+}
+
+.ct-save {
+  padding: 5px 13px;
+  background: #3858e9;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font: 500 12px 'DM Sans', sans-serif;
+  cursor: pointer;
+  display: none;
+  transition: background 0.12s;
+}
+
+.ct-save:hover {
+  background: #2a47d4;
+}
+
+.ct-save.show {
+  display: block;
 }
 
 /* Section inserter — left sidebar that shifts the canvas */
