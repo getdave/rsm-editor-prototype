@@ -1,6 +1,7 @@
 import { useAppState } from '../hooks/useAppState';
 import PagesStrip from './PagesStrip';
 import { siteData } from '../data/mockData';
+import { Tooltip } from '@wordpress/components';
 import { 
   wordpress,
   home,
@@ -55,35 +56,39 @@ function Sidebar() {
       </div>
 
       {/* Back to Dashboard */}
-      <div className="dash-link" data-tip="Go to WordPress Admin">
-        <span className="dash-ico">
-          {wordpress}
-        </span>
-        <span className="dash-label">Dashboard</span>
-      </div>
+      <Tooltip text="Go to WordPress Admin" placement="right">
+        <div className="dash-link">
+          <span className="dash-ico">
+            {wordpress}
+          </span>
+          <span className="dash-label">Dashboard</span>
+        </div>
+      </Tooltip>
 
       {/* Nav items */}
       <nav className="nav">
         {navItems.map((item) => (
-          <div
-            key={item.id}
-            className={`ni ${isActive(item.view) ? 'on' : ''}`}
-            onClick={() => handleNavClick(item.view)}
-            data-tip={item.tip}
-          >
-            <span className="ni-ico">
-              {item.icon}
-            </span>
-            <span className="ni-label">{item.label}</span>
-          </div>
+          <Tooltip key={item.id} text={item.tip} placement="right">
+            <div
+              className={`ni ${isActive(item.view) ? 'on' : ''}`}
+              onClick={() => handleNavClick(item.view)}
+            >
+              <span className="ni-ico">
+                {item.icon}
+              </span>
+              <span className="ni-label">{item.label}</span>
+            </div>
+          </Tooltip>
         ))}
         <div className="divider"></div>
-        <div className="ni ni-adv" data-tip="Advanced site settings">
-          <span className="ni-ico">
-            {settings}
-          </span>
-          <span className="ni-label">Advanced</span>
-        </div>
+        <Tooltip text="Advanced site settings" placement="right">
+          <div className="ni ni-adv">
+            <span className="ni-ico">
+              {settings}
+            </span>
+            <span className="ni-label">Advanced</span>
+          </div>
+        </Tooltip>
       </nav>
 
       {/* Pages strip */}
