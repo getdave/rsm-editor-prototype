@@ -61,26 +61,7 @@ function Sidebar() {
           <span className="wp-logo-tip">Edit logo</span>
         </div>
         <span className="site-name">{siteData.name}</span>
-        <button className="collapse-btn" onClick={toggleSidebar}>
-          <WPIcon path={icons.chevronLeft} style={{ width: 12, height: 12, fill: 'currentColor' }} />
-        </button>
       </div>
-
-      {/* Expand button (collapsed only) */}
-      {sidebarCollapsed && (
-        <div 
-          style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            padding: '8px 0', 
-            cursor: 'pointer', 
-            borderBottom: '1px solid #2a2a2a' 
-          }} 
-          onClick={toggleSidebar}
-        >
-          <WPIcon path={icons.chevronRight} style={{ width: 16, height: 16, fill: '#666' }} />
-        </div>
-      )}
 
       {/* Back to Dashboard */}
       <div className="dash-link" data-tip="Dashboard">

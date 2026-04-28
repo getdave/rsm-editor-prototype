@@ -143,6 +143,7 @@ body {
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  position: relative;
 }
 
 /* ── SIDEBAR ── */
@@ -241,32 +242,38 @@ body {
   min-width: 0;
 }
 
-.collapse-btn {
-  width: 22px;
-  height: 22px;
+/* Floating sidebar toggle */
+.sidebar-toggle {
+  position: absolute;
+  top: 12px;
+  left: 270px;
+  width: 28px;
+  height: 28px;
   border: none;
-  background: #2a2a2a;
-  color: #888;
-  border-radius: 3px;
+  background: #fff;
+  color: #1e1e1e;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.15s;
+  z-index: 100;
+  transition: left 0.2s, background 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
 }
 
-.collapse-btn:hover {
-  background: #3c3c3c;
-  color: #fff;
+.sidebar-toggle:hover {
+  background: #f5f5f5;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Adjust position when sidebar is collapsed */
+.sidebar.collapsed ~ .sidebar-toggle {
+  left: 60px;
 }
 
 .sidebar.collapsed .site-name {
-  display: none;
-}
-
-.sidebar.collapsed .collapse-btn {
   display: none;
 }
 
