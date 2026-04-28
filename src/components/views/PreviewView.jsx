@@ -10,7 +10,11 @@ function PreviewView() {
     navigate(`/pages/${currentPage.id}/edit`);
   };
 
-  return <PreviewCanvas page={currentPage} onEdit={handleEdit} />;
+  return (
+    <div className="home-view">
+      <PreviewCanvas page={currentPage} onEdit={handleEdit} />
+    </div>
+  );
 }
 
 export default PreviewView;
