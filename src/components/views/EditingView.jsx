@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { Button, ButtonGroup } from '@wordpress/components';
-import { undo, redo, desktop, tablet, mobile, drawerRight, moreVertical, plus } from '@wordpress/icons';
+import { undo, redo, desktop, tablet, mobile, drawerRight, moreVertical, plus, listView } from '@wordpress/icons';
 import UrlBar from '../shared/UrlBar';
 import SectionInserter from './SectionInserter';
 
@@ -50,6 +50,12 @@ function EditingView() {
             className="ct-btn" 
             label="Redo"
             icon={redo}
+            iconSize={20}
+          />
+          <Button 
+            className="ct-btn" 
+            label="Document Overview"
+            icon={listView}
             iconSize={20}
           />
           
