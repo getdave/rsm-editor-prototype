@@ -43,7 +43,7 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badge: 'System'
+    badge: 'WordPress'
   },
   {
     id: '404',
@@ -53,7 +53,7 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badge: 'System'
+    badge: 'Theme'
   },
   {
     id: 'cart',

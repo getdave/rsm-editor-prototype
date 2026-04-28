@@ -6,7 +6,6 @@ function PagesStrip() {
   const { setCurrentPage } = useAppState();
   
   const contentPages = pages.filter(p => !p.isSystem);
-  const systemPages = pages.filter(p => p.isSystem);
 
   const handlePageClick = (page) => {
     setCurrentPage(page);
@@ -20,10 +19,6 @@ function PagesStrip() {
       </div>
       <div className="ps-list">
         {contentPages.map((page) => (
-          <PageRow key={page.id} page={page} onClick={handlePageClick} />
-        ))}
-        <div className="ps-sys-label">System</div>
-        {systemPages.map((page) => (
           <PageRow key={page.id} page={page} onClick={handlePageClick} />
         ))}
       </div>

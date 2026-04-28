@@ -16,7 +16,8 @@ function PageRow({ page: pageData, onClick }) {
         {pageData.isLive && !pageData.isSystem && <LiveBadge />}
         {!pageData.isLive && <span className="pb pb-draft">Draft</span>}
         {pageData.inMenu && <span className="pb pb-nav">Menu</span>}
-        {pageData.badge === 'System' && <span className="pb pb-sys">System</span>}
+        {pageData.badge === 'WordPress' && <span className="pb pb-wp">WordPress</span>}
+        {pageData.badge === 'Theme' && <span className="pb pb-theme">Theme</span>}
         {pageData.badge === 'WooCommerce' && <span className="pb pb-woo">WooCommerce</span>}
       </div>
     </div>
