@@ -178,6 +178,37 @@ import '@wordpress/components/build-style/style.css';
 
 ## Development Workflow
 
+### Before Starting New Work
+
+**CRITICAL: Always ask about branching strategy before starting new features.**
+
+When a user requests work on a new feature or significant change, ALWAYS prompt:
+
+> "Should I create a new branch for this work, or work directly on trunk?"
+
+**Why this matters:**
+- This prototype is a collaboration between multiple people
+- Working on separate branches prevents conflicts
+- Feature branches make it easier to review and discuss changes
+- The main collaborator is a designer who may be working in parallel
+
+**Recommended approach:**
+```bash
+# For new features or experiments
+git checkout -b feature/descriptive-name
+
+# For bug fixes
+git checkout -b fix/issue-description
+
+# For documentation
+git checkout -b docs/what-changed
+```
+
+Only work directly on `trunk` for:
+- Trivial typo fixes
+- Emergency hotfixes
+- Changes explicitly requested to go straight to trunk
+
 ### Running the Prototype
 ```bash
 npm run dev  # Starts on http://localhost:5173
@@ -197,7 +228,7 @@ npm run dev  # Starts on http://localhost:5173
 ### Git Commits
 - Use conventional commit format: `feat:`, `fix:`, `refactor:`, `style:`
 - Write descriptive commit messages
-- Commit to `trunk` branch or feature branches
+- Commit frequently to your branch
 
 ## Key Files to Reference
 
@@ -313,10 +344,19 @@ When adding features or making changes, consider:
 ## AI Assistant Tips
 
 When working with this codebase:
-1. Always check existing patterns before creating new ones
-2. Read the component you're modifying fully before making changes
-3. Test changes in the browser during development
-4. Keep the prototype philosophy: simple, fast iteration, explore UX
-5. When in doubt, reference similar existing components
-6. Commit changes incrementally as you complete features
-7. Don't over-engineer - this is a prototype, not production code
+1. **ALWAYS ask about branching before starting new features** - This is a collaborative project
+2. Always check existing patterns before creating new ones
+3. Read the component you're modifying fully before making changes
+4. Test changes in the browser during development
+5. Keep the prototype philosophy: simple, fast iteration, explore UX
+6. When in doubt, reference similar existing components
+7. Commit changes incrementally as you complete features
+8. Don't over-engineer - this is a prototype, not production code
+
+### Collaboration Workflow
+
+This prototype has multiple contributors working in parallel:
+- Ask about branch strategy at the start of each session
+- Push branches to remote so others can see progress
+- Keep commits atomic and well-described
+- Don't force push to shared branches without confirmation
