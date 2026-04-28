@@ -116,13 +116,13 @@ body {
 
 /* Browse bar — preview state */
 .preview-bar {
-  height: 40px;
+  height: 64px;
   background: #fff;
   border-bottom: 1px solid #e0e0e0;
   display: flex;
   align-items: center;
-  justify-content: center;
   padding: 0 12px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -165,12 +165,14 @@ body {
 
 /* Site anchor - W logo and site name */
 .site-anchor {
-  padding: 10px 12px;
+  padding: 14px 12px;
   border-bottom: 1px solid #2a2a2a;
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  height: 56px;
+  box-sizing: border-box;
 }
 
 .wp-logo {
@@ -809,32 +811,25 @@ body {
   color: #aaa;
 }
 
-/* Edit hover overlay */
-.edit-overlay {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.main:hover .edit-overlay {
-  opacity: 1;
-}
-
-.edit-btn {
-  padding: 7px 14px;
-  background: #1e1e1e;
+/* Edit button in preview bar */
+.ct-edit {
+  padding: 8px 16px;
+  background: #3858e9;
   color: #fff;
-  border: none;
+  border: 1px solid #3858e9;
   border-radius: 4px;
   font: 500 12px 'DM Sans', sans-serif;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.12s;
+  height: 36px;
 }
 
-.edit-btn:hover {
-  background: #3858e9;
+.ct-edit:hover {
+  background: #2a47d4;
+  border-color: #2a47d4;
 }
 
 /* Editing canvas — flex row so inserter shifts canvas */
@@ -996,44 +991,22 @@ body {
   pointer-events: auto;
 }
 
-/* Inspector */
-.ct-exit {
-  height: 30px;
-  padding: 0 12px;
-  border: 1px solid #e0e0e0;
-  background: #fff;
-  color: #555;
-  border-radius: 4px;
-  font: 500 11px 'DM Sans', sans-serif;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: all 0.12s;
-}
-
-.ct-exit:hover {
-  border-color: #1e1e1e;
-  color: #1e1e1e;
-  background: #f5f5f5;
-}
-
 /* ── GUTENBERG CANVAS TOOLBAR ── */
 .canvas-toolbar {
-  height: 40px;
+  height: 64px;
   background: #fff;
   border-bottom: 1px solid #e0e0e0;
   display: flex;
   align-items: center;
   padding: 0 12px;
-  gap: 4px;
+  gap: 6px;
   flex-shrink: 0;
   width: 100%;
 }
 
 .ct-btn {
-  height: 30px;
-  min-width: 30px;
+  height: 36px;
+  min-width: 36px;
   border: none;
   background: transparent;
   border-radius: 4px;
@@ -1043,7 +1016,7 @@ body {
   justify-content: center;
   color: #1e1e1e;
   font-size: 13px;
-  padding: 0 6px;
+  padding: 0 8px;
   gap: 5px;
   transition: background 0.12s;
 }
@@ -1055,9 +1028,12 @@ body {
 .ct-btn.primary {
   background: #3858e9;
   color: #fff;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 0 10px;
+  font-size: 18px;
+  font-weight: 400;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  padding: 0;
 }
 
 .ct-btn.primary:hover {
@@ -1081,56 +1057,113 @@ body {
   color: #757575;
 }
 
-.ct-devices {
+/* View mode switcher */
+.ct-view-modes {
   display: flex;
-  gap: 2px;
+  gap: 0;
+  background: #f0f0f0;
+  border-radius: 4px;
+  padding: 2px;
 }
 
-.ct-device {
-  width: 26px;
-  height: 26px;
+.ct-view-btn {
+  width: 32px;
+  height: 32px;
   border: none;
   background: transparent;
-  color: #666;
+  color: #757575;
   border-radius: 3px;
   cursor: pointer;
-  font-size: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.12s, color 0.12s;
+  transition: all 0.12s;
 }
 
-.ct-device:hover,
-.ct-device.on {
-  background: #f0f0f0;
+.ct-view-btn:hover {
   color: #1e1e1e;
 }
 
-.ct-saved {
-  color: #757575;
-  font-size: 12px;
-  padding: 0 6px;
+.ct-view-btn.active {
+  background: #fff;
+  color: #1e1e1e;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
+/* Icon buttons */
+.ct-icon-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: #1e1e1e;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+}
+
+.ct-icon-btn:hover {
+  background: #f0f0f0;
+}
+
+/* Save status and button */
+.ct-saved {
+  color: #00a32a;
+  font-size: 11px;
+  padding: 0 8px;
+  font-weight: 500;
+}
+
+/* Save and Exit button group */
 .ct-save {
-  padding: 5px 13px;
+  padding: 8px 16px;
   background: #3858e9;
   color: #fff;
-  border: none;
-  border-radius: 4px;
+  border: 1px solid #3858e9;
   font: 500 12px 'DM Sans', sans-serif;
   cursor: pointer;
   display: none;
   transition: background 0.12s;
+  height: 36px;
 }
 
 .ct-save:hover {
   background: #2a47d4;
+  border-color: #2a47d4;
 }
 
 .ct-save.show {
   display: block;
+  border-radius: 4px 0 0 4px;
+}
+
+.ct-exit {
+  padding: 8px 16px;
+  background: transparent;
+  color: #1e1e1e;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font: 500 12px 'DM Sans', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.12s;
+  height: 36px;
+}
+
+.ct-exit:hover {
+  border-color: #999;
+  background: #f9f9f9;
+}
+
+/* When Save is shown, Exit button connects to it */
+.ct-save.show + .ct-exit {
+  border-radius: 0 4px 4px 0;
+  border-left: none;
 }
 
 /* Section inserter — left sidebar that shifts the canvas */

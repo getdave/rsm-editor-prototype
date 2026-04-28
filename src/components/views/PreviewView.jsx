@@ -7,15 +7,17 @@ function PreviewView() {
   return (
     <div className="canvas" style={{ flexDirection: 'column', padding: 0 }}>
       <div className="preview-bar">
+        <div className="ct-space"></div>
         <UrlBar page={currentPage} />
-      </div>
-      <div className="preview-canvas-area">
+        <div className="ct-space"></div>
         <button 
-          className="edit-btn edit-overlay" 
+          className="ct-edit" 
           onClick={() => setCurrentView('editing')}
         >
-          ✏ Edit Homepage
+          Edit
         </button>
+      </div>
+      <div className="preview-canvas-area">
         <div className="site-card">
           <div className="p-header">
             <span className="p-sitename">My Photography Site</span>
