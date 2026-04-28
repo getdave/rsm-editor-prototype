@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, ButtonGroup, Tooltip } from '@wordpress/components';
+import { useAppState } from '../../hooks/useAppState';
 import { pages } from '../../data/mockData';
 import { home, page as pageIcon, list, grid, help, chevronDown, chevronUp } from '@wordpress/icons';
+import SplitViewLayout from '../../layouts/SplitViewLayout';
+import PreviewCanvas from '../shared/PreviewCanvas';
 
 function PagesView() {
   const navigate = useNavigate();
+  const { currentPage } = useAppState();
+  const [previewPage, setPreviewPage] = useState(currentPage);
   const [activeTab, setActiveTab] = useState('all');
   const [viewMode, setViewMode] = useState('list');
   const [systemPagesOpen, setSystemPagesOpen] = useState(true);
@@ -45,9 +50,8 @@ function PagesView() {
     ));
   };
 
-  return (
-    <div className="pages-panel show">
-      <div className="pp-inner">
+  const stageContent = (
+    <div className="pp-inner">
         <div className="pp-hd">
           <span className="pp-title">Pages</span>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -94,7 +98,12 @@ function PagesView() {
         {viewMode === 'list' ? (
           <>
             {filteredContentPages.map((pageItem) => (
-              <div key={pageItem.id} className="pp-row">
+              <div 
+                key={pageItem.id} 
+                className="pp-row"
+                onClick={() => setPreviewPage(pageItem)}
+                style={{ cursor: 'pointer' }}
+              >
             <span className="pp-ico" style={{ color: pageItem.id === 'home' ? '#3858e9' : '#999' }}>
               {pageItem.id === 'home' ? home : pageIcon}
             </span>
@@ -109,10 +118,10 @@ function PagesView() {
               {!pageItem.isLive && <span className="pp-badge pp-draft">Draft</span>}
             </div>
             <div className="pp-actions">
-              <button className="pp-act" onClick={() => handleEdit(pageItem)}>
+              <button className="pp-act" onClick={(e) => { e.stopPropagation(); handleEdit(pageItem); }}>
                 Edit
               </button>
-              <button className="pp-act">Settings</button>
+              <button className="pp-act" onClick={(e) => e.stopPropagation()}>Settings</button>
             </div>
           </div>
             ))}
@@ -134,7 +143,12 @@ function PagesView() {
               </Tooltip>
             </div>
             {systemPagesOpen && filteredSystemPages.map((pageItem) => (
-              <div key={pageItem.id} className="pp-row">
+              <div 
+                key={pageItem.id} 
+                className="pp-row"
+                onClick={() => setPreviewPage(pageItem)}
+                style={{ cursor: 'pointer' }}
+              >
                 <span className="pp-ico" style={{ opacity: 0.45 }}>
                   {pageIcon}
                 </span>
@@ -145,7 +159,7 @@ function PagesView() {
                   {renderBadges(pageItem.badges)}
                 </div>
                 <div className="pp-actions">
-                  <button className="pp-act">Edit</button>
+                  <button className="pp-act" onClick={(e) => { e.stopPropagation(); handleEdit(pageItem); }}>Edit</button>
                 </div>
               </div>
             ))}
@@ -169,7 +183,12 @@ function PagesView() {
               </Tooltip>
             </div>
             {dynamicPagesOpen && filteredDynamicPages.map((pageItem) => (
-              <div key={pageItem.id} className="pp-row">
+              <div 
+                key={pageItem.id} 
+                className="pp-row"
+                onClick={() => setPreviewPage(pageItem)}
+                style={{ cursor: 'pointer' }}
+              >
                 <span className="pp-ico" style={{ opacity: 0.45 }}>
                   {pageIcon}
                 </span>
@@ -180,7 +199,7 @@ function PagesView() {
                   {renderBadges(pageItem.badges)}
                 </div>
                 <div className="pp-actions">
-                  <button className="pp-act">Edit</button>
+                  <button className="pp-act" onClick={(e) => { e.stopPropagation(); handleEdit(pageItem); }}>Edit</button>
                 </div>
               </div>
             ))}
@@ -297,6 +316,25 @@ function PagesView() {
           </>
         )}
       </div>
+  );
+
+  const canvasContent = (
+    <PreviewCanvas 
+      page={previewPage} 
+      onEdit={() => handleEdit(previewPage)} 
+    />
+  );
+
+  const gridContent = stageContent;
+
+  return (
+    <div className="pages-panel show">
+      <SplitViewLayout
+        mode={viewMode}
+        stageContent={stageContent}
+        canvasContent={canvasContent}
+        gridContent={gridContent}
+      />
     </div>
   );
 }
