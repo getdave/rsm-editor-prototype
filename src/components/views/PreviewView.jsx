@@ -4,13 +4,19 @@ import PreviewCanvas from '../shared/PreviewCanvas';
 
 function PreviewView() {
   const navigate = useNavigate();
-  const { currentPage } = useAppState();
+  const { currentPage, setCurrentPage } = useAppState();
 
   const handleEdit = () => {
     navigate(`/pages/${currentPage.id}/edit`);
   };
 
-  return <PreviewCanvas page={currentPage} onEdit={handleEdit} />;
+  return (
+    <PreviewCanvas
+      page={currentPage}
+      onEdit={handleEdit}
+      onPageChange={setCurrentPage}
+    />
+  );
 }
 
 export default PreviewView;
