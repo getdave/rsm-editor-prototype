@@ -21,6 +21,9 @@ export function AppStateProvider({ children }) {
   
   // Device preview state
   const [selectedDevice, setSelectedDevice] = useState('desktop');
+  
+  // Pages view mode (list/grid)
+  const [pagesViewMode, setPagesViewMode] = useState('list');
 
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => !prev);
@@ -68,7 +71,11 @@ export function AppStateProvider({ children }) {
     
     // Device preview state
     selectedDevice,
-    setSelectedDevice
+    setSelectedDevice,
+    
+    // Pages view mode
+    pagesViewMode,
+    setPagesViewMode
   };
 
   return (
