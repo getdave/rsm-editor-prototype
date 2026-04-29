@@ -1891,7 +1891,7 @@ body {
 .split-view-stage {
   width: 40%;
   min-width: 360px;
-  overflow-y: auto;
+  overflow: hidden;
   background: #fff;
   border-right: 1px solid #e0e0e0;
   display: flex;
@@ -1930,6 +1930,10 @@ body {
 
 .pp-inner {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Pages panel heading */
@@ -2008,6 +2012,25 @@ body {
 /* DataViews integration wrapper */
 .pp-dataviews {
   --wp-dataviews-color-background: #fff;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* DataViews renders a .dataviews-wrapper div — make it fill and flex */
+.pp-dataviews .dataviews-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Scrollable area — only the list/grid and pagination scroll */
+.pp-dv-scroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .pp-tab-desc {

@@ -49,11 +49,11 @@ const DEFAULT_VIEW = {
   titleField: 'name',
   mediaField: 'media',
   fields: [ 'status', 'inMenu', 'badges' ],
-  layout: {},
+  layout: { density: 'compact' },
 };
 
 const DEFAULT_LAYOUTS = {
-  list: {},
+  list: { layout: { density: 'compact' } },
   grid: { badgeFields: [ 'badges' ], layout: { previewSize: 170 } },
 };
 
@@ -272,8 +272,10 @@ function PagesView() {
         <div className="pp-dv-filters">
           <DataViews.FiltersToggled />
         </div>
-        <DataViews.Layout />
-        <DataViews.Pagination />
+        <div className="pp-dv-scroll">
+          <DataViews.Layout />
+          <DataViews.Pagination />
+        </div>
       </DataViews>
     </div>
   );
