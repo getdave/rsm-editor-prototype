@@ -2614,51 +2614,43 @@ body {
   line-height: 1.8;
 }
 
-/* Template Placeholder Styles - Edit Mode Only */
-.template-placeholder {
-  min-height: 300px;
+/* Template Edit Mode Styles */
+.template-edit-notice {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e3e8ef 100%);
-  border: 2px dashed #cbd5e0;
-  border-radius: 8px;
-  padding: 40px;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #f59e0b;
+  border-radius: 6px;
+  margin-bottom: 24px;
+  font-size: 14px;
 }
 
-.template-notice {
-  text-align: center;
-  max-width: 500px;
+.template-edit-icon {
+  font-size: 20px;
+  opacity: 0.8;
 }
 
-.template-notice-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-  opacity: 0.7;
+.template-edit-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.template-notice-title {
-  font-size: 24px;
+.template-edit-content strong {
   font-weight: 600;
-  color: #2d3748;
-  margin: 0 0 12px 0;
+  color: #92400e;
 }
 
-.template-notice-description {
-  font-size: 16px;
-  color: #718096;
-  line-height: 1.6;
-  margin: 0 0 16px 0;
+.template-edit-content span {
+  color: #78350f;
+  font-size: 13px;
 }
 
-.template-notice-type {
-  display: inline-block;
-  padding: 6px 12px;
-  background: rgba(66, 153, 225, 0.1);
-  color: #4299e1;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.template-preview-wrapper {
+  position: relative;
+  opacity: 0.85;
+  pointer-events: none;
+  user-select: none;
 }

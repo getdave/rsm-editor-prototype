@@ -414,7 +414,8 @@ function getDefaultContent(page = null) {
 
 /**
  * Get content appropriate for edit mode
- * Templates show placeholder content, regular pages show real content
+ * Templates show their layout with generic placeholder content
+ * Regular pages show real editable content
  * 
  * @param {object} page - Page object from mockData.js
  * @returns {object} Content object appropriate for editing
@@ -422,25 +423,124 @@ function getDefaultContent(page = null) {
 export const getEditModeContent = (page) => {
   const content = getPageContent(page);
   
-  // For templates/system pages, return placeholder versions
+  // For templates, replace content with generic placeholders
   if (content.wordpressContext.type === 'template') {
-    return getTemplatePlaceholder(page, content);
+    return {
+      ...content,
+      isTemplate: true,
+      templateName: page.name,
+      templateDescription: getTemplateDescription(content.layout),
+      title: getPlaceholderTitle(page.id, content.layout),
+      subtitle: getPlaceholderSubtitle(page.id, content.layout),
+      sections: replaceWithPlaceholders(content.sections, content.layout, page.id)
+    };
   }
   
   return content;
 };
 
-function getTemplatePlaceholder(page, originalContent) {
-  return {
-    ...originalContent,
-    isTemplate: true,
-    sections: [{
-      type: 'template-placeholder',
-      templateType: originalContent.layout,
-      templateName: page.name,
-      description: getTemplateDescription(originalContent.layout)
-    }]
+function getPlaceholderTitle(pageId, layout) {
+  // Specific titles for known page types
+  if (pageId === 'product-list') return 'Product Category Title';
+  if (pageId === 'blog-list') return 'Blog Archive Title';
+  if (pageId === 'product-single') return 'Product Title';
+  if (pageId === 'blog-single') return 'Post Title';
+  if (pageId === '404') return 'Error Page Title';
+  if (pageId === 'cart') return 'Shopping Cart';
+  if (pageId === 'checkout') return 'Checkout';
+  
+  // Fallback generic titles by layout
+  const titles = {
+    'error': 'Error Page Title',
+    'ecommerce': 'Page Title',
+    'archive': 'Archive Title',
+    'single': 'Content Title'
   };
+  return titles[layout] || 'Page Title';
+}
+
+function getPlaceholderSubtitle(pageId, layout) {
+  return null; // Most templates don't need subtitle placeholders
+}
+
+function replaceWithPlaceholders(sections, layout, pageId) {
+  return sections.map(section => {
+    switch (section.type) {
+      case 'archive-header':
+        // Keep archive headers as-is since we set the title at the parent level
+        return section;
+      
+      case 'error':
+        return {
+          ...section,
+          code: '404',
+          message: 'Error Page Title',
+          description: 'Error description text goes here.'
+        };
+      
+      case 'cart':
+        return {
+          ...section,
+          items: section.items.map((_, index) => ({
+            name: 'Product Name',
+            price: '0.00',
+            quantity: 1
+          })),
+          total: '0.00'
+        };
+      
+      case 'checkout':
+        return {
+          ...section,
+          steps: section.steps.map((_, index) => `Checkout Step ${index + 1}`)
+        };
+      
+      case 'product-grid':
+        return {
+          ...section,
+          items: section.items.map((_, index) => ({
+            name: 'Product Title',
+            price: '0.00',
+            excerpt: 'Product description text goes here...'
+          }))
+        };
+      
+      case 'post-list':
+        return {
+          ...section,
+          items: section.items.map((_, index) => ({
+            title: 'Post Title',
+            date: 'Post Date',
+            excerpt: 'Post excerpt text goes here. This is a preview of the post content...'
+          }))
+        };
+      
+      case 'product-detail':
+        return {
+          ...section,
+          name: 'Product Title',
+          price: '0.00',
+          description: 'Product description text goes here. This is where the full product details would be displayed.',
+          features: [
+            'Product feature 1',
+            'Product feature 2',
+            'Product feature 3'
+          ]
+        };
+      
+      case 'post-content':
+        return {
+          ...section,
+          title: 'Post Title',
+          date: 'Post Date',
+          author: 'Author Name',
+          content: 'Post content goes here. This is where the full blog post text would be displayed with multiple paragraphs and formatting.'
+        };
+      
+      default:
+        return section;
+    }
+  });
 }
 
 function getTemplateDescription(layout) {
