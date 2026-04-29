@@ -1936,9 +1936,13 @@ body {
 .pp-hd {
   display: flex;
   align-items: center;
-  padding: 20px 20px 12px;
+  padding: 16px 16px 16px 20px;
   background: #fff;
   flex-shrink: 0;
+}
+
+.pp-hd .components-button {
+  margin-left: auto;
 }
 
 .pp-title {
@@ -1947,16 +1951,36 @@ body {
   color: #1e1e1e;
 }
 
-/* Category tabs */
+/* Category tabs row */
 .pp-tabs {
   display: flex;
   flex-direction: row;
   align-items: center;
+  flex-shrink: 0;
+  padding: 0 8px 0 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+}
+
+/* Controls row: sits below tabs */
+.pp-toolbar-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 16px 6px 20px;
   border-bottom: 1px solid #e0e0e0;
   background: #fff;
   flex-shrink: 0;
-  padding: 0 20px;
+  flex-wrap: nowrap;
 }
+
+/* Let search grow but cap it so the other controls stay visible */
+.pp-toolbar-controls .dataviews-search {
+  flex: 1;
+  max-width: 220px;
+}
+
 
 .pp-tab {
   padding: 10px 14px;
@@ -1984,6 +2008,29 @@ body {
 /* DataViews integration wrapper */
 .pp-dataviews {
   --wp-dataviews-color-background: #fff;
+}
+
+.pp-tab-desc {
+  padding: 12px 20px 0;
+}
+
+/* Align filter chips and bulk-select bar with the toolbar */
+.pp-dv-filters {
+  padding: 6px 16px 6px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.pp-dv-filters:empty {
+  display: none;
+}
+
+.pp-dv-bulk {
+  padding: 4px 16px 4px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.pp-dv-bulk:empty {
+  display: none;
 }
 
 /* Badges used in render functions */

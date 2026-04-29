@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@wordpress/components';
+import { Button, Notice } from '@wordpress/components';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { pencil, external, plus, trash, copy, home, page as pageIcon } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
@@ -17,9 +17,21 @@ const BADGE_STYLES = {
 };
 
 const TABS = [
-  { value: 'content', label: 'Content' },
-  { value: 'system',  label: 'System'  },
-  { value: 'dynamic', label: 'Dynamic' },
+  {
+    value: 'content',
+    label: 'Content',
+    description: null,
+  },
+  {
+    value: 'system',
+    label: 'System',
+    description: 'System pages are automatically created by WordPress, your theme, or plugins. You can customise their appearance but not remove them.',
+  },
+  {
+    value: 'dynamic',
+    label: 'Dynamic',
+    description: 'Dynamic pages are templates that generate content automatically from your site\'s data — like blog posts or product pages.',
+  },
 ];
 
 const STATUS_ELEMENTS = [
@@ -209,66 +221,75 @@ function PagesView() {
 
   const isGridMode = view.type === 'grid';
 
-  const headerSlot = (
-    <Button
-      variant="primary"
-      icon={ plus }
-      iconSize={ 16 }
-      onClick={ () => console.log( 'Add page' ) }
-    >
-      Add page
-    </Button>
-  );
-
-  const dataViewsEl = (
-    <DataViews
-      data={ processedData }
-      fields={ fields }
-      view={ view }
-      onChangeView={ handleChangeView }
-      defaultLayouts={ DEFAULT_LAYOUTS }
-      actions={ actions }
-      paginationInfo={ paginationInfo }
-      selection={ selection }
-      onChangeSelection={ setSelection }
-      isItemClickable={ () => true }
-      onClickItem={ ( item ) => setPreviewPage( item ) }
-      header={ headerSlot }
-      searchLabel="Search pages…"
-      getItemId={ ( item ) => item.id }
-    />
-  );
-
   const handleTabClick = ( value ) => {
     setActiveCategory( value );
     setView( ( prev ) => ( { ...prev, page: 1, search: '', filters: [] } ) );
     setSelection( [] );
   };
 
+  const activeTab = TABS.find( ( t ) => t.value === activeCategory );
+
   const stageContent = (
     <div className="pp-inner pp-dataviews">
-      <div className="pp-hd">
-        <span className="pp-title">Pages</span>
-      </div>
-      <div className="pp-tabs">
-        { TABS.map( ( tab ) => (
-          <button
-            key={ tab.value }
-            className={ `pp-tab${ activeCategory === tab.value ? ' on' : '' }` }
-            onClick={ () => handleTabClick( tab.value ) }
+      <DataViews
+        data={ processedData }
+        fields={ fields }
+        view={ view }
+        onChangeView={ handleChangeView }
+        defaultLayouts={ DEFAULT_LAYOUTS }
+        actions={ actions }
+        paginationInfo={ paginationInfo }
+        selection={ selection }
+        onChangeSelection={ setSelection }
+        isItemClickable={ () => true }
+        onClickItem={ ( item ) => setPreviewPage( item ) }
+        getItemId={ ( item ) => item.id }
+        getItemLevel={ ( item ) => item.level ?? 0 }
+      >
+        <div className="pp-hd">
+          <span className="pp-title">Pages</span>
+          <Button
+            variant="primary"
+            icon={ plus }
+            iconSize={ 16 }
+            onClick={ () => console.log( 'Add page' ) }
           >
-            { tab.label }
-          </button>
-        ) ) }
-      </div>
-      { isGridMode ? (
-        <div className="pp-grid-with-add">
-          <AddNewCard />
-          { dataViewsEl }
+            Add page
+          </Button>
         </div>
-      ) : (
-        dataViewsEl
-      ) }
+        <div className="pp-tabs">
+          { TABS.map( ( tab ) => (
+            <button
+              key={ tab.value }
+              className={ `pp-tab${ activeCategory === tab.value ? ' on' : '' }` }
+              onClick={ () => handleTabClick( tab.value ) }
+            >
+              { tab.label }
+            </button>
+          ) ) }
+        </div>
+        <div className="pp-toolbar-controls">
+          <DataViews.Search />
+          <DataViews.FiltersToggle />
+          <DataViews.LayoutSwitcher />
+          <DataViews.ViewConfig />
+        </div>
+        { activeTab?.description && (
+          <div className="pp-tab-desc">
+            <Notice status="info" isDismissible={ false }>
+              { activeTab.description }
+            </Notice>
+          </div>
+        ) }
+        <div className="pp-dv-filters">
+          <DataViews.FiltersToggled />
+        </div>
+        <div className="pp-dv-bulk">
+          <DataViews.BulkActionToolbar />
+        </div>
+        <DataViews.Layout />
+        <DataViews.Pagination />
+      </DataViews>
     </div>
   );
 
