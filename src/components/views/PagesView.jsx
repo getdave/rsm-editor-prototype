@@ -9,12 +9,14 @@ import PreviewCanvas from '../shared/PreviewCanvas';
 
 function PagesView() {
   const navigate = useNavigate();
-  const { currentPage } = useAppState();
+  const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [activeTab, setActiveTab] = useState('all');
-  const [viewMode, setViewMode] = useState('list');
   const [systemPagesOpen, setSystemPagesOpen] = useState(true);
   const [dynamicPagesOpen, setDynamicPagesOpen] = useState(true);
+  
+  // Use global view mode state
+  const viewMode = pagesViewMode;
 
   const contentPages = pages.filter(p => !p.isSystem);
   const systemPages = pages.filter(p => p.isSystem && !p.isDynamic);
@@ -31,7 +33,12 @@ function PagesView() {
   const filteredDynamicPages = filterPages(dynamicPages);
 
   const handleEdit = (pageItem) => {
+    setCurrentPage(pageItem); // Update global state
     navigate(`/pages/${pageItem.id}/edit`);
+  };
+
+  const setViewMode = (mode) => {
+    setPagesViewMode(mode);
   };
 
   const renderBadges = (badges) => {
