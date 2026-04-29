@@ -13,6 +13,7 @@ export const router = createBrowserRouter([
       { path: 'pages', element: <PagesView /> },
       { path: 'pages/:pageId/edit', element: <EditingView /> },
       { path: 'posts', element: <div style={{ padding: '20px' }}>Posts view coming soon</div> },
+      { path: 'navigation', element: <div style={{ padding: '20px' }}>Navigation view coming soon</div> },
       { path: 'media', element: <div style={{ padding: '20px' }}>Media view coming soon</div> },
       { path: 'design', element: <div style={{ padding: '20px' }}>Design view coming soon</div> },
       { path: 'plugins', element: <div style={{ padding: '20px' }}>Plugins view coming soon</div> },
