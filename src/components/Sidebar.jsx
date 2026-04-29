@@ -4,10 +4,7 @@ import { Tooltip } from '@wordpress/components';
 import {
   home,
   page as pageIcon,
-  postList,
-  image,
   styles,
-  plugins,
   settings,
   chevronRight,
 } from '@wordpress/icons';
@@ -19,14 +16,11 @@ function Sidebar() {
 
   const primaryNavItems = [
     { id: 'home', icon: home, label: 'Home', path: '/', tip: "View your site's home page" },
-    { id: 'posts', icon: postList, label: 'Posts', path: '/posts', tip: 'Manage Posts on your site' },
     { id: 'pages', icon: pageIcon, label: 'Pages', path: '/pages', tip: "View your site's Pages" },
-    { id: 'media', icon: image, label: 'Media', path: '/media', tip: 'Manage Media on your site' },
   ];
 
   const bottomNavItems = [
     { id: 'design', icon: styles, label: 'Design', path: '/design', tip: 'Modify your site design and styling' },
-    { id: 'plugins', icon: plugins, label: 'Plugins', path: '/plugins', tip: 'Manage your plugins' },
   ];
 
   const handleNavClick = (item) => {
