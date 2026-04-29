@@ -9,7 +9,7 @@ import PreviewCanvas from '../shared/PreviewCanvas';
 
 function PagesView() {
   const navigate = useNavigate();
-  const { currentPage } = useAppState();
+  const { currentPage, setCurrentPage } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [activeTab, setActiveTab] = useState('all');
   const [viewMode, setViewMode] = useState('list');
@@ -31,6 +31,7 @@ function PagesView() {
   const filteredDynamicPages = filterPages(dynamicPages);
 
   const handleEdit = (pageItem) => {
+    setCurrentPage(pageItem); // Update global state
     navigate(`/pages/${pageItem.id}/edit`);
   };
 
