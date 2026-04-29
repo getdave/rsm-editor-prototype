@@ -6,7 +6,9 @@ export const pages = [
     type: 'Page',
     isLive: true,
     inMenu: true,
-    isSystem: false
+    isSystem: false,
+    category: 'content',
+    status: 'live',
   },
   {
     id: 'about',
@@ -15,7 +17,9 @@ export const pages = [
     type: 'Page',
     isLive: true,
     inMenu: true,
-    isSystem: false
+    isSystem: false,
+    category: 'content',
+    status: 'live',
   },
   {
     id: 'gallery',
@@ -24,7 +28,9 @@ export const pages = [
     type: 'Page',
     isLive: true,
     inMenu: true,
-    isSystem: false
+    isSystem: false,
+    category: 'content',
+    status: 'live',
   },
   {
     id: 'contact',
@@ -33,7 +39,9 @@ export const pages = [
     type: 'Page',
     isLive: false,
     inMenu: false,
-    isSystem: false
+    isSystem: false,
+    category: 'content',
+    status: 'draft',
   },
   {
     id: 'privacy-policy',
@@ -43,7 +51,9 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badges: ['WordPress']
+    badges: ['WordPress'],
+    category: 'system',
+    status: 'live',
   },
   {
     id: '404',
@@ -53,7 +63,9 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badges: ['Template', 'Theme']
+    badges: ['Template', 'Theme'],
+    category: 'system',
+    status: 'live',
   },
   {
     id: 'cart',
@@ -63,7 +75,9 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badges: ['Plugin', 'WooCommerce']
+    badges: ['Plugin', 'WooCommerce'],
+    category: 'system',
+    status: 'live',
   },
   {
     id: 'checkout',
@@ -73,7 +87,9 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badges: ['Plugin', 'WooCommerce']
+    badges: ['Plugin', 'WooCommerce'],
+    category: 'system',
+    status: 'live',
   },
   {
     id: 'product-list',
@@ -84,7 +100,9 @@ export const pages = [
     inMenu: false,
     isSystem: true,
     isDynamic: true,
-    badges: ['WooCommerce']
+    badges: ['WooCommerce'],
+    category: 'dynamic',
+    status: 'live',
   },
   {
     id: 'product-single',
@@ -95,7 +113,9 @@ export const pages = [
     inMenu: false,
     isSystem: true,
     isDynamic: true,
-    badges: ['WooCommerce']
+    badges: ['WooCommerce'],
+    category: 'dynamic',
+    status: 'live',
   },
   {
     id: 'blog-list',
@@ -106,7 +126,9 @@ export const pages = [
     inMenu: false,
     isSystem: true,
     isDynamic: true,
-    badges: ['WordPress']
+    badges: ['WordPress'],
+    category: 'dynamic',
+    status: 'live',
   },
   {
     id: 'blog-single',
@@ -117,8 +139,10 @@ export const pages = [
     inMenu: false,
     isSystem: true,
     isDynamic: true,
-    badges: ['WordPress']
-  }
+    badges: ['WordPress'],
+    category: 'dynamic',
+    status: 'live',
+  },
 ];
 
 export const siteData = {
