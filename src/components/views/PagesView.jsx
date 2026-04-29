@@ -100,11 +100,20 @@ function PagesView() {
       label: 'Title',
       enableHiding: false,
       enableGlobalSearch: true,
-      render: ( { item } ) => (
-        <span style={ { color: item.id === 'home' ? '#3858e9' : 'inherit', fontWeight: item.id === 'home' ? 600 : 'inherit' } }>
-          { item.name }
-        </span>
-      ),
+      render: ( { item } ) => {
+        const level = item.level ?? 0;
+        return (
+          <span className={ `pp-title-cell pp-title-l${ level }` }>
+            { level > 0 && <span className="pp-tree-branch" aria-hidden="true" /> }
+            <span style={ {
+              color: item.id === 'home' ? '#3858e9' : 'inherit',
+              fontWeight: item.id === 'home' ? 600 : 'inherit',
+            } }>
+              { item.name }
+            </span>
+          </span>
+        );
+      },
     },
     {
       id: 'status',
