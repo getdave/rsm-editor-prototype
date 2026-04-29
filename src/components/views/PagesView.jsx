@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Notice } from '@wordpress/components';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { pencil, external, plus, trash, copy, home, page as pageIcon } from '@wordpress/icons';
+import { pencil, external, plus, copy, home, page as pageIcon, seen } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { pages } from '../../data/mockData';
 import SplitViewLayout from '../../layouts/SplitViewLayout';
@@ -45,7 +45,7 @@ const DEFAULT_VIEW = {
   filters: [],
   page: 1,
   perPage: 50,
-  sort: { field: 'name', direction: 'asc' },
+  sort: undefined,
   titleField: 'name',
   mediaField: 'media',
   fields: [ 'status', 'inMenu', 'badges' ],
@@ -54,7 +54,7 @@ const DEFAULT_VIEW = {
 
 const DEFAULT_LAYOUTS = {
   list: {},
-  grid: { badgeFields: [ 'badges' ] },
+  grid: { badgeFields: [ 'badges' ], layout: { previewSize: 170 } },
 };
 
 function AddNewCard() {
@@ -78,7 +78,7 @@ function PagesView() {
   const [ previewPage, setPreviewPage ] = useState( currentPage );
   const [ activeCategory, setActiveCategory ] = useState( 'content' );
   const [ view, setView ] = useState( DEFAULT_VIEW );
-  const [ selection, setSelection ] = useState( [] );
+
 
   const fields = useMemo( () => [
     {
@@ -156,9 +156,15 @@ function PagesView() {
 
   const actions = useMemo( () => [
     {
+      id: 'preview',
+      label: 'Preview',
+      isPrimary: true,
+      icon: seen,
+      callback: ( items ) => setPreviewPage( items[ 0 ] ),
+    },
+    {
       id: 'edit',
       label: 'Edit',
-      isPrimary: true,
       icon: pencil,
       callback: ( items ) => navigate( `/pages/${ items[ 0 ].id }/edit` ),
     },
@@ -166,44 +172,15 @@ function PagesView() {
       id: 'view-live',
       label: 'View live',
       icon: external,
-      callback: ( items ) => {
-        console.log( 'View live:', items[ 0 ].slug );
-      },
+      callback: ( items ) => console.log( 'View live:', items[ 0 ].slug ),
     },
     {
       id: 'duplicate',
       label: 'Duplicate',
       icon: copy,
-      callback: ( items ) => {
-        console.log( 'Duplicate:', items[ 0 ].slug );
-      },
+      callback: ( items ) => console.log( 'Duplicate:', items[ 0 ].slug ),
     },
-    {
-      id: 'delete',
-      label: 'Delete',
-      icon: trash,
-      supportsBulk: true,
-      isDestructive: true,
-      RenderModal: ( { items, closeModal } ) => (
-        <div style={ { padding: '16px' } }>
-          <p>Delete { items.length === 1 ? `"${ items[ 0 ].name }"` : `${ items.length } pages` }? This cannot be undone.</p>
-          <div style={ { display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '16px' } }>
-            <Button variant="tertiary" onClick={ closeModal }>Cancel</Button>
-            <Button
-              variant="primary"
-              isDestructive
-              onClick={ () => {
-                console.log( 'Delete:', items.map( i => i.slug ) );
-                closeModal();
-              } }
-            >
-              Delete
-            </Button>
-          </div>
-        </div>
-      ),
-    },
-  ], [ navigate ] );
+  ], [ navigate, setPreviewPage ] );
 
   const categoryPages = useMemo(
     () => pages.filter( ( p ) => p.category === activeCategory ),
@@ -224,7 +201,6 @@ function PagesView() {
   const handleTabClick = ( value ) => {
     setActiveCategory( value );
     setView( ( prev ) => ( { ...prev, page: 1, search: '', filters: [] } ) );
-    setSelection( [] );
   };
 
   const activeTab = TABS.find( ( t ) => t.value === activeCategory );
@@ -239,8 +215,12 @@ function PagesView() {
         defaultLayouts={ DEFAULT_LAYOUTS }
         actions={ actions }
         paginationInfo={ paginationInfo }
-        selection={ selection }
-        onChangeSelection={ setSelection }
+        onChangeSelection={ ( ids ) => {
+          if ( ids.length === 1 ) {
+            const clicked = categoryPages.find( ( p ) => p.id === ids[ 0 ] );
+            if ( clicked ) setPreviewPage( clicked );
+          }
+        } }
         isItemClickable={ () => true }
         onClickItem={ ( item ) => setPreviewPage( item ) }
         getItemId={ ( item ) => item.id }
@@ -272,7 +252,6 @@ function PagesView() {
           <DataViews.Search />
           <DataViews.FiltersToggle />
           <DataViews.LayoutSwitcher />
-          <DataViews.ViewConfig />
         </div>
         { activeTab?.description && (
           <div className="pp-tab-desc">
@@ -283,9 +262,6 @@ function PagesView() {
         ) }
         <div className="pp-dv-filters">
           <DataViews.FiltersToggled />
-        </div>
-        <div className="pp-dv-bulk">
-          <DataViews.BulkActionToolbar />
         </div>
         <DataViews.Layout />
         <DataViews.Pagination />
