@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Notice } from "@wordpress/components";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
+import { createInterpolateElement } from "@wordpress/element";
 import {
   pencil,
   external,
@@ -15,6 +16,7 @@ import { useAppState } from "../../hooks/useAppState";
 import { pages } from "../../data/mockData";
 import SplitViewLayout from "../../layouts/SplitViewLayout";
 import PreviewCanvas from "../shared/PreviewCanvas";
+import DefinedTerm from "../shared/DefinedTerm";
 
 const BADGE_STYLES = {
   WordPress: { background: "rgba(33,117,155,.12)", color: "#21759b" },
@@ -34,13 +36,19 @@ const TABS = [
     value: "system",
     label: "System",
     description:
-      "System pages are automatically created by WordPress, your theme, or plugins. You can customise their appearance but not remove them.",
+      "System pages are automatically created by WordPress, your theme, or plugins.",
   },
   {
     value: "dynamic",
     label: "Dynamic",
-    description:
-      "Dynamic pages are templates that generate content automatically from your site's data — like blog posts or product pages.",
+    description: createInterpolateElement(
+      "Dynamic pages use <term>Templates</term> that automatically generate pages from your content.",
+      {
+        term: (
+          <DefinedTerm definition="Reusable page layouts in WordPress. Examples: Single Post template (for blog posts), Product Archive template (for product listings), Search Results template." />
+        ),
+      }
+    ),
   },
 ];
 
@@ -233,8 +241,7 @@ function PagesView() {
     setView(newView);
   };
 
-  const hasPreviewPanel = view.type === 'list';
-
+  const hasPreviewPanel = view.type === "list";
 
   const handleTabClick = (value) => {
     setActiveCategory(value);
@@ -300,9 +307,9 @@ function PagesView() {
         </div>
         {activeTab?.description && (
           <div className="pp-tab-desc">
-            <Notice status="info" isDismissible={false}>
+            <div className="pp-tab-desc-content">
               {activeTab.description}
-            </Notice>
+            </div>
           </div>
         )}
         <div className="pp-dv-filters">
@@ -327,7 +334,7 @@ function PagesView() {
   return (
     <div className="pages-panel show">
       <SplitViewLayout
-        mode={hasPreviewPanel ? 'list' : 'grid'}
+        mode={hasPreviewPanel ? "list" : "grid"}
         stageContent={stageContent}
         canvasContent={canvasContent}
         gridContent={stageContent}

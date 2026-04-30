@@ -2038,6 +2038,23 @@ body {
   padding: 12px 20px 0;
 }
 
+.pp-tab-desc-content {
+  padding: 12px 16px;
+  background: #f0f6fc;
+  border-left: 4px solid #3582c4;
+  border-radius: 2px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #1e1e1e;
+}
+
+/* WordPress Tooltip styling for defined terms */
+.components-tooltip {
+  max-width: 280px;
+  white-space: normal;
+  text-align: left;
+}
+
 /* Align filter chips and bulk-select bar with the toolbar */
 .pp-dv-filters {
   padding: 6px 16px 6px 20px;
@@ -2806,3 +2823,15 @@ body {
 .cs-area.collapsed .cs-banners {
   display: none;
 }
+
+/* Defined term with tooltip (wiki-style) */
+.defined-term {
+  border-bottom: 1px dotted #666;
+  cursor: help;
+  text-decoration: none;
+}
+
+.defined-term:hover {
+  border-bottom-color: #3858e9;
+}
+
