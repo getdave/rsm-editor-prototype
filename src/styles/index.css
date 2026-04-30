@@ -2816,9 +2816,9 @@ body {
 
 .cs-area {
   flex-shrink: 0;
-  background: #e8e8e8;
+  background: #1e1e1e;
   padding: 16px;
-  border-top: 1px solid #d0d0d0;
+  border-top: 1px solid #2a2a2a;
   transition: padding .15s ease;
 }
 
@@ -2832,7 +2832,7 @@ body {
 .cs-title {
   font-size: 13px;
   line-height: 20px;
-  color: #1e1e1e;
+  color: #fff;
   font-weight: 500;
 }
 
@@ -2843,13 +2843,14 @@ body {
 
 .cs-action.components-button.is-link {
   font-size: 13px;
-  color: #1e1e1e;
+  color: #bbb;
   text-decoration: none;
   padding: 0;
   height: 20px;
 }
 
 .cs-action.components-button.is-link:hover {
+  color: #fff;
   text-decoration: underline;
 }
 
@@ -2861,12 +2862,12 @@ body {
 }
 
 .cs-banner {
-  background: #f0f0f0;
+  background: #252525;
   border-radius: 4px;
   padding: 12px;
   height: 88px;
   font-size: 13px;
-  color: #1e1e1e;
+  color: #e0e0e0;
 }
 
 .cs-area.collapsed .cs-banners {
