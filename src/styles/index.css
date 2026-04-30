@@ -1997,7 +1997,7 @@ body {
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   font-family: inherit;
-  transition: color 0.12s;
+  transition: color 0.12s, background 0.12s;
 }
 
 .pp-tab:hover {
@@ -2007,6 +2007,32 @@ body {
 .pp-tab.on {
   color: #1e1e1e;
   border-bottom-color: #3858e9;
+}
+
+/* Spacer to push system toggle to the right */
+.pp-toolbar-spacer {
+  flex: 1;
+}
+
+/* System pages toggle in toolbar */
+.pp-system-toggle.components-base-control {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  margin-left: 12px;
+  border-left: 1px solid #e0e0e0;
+}
+
+.pp-system-toggle .components-base-control__field {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.pp-system-toggle .components-toggle-control__label {
+  font-size: 13px;
+  color: #757575;
 }
 
 /* DataViews integration wrapper */

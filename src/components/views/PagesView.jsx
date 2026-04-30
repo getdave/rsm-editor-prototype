@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Notice } from "@wordpress/components";
+import { Button, Notice, ToggleControl } from "@wordpress/components";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
 import { createInterpolateElement } from "@wordpress/element";
 import {
@@ -31,12 +31,6 @@ const TABS = [
     value: "content",
     label: "Content",
     description: null,
-  },
-  {
-    value: "system",
-    label: "System",
-    description:
-      "System pages are automatically created by WordPress, your theme, or plugins.",
   },
   {
     value: "dynamic",
@@ -96,6 +90,8 @@ function PagesView() {
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [activeCategory, setActiveCategory] = useState("content");
   const [view, setView] = useState({ ...DEFAULT_VIEW, type: pagesViewMode });
+  const [showSystemPages, setShowSystemPages] = useState(false);
+  const [showDrafts, setShowDrafts] = useState(true);
 
   const fields = useMemo(
     () => [
@@ -224,10 +220,21 @@ function PagesView() {
     [navigate, setCurrentPage, setPreviewPage],
   );
 
-  const categoryPages = useMemo(
-    () => pages.filter((p) => p.category === activeCategory),
-    [activeCategory],
-  );
+  const categoryPages = useMemo(() => {
+    let filtered = pages.filter((p) => p.category === activeCategory);
+    
+    // In Content tab, hide drafts unless toggled on
+    if (activeCategory === "content" && !showDrafts) {
+      filtered = filtered.filter((p) => p.status !== "draft");
+    }
+    
+    // In Dynamic tab, hide system pages by default unless toggled on
+    if (activeCategory === "dynamic" && !showSystemPages) {
+      filtered = filtered.filter((p) => !p.isSystem);
+    }
+    
+    return filtered;
+  }, [activeCategory, showSystemPages, showDrafts]);
 
   const { data: processedData, paginationInfo } = useMemo(
     () => filterSortAndPaginate(categoryPages, view, fields),
@@ -304,6 +311,28 @@ function PagesView() {
           <DataViews.Search />
           <DataViews.FiltersToggle />
           <DataViews.LayoutSwitcher />
+          {activeCategory === "content" && (
+            <>
+              <div className="pp-toolbar-spacer" />
+              <ToggleControl
+                label="Show drafts"
+                checked={showDrafts}
+                onChange={setShowDrafts}
+                className="pp-system-toggle"
+              />
+            </>
+          )}
+          {activeCategory === "dynamic" && (
+            <>
+              <div className="pp-toolbar-spacer" />
+              <ToggleControl
+                label="Show system pages"
+                checked={showSystemPages}
+                onChange={setShowSystemPages}
+                className="pp-system-toggle"
+              />
+            </>
+          )}
         </div>
         {activeTab?.description && (
           <div className="pp-tab-desc">
