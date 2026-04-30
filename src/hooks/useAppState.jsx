@@ -16,6 +16,13 @@ export function AppStateProvider({ children }) {
   // Modal state
   const [siteIdentityModalOpen, setSiteIdentityModalOpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
+  // User identity (display only — no auth wired yet)
+  const [userName] = useState('Fran');
+
+  // Site visibility status — drives the header indicator dot.
+  const [siteStatus] = useState('live');
 
   // Site settings (mirrors WP General Settings — backs the DataForm in the
   // Settings modal so prototype edits round-trip until a refresh).
@@ -63,6 +70,14 @@ export function AppStateProvider({ children }) {
     setSettingsModalOpen(false);
   };
 
+  const openCommandPalette = () => {
+    setCommandPaletteOpen(true);
+  };
+
+  const closeCommandPalette = () => {
+    setCommandPaletteOpen(false);
+  };
+
   const markDirty = () => {
     setHasUnsavedChanges(true);
   };
@@ -92,6 +107,15 @@ export function AppStateProvider({ children }) {
     settingsModalOpen,
     openSettingsModal,
     closeSettingsModal,
+    commandPaletteOpen,
+    openCommandPalette,
+    closeCommandPalette,
+
+    // User identity
+    userName,
+
+    // Site status
+    siteStatus,
 
     // Site settings
     siteSettings,

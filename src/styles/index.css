@@ -906,12 +906,13 @@ body {
   font-weight: 500;
 }
 
-/* Sidebar bottom section - User and Settings */
+/* Sidebar bottom — Dashboard link + customization icon */
 .sidebar-bottom {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   border-top: 1px solid #2a2a2a;
   height: 56px;
   padding: 12px;
@@ -924,47 +925,73 @@ body {
   display: none;
 }
 
-.sb-user {
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-}
-
-.sb-user:hover {
-  opacity: 0.8;
-}
-
-.sb-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #3858e9;
+.sb-dashboard {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-  color: #fff;
-  letter-spacing: 0.5px;
-}
-
-.sb-settings {
-  width: 32px;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
   height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  padding: 0 6px;
   border-radius: 4px;
-  transition: all 0.15s ease;
-  color: #999;
+  color: #ddd;
+  text-decoration: none;
+  font-size: 13px;
+  line-height: 20px;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.sb-settings:hover {
+.sb-dashboard:hover,
+.sb-dashboard:focus-visible {
   background: #2a2a2a;
   color: #fff;
+  outline: none;
 }
 
-.sb-settings svg {
+.sb-dashboard-ico {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sb-dashboard-ico svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.sb-dashboard-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sb-customize {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 4px;
+  color: #999;
+  cursor: not-allowed;
+  transition: color 0.15s ease;
+  font: inherit;
+}
+
+.sb-customize:not(:disabled):hover {
+  background: #2a2a2a;
+  color: #fff;
+  cursor: pointer;
+}
+
+.sb-customize svg {
   width: 20px;
   height: 20px;
   fill: currentColor;
@@ -2740,15 +2767,6 @@ body {
   border-top: 1px solid #f0f0f0;
 }
 
-/* The settings button in the sidebar is now an actual <button> — strip
-   default browser chrome so it matches the existing icon affordance. */
-.sb-settings {
-  background: transparent;
-  border: none;
-  padding: 0;
-  font: inherit;
-}
-
 /* ── Content suggestion area (home view) ── */
 .cs-stack {
   display: flex;
@@ -2835,3 +2853,310 @@ body {
   border-bottom-color: #3858e9;
 }
 
+/* ── Site Editor header ──
+   Persistent bar above the body on every main route (suppressed on the
+   dedicated /pages/:pageId/edit canvas, which has its own toolbar). */
+.site-editor-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 4px 12px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.seh-anchor {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.seh-logo {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seh-logo:hover,
+.seh-logo:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.seh-logo-img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: #bebebe;
+}
+
+.seh-title {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  color: #000;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.seh-title:hover,
+.seh-title:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
+.seh-search {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 16px 0 12px;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 2px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  color: #000;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.seh-search:hover,
+.seh-search:focus-visible {
+  background: #f5f5f5;
+  outline: none;
+}
+
+.seh-search-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+}
+
+.seh-search-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.seh-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seh-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 2px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.seh-save:disabled {
+  opacity: 0.15;
+  cursor: not-allowed;
+}
+
+.seh-save:not(:disabled):hover {
+  opacity: 0.85;
+}
+
+.seh-status {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+}
+
+.seh-status-dot {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #bebebe;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.seh-status.is-live .seh-status-dot {
+  background: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.18);
+}
+
+.seh-status.is-private .seh-status-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+}
+
+/* ── Command palette ── */
+.command-palette-overlay {
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 96px;
+}
+
+.command-palette {
+  width: min(560px, calc(100vw - 32px));
+  max-height: 60vh;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cp-input {
+  appearance: none;
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: #000;
+  outline: none;
+}
+
+.cp-input::placeholder {
+  color: #888;
+}
+
+.cp-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  overflow-y: auto;
+  max-height: calc(60vh - 48px);
+}
+
+.cp-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+  line-height: 20px;
+  color: #000;
+  cursor: pointer;
+}
+
+.cp-item.is-active {
+  background: #f0f0f0;
+}
+
+.cp-item-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cp-item-group {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #888;
+  flex-shrink: 0;
+}
+
+.cp-empty {
+  padding: 16px;
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+}
+
+/* ── Preview heading row (home view) ── */
+.preview-body {
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 16px 0;
+  background: #fff;
+}
+
+.preview-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.preview-heading {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 40px;
+  color: #000;
+}
+
+.preview-mode-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  padding: 0 4px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  color: #000;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.preview-mode-select svg {
+  fill: currentColor;
+}
+
+.preview-body-canvas {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}

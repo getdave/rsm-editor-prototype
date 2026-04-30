@@ -7,16 +7,17 @@ import {
   postList,
   navigation,
   styles,
-  settings,
+  cog,
   pencil,
   search,
   chevronRight,
+  wordpress,
 } from '@wordpress/icons';
 
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { sidebarCollapsed, siteTitle, openSiteIdentityModal, openSettingsModal } = useAppState();
+  const { sidebarCollapsed, siteTitle, openSiteIdentityModal } = useAppState();
 
   const navItems = [
     { id: 'home', icon: home, label: 'Home', path: '/', tip: "View your site's home page" },
@@ -77,21 +78,22 @@ function Sidebar() {
         ))}
       </nav>
 
-      {/* Profile + Settings */}
+      {/* Dashboard link + sidebar customization */}
       <div className="sidebar-bottom">
-        <Tooltip text="User profile" placement="top">
-          <div className="sb-user">
-            <div className="sb-avatar">DS</div>
-          </div>
+        <Tooltip text="Return to WordPress dashboard" placement="top">
+          <a className="sb-dashboard" href="/wp-admin">
+            <span className="sb-dashboard-ico" aria-hidden="true">{wordpress}</span>
+            <span className="sb-dashboard-label">Dashboard</span>
+          </a>
         </Tooltip>
-        <Tooltip text="Settings" placement="top">
+        <Tooltip text="Coming soon — customize navigation" placement="top">
           <button
             type="button"
-            className="sb-settings"
-            onClick={openSettingsModal}
-            aria-label="Settings"
+            className="sb-customize"
+            disabled
+            aria-label="Customize navigation"
           >
-            {settings}
+            {cog}
           </button>
         </Tooltip>
       </div>
