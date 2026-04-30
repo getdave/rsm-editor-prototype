@@ -7,9 +7,7 @@ import {
   postList,
   navigation,
   styles,
-  cog,
-  pencil,
-  search,
+  settings,
   chevronRight,
   wordpress,
 } from '@wordpress/icons';
@@ -17,7 +15,7 @@ import {
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { sidebarCollapsed, siteTitle, openSiteIdentityModal } = useAppState();
+  const { sidebarCollapsed } = useAppState();
 
   const navItems = [
     { id: 'home', icon: home, label: 'Home', path: '/', tip: "View your site's home page" },
@@ -40,28 +38,6 @@ function Sidebar() {
 
   return (
     <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
-      {/* Site anchor: logo + title + search. Clicking logo or title opens
-          the single Site Identity modal that edits both logo and title. */}
-      <div className="site-anchor">
-        <Tooltip text="Edit site identity" placement="bottom">
-          <button
-            type="button"
-            className="site-anchor-edit"
-            onClick={openSiteIdentityModal}
-            aria-label="Edit site identity"
-          >
-            <span className="wp-logo" aria-hidden="true" />
-            <span className="site-name">{siteTitle}</span>
-            <span className="site-name-edit-icon" aria-hidden="true">{pencil}</span>
-          </button>
-        </Tooltip>
-        <Tooltip text="Search" placement="bottom">
-          <button type="button" className="site-search" aria-label="Search">
-            <span className="site-search-icon">{search}</span>
-          </button>
-        </Tooltip>
-      </div>
-
       {/* Admin root navigation — single flat group per Figma 40:1381 */}
       <nav className="admin-root-nav">
         {navItems.map((item) => (
@@ -81,19 +57,18 @@ function Sidebar() {
       {/* Dashboard link + sidebar customization */}
       <div className="sidebar-bottom">
         <Tooltip text="Return to WordPress dashboard" placement="top">
-          <a className="sb-dashboard" href="/wp-admin">
+          <button type="button" className="sb-dashboard">
             <span className="sb-dashboard-ico" aria-hidden="true">{wordpress}</span>
             <span className="sb-dashboard-label">Dashboard</span>
-          </a>
+          </button>
         </Tooltip>
-        <Tooltip text="Coming soon — customize navigation" placement="top">
+        <Tooltip text="Customize navigation" placement="top">
           <button
             type="button"
             className="sb-customize"
-            disabled
             aria-label="Customize navigation"
           >
-            {cog}
+            {settings}
           </button>
         </Tooltip>
       </div>

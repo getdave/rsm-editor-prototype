@@ -1,5 +1,5 @@
 import { Tooltip } from '@wordpress/components';
-import { search } from '@wordpress/icons';
+import { search, pencil } from '@wordpress/icons';
 import { useAppState } from '../hooks/useAppState';
 
 function SiteEditorHeader() {
@@ -17,24 +17,19 @@ function SiteEditorHeader() {
 
   return (
     <header className="site-editor-header">
+      {/* Site identity — single edit affordance matching trunk's
+          sidebar site-anchor: logo + title + pencil-on-hover. */}
       <div className="seh-anchor">
         <Tooltip text="Edit site identity" placement="bottom">
           <button
             type="button"
-            className="seh-logo"
+            className="seh-identity"
             onClick={openSiteIdentityModal}
-            aria-label="Edit site logo"
+            aria-label="Edit site identity"
           >
-            <span className="seh-logo-img" aria-hidden="true" />
-          </button>
-        </Tooltip>
-        <Tooltip text="Edit site title" placement="bottom">
-          <button
-            type="button"
-            className="seh-title"
-            onClick={openSiteIdentityModal}
-          >
-            {siteTitle}
+            <span className="seh-logo" aria-hidden="true" />
+            <span className="seh-title">{siteTitle}</span>
+            <span className="seh-pencil" aria-hidden="true">{pencil}</span>
           </button>
         </Tooltip>
       </div>
