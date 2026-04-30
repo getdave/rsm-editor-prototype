@@ -55,6 +55,7 @@ const DEFAULT_VIEW = {
 const DEFAULT_LAYOUTS = {
   list: { layout: { density: 'compact' } },
   grid: { badgeFields: [ 'badges' ], layout: { previewSize: 170 } },
+  table: {},
 };
 
 function AddNewCard() {
@@ -211,7 +212,7 @@ function PagesView() {
     setView( newView );
   };
 
-  const isGridMode = view.type === 'grid';
+  const isGridMode = view.type === 'grid' || view.type === 'table';
 
   const handleTabClick = ( value ) => {
     setActiveCategory( value );
