@@ -41,7 +41,7 @@ export function AppStateProvider({ children }) {
   const [selectedDevice, setSelectedDevice] = useState('desktop');
   
   // Pages view mode (list/grid)
-  const [pagesViewMode, setPagesViewMode] = useState('list');
+  const [pagesViewMode, setPagesViewMode] = useState('grid');
 
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => !prev);
