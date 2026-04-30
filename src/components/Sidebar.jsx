@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppState } from '../hooks/useAppState';
 import { Button } from '@wordpress/components';
-import PagesStrip from './PagesStrip';
 import { siteData } from '../data/mockData';
 import { Tooltip } from '@wordpress/components';
 import { 
@@ -159,8 +158,8 @@ function Sidebar() {
         ))}
       </nav>
 
-      {/* Pages strip */}
-      <PagesStrip />
+      {/* Spacer to push Advanced menu to bottom */}
+      <div style={{ flex: 1 }} />
 
       {/* Advanced menu item with flyout */}
       <div className="ni-adv-wrapper">
@@ -217,13 +216,6 @@ function Sidebar() {
           </div>
         </Tooltip>
       </div>
-
-      {/* Pages collapsed icon */}
-      {sidebarCollapsed && (
-        <div className="pages-collapsed" data-tip="Pages">
-          {pageIcon}
-        </div>
-      )}
 
       {/* Site name change confirmation modal */}
       {showConfirmModal && (

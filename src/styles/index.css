@@ -593,20 +593,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ── PAGES STRIP (expanded sidebar) ── */
-.pages-strip {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  border-top: 1px solid #2a2a2a;
-  overflow: hidden;
-}
-
-.sidebar.collapsed .pages-strip {
-  display: none;
-}
-
 .ps-hd {
   display: flex;
   align-items: center;
@@ -924,33 +910,6 @@ body {
 .sb-settings svg {
   width: 20px;
   height: 20px;
-  fill: currentColor;
-}
-
-/* Pages collapsed icon */
-.pages-collapsed {
-  display: none;
-  border-top: 1px solid #2a2a2a;
-  flex-shrink: 0;
-}
-
-.sidebar.collapsed .pages-collapsed {
-  display: flex;
-  justify-content: center;
-  padding: 10px 0;
-  cursor: pointer;
-  color: #bbb;
-  transition: all 0.12s;
-}
-
-.sidebar.collapsed .pages-collapsed:hover {
-  color: #fff;
-  background: #252525;
-}
-
-.pages-collapsed svg {
-  width: 16px;
-  height: 16px;
   fill: currentColor;
 }
 
