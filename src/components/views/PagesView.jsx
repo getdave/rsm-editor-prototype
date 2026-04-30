@@ -90,8 +90,8 @@ function PagesView() {
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [activeCategory, setActiveCategory] = useState("content");
   const [view, setView] = useState({ ...DEFAULT_VIEW, type: pagesViewMode });
-  const [showSystemPages, setShowSystemPages] = useState(false);
-  const [showDrafts, setShowDrafts] = useState(true);
+  const [showSystemPagesDynamic, setShowSystemPagesDynamic] = useState(false);
+  const [showDrafts, setShowDrafts] = useState(false);
 
   const fields = useMemo(
     () => [
@@ -160,7 +160,7 @@ function PagesView() {
       },
       {
         id: "badges",
-        label: "Source",
+        label: "Author",
         enableSorting: false,
         enableHiding: true,
         enableGlobalSearch: false,
@@ -228,13 +228,13 @@ function PagesView() {
       filtered = filtered.filter((p) => p.status !== "draft");
     }
     
-    // In Dynamic tab, hide system pages by default unless toggled on
-    if (activeCategory === "dynamic" && !showSystemPages) {
+    // In Dynamic tab, hide system pages unless toggled on
+    if (activeCategory === "dynamic" && !showSystemPagesDynamic) {
       filtered = filtered.filter((p) => !p.isSystem);
     }
     
     return filtered;
-  }, [activeCategory, showSystemPages, showDrafts]);
+  }, [activeCategory, showSystemPagesDynamic, showDrafts]);
 
   const { data: processedData, paginationInfo } = useMemo(
     () => filterSortAndPaginate(categoryPages, view, fields),
@@ -327,8 +327,8 @@ function PagesView() {
               <div className="pp-toolbar-spacer" />
               <ToggleControl
                 label="Show system pages"
-                checked={showSystemPages}
-                onChange={setShowSystemPages}
+                checked={showSystemPagesDynamic}
+                onChange={setShowSystemPagesDynamic}
                 className="pp-system-toggle"
               />
             </>
