@@ -74,10 +74,10 @@ function AddNewCard() {
 
 function PagesView() {
   const navigate = useNavigate();
-  const { currentPage } = useAppState();
+  const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode } = useAppState();
   const [ previewPage, setPreviewPage ] = useState( currentPage );
   const [ activeCategory, setActiveCategory ] = useState( 'content' );
-  const [ view, setView ] = useState( DEFAULT_VIEW );
+  const [ view, setView ] = useState( { ...DEFAULT_VIEW, type: pagesViewMode } );
 
 
   const fields = useMemo( () => [
@@ -175,7 +175,10 @@ function PagesView() {
       id: 'edit',
       label: 'Edit',
       icon: pencil,
-      callback: ( items ) => navigate( `/pages/${ items[ 0 ].id }/edit` ),
+      callback: ( items ) => {
+        setCurrentPage( items[ 0 ] );
+        navigate( `/pages/${ items[ 0 ].id }/edit` );
+      },
     },
     {
       id: 'view-live',
@@ -189,7 +192,7 @@ function PagesView() {
       icon: copy,
       callback: ( items ) => console.log( 'Duplicate:', items[ 0 ].slug ),
     },
-  ], [ navigate, setPreviewPage ] );
+  ], [ navigate, setCurrentPage, setPreviewPage ] );
 
   const categoryPages = useMemo(
     () => pages.filter( ( p ) => p.category === activeCategory ),
@@ -202,6 +205,9 @@ function PagesView() {
   );
 
   const handleChangeView = ( newView ) => {
+    if ( newView.type !== view.type ) {
+      setPagesViewMode( newView.type );
+    }
     setView( newView );
   };
 
@@ -284,6 +290,7 @@ function PagesView() {
     <PreviewCanvas
       page={ previewPage }
       onEdit={ () => navigate( `/pages/${ previewPage.id }/edit` ) }
+      onPageChange={ setPreviewPage }
     />
   );
 
