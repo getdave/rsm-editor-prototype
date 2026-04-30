@@ -2,6 +2,7 @@ import { Button } from '@wordpress/components';
 import { desktop, tablet, mobile } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { getPageContent } from '../../services/pageContentService';
+import { pages } from '../../data/mockData';
 import UrlBar from './UrlBar';
 
 /**
@@ -19,12 +20,20 @@ import UrlBar from './UrlBar';
  * 
  * @param {object} page - The page/item to preview
  * @param {function} onEdit - Callback when Edit button is clicked
+ * @param {function} onPageChange - Callback when a nav link is clicked; parent decides what switching page means
  */
-function PreviewCanvas({ page, onEdit }) {
+function PreviewCanvas({ page, onEdit, onPageChange = () => {} }) {
   const { selectedDevice, setSelectedDevice, siteTitle } = useAppState();
   
   // Get WordPress-appropriate content for this page
   const content = getPageContent(page);
+  
+  // Get pages that should appear in navigation menu
+  const menuPages = pages.filter(p => p.inMenu);
+  
+  const handleNavClick = (clickedPage) => {
+    onPageChange(clickedPage);
+  };
 
   // Render functions for different WordPress template types
   
@@ -34,10 +43,18 @@ function PreviewCanvas({ page, onEdit }) {
       <div className="p-header">
         <span className="p-sitename">{siteTitle}</span>
         <div className="p-nav">
-          <a href="#">Home</a>
-          <a href="#">About</a>
-          <a href="#">Gallery</a>
-          <a href="#">Contact</a>
+          {menuPages.map(menuPage => (
+            <a 
+              key={menuPage.id}
+              href="#" 
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick(menuPage);
+              }}
+            >
+              {menuPage.name}
+            </a>
+          ))}
         </div>
       </div>
       {content.sections.map((section, index) => {

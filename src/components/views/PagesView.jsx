@@ -358,7 +358,8 @@ function PagesView() {
   const canvasContent = (
     <PreviewCanvas 
       page={previewPage} 
-      onEdit={() => handleEdit(previewPage)} 
+      onEdit={() => handleEdit(previewPage)}
+      onPageChange={setPreviewPage}
     />
   );
 
