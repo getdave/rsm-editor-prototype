@@ -2074,6 +2074,25 @@ body {
   color: #1e1e1e;
 }
 
+.pp-desc-link {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: #2271b1;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.pp-desc-link:hover {
+  text-decoration: underline;
+  color: #135e96;
+}
+
 /* WordPress Tooltip styling for defined terms */
 .components-tooltip {
   max-width: 280px;

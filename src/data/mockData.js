@@ -110,6 +110,8 @@ export const pages = [
     badges: ["WordPress"],
     category: "content",
     status: "live",
+    titleTooltip:
+      "Displays your privacy-policy page on your website unless administrators choose a different designated page.",
   },
   {
     id: "cart",
@@ -122,6 +124,8 @@ export const pages = [
     badges: ["WooCommerce"],
     category: "content",
     status: "live",
+    titleTooltip:
+      "Displays the shopping-cart page on your website unless storefronts consolidate cart chores directly into checkout flows.",
   },
   {
     id: "checkout",
@@ -134,6 +138,8 @@ export const pages = [
     badges: ["WooCommerce"],
     category: "content",
     status: "live",
+    titleTooltip:
+      "Displays checkout on your website unless storefronts offload fulfilment steps to hosted or external windows.",
   },
   {
     id: "404",
@@ -146,6 +152,8 @@ export const pages = [
     badges: ["Template", "Theme"],
     category: "dynamic",
     status: "live",
+    titleTooltip:
+      "Displays the missing-page layout on your website unless redirections handle the malformed link beforehand.",
   },
   {
     id: "product-list",
@@ -159,6 +167,8 @@ export const pages = [
     badges: ["WooCommerce"],
     category: "dynamic",
     status: "live",
+    titleTooltip:
+      "Displays grouped products on your website unless narrower shop or catalogue templates apply, or a dedicated template overrides.",
   },
   {
     id: "product-single",
@@ -172,6 +182,8 @@ export const pages = [
     badges: ["WooCommerce"],
     category: "dynamic",
     status: "live",
+    titleTooltip:
+      "Displays a single product on your website unless a custom template has been applied to that product or a dedicated template exists.",
   },
   {
     id: "blog-list",
@@ -185,6 +197,8 @@ export const pages = [
     badges: ["WordPress"],
     category: "dynamic",
     status: "live",
+    titleTooltip:
+      "Displays grouped posts on your website unless narrower archive templates apply, or a dedicated template overrides.",
   },
   {
     id: "blog-single",
@@ -198,6 +212,23 @@ export const pages = [
     badges: ["WordPress"],
     category: "dynamic",
     status: "live",
+    titleTooltip:
+      "Displays a single post on your website unless a custom template has been applied to that post or a dedicated template exists.",
+  },
+  {
+    id: "search-results",
+    slug: "search-results",
+    name: "Search Results",
+    type: "Dynamic Page",
+    isLive: true,
+    inMenu: false,
+    isSystem: false,
+    isDynamic: true,
+    badges: ["WordPress"],
+    category: "dynamic",
+    status: "live",
+    titleTooltip:
+      "Displays search results on your website unless narrower result templates constrain which content renders.",
   },
 ];
 

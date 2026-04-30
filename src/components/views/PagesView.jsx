@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Notice, ToggleControl } from "@wordpress/components";
+import { Button, ToggleControl, Tooltip } from "@wordpress/components";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
 import { createInterpolateElement } from "@wordpress/element";
 import {
@@ -43,6 +43,10 @@ const TABS = [
         ),
       }
     ),
+    descriptionLink: {
+      text: "View all Templates",
+      action: "view-templates",
+    },
   },
 ];
 
@@ -66,7 +70,7 @@ const DEFAULT_VIEW = {
 
 const DEFAULT_LAYOUTS = {
   list: { layout: { density: "compact" } },
-  grid: { badgeFields: ["badges"], layout: { previewSize: 170 } },
+  grid: { badgeFields: ["badges"], layout: { previewSize: 60 } },
   table: {},
 };
 
@@ -119,16 +123,26 @@ function PagesView() {
         label: "Title",
         enableHiding: false,
         enableGlobalSearch: true,
-        render: ({ item }) => (
-          <span
-            style={{
-              color: item.id === "home" ? "#3858e9" : "inherit",
-              fontWeight: item.id === "home" ? 600 : "inherit",
-            }}
-          >
-            {item.name}
-          </span>
-        ),
+        render: ({ item }) => {
+          const title = (
+            <span
+              style={{
+                color: item.id === "home" ? "#3858e9" : "inherit",
+                fontWeight: item.id === "home" ? 600 : "inherit",
+              }}
+            >
+              {item.name}
+            </span>
+          );
+          if (!item.titleTooltip) {
+            return title;
+          }
+          return (
+            <Tooltip text={item.titleTooltip} delay={400} placement="top">
+              <span style={{ display: "inline-flex" }}>{title}</span>
+            </Tooltip>
+          );
+        },
       },
       {
         id: "status",
@@ -337,7 +351,19 @@ function PagesView() {
         {activeTab?.description && (
           <div className="pp-tab-desc">
             <div className="pp-tab-desc-content">
-              {activeTab.description}
+              <span>{activeTab.description}</span>
+              {activeTab.descriptionLink && (
+                <>
+                  {" "}
+                  <button
+                    type="button"
+                    className="pp-desc-link"
+                    onClick={() => navigate("/templates")}
+                  >
+                    {activeTab.descriptionLink.text} →
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
