@@ -2056,37 +2056,6 @@ body {
   display: none;
 }
 
-/* Hierarchy tree display in list mode */
-.pp-title-cell {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Indent the whole row (icon + title + badges) using :has()
-   Must match DataViews' specificity (.dataviews-view-list div[role] .wrapper = 0,3,1)
-   and add to its 24px base padding */
-.dataviews-view-list div[role="row"] .dataviews-view-list__item-wrapper:has(.pp-title-l1),
-.dataviews-view-list div[role="article"] .dataviews-view-list__item-wrapper:has(.pp-title-l1) {
-  padding-left: 44px;
-}
-
-.dataviews-view-list div[role="row"] .dataviews-view-list__item-wrapper:has(.pp-title-l2),
-.dataviews-view-list div[role="article"] .dataviews-view-list__item-wrapper:has(.pp-title-l2) {
-  padding-left: 64px;
-}
-
-/* L-shaped connector for child rows */
-.pp-tree-branch {
-  display: inline-block;
-  flex-shrink: 0;
-  width: 10px;
-  height: 10px;
-  border-left: 1.5px solid #d0d0d0;
-  border-bottom: 1.5px solid #d0d0d0;
-  border-radius: 0 0 0 3px;
-  margin-bottom: 3px;
-}
 
 /* Badges used in render functions */
 .pp-badge {
