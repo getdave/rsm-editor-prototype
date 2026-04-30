@@ -16,7 +16,7 @@ import {
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { sidebarCollapsed, siteTitle, openSiteIdentityModal } = useAppState();
+  const { sidebarCollapsed, siteTitle, openSiteIdentityModal, openSettingsModal } = useAppState();
 
   const navItems = [
     { id: 'home', icon: home, label: 'Home', path: '/', tip: "View your site's home page" },
@@ -85,7 +85,14 @@ function Sidebar() {
           </div>
         </Tooltip>
         <Tooltip text="Settings" placement="top">
-          <div className="sb-settings">{settings}</div>
+          <button
+            type="button"
+            className="sb-settings"
+            onClick={openSettingsModal}
+            aria-label="Settings"
+          >
+            {settings}
+          </button>
         </Tooltip>
       </div>
     </div>

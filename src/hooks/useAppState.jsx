@@ -15,7 +15,25 @@ export function AppStateProvider({ children }) {
   
   // Modal state
   const [siteIdentityModalOpen, setSiteIdentityModalOpen] = useState(false);
-  
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+
+  // Site settings (mirrors WP General Settings — backs the DataForm in the
+  // Settings modal so prototype edits round-trip until a refresh).
+  const [siteSettings, setSiteSettings] = useState({
+    tagline: '',
+    siteIcon: '',
+    wpAddress: 'https://pistachio-paradise.mystagingwebsite.com',
+    siteAddress: 'https://pistachio-paradise.mystagingwebsite.com',
+    adminEmail: 'francisco.vera@automattic.com',
+    membership: false,
+    defaultRole: 'subscriber',
+    siteLanguage: 'en_US',
+    timezone: 'UTC+0',
+    dateFormat: 'F j, Y',
+    timeFormat: 'g:i a',
+    weekStartsOn: 'monday',
+  });
+
   // Save state
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
@@ -35,6 +53,14 @@ export function AppStateProvider({ children }) {
 
   const closeSiteIdentityModal = () => {
     setSiteIdentityModalOpen(false);
+  };
+
+  const openSettingsModal = () => {
+    setSettingsModalOpen(true);
+  };
+
+  const closeSettingsModal = () => {
+    setSettingsModalOpen(false);
   };
 
   const markDirty = () => {
@@ -63,7 +89,14 @@ export function AppStateProvider({ children }) {
     siteIdentityModalOpen,
     openSiteIdentityModal,
     closeSiteIdentityModal,
-    
+    settingsModalOpen,
+    openSettingsModal,
+    closeSettingsModal,
+
+    // Site settings
+    siteSettings,
+    setSiteSettings,
+
     // Save state
     hasUnsavedChanges,
     markDirty,
