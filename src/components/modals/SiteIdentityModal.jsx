@@ -2,9 +2,22 @@ import { useState } from 'react';
 import { useAppState } from '../../hooks/useAppState';
 
 function SiteIdentityModal() {
-  const { siteIdentityModalOpen, closeSiteIdentityModal } = useAppState();
+  const { siteIdentityModalOpen } = useAppState();
 
+  // Render an inner component only while open so its local state resets
+  // (and reseeds from the current siteTitle) every time the modal reopens —
+  // without needing a setState-in-effect to do the reseeding.
   if (!siteIdentityModalOpen) return null;
+  return <SiteIdentityModalContent />;
+}
+
+function SiteIdentityModalContent() {
+  const {
+    closeSiteIdentityModal,
+    siteTitle,
+    setSiteTitle,
+  } = useAppState();
+  const [draftTitle, setDraftTitle] = useState(siteTitle);
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -13,7 +26,11 @@ function SiteIdentityModal() {
   };
 
   const handleSave = () => {
-    // Logo save logic would go here
+    const trimmed = draftTitle.trim();
+    if (trimmed && trimmed !== siteTitle) {
+      setSiteTitle(trimmed);
+    }
+    // Logo save logic would go here once persistence is wired up.
     closeSiteIdentityModal();
   };
 
@@ -25,17 +42,32 @@ function SiteIdentityModal() {
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <div className="modal-hd">
-          <span className="modal-title">Change Site Logo</span>
+          <span className="modal-title">Edit site identity</span>
           <button className="modal-close" onClick={closeSiteIdentityModal}>
             ✕
           </button>
         </div>
         <div className="modal-body">
           <div className="m-field">
-            <label className="m-lbl">Upload or select a logo for your site</label>
+            <label className="m-lbl" htmlFor="site-identity-title">Site title</label>
+            <input
+              id="site-identity-title"
+              type="text"
+              className="m-input"
+              value={draftTitle}
+              onChange={(e) => setDraftTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSave();
+                if (e.key === 'Escape') handleCancel();
+              }}
+              autoFocus
+            />
+          </div>
+          <div className="m-field">
+            <label className="m-lbl">Site logo</label>
             <div className="m-logo-area">
               <div className="m-logo-preview">
-                <div className="m-logo-placeholder">W</div>
+                <div className="m-logo-placeholder" />
               </div>
               <div className="m-logo-actions">
                 <button className="m-logo-btn primary">Upload image</button>

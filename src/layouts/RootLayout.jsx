@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useAppState } from '../hooks/useAppState';
-import Topbar from '../components/Topbar';
 import Sidebar from '../components/Sidebar';
 import SiteIdentityModal from '../components/modals/SiteIdentityModal';
+import SettingsModal from '../components/modals/SettingsModal';
 import PagesFloatingPanel from '../components/modals/PagesFloatingPanel';
 
 function RootLayout() {
@@ -25,7 +25,6 @@ function RootLayout() {
 
   return (
     <>
-      <Topbar />
       <div className="body">
         <Sidebar />
         <main className="main">
@@ -33,6 +32,7 @@ function RootLayout() {
         </main>
       </div>
       <SiteIdentityModal />
+      <SettingsModal />
       <PagesFloatingPanel />
     </>
   );
