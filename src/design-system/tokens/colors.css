@@ -1,0 +1,35 @@
+/*
+ * Color tokens
+ * Source: @wordpress/base-styles/_colors.scss
+ */
+:root {
+  --wpds-color-black: #000;
+  --wpds-color-white: #fff;
+
+  --wpds-color-gray-100: #f0f0f0;
+  --wpds-color-gray-200: #e0e0e0;
+  --wpds-color-gray-300: #ddd;
+  --wpds-color-gray-400: #ccc;
+  --wpds-color-gray-600: #949494;
+  --wpds-color-gray-700: #757575;
+  --wpds-color-gray-800: #2f2f2f;
+  --wpds-color-gray-900: #1e1e1e;
+
+  --wpds-color-alert-yellow: #f0b849;
+  --wpds-color-alert-red: #cc1818;
+  --wpds-color-alert-green: #4ab866;
+
+  --wpds-color-admin-theme: #007cba;
+  --wpds-color-admin-theme-hover: #005a87;
+  --wpds-color-admin-theme-active: #00466b;
+
+  --wpds-color-text: var(--wpds-color-gray-900);
+  --wpds-color-text-muted: var(--wpds-color-gray-700);
+  --wpds-color-text-on-theme: var(--wpds-color-white);
+  --wpds-color-border: var(--wpds-color-gray-300);
+  --wpds-color-border-strong: var(--wpds-color-gray-700);
+  --wpds-color-surface: var(--wpds-color-white);
+  --wpds-color-surface-subtle: var(--wpds-color-gray-100);
+  --wpds-color-surface-disabled: var(--wpds-color-gray-100);
+  --wpds-color-focus: var(--wpds-color-admin-theme);
+}

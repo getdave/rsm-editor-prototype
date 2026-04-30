@@ -1,0 +1,119 @@
+.wpds-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wpds-space-10);
+  box-sizing: border-box;
+  height: 36px;
+  min-width: 36px;
+  padding: 0 var(--wpds-space-15);
+  border: 1px solid transparent;
+  border-radius: var(--wpds-radius-small);
+  background: transparent;
+  color: var(--wpds-color-text);
+  font-family: var(--wpds-font-family-body);
+  font-size: var(--wpds-font-size-medium);
+  line-height: var(--wpds-line-height-medium);
+  font-weight: var(--wpds-font-weight-regular);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out,
+    border-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+}
+
+.wpds-button:focus-visible {
+  outline: 2px solid var(--wpds-color-focus);
+  outline-offset: 2px;
+}
+
+.wpds-button[disabled],
+.wpds-button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Variants */
+
+.wpds-button--primary {
+  background: var(--wpds-color-admin-theme);
+  color: var(--wpds-color-text-on-theme);
+  border-color: var(--wpds-color-admin-theme);
+}
+.wpds-button--primary:hover:not([disabled]):not([aria-disabled="true"]) {
+  background: var(--wpds-color-admin-theme-hover);
+  border-color: var(--wpds-color-admin-theme-hover);
+}
+.wpds-button--primary:active:not([disabled]):not([aria-disabled="true"]) {
+  background: var(--wpds-color-admin-theme-active);
+  border-color: var(--wpds-color-admin-theme-active);
+}
+
+.wpds-button--secondary {
+  background: transparent;
+  color: var(--wpds-color-admin-theme);
+  border-color: var(--wpds-color-admin-theme);
+}
+.wpds-button--secondary:hover:not([disabled]):not([aria-disabled="true"]) {
+  background: rgba(0, 124, 186, 0.04);
+  color: var(--wpds-color-admin-theme-hover);
+  border-color: var(--wpds-color-admin-theme-hover);
+}
+
+.wpds-button--tertiary {
+  background: transparent;
+  color: var(--wpds-color-admin-theme);
+  border-color: transparent;
+}
+.wpds-button--tertiary:hover:not([disabled]):not([aria-disabled="true"]) {
+  background: rgba(0, 124, 186, 0.04);
+  color: var(--wpds-color-admin-theme-hover);
+}
+
+.wpds-button--link {
+  height: auto;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--wpds-color-admin-theme);
+  border-color: transparent;
+  text-decoration: underline;
+}
+.wpds-button--link:hover:not([disabled]):not([aria-disabled="true"]) {
+  color: var(--wpds-color-admin-theme-hover);
+}
+
+/* Sizes (heights match @wordpress/base-styles $button-size variants) */
+
+.wpds-button--small {
+  height: 24px;
+  min-width: 24px;
+  padding: 0 var(--wpds-space-10);
+  font-size: var(--wpds-font-size-small);
+  line-height: var(--wpds-line-height-small);
+}
+
+.wpds-button--compact {
+  height: 32px;
+  min-width: 32px;
+  padding: 0 var(--wpds-space-15);
+}
+
+/* Busy state */
+
+.wpds-button--busy {
+  cursor: progress;
+}
+.wpds-button--busy .wpds-button__label {
+  opacity: 0.6;
+}
+
+/* Icon slots */
+
+.wpds-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
