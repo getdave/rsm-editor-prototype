@@ -119,6 +119,9 @@ function PagesView() {
   const [frontPageId, setFrontPageId] = useState(
     () => pages.find((p) => p.isFrontPage)?.id ?? "home",
   );
+  const [postsPageId, setPostsPageId] = useState(
+    () => pages.find((p) => p.isPostsPage)?.id ?? "blog",
+  );
   const [activeCategory, setActiveCategory] = useState("content");
   const [view, setView] = useState({ ...DEFAULT_VIEW, type: pagesViewMode });
   const [showDrafts, setShowDrafts] = useState(false);
@@ -168,13 +171,34 @@ function PagesView() {
         enableHiding: false,
         enableGlobalSearch: true,
         render: ({ item }) => {
-          const title = <span>{item.name}</span>;
+          const title = (
+            <span className="pp-title-cell-inner">
+              {item.isFrontPage ? (
+                <span
+                  className="pp-title-glyph-icon"
+                  aria-hidden="true"
+                  title="Front page"
+                >
+                  {home}
+                </span>
+              ) : item.isPostsPage ? (
+                <span
+                  className="pp-title-glyph-icon pp-title-glyph-icon--posts"
+                  aria-hidden="true"
+                  title="Posts page"
+                >
+                  {postList}
+                </span>
+              ) : null}
+              <span className="pp-title-cell-name">{item.name}</span>
+            </span>
+          );
           if (!item.titleTooltip) {
             return title;
           }
           return (
             <Tooltip text={item.titleTooltip} delay={400} placement="top">
-              <span style={{ display: "inline-flex" }}>{title}</span>
+              <span className="pp-title-cell-tooltip-wrap">{title}</span>
             </Tooltip>
           );
         },
@@ -303,8 +327,45 @@ function PagesView() {
         disabled: true,
         callback: () => {},
       },
+      {
+        id: "set-as-posts-page",
+        label: "Set as Posts page",
+        isEligible: (item) =>
+          item.category === "content" &&
+          item.id !== postsPageId &&
+          item.id !== frontPageId,
+        callback: (items, { onActionPerformed } = {}) => {
+          setPostsPageId(items[0].id);
+          setPreviewPage(items[0]);
+          onActionPerformed?.(items);
+        },
+      },
+      {
+        id: "set-as-posts-page-current",
+        label: "Set as Posts page",
+        isEligible: (item) =>
+          item.category === "content" && item.id === postsPageId,
+        disabled: true,
+        callback: () => {},
+      },
+      {
+        id: "set-as-posts-page-is-front-page",
+        label: "Set as Posts page",
+        isEligible: (item) =>
+          item.category === "content" &&
+          item.id === frontPageId &&
+          item.id !== postsPageId,
+        disabled: true,
+        callback: () => {},
+      },
     ],
-    [navigate, setCurrentPage, setPreviewPage, frontPageId],
+    [
+      navigate,
+      setCurrentPage,
+      setPreviewPage,
+      frontPageId,
+      postsPageId,
+    ],
   );
 
   const categoryPages = useMemo(() => {
@@ -312,8 +373,7 @@ function PagesView() {
       .map((p) => ({
         ...p,
         isFrontPage: p.category === "content" && p.id === frontPageId,
-        isPostsPage:
-          p.category === "content" && Boolean(p.isPostsPage),
+        isPostsPage: p.category === "content" && p.id === postsPageId,
       }))
       .filter((p) => p.category === activeCategory);
 
@@ -322,7 +382,7 @@ function PagesView() {
     }
 
     return filtered;
-  }, [activeCategory, showDrafts, frontPageId]);
+  }, [activeCategory, showDrafts, frontPageId, postsPageId]);
 
   const { data: processedData, paginationInfo } = useMemo(
     () => filterSortAndPaginate(categoryPages, view, fields),

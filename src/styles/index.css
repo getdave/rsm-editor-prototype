@@ -2210,6 +2210,45 @@ body {
   box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
 }
 
+/* Title column: compact house icon for front page (matches text size) */
+.pp-title-cell-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  min-width: 0;
+}
+
+.pp-title-cell-tooltip-wrap {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.pp-title-glyph-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  color: #646970;
+  vertical-align: middle;
+}
+
+.pp-title-glyph-icon--posts {
+  color: #007017;
+}
+
+.pp-title-glyph-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  display: block;
+}
+
+.pp-title-cell-name {
+  min-width: 0;
+}
+
 .pp-menu-empty,
 .pp-author-empty {
   color: #a0a0a0;
