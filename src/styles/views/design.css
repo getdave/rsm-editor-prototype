@@ -1,2 +1,68 @@
-/* Design/Styles view styles */
-/* Placeholder for future Design view implementation */
+/* ── DESIGN VIEW (/design/*) ── */
+/* Layout glue only — visual treatment comes from existing trunk classes
+   (.pp-card, .pp-tab, .pp-inner, .pp-hd, .ni) and @wordpress/components defaults. */
+
+.styles-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+.styles-list-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.styles-swatches { display: inline-flex; gap: 4px; }
+.styles-swatch { width: 16px; height: 16px; border-radius: 50%; }
+.styles-list-name { flex: 1; }
+
+/* Themes views (/design/themes/installed and /design/themes/browse) */
+.themes-view {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: auto;
+  flex: 1;
+  min-width: 0;
+}
+.themes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.themes-active-wrap {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.themes-active-screenshot {
+  flex: 1 1 280px;
+  min-width: 0;
+  max-width: 320px;
+  aspect-ratio: 4 / 3;
+  background-size: cover;
+  background-position: center;
+}
+.themes-active-details {
+  flex: 1 1 280px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.themes-active-actions { display: flex; gap: 8px; margin-top: auto; }
+.themes-active-version { font-weight: 400; opacity: 0.7; margin-left: 4px; }
+.themes-add-row { display: flex; }
+.theme-card { display: flex; flex-direction: column; }
+.theme-card-thumb {
+  aspect-ratio: 4 / 3;
+  background-size: cover;
+  background-position: center;
+}
+.theme-card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.theme-card-meta { font-size: 12px; opacity: 0.7; }
+
+.themes-browse-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.themes-browse-actions { display: flex; gap: 8px; }
+.themes-empty { padding: 24px; text-align: center; opacity: 0.6; }
