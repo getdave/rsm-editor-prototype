@@ -790,24 +790,39 @@ function PagesView() {
         <div className="pp-toolbar-controls">
           <div className="pp-notice-toolbar-row">
             <div className="pp-notice-toolbar-col pp-notice-toolbar-col--notice">
-              {activeTab?.description && (
-                <div className="pp-tab-desc">
-                  <div className="pp-tab-desc-content">
-                    <span>{activeTab.description}</span>
-                    {activeTab.descriptionLink && (
-                      <>
-                        {" "}
-                        <button
-                          type="button"
-                          className="pp-desc-link"
-                          onClick={() => navigate("/templates")}
-                        >
-                          {activeTab.descriptionLink.text} →
-                        </button>
-                      </>
-                    )}
+              {homepageDisplayMode === READING_DISPLAY_LATEST &&
+                activeCategory === "content" && (
+                  <div
+                    className="pp-latest-posts-home-tip"
+                    role="status"
+                  >
+                    Looking for your Homepage? It&apos;s under{" "}
+                    <button
+                      type="button"
+                      className="pp-desc-link"
+                      onClick={() => handleTabClick("dynamic")}
+                    >
+                      Dynamic
+                    </button>
+                    .
                   </div>
-                </div>
+                )}
+              {activeTab?.description && (
+                <p className="pp-tab-desc-content">
+                  {activeTab.description}
+                  {activeTab.descriptionLink && (
+                    <>
+                      {" "}
+                      <button
+                        type="button"
+                        className="pp-desc-link"
+                        onClick={() => navigate("/templates")}
+                      >
+                        {activeTab.descriptionLink.text} →
+                      </button>
+                    </>
+                  )}
+                </p>
               )}
             </div>
             <div className="pp-notice-toolbar-col pp-notice-toolbar-col--actions">

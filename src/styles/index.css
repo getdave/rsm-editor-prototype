@@ -2079,7 +2079,7 @@ body {
 .pp-notice-toolbar-row {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
   width: 100%;
   min-width: 0;
@@ -2097,16 +2097,17 @@ body {
   align-items: center;
   justify-content: flex-end;
   gap: 4px;
-  padding-top: 4px;
 }
 
-.pp-toolbar-controls .pp-tab-desc {
-  padding: 0;
-  margin: 0;
-}
-
-.pp-toolbar-controls .pp-tab-desc-content {
+.pp-latest-posts-home-tip {
   padding: 10px 14px;
+  margin: 0 0 10px;
+  background: #fcf9e8;
+  border-left: 4px solid #dba617;
+  border-radius: 2px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #1e1e1e;
 }
 
 .pp-toolbar-row-options {
@@ -2330,18 +2331,12 @@ body {
   color: #a0a0a0;
 }
 
-.pp-tab-desc {
-  padding: 12px 20px 0;
-}
-
 .pp-tab-desc-content {
-  padding: 12px 16px;
-  background: #f0f6fc;
-  border-left: 4px solid #3582c4;
-  border-radius: 2px;
+  margin: 0;
+  padding: 0;
   font-size: 13px;
-  line-height: 1.4;
-  color: #1e1e1e;
+  line-height: 1.5;
+  color: #505050;
 }
 
 .pp-desc-link {
