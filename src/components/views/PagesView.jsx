@@ -115,6 +115,9 @@ function PagesView() {
   const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode } =
     useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
+  const [frontPageId, setFrontPageId] = useState(
+    () => pages.find((p) => p.isFrontPage)?.id ?? "home",
+  );
   const [activeCategory, setActiveCategory] = useState("content");
   const [view, setView] = useState({ ...DEFAULT_VIEW, type: pagesViewMode });
   const [showDrafts, setShowDrafts] = useState(false);
@@ -262,19 +265,43 @@ function PagesView() {
         icon: copy,
         callback: (items) => console.log("Duplicate:", items[0].slug),
       },
+      {
+        id: "set-as-homepage",
+        label: "Set as Homepage",
+        isEligible: (item) =>
+          item.category === "content" && item.id !== frontPageId,
+        callback: (items, { onActionPerformed } = {}) => {
+          setFrontPageId(items[0].id);
+          setPreviewPage(items[0]);
+          onActionPerformed?.(items);
+        },
+      },
+      {
+        id: "set-as-homepage-current",
+        label: "Set as Homepage",
+        isEligible: (item) =>
+          item.category === "content" && item.id === frontPageId,
+        disabled: true,
+        callback: () => {},
+      },
     ],
-    [navigate, setCurrentPage, setPreviewPage],
+    [navigate, setCurrentPage, setPreviewPage, frontPageId],
   );
 
   const categoryPages = useMemo(() => {
-    let filtered = pages.filter((p) => p.category === activeCategory);
+    let filtered = pages
+      .map((p) => ({
+        ...p,
+        isFrontPage: p.category === "content" && p.id === frontPageId,
+      }))
+      .filter((p) => p.category === activeCategory);
 
     if (activeCategory === "content" && !showDrafts) {
       filtered = filtered.filter((p) => p.status !== "draft");
     }
 
     return filtered;
-  }, [activeCategory, showDrafts]);
+  }, [activeCategory, showDrafts, frontPageId]);
 
   const { data: processedData, paginationInfo } = useMemo(
     () => filterSortAndPaginate(categoryPages, view, fields),
