@@ -11,6 +11,8 @@ import {
   home,
   page as pageIcon,
   seen,
+  chevronDown,
+  chevronUp,
 } from "@wordpress/icons";
 import { useAppState } from "../../hooks/useAppState";
 import { pages } from "../../data/mockData";
@@ -30,7 +32,8 @@ const TABS = [
   {
     value: "content",
     label: "Content",
-    description: null,
+    description:
+      "These pages are created by an author or automatically created by a Plugin or WordPress.",
   },
   {
     value: "dynamic",
@@ -41,7 +44,7 @@ const TABS = [
         term: (
           <DefinedTerm definition="Reusable page layouts in WordPress. Examples: Single Post template (for blog posts), Product Archive template (for product listings), Search Results template." />
         ),
-      }
+      },
     ),
     descriptionLink: {
       text: "View all Templates",
@@ -55,6 +58,10 @@ const STATUS_ELEMENTS = [
   { value: "draft", label: "Draft" },
 ];
 
+const SYSTEM_FILTER_HIDE = Object.freeze([
+  { field: "isSystem", operator: "is", value: false },
+]);
+
 const DEFAULT_VIEW = {
   type: "list",
   search: "",
@@ -64,13 +71,13 @@ const DEFAULT_VIEW = {
   sort: undefined,
   titleField: "name",
   mediaField: "media",
-  fields: ["status", "inMenu", "badges"],
+  fields: ["status", "inMenu", "authorDisplay"],
   layout: { density: "compact" },
 };
 
 const DEFAULT_LAYOUTS = {
   list: { layout: { density: "compact" } },
-  grid: { badgeFields: ["badges"], layout: { previewSize: 60 } },
+  grid: { badgeFields: ["authorDisplay"], layout: { previewSize: 60 } },
   table: {},
 };
 
@@ -87,6 +94,22 @@ function AddNewCard() {
   );
 }
 
+function renderAuthorCell(item) {
+  const text = item.authorDisplay ?? "";
+  if (!text) {
+    return <span className="pp-author-empty">—</span>;
+  }
+  const style = text !== "John Doe" ? BADGE_STYLES[text] : undefined;
+  if (style) {
+    return (
+      <span className="pp-badge" style={style}>
+        {text}
+      </span>
+    );
+  }
+  return <span>{text}</span>;
+}
+
 function PagesView() {
   const navigate = useNavigate();
   const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode } =
@@ -94,8 +117,10 @@ function PagesView() {
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [activeCategory, setActiveCategory] = useState("content");
   const [view, setView] = useState({ ...DEFAULT_VIEW, type: pagesViewMode });
-  const [showSystemPagesDynamic, setShowSystemPagesDynamic] = useState(false);
   const [showDrafts, setShowDrafts] = useState(false);
+  const [viewOptionsOpen, setViewOptionsOpen] = useState(false);
+
+  const isGridLayout = view.type === "grid";
 
   const fields = useMemo(
     () => [
@@ -104,12 +129,21 @@ function PagesView() {
         label: "Icon",
         render: ({ item }) => (
           <span
-            style={{
-              color: item.id === "home" ? "#3858e9" : "#999",
-              display: "flex",
-            }}
+            className={
+              isGridLayout
+                ? "pp-media-thumb pp-media-thumb--grid"
+                : "pp-media-thumb"
+            }
           >
-            {item.id === "home" ? home : pageIcon}
+            <span
+              className="pp-media-thumb-icon"
+              style={{ color: "#999", display: "flex" }}
+            >
+              {item.id === "home" ? home : pageIcon}
+            </span>
+            {item.isFrontPage ? (
+              <span className="pp-front-page-overlay">Front page</span>
+            ) : null}
           </span>
         ),
         enableSorting: false,
@@ -124,16 +158,7 @@ function PagesView() {
         enableHiding: false,
         enableGlobalSearch: true,
         render: ({ item }) => {
-          const title = (
-            <span
-              style={{
-                color: item.id === "home" ? "#3858e9" : "inherit",
-                fontWeight: item.id === "home" ? 600 : "inherit",
-              }}
-            >
-              {item.name}
-            </span>
-          );
+          const title = <span>{item.name}</span>;
           if (!item.titleTooltip) {
             return title;
           }
@@ -165,39 +190,46 @@ function PagesView() {
       {
         id: "inMenu",
         type: "boolean",
-        label: "In menu",
+        label: "Menu",
         enableSorting: false,
+        enableHiding: true,
+        enableGlobalSearch: false,
+        getValue: ({ item }) => Boolean(item.inMenu),
+        render: ({ item }) =>
+          item.inMenu ? (
+            <span className="pp-badge pp-nav">Main Menu</span>
+          ) : (
+            <span className="pp-menu-empty">—</span>
+          ),
+      },
+      {
+        id: "isSystem",
+        type: "boolean",
+        label: "System template",
+        getValue: ({ item }) => Boolean(item.isSystem),
+        filterBy: {
+          operators: ["is", "isNot"],
+        },
+        enableSorting: true,
         enableHiding: true,
         enableGlobalSearch: false,
         render: ({ item }) =>
-          item.inMenu ? <span className="pp-badge pp-nav">In menu</span> : null,
+          item.isSystem ? (
+            <span className="pp-badge pp-draft">System</span>
+          ) : null,
       },
       {
-        id: "badges",
+        id: "authorDisplay",
+        type: "text",
         label: "Author",
-        enableSorting: false,
+        enableSorting: true,
         enableHiding: true,
         enableGlobalSearch: false,
-        getValue: ({ item }) => item.badges ?? [],
-        render: ({ item }) => {
-          if (!item.badges || item.badges.length === 0) return null;
-          return (
-            <span style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
-              {item.badges.map((badge) => (
-                <span
-                  key={badge}
-                  className="pp-badge"
-                  style={BADGE_STYLES[badge] ?? {}}
-                >
-                  {badge}
-                </span>
-              ))}
-            </span>
-          );
-        },
+        getValue: ({ item }) => item.authorDisplay ?? "",
+        render: ({ item }) => renderAuthorCell(item),
       },
     ],
-    [],
+    [isGridLayout],
   );
 
   const actions = useMemo(
@@ -236,19 +268,13 @@ function PagesView() {
 
   const categoryPages = useMemo(() => {
     let filtered = pages.filter((p) => p.category === activeCategory);
-    
-    // In Content tab, hide drafts unless toggled on
+
     if (activeCategory === "content" && !showDrafts) {
       filtered = filtered.filter((p) => p.status !== "draft");
     }
-    
-    // In Dynamic tab, hide system pages unless toggled on
-    if (activeCategory === "dynamic" && !showSystemPagesDynamic) {
-      filtered = filtered.filter((p) => !p.isSystem);
-    }
-    
+
     return filtered;
-  }, [activeCategory, showSystemPagesDynamic, showDrafts]);
+  }, [activeCategory, showDrafts]);
 
   const { data: processedData, paginationInfo } = useMemo(
     () => filterSortAndPaginate(categoryPages, view, fields),
@@ -266,7 +292,12 @@ function PagesView() {
 
   const handleTabClick = (value) => {
     setActiveCategory(value);
-    setView((prev) => ({ ...prev, page: 1, search: "", filters: [] }));
+    setView((prev) => ({
+      ...prev,
+      page: 1,
+      search: "",
+      filters: value === "dynamic" ? [...SYSTEM_FILTER_HIDE] : [],
+    }));
   };
 
   const activeTab = TABS.find((t) => t.value === activeCategory);
@@ -322,51 +353,58 @@ function PagesView() {
           ))}
         </div>
         <div className="pp-toolbar-controls">
-          <DataViews.Search />
-          <DataViews.FiltersToggle />
-          <DataViews.LayoutSwitcher />
-          {activeCategory === "content" && (
-            <>
-              <div className="pp-toolbar-spacer" />
-              <ToggleControl
-                label="Show drafts"
-                checked={showDrafts}
-                onChange={setShowDrafts}
-                className="pp-system-toggle"
-              />
-            </>
-          )}
-          {activeCategory === "dynamic" && (
-            <>
-              <div className="pp-toolbar-spacer" />
-              <ToggleControl
-                label="Show system pages"
-                checked={showSystemPagesDynamic}
-                onChange={setShowSystemPagesDynamic}
-                className="pp-system-toggle"
-              />
-            </>
-          )}
-        </div>
-        {activeTab?.description && (
-          <div className="pp-tab-desc">
-            <div className="pp-tab-desc-content">
-              <span>{activeTab.description}</span>
-              {activeTab.descriptionLink && (
-                <>
-                  {" "}
-                  <button
-                    type="button"
-                    className="pp-desc-link"
-                    onClick={() => navigate("/templates")}
-                  >
-                    {activeTab.descriptionLink.text} →
-                  </button>
-                </>
+          <div className="pp-notice-toolbar-row">
+            <div className="pp-notice-toolbar-col pp-notice-toolbar-col--notice">
+              {activeTab?.description && (
+                <div className="pp-tab-desc">
+                  <div className="pp-tab-desc-content">
+                    <span>{activeTab.description}</span>
+                    {activeTab.descriptionLink && (
+                      <>
+                        {" "}
+                        <button
+                          type="button"
+                          className="pp-desc-link"
+                          onClick={() => navigate("/templates")}
+                        >
+                          {activeTab.descriptionLink.text} →
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="pp-notice-toolbar-col pp-notice-toolbar-col--actions">
+              <Button
+                variant="tertiary"
+                className="pp-view-options-toggle"
+                onClick={() => setViewOptionsOpen((o) => !o)}
+                aria-expanded={viewOptionsOpen}
+              >
+                View options
+                <span className="pp-view-options-chevron">
+                  {viewOptionsOpen ? chevronUp : chevronDown}
+                </span>
+              </Button>
+              {activeCategory === "content" && (
+                <ToggleControl
+                  label="Show drafts"
+                  checked={showDrafts}
+                  onChange={setShowDrafts}
+                  className="pp-system-toggle"
+                />
               )}
             </div>
           </div>
-        )}
+          {viewOptionsOpen && (
+            <div className="pp-toolbar-row-options">
+              <DataViews.Search />
+              <DataViews.FiltersToggle />
+              <DataViews.LayoutSwitcher />
+            </div>
+          )}
+        </div>
         <div className="pp-dv-filters">
           <DataViews.FiltersToggled />
         </div>

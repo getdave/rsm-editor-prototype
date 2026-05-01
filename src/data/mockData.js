@@ -10,6 +10,8 @@ export const pages = [
     category: "content",
     status: "live",
     level: 0,
+    authorDisplay: "John Doe",
+    isFrontPage: true,
   },
   {
     id: "about",
@@ -22,6 +24,7 @@ export const pages = [
     category: "content",
     status: "live",
     level: 0,
+    authorDisplay: "John Doe",
   },
   {
     id: "about-our-story",
@@ -35,6 +38,7 @@ export const pages = [
     status: "live",
     level: 1,
     parentId: "about",
+    authorDisplay: "John Doe",
   },
   {
     id: "about-our-team",
@@ -48,6 +52,7 @@ export const pages = [
     status: "live",
     level: 1,
     parentId: "about",
+    authorDisplay: "John Doe",
   },
   {
     id: "gallery",
@@ -60,6 +65,7 @@ export const pages = [
     category: "content",
     status: "live",
     level: 0,
+    authorDisplay: "John Doe",
   },
   {
     id: "gallery-portraits",
@@ -73,6 +79,7 @@ export const pages = [
     status: "live",
     level: 1,
     parentId: "gallery",
+    authorDisplay: "John Doe",
   },
   {
     id: "gallery-landscapes",
@@ -86,6 +93,7 @@ export const pages = [
     status: "draft",
     level: 1,
     parentId: "gallery",
+    authorDisplay: "John Doe",
   },
   {
     id: "contact",
@@ -98,6 +106,7 @@ export const pages = [
     category: "content",
     status: "draft",
     level: 0,
+    authorDisplay: "John Doe",
   },
   {
     id: "privacy-policy",
@@ -107,9 +116,9 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badges: ["WordPress"],
     category: "content",
     status: "live",
+    authorDisplay: "WordPress",
     titleTooltip:
       "Displays your privacy-policy page on your website unless administrators choose a different designated page.",
   },
@@ -121,9 +130,9 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badges: ["WooCommerce"],
     category: "content",
     status: "live",
+    authorDisplay: "WooCommerce",
     titleTooltip:
       "Displays the shopping-cart page on your website unless storefronts consolidate cart chores directly into checkout flows.",
   },
@@ -135,9 +144,9 @@ export const pages = [
     isLive: true,
     inMenu: false,
     isSystem: true,
-    badges: ["WooCommerce"],
     category: "content",
     status: "live",
+    authorDisplay: "WooCommerce",
     titleTooltip:
       "Displays checkout on your website unless storefronts offload fulfilment steps to hosted or external windows.",
   },
@@ -152,6 +161,7 @@ export const pages = [
     badges: ["Template", "Theme"],
     category: "dynamic",
     status: "live",
+    authorDisplay: "WordPress",
     titleTooltip:
       "Displays the missing-page layout on your website unless redirections handle the malformed link beforehand.",
   },
@@ -164,9 +174,9 @@ export const pages = [
     inMenu: false,
     isSystem: false,
     isDynamic: true,
-    badges: ["WooCommerce"],
     category: "dynamic",
     status: "live",
+    authorDisplay: "WooCommerce",
     titleTooltip:
       "Displays grouped products on your website unless narrower shop or catalogue templates apply, or a dedicated template overrides.",
   },
@@ -179,9 +189,9 @@ export const pages = [
     inMenu: false,
     isSystem: false,
     isDynamic: true,
-    badges: ["WooCommerce"],
     category: "dynamic",
     status: "live",
+    authorDisplay: "WooCommerce",
     titleTooltip:
       "Displays a single product on your website unless a custom template has been applied to that product or a dedicated template exists.",
   },
@@ -194,9 +204,9 @@ export const pages = [
     inMenu: false,
     isSystem: false,
     isDynamic: true,
-    badges: ["WordPress"],
     category: "dynamic",
     status: "live",
+    authorDisplay: "WordPress",
     titleTooltip:
       "Displays grouped posts on your website unless narrower archive templates apply, or a dedicated template overrides.",
   },
@@ -209,9 +219,9 @@ export const pages = [
     inMenu: false,
     isSystem: false,
     isDynamic: true,
-    badges: ["WordPress"],
     category: "dynamic",
     status: "live",
+    authorDisplay: "WordPress",
     titleTooltip:
       "Displays a single post on your website unless a custom template has been applied to that post or a dedicated template exists.",
   },
@@ -224,9 +234,9 @@ export const pages = [
     inMenu: false,
     isSystem: false,
     isDynamic: true,
-    badges: ["WordPress"],
     category: "dynamic",
     status: "live",
+    authorDisplay: "WordPress",
     titleTooltip:
       "Displays search results on your website unless narrower result templates constrain which content renders.",
   },
