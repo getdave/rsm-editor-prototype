@@ -7,6 +7,7 @@ import {
   SelectControl,
   ToggleControl,
   Tooltip,
+  VisuallyHidden,
 } from "@wordpress/components";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
 import { createInterpolateElement } from "@wordpress/element";
@@ -344,6 +345,30 @@ function PagesView() {
     () => pages.filter((p) => p.category === "content" && p.status === "live"),
     [],
   );
+
+  const readingConfigureMenuNeedsAttention = useMemo(() => {
+    if (homepageDisplayMode !== READING_DISPLAY_STATIC) {
+      return false;
+    }
+    if (!frontPageId) {
+      return true;
+    }
+    if (!readingSelectPages.some((p) => p.id === frontPageId)) {
+      return true;
+    }
+    if (!postsPageId) {
+      return true;
+    }
+    if (!readingSelectPages.some((p) => p.id === postsPageId)) {
+      return true;
+    }
+    return false;
+  }, [
+    homepageDisplayMode,
+    frontPageId,
+    postsPageId,
+    readingSelectPages,
+  ]);
 
   const isGridLayout = view.type === "grid";
 
@@ -721,17 +746,34 @@ function PagesView() {
             >
               Add page
             </Button>
-            <DropdownMenu
-              icon={moreVertical}
-              label="More page options"
-              toggleProps={{ variant: "tertiary" }}
-              controls={[
-                {
-                  title: "Configure homepage",
-                  onClick: () => setConfigureHomepageOpen(true),
-                },
-              ]}
-            />
+            <span className="pp-hd-more-wrap">
+              {readingConfigureMenuNeedsAttention ? (
+                <VisuallyHidden>
+                  Homepage or posts page configuration needs attention.
+                  Configure it in this menu.
+                </VisuallyHidden>
+              ) : null}
+              <DropdownMenu
+                icon={moreVertical}
+                label={
+                  readingConfigureMenuNeedsAttention
+                    ? "More options. Homepage settings need attention; choose Configure homepage."
+                    : "More page options"
+                }
+                toggleProps={{
+                  variant: "tertiary",
+                  className: readingConfigureMenuNeedsAttention
+                    ? "pp-hd-more-toggle-attention"
+                    : undefined,
+                }}
+                controls={[
+                  {
+                    title: "Configure homepage",
+                    onClick: () => setConfigureHomepageOpen(true),
+                  },
+                ]}
+              />
+            </span>
           </div>
         </div>
         <div className="pp-tabs">
