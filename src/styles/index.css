@@ -1892,6 +1892,55 @@ body {
   background: #2a47d4;
 }
 
+/* Configure homepage (Reading settings) modal */
+.ch-reading-modal.modal-box {
+  width: min(400px, calc(100vw - 48px));
+  max-width: 400px;
+}
+
+.ch-reading-body {
+  padding-bottom: 8px;
+}
+
+.ch-reading-intro {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #555;
+}
+
+.ch-reading-radio.components-base-control {
+  margin-bottom: 0;
+}
+
+.ch-reading-static {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.ch-reading-static .components-base-control__field {
+  margin-bottom: 0;
+}
+
+.ch-reading-field-warning {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #755100;
+  background: #fcf9e8;
+  border: 1px solid #edc949;
+  border-radius: 4px;
+}
+
+.ch-reading-footer.modal-footer {
+  justify-content: flex-end;
+}
+
 /* Split View Layout - Generic reusable pattern for stage + canvas views */
 .split-view {
   width: 100%;
@@ -1966,7 +2015,10 @@ body {
   flex-shrink: 0;
 }
 
-.pp-hd .components-button {
+.pp-hd-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin-left: auto;
 }
 

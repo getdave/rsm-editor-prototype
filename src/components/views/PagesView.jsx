@@ -1,6 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, ToggleControl, Tooltip } from "@wordpress/components";
+import {
+  Button,
+  DropdownMenu,
+  RadioControl,
+  SelectControl,
+  ToggleControl,
+  Tooltip,
+} from "@wordpress/components";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
 import { createInterpolateElement } from "@wordpress/element";
 import {
@@ -14,6 +21,7 @@ import {
   seen,
   chevronDown,
   chevronUp,
+  moreVertical,
 } from "@wordpress/icons";
 import { useAppState } from "../../hooks/useAppState";
 import { pages } from "../../data/mockData";
@@ -82,6 +90,182 @@ const DEFAULT_LAYOUTS = {
   table: {},
 };
 
+const READING_DISPLAY_LATEST = "latest";
+const READING_DISPLAY_STATIC = "static";
+
+function readingPageOptionLabel(p) {
+  const prefix = p.level > 0 ? `${"— ".repeat(p.level)}` : "";
+  return `${prefix}${p.name}`;
+}
+
+function ConfigureHomepageReadingModal({
+  onClose,
+  onApply,
+  initialHomepageDisplayMode,
+  initialFrontPageId,
+  initialPostsPageId,
+  readingSelectPages,
+}) {
+  const [mode, setMode] = useState(initialHomepageDisplayMode);
+  const [homePageId, setHomePageId] = useState(initialFrontPageId);
+  const [postsPageIdDraft, setPostsPageIdDraft] = useState(initialPostsPageId);
+
+  const homepageOptions = useMemo(() => {
+    const rows = readingSelectPages.map((p) => ({
+      label: readingPageOptionLabel(p),
+      value: p.id,
+    }));
+    const out = [{ label: "— Select —", value: "" }, ...rows];
+    if (homePageId && !readingSelectPages.some((p) => p.id === homePageId)) {
+      out.push({
+        label: `Unavailable (${homePageId})`,
+        value: homePageId,
+      });
+    }
+    return out;
+  }, [readingSelectPages, homePageId]);
+
+  const homePageResolved =
+    homePageId && readingSelectPages.some((p) => p.id === homePageId);
+  let homepageWarning = null;
+  if (mode === READING_DISPLAY_STATIC) {
+    if (homePageId && !homePageResolved) {
+      homepageWarning =
+        "That page isn't listed here (for example if it isn't published as Live yet). Pick a Live page—the one visitors should see when they open your site's main web address.";
+    } else if (!homePageId) {
+      homepageWarning =
+        "No homepage chosen. Pick which page should open at your site's main web address. Until then, people visiting that will usually see a blog-style list of your newest posts.";
+    }
+  }
+
+  const postsPageUnset = mode === READING_DISPLAY_STATIC && !postsPageIdDraft;
+
+  const postsPageWarning = postsPageUnset
+    ? "No posts Page set. There’s no bookmarkable URL dedicated to listing recent posts; posts still surface through archives, category links, and similar views."
+    : null;
+  const postsPageOptions = useMemo(() => {
+    const rows = readingSelectPages
+      .filter((p) => p.id !== homePageId)
+      .map((p) => ({ label: readingPageOptionLabel(p), value: p.id }));
+    return [{ label: "— Select —", value: "" }, ...rows];
+  }, [readingSelectPages, homePageId]);
+
+  const handleDisplayModeChange = (next) => {
+    if (next === READING_DISPLAY_LATEST) {
+      setMode(READING_DISPLAY_LATEST);
+      setHomePageId("");
+      setPostsPageIdDraft("");
+    } else {
+      setMode(READING_DISPLAY_STATIC);
+      setHomePageId((prev) => prev || "home");
+      setPostsPageIdDraft((prev) => prev || "blog");
+    }
+  };
+
+  const handleHomepageSelect = (id) => {
+    setHomePageId(id);
+    if (id === postsPageIdDraft) {
+      setPostsPageIdDraft("");
+    }
+  };
+
+  const handleDone = () => {
+    onApply({
+      homepageDisplayMode: mode,
+      frontPageId: homePageId,
+      postsPageId: postsPageIdDraft,
+    });
+  };
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="configure-homepage-modal-title"
+      className="modal-box ch-reading-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="modal-hd">
+        <span id="configure-homepage-modal-title" className="modal-title">
+          Homepage
+        </span>
+        <button
+          type="button"
+          className="modal-close"
+          aria-label="Close dialog"
+          onClick={onClose}
+        >
+          ×
+        </button>
+      </div>
+      <div className="modal-body ch-reading-body">
+        <p className="ch-reading-intro">
+          Controls what visitors see at your site&apos;s main address.
+        </p>
+
+        <RadioControl
+          className="ch-reading-radio"
+          label="Your homepage displays"
+          selected={mode}
+          options={[
+            {
+              label: "Your latest posts",
+              value: READING_DISPLAY_LATEST,
+            },
+            {
+              label: "A static page",
+              value: READING_DISPLAY_STATIC,
+            },
+          ]}
+          onChange={handleDisplayModeChange}
+        />
+
+        {mode === READING_DISPLAY_STATIC && (
+          <div className="ch-reading-static">
+            <div className="ch-reading-field">
+              <SelectControl
+                __next40pxDefaultSize
+                label="Homepage"
+                value={homePageId || ""}
+                options={homepageOptions}
+                onChange={handleHomepageSelect}
+              />
+              {homepageWarning ? (
+                <p className="ch-reading-field-warning" role="note">
+                  {homepageWarning}
+                </p>
+              ) : null}
+            </div>
+            <div className="ch-reading-field">
+              <SelectControl
+                __next40pxDefaultSize
+                label="Posts page"
+                help="Optional. Uses the blog index; page content isn't used on the front of the site."
+                value={postsPageIdDraft || ""}
+                options={postsPageOptions}
+                onChange={(v) => setPostsPageIdDraft(v || "")}
+              />
+              {postsPageWarning ? (
+                <p className="ch-reading-field-warning" role="note">
+                  {postsPageWarning}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="modal-footer ch-reading-footer">
+        <Button variant="tertiary" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button variant="primary" onClick={handleDone}>
+          Done
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function AddNewCard() {
   return (
     <div className="pp-card pp-card-add">
@@ -126,8 +310,30 @@ function PagesView() {
   const [view, setView] = useState({ ...DEFAULT_VIEW, type: pagesViewMode });
   const [showDrafts, setShowDrafts] = useState(false);
   const [viewOptionsOpen, setViewOptionsOpen] = useState(false);
+  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
+    READING_DISPLAY_STATIC,
+  );
+  const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
+
+  const readingSelectPages = useMemo(
+    () => pages.filter((p) => p.category === "content" && p.status === "live"),
+    [],
+  );
 
   const isGridLayout = view.type === "grid";
+
+  useEffect(() => {
+    if (!configureHomepageOpen) {
+      return;
+    }
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setConfigureHomepageOpen(false);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [configureHomepageOpen]);
 
   const fields = useMemo(
     () => [
@@ -146,11 +352,7 @@ function PagesView() {
               className="pp-media-thumb-icon"
               style={{ color: "#999", display: "flex" }}
             >
-              {item.id === "home"
-                ? home
-                : item.isPostsPage
-                  ? postList
-                  : pageIcon}
+              {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
             </span>
             {item.isFrontPage ? (
               <span className="pp-front-page-overlay">Front page</span>
@@ -304,7 +506,11 @@ function PagesView() {
           item.id !== frontPageId &&
           !item.isPostsPage,
         callback: (items, { onActionPerformed } = {}) => {
+          setHomepageDisplayMode(READING_DISPLAY_STATIC);
           setFrontPageId(items[0].id);
+          if (items[0].id === postsPageId) {
+            setPostsPageId("");
+          }
           setPreviewPage(items[0]);
           onActionPerformed?.(items);
         },
@@ -335,6 +541,7 @@ function PagesView() {
           item.id !== postsPageId &&
           item.id !== frontPageId,
         callback: (items, { onActionPerformed } = {}) => {
+          setHomepageDisplayMode(READING_DISPLAY_STATIC);
           setPostsPageId(items[0].id);
           setPreviewPage(items[0]);
           onActionPerformed?.(items);
@@ -365,6 +572,7 @@ function PagesView() {
       setPreviewPage,
       frontPageId,
       postsPageId,
+      setHomepageDisplayMode,
     ],
   );
 
@@ -372,8 +580,16 @@ function PagesView() {
     let filtered = pages
       .map((p) => ({
         ...p,
-        isFrontPage: p.category === "content" && p.id === frontPageId,
-        isPostsPage: p.category === "content" && p.id === postsPageId,
+        isFrontPage:
+          homepageDisplayMode === READING_DISPLAY_STATIC &&
+          Boolean(frontPageId) &&
+          p.category === "content" &&
+          p.id === frontPageId,
+        isPostsPage:
+          homepageDisplayMode === READING_DISPLAY_STATIC &&
+          Boolean(postsPageId) &&
+          p.category === "content" &&
+          p.id === postsPageId,
       }))
       .filter((p) => p.category === activeCategory);
 
@@ -382,7 +598,30 @@ function PagesView() {
     }
 
     return filtered;
-  }, [activeCategory, showDrafts, frontPageId, postsPageId]);
+  }, [
+    activeCategory,
+    showDrafts,
+    frontPageId,
+    postsPageId,
+    homepageDisplayMode,
+  ]);
+
+  const handleReadingModalApply = (draft) => {
+    if (draft.homepageDisplayMode === READING_DISPLAY_LATEST) {
+      setHomepageDisplayMode(READING_DISPLAY_LATEST);
+      setFrontPageId("");
+      setPostsPageId("");
+    } else {
+      setHomepageDisplayMode(READING_DISPLAY_STATIC);
+      setFrontPageId(draft.frontPageId || "");
+      setPostsPageId(draft.postsPageId || "");
+    }
+    setConfigureHomepageOpen(false);
+  };
+
+  const handleReadingModalClose = () => {
+    setConfigureHomepageOpen(false);
+  };
 
   const { data: processedData, paginationInfo } = useMemo(
     () => filterSortAndPaginate(categoryPages, view, fields),
@@ -440,14 +679,27 @@ function PagesView() {
       >
         <div className="pp-hd">
           <span className="pp-title">Pages</span>
-          <Button
-            variant="primary"
-            icon={plus}
-            iconSize={16}
-            onClick={() => console.log("Add page")}
-          >
-            Add page
-          </Button>
+          <div className="pp-hd-actions">
+            <Button
+              variant="primary"
+              icon={plus}
+              iconSize={16}
+              onClick={() => console.log("Add page")}
+            >
+              Add page
+            </Button>
+            <DropdownMenu
+              icon={moreVertical}
+              label="More page options"
+              toggleProps={{ variant: "tertiary" }}
+              controls={[
+                {
+                  title: "Configure homepage",
+                  onClick: () => setConfigureHomepageOpen(true),
+                },
+              ]}
+            />
+          </div>
         </div>
         <div className="pp-tabs">
           {TABS.map((tab) => (
@@ -540,6 +792,22 @@ function PagesView() {
         canvasContent={canvasContent}
         gridContent={stageContent}
       />
+      {configureHomepageOpen && (
+        <div
+          className="modal-overlay"
+          role="presentation"
+          onClick={handleReadingModalClose}
+        >
+          <ConfigureHomepageReadingModal
+            onClose={handleReadingModalClose}
+            onApply={handleReadingModalApply}
+            initialHomepageDisplayMode={homepageDisplayMode}
+            initialFrontPageId={frontPageId}
+            initialPostsPageId={postsPageId}
+            readingSelectPages={readingSelectPages}
+          />
+        </div>
+      )}
     </div>
   );
 }
