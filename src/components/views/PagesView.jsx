@@ -93,6 +93,27 @@ const DEFAULT_LAYOUTS = {
 const READING_DISPLAY_LATEST = "latest";
 const READING_DISPLAY_STATIC = "static";
 
+/** Synthetic dynamic row — blog index at `/` when Reading uses “your latest posts” */
+const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = "blog-home-root";
+
+const blogHomepageRootTemplateRow = Object.freeze({
+  id: BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
+  slug: "",
+  name: "Blog Homepage",
+  type: "Dynamic Page",
+  isLive: true,
+  inMenu: false,
+  isSystem: false,
+  isDynamic: true,
+  category: "dynamic",
+  status: "live",
+  level: 0,
+  authorDisplay: "WordPress",
+  titleTooltip:
+    "Used at your site's main web address while the homepage shows your latest posts. Visitors see your newest posts listed first.",
+  isFrontPage: true,
+});
+
 function readingPageOptionLabel(p) {
   const prefix = p.level > 0 ? `${"— ".repeat(p.level)}` : "";
   return `${prefix}${p.name}`;
@@ -187,7 +208,7 @@ function ConfigureHomepageReadingModal({
     >
       <div className="modal-hd">
         <span id="configure-homepage-modal-title" className="modal-title">
-          Homepage
+          Configure site homepage
         </span>
         <button
           type="button"
@@ -211,10 +232,14 @@ function ConfigureHomepageReadingModal({
             {
               label: "Your latest posts",
               value: READING_DISPLAY_LATEST,
+              description:
+                "Visitors land on your main web address and see your newest blog posts listed first. This works well for a blog or magazine-style site.",
             },
             {
               label: "A static page",
               value: READING_DISPLAY_STATIC,
+              description:
+                "Visitors land on one page you edit (often labeled Home), similar to a storefront or brochure site. You choose that page below.",
             },
           ]}
           onChange={handleDisplayModeChange}
@@ -595,6 +620,14 @@ function PagesView() {
 
     if (activeCategory === "content" && !showDrafts) {
       filtered = filtered.filter((p) => p.status !== "draft");
+    }
+
+    if (
+      activeCategory === "dynamic" &&
+      homepageDisplayMode === READING_DISPLAY_LATEST &&
+      !filtered.some((p) => p.id === BLOG_HOMEPAGE_ROOT_TEMPLATE_ID)
+    ) {
+      filtered = [blogHomepageRootTemplateRow, ...filtered];
     }
 
     return filtered;
