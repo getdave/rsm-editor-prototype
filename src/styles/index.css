@@ -3022,49 +3022,7 @@ body {
 .preview-body {
   flex-direction: column;
   gap: 16px;
-  padding: 8px 16px 0;
-}
-
-.preview-heading-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-  flex-shrink: 0;
-}
-
-.preview-heading {
-  flex: 1;
-  min-width: 0;
-  margin: 0;
-  font-size: 32px;
-  font-weight: 500;
-  line-height: 40px;
-  color: #fff;
-}
-
-.preview-mode-select {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: transparent;
-  border: none;
-  padding: 0 4px;
-  font: inherit;
-  font-size: 13px;
-  line-height: 20px;
-  color: #e0e0e0;
-  cursor: pointer;
-  opacity: 0.85;
-}
-
-.preview-mode-select:disabled {
-  cursor: not-allowed;
-}
-
-.preview-mode-select svg {
-  fill: currentColor;
+  padding: 16px 16px 0;
 }
 
 /* Raised light surface sitting on top of the dark main material. */

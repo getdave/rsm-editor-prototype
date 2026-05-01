@@ -18,9 +18,6 @@ export function AppStateProvider({ children }) {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
-  // User identity (display only — no auth wired yet)
-  const [userName] = useState('Fran');
-
   // Site visibility status — drives the header indicator dot.
   const [siteStatus] = useState('live');
 
@@ -110,9 +107,6 @@ export function AppStateProvider({ children }) {
     commandPaletteOpen,
     openCommandPalette,
     closeCommandPalette,
-
-    // User identity
-    userName,
 
     // Site status
     siteStatus,
