@@ -26,6 +26,7 @@ export const getPageContent = (page) => {
     'home': getHomeContent(),
     'about': getAboutContent(),
     'gallery': getGalleryContent(),
+    'blog': getBlogPageAsPostsIndexContent(),
     'contact': getContactContent(),
     
     // System Pages (Special-purpose Templates)
@@ -336,6 +337,19 @@ function getBlogListContent() {
         ]
       }
     ]
+  };
+}
+
+/** Content Page (CPT) assigned as “Posts page” in Reading settings — shows latest posts */
+function getBlogPageAsPostsIndexContent() {
+  const archive = getBlogListContent();
+  return {
+    ...archive,
+    wordpressContext: {
+      type: "page",
+      templateFile: "home.html",
+      isPostsPage: true,
+    },
   };
 }
 

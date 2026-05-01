@@ -10,6 +10,7 @@ import {
   copy,
   home,
   page as pageIcon,
+  postList,
   seen,
   chevronDown,
   chevronUp,
@@ -142,10 +143,16 @@ function PagesView() {
               className="pp-media-thumb-icon"
               style={{ color: "#999", display: "flex" }}
             >
-              {item.id === "home" ? home : pageIcon}
+              {item.id === "home"
+                ? home
+                : item.isPostsPage
+                  ? postList
+                  : pageIcon}
             </span>
             {item.isFrontPage ? (
               <span className="pp-front-page-overlay">Front page</span>
+            ) : item.isPostsPage ? (
+              <span className="pp-posts-page-overlay">Posts page</span>
             ) : null}
           </span>
         ),
@@ -269,7 +276,9 @@ function PagesView() {
         id: "set-as-homepage",
         label: "Set as Homepage",
         isEligible: (item) =>
-          item.category === "content" && item.id !== frontPageId,
+          item.category === "content" &&
+          item.id !== frontPageId &&
+          !item.isPostsPage,
         callback: (items, { onActionPerformed } = {}) => {
           setFrontPageId(items[0].id);
           setPreviewPage(items[0]);
@@ -284,6 +293,16 @@ function PagesView() {
         disabled: true,
         callback: () => {},
       },
+      {
+        id: "set-as-homepage-posts-page",
+        label: "Set as Homepage",
+        isEligible: (item) =>
+          item.category === "content" &&
+          item.isPostsPage &&
+          item.id !== frontPageId,
+        disabled: true,
+        callback: () => {},
+      },
     ],
     [navigate, setCurrentPage, setPreviewPage, frontPageId],
   );
@@ -293,6 +312,8 @@ function PagesView() {
       .map((p) => ({
         ...p,
         isFrontPage: p.category === "content" && p.id === frontPageId,
+        isPostsPage:
+          p.category === "content" && Boolean(p.isPostsPage),
       }))
       .filter((p) => p.category === activeCategory);
 

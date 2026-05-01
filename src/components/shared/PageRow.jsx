@@ -1,17 +1,21 @@
-import { home, page as pageIcon } from '@wordpress/icons';
+import { home, page as pageIcon, postList } from '@wordpress/icons';
 import LiveBadge from './LiveBadge';
 
 function PageRow({ page: pageData, onClick }) {
   const isHome = pageData.id === 'home';
+  const rowIcon =
+    isHome ? home : pageData.isPostsPage ? postList : pageIcon;
 
   return (
     <div className="pi" onClick={() => onClick && onClick(pageData)}>
       <span className="pi-media-thumb">
         <span className="pi-ico">
-          {isHome ? home : pageIcon}
+          {rowIcon}
         </span>
         {pageData.isFrontPage ? (
           <span className="pp-front-page-overlay">Front page</span>
+        ) : pageData.isPostsPage ? (
+          <span className="pp-posts-page-overlay">Posts page</span>
         ) : null}
       </span>
       <span className={`pi-name ${pageData.isSystem ? 'sys' : ''}`}>

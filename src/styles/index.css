@@ -725,7 +725,8 @@ body {
   height: 40px;
 }
 
-.pi-media-thumb .pp-front-page-overlay {
+.pi-media-thumb .pp-front-page-overlay,
+.pi-media-thumb .pp-posts-page-overlay {
   top: -1px;
   left: -1px;
   padding: 1px 3px;
@@ -2184,6 +2185,27 @@ body {
   color: #3858e9;
   background: rgba(56, 88, 233, 0.1);
   border: 1px solid rgba(56, 88, 233, 0.45);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.pp-posts-page-overlay {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 2;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #007017;
+  background: rgba(0, 112, 23, 0.1);
+  border: 1px solid rgba(0, 112, 23, 0.42);
   border-radius: 2px;
   box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
 }
