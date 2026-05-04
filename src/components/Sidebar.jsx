@@ -15,6 +15,7 @@ import {
   chevronDown,
   wordpress,
   brush,
+  color,
 } from '@wordpress/icons';
 
 const ADMIN_NAV_ITEMS = [
@@ -48,7 +49,7 @@ const DESIGN_NAV_ITEMS = [
     kind: 'group',
     id: 'style-elements-group',
     items: [
-      { kind: 'group-parent', id: 'style-elements-parent', icon: styles, label: 'Style elements', tip: 'Style elements' },
+      { kind: 'group-parent', id: 'style-elements-parent', icon: color, label: 'Style elements', tip: 'Style elements' },
       { kind: 'group-child', id: 'colors', label: 'Colors', href: '#' },
       { kind: 'group-child', id: 'fonts', label: 'Fonts', href: '#' },
       { kind: 'group-child', id: 'background', label: 'Background', href: '#' },

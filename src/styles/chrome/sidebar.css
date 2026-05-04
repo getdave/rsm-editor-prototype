@@ -442,12 +442,19 @@
 .ni.ni-child { text-decoration: none; }
 
 /* Section header sits between the Back row and the first nav group. */
-.ni-section-header { padding: 0 12px; }
+.ni-section-header {
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .ni-section-header .ni-section-title,
 .ni-section-header .ni-section-desc {
   margin: 0;
   color: #fff;
 }
+.ni-section-header .ni-section-title { font-size: 20px; }
+.ni-section-header .ni-section-desc { font-size: 13px; }
 
 /* Design sidebar grouping: 24px between groups, 8px within a group. */
 .admin-root-nav.design-nav { gap: 24px; }
