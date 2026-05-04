@@ -6,12 +6,23 @@ const AppStateContext = createContext(null);
 export function AppStateProvider({ children }) {
   // Sidebar state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  
-  // Pages state (mutable for adding new pages)
+
+  // Pages state (mutable for adding new pages and renames in the editor)
   const [pages, setPages] = useState(pagesData);
-  
+
   // Current page
   const [currentPage, setCurrentPage] = useState(pages[0]); // Home page
+
+  // Where the user came from when entering the edit canvas — drives the
+  // split-Exit button label/destination. null when not inside the editor.
+  const [editorReferrer, setEditorReferrer] = useState(null);
+
+  // Recently edited pages — used by the Exit popover's "Recent documents"
+  // group. Most-recent first, deduplicated, capped at 3.
+  const [recentPages, setRecentPages] = useState([]);
+
+  // When true, the in-canvas narrow nav strip stays visible. Off by default.
+  const [keepMenuFixed, setKeepMenuFixed] = useState(false);
   
   // Site identity
   const [siteTitle, setSiteTitle] = useState('My Photography Site');
@@ -123,18 +134,51 @@ export function AppStateProvider({ children }) {
     // Actual save logic would go here
   };
 
+  const setCurrentPageName = (name) => {
+    setCurrentPage((p) => ({ ...p, name }));
+    setPages((list) => list.map((p) => (p.id === currentPage.id ? { ...p, name } : p)));
+  };
+
+  // Wrap setCurrentPage so picking a page in the editor also bumps it to the
+  // top of the recents list (deduped, capped at 3 entries).
+  const selectPage = (page) => {
+    if (!page) return;
+    setCurrentPage(page);
+    setRecentPages((prev) => {
+      const filtered = prev.filter((p) => p.id !== page.id);
+      return [page, ...filtered].slice(0, 3);
+    });
+  };
+
+  const toggleKeepMenuFixed = () => {
+    setKeepMenuFixed((prev) => !prev);
+  };
+
   const value = {
     // Sidebar state
     sidebarCollapsed,
     toggleSidebar,
-    
+
     // Pages state
     pages,
     addPage,
-    
+
     // Current page
     currentPage,
     setCurrentPage,
+    selectPage,
+    setCurrentPageName,
+
+    // Editor referrer (set by RootLayout)
+    editorReferrer,
+    setEditorReferrer,
+
+    // Recent docs
+    recentPages,
+
+    // In-canvas narrow nav
+    keepMenuFixed,
+    toggleKeepMenuFixed,
     
     // Site identity
     siteTitle,

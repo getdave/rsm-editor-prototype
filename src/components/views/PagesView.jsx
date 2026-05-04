@@ -380,6 +380,7 @@ function PagesView() {
   const {
     currentPage,
     setCurrentPage,
+    selectPage,
     pagesViewMode,
     setPagesViewMode,
     pages,
@@ -628,7 +629,7 @@ function PagesView() {
         label: "Edit",
         icon: pencil,
         callback: (items) => {
-          setCurrentPage(items[0]);
+          selectPage(items[0]);
           navigate(`/pages/${items[0].id}/edit`);
         },
       },
@@ -714,7 +715,7 @@ function PagesView() {
     ],
     [
       navigate,
-      setCurrentPage,
+      selectPage,
       setPreviewPage,
       frontPageId,
       postsPageId,
@@ -754,6 +755,7 @@ function PagesView() {
     return filtered;
   }, [
     activeCategory,
+    pages,
     showDrafts,
     frontPageId,
     postsPageId,
@@ -838,7 +840,7 @@ function PagesView() {
         isItemClickable={() => true}
         onClickItem={(item) => {
           if (!hasPreviewPanel) {
-            setCurrentPage(item);
+            selectPage(item);
             navigate(`/pages/${item.id}/edit`);
           } else {
             setPreviewPage(item);

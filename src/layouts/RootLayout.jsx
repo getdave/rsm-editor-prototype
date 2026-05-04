@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Snackbar } from '@wordpress/components';
 import { useAppState } from '../hooks/useAppState';
@@ -14,9 +14,16 @@ const EDIT_ROUTE_PATTERN = /\/pages\/[^/]+\/edit$/;
 
 function RootLayout() {
   const location = useLocation();
-  const { sidebarCollapsed, toggleSidebar, snackbarMessage, dismissSnackbar } = useAppState();
+  const {
+    sidebarCollapsed,
+    toggleSidebar,
+    snackbarMessage,
+    dismissSnackbar,
+    setEditorReferrer,
+  } = useAppState();
 
   const isEditCanvas = EDIT_ROUTE_PATTERN.test(location.pathname);
+  const prevPathRef = useRef(location.pathname);
 
   // Auto-collapse sidebar when entering edit mode
   useEffect(() => {
@@ -31,11 +38,24 @@ function RootLayout() {
     }
   }, [location.pathname]);
 
+  // Capture the route the user was on before entering the edit canvas so the
+  // split-Exit button knows where to take them back. Cleared on exit.
+  useEffect(() => {
+    const isEdit = EDIT_ROUTE_PATTERN.test(location.pathname);
+    const wasEdit = EDIT_ROUTE_PATTERN.test(prevPathRef.current);
+    if (isEdit && !wasEdit) {
+      setEditorReferrer(prevPathRef.current);
+    } else if (!isEdit) {
+      setEditorReferrer(null);
+    }
+    prevPathRef.current = location.pathname;
+  }, [location.pathname]);
+
   return (
     <>
       {!isEditCanvas && <SiteEditorHeader />}
       <div className="body">
-        <Sidebar />
+        {!isEditCanvas && <Sidebar />}
         <main className="main">
           <Outlet />
         </main>
