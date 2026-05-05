@@ -257,7 +257,7 @@ npm run worktree:create -- feature/my-change 5174
 # or: bash scripts/create-worktree.sh feature/my-change 5174
 ```
 
-This adds a sibling directory `../rsm-prototyping-feature-my-change`, checks out branch `feature/my-change` (creating it if needed), writes `.env.local` with a unique **`VITE_PORT`** and **`VITE_BRANCH_NAME`**, and symlinks `node_modules` from the main clone when possible.
+This adds a sibling directory `../rsm-prototyping-feature-my-change`, checks out branch `feature/my-change` (creating it if needed), writes `.env.local` with a unique **`VITE_PORT`** and optional **`VITE_BRANCH_NAME`** (fallback when Git cannot resolve the branch), and symlinks `node_modules` from the main clone when possible.
 
 **Run the dev server** in that directory:
 
@@ -270,8 +270,8 @@ Vite reads `VITE_PORT` from `.env.local`, so each worktree can use a different l
 
 **How you know which preview is which**
 
-- Browser tab title in dev: `RSM Prototype (<branch>)` (driven by `VITE_BRANCH_NAME`).
-- A **dev-only** control in the **bottom-right** of the app: click the small pill to expand a note that this is not part of the prototype UI.
+- Browser tab title in dev: `RSM Prototype (<branch>)` (from the current **Git** branch, with `VITE_BRANCH_NAME` as fallback if needed).
+- A **dev-only** control in the **bottom-right** of the app (label = current **Git** branch): click the small pill to expand a note that this is not part of the prototype UI.
 
 **Optional port override** (any clone): `vite --port 5180` or `npm run dev:port -- 5180`.
 

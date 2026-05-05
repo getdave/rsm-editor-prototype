@@ -14,15 +14,18 @@ export default defineConfig([
     },
   },
   {
-    files: ['**/*.{js,jsx}'],
-    ignores: ['vite.config.js'],
+    files: [ '**/*.{js,jsx}' ],
+    ignores: [ 'vite.config.js' ],
     extends: [
       js.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
     languageOptions: {
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        __RSM_DEV_BRANCH_LABEL__: 'readonly',
+      },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },

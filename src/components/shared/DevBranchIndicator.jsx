@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
+import { DEV_BRANCH_LABEL } from '../../utils/devBranchLabel.js'
 
-const branchLabel =
-  import.meta.env.VITE_BRANCH_NAME?.trim() || 'dev'
+const branchLabel = DEV_BRANCH_LABEL || 'local'
 
 export default function DevBranchIndicator() {
   const [ expanded, setExpanded ] = useState(false)
