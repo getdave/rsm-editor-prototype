@@ -13,7 +13,7 @@ function NavigationView() {
   const { sidebarCollapsed, toggleSidebar } = useAppState();
 
   const [view, setView] = useState({
-    type: 'list',
+    type: 'table',
     search: '',
     filters: [],
     page: 1,
@@ -23,7 +23,7 @@ function NavigationView() {
       direction: 'asc',
     },
     fields: ['name', 'locations'],
-    layout: { density: 'compact' },
+    layout: {},
   });
 
   const selectedMenu = menus.find(menu => menu.id === selectedMenuId);
