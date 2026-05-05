@@ -481,3 +481,11 @@
 .sidebar-nav-pane-design { transform: translateX(100%); }
 .sidebar-nav-slider.is-design .sidebar-nav-pane-admin { transform: translateX(-100%); }
 .sidebar-nav-slider.is-design .sidebar-nav-pane-design { transform: translateX(0); }
+
+/* Hide sidebar-bottom when the design section is active. Fade matches the
+   nav slider's 0.3s timing for a cohesive transition. */
+.sidebar-bottom { transition: opacity 0.3s ease; }
+.sidebar.is-design-section .sidebar-bottom {
+  opacity: 0;
+  pointer-events: none;
+}

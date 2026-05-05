@@ -14,8 +14,11 @@ import {
   chevronUp,
   chevronDown,
   wordpress,
-  brush,
   color,
+  typography,
+  background,
+  shadow,
+  layout,
 } from '@wordpress/icons';
 
 const ADMIN_NAV_ITEMS = [
@@ -38,23 +41,13 @@ const DESIGN_NAV_ITEMS = [
   },
   {
     kind: 'group',
-    id: 'themes-group',
-    items: [
-      { kind: 'group-parent', id: 'themes-parent', icon: brush, label: 'Themes', tip: 'Themes' },
-      { kind: 'group-child', id: 'themes-installed', label: 'Installed', path: '/design/themes/installed' },
-      { kind: 'group-child-last', id: 'themes-browse', label: 'Browse', path: '/design/themes/browse' },
-    ],
-  },
-  {
-    kind: 'group',
     id: 'style-elements-group',
     items: [
-      { kind: 'group-parent', id: 'style-elements-parent', icon: color, label: 'Style elements', tip: 'Style elements' },
-      { kind: 'group-child', id: 'colors', label: 'Colors', href: '#' },
-      { kind: 'group-child', id: 'fonts', label: 'Fonts', href: '#' },
-      { kind: 'group-child', id: 'background', label: 'Background', href: '#' },
-      { kind: 'group-child', id: 'shadows', label: 'Shadows', href: '#' },
-      { kind: 'group-child-last', id: 'layout', label: 'Layout', href: '#' },
+      { kind: 'item', id: 'colors', icon: color, label: 'Colors', href: '#', tip: 'Colors' },
+      { kind: 'item', id: 'fonts', icon: typography, label: 'Fonts', href: '#', tip: 'Fonts' },
+      { kind: 'item', id: 'background', icon: background, label: 'Background', href: '#', tip: 'Background' },
+      { kind: 'item', id: 'shadows', icon: shadow, label: 'Shadows', href: '#', tip: 'Shadows' },
+      { kind: 'item', id: 'layout', icon: layout, label: 'Layout', href: '#', tip: 'Layout' },
     ],
   },
 ];
@@ -64,10 +57,7 @@ function Sidebar() {
   const location = useLocation();
   const { sidebarCollapsed } = useAppState();
   const isDesignSection = location.pathname.startsWith('/design');
-  const [collapsedGroups, setCollapsedGroups] = useState({
-    'themes-group': true,
-    'style-elements-group': true,
-  });
+  const [collapsedGroups, setCollapsedGroups] = useState({});
 
   const toggleGroup = (groupId) => {
     setCollapsedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
@@ -104,6 +94,18 @@ function Sidebar() {
       );
     }
     if (item.kind === 'item') {
+      // Dummy link variant: when item.href is set, render as <a> with no
+      // navigation. Reuses existing .ni-child anchor reset.
+      if (item.href) {
+        return (
+          <Tooltip text={item.tip} placement="right">
+            <a href={item.href} className="ni ni-child">
+              <span className="ni-ico">{item.icon}</span>
+              <span className="ni-label">{item.label}</span>
+            </a>
+          </Tooltip>
+        );
+      }
       return (
         <Tooltip text={item.tip} placement="right">
           <div
@@ -161,7 +163,7 @@ function Sidebar() {
               </div>
             </Tooltip>
           )}
-          {!isCollapsed &&
+          {(!parent || !isCollapsed) &&
             children.map((child) => (
               <Fragment key={child.id}>{renderItem(child)}</Fragment>
             ))}
@@ -172,7 +174,11 @@ function Sidebar() {
   };
 
   return (
-    <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+    <div
+      className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${
+        isDesignSection ? 'is-design-section' : ''
+      }`}
+    >
       <div className={`sidebar-nav-slider ${isDesignSection ? 'is-design' : ''}`}>
         <nav className="admin-root-nav sidebar-nav-pane sidebar-nav-pane-admin">
           {ADMIN_NAV_ITEMS.map((item) => (
@@ -186,7 +192,7 @@ function Sidebar() {
         </nav>
       </div>
 
-      {/* Dashboard link + sidebar customization */}
+      {/* Dashboard link + sidebar customization. Hidden in the design section. */}
       <div className="sidebar-bottom">
         <Tooltip text="Return to WordPress dashboard" placement="top">
           <button type="button" className="sb-dashboard">
