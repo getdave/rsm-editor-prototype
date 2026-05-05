@@ -658,3 +658,102 @@ export const layoutDefaults = {
   padding: { top: "0", right: "0", bottom: "0", left: "0" },
   blockSpacing: "1.5rem",
 };
+
+export const templateParts = [
+  {
+    id: "header-main",
+    name: "Main header",
+    area: "header",
+  },
+  {
+    id: "header-promo",
+    name: "Promo header",
+    area: "header",
+  },
+  {
+    id: "footer-main",
+    name: "Main footer",
+    area: "footer",
+  },
+];
+
+export const navigationMenus = [
+  {
+    id: "main-menu",
+    name: "Main menu",
+    isPrimary: true,
+    items: [
+      {
+        id: "nav-1",
+        pageId: "home",
+        label: "Home",
+        children: [],
+      },
+      {
+        id: "nav-2",
+        pageId: "about",
+        label: "About",
+        children: [
+          {
+            id: "nav-2a",
+            pageId: "about-our-story",
+            label: "Our Story",
+            children: [],
+          },
+          {
+            id: "nav-2b",
+            pageId: "about-our-team",
+            label: "Our Team",
+            children: [],
+          },
+        ],
+      },
+      {
+        id: "nav-3",
+        pageId: "gallery",
+        label: "Gallery",
+        children: [],
+      },
+      {
+        id: "nav-4",
+        pageId: "blog",
+        label: "Blog",
+        children: [],
+      },
+    ],
+    usedIn: ["header-main", "header-promo"],
+  },
+  {
+    id: "footer-menu",
+    name: "Footer menu",
+    isPrimary: false,
+    items: [
+      {
+        id: "nav-f1",
+        pageId: "about",
+        label: "About",
+        children: [],
+      },
+      {
+        id: "nav-f2",
+        pageId: "contact",
+        label: "Contact",
+        children: [],
+      },
+      {
+        id: "nav-f3",
+        pageId: "privacy-policy",
+        label: "Privacy",
+        children: [],
+      },
+    ],
+    usedIn: ["footer-main"],
+  },
+  {
+    id: "mobile-menu",
+    name: "Mobile menu",
+    isPrimary: false,
+    items: [],
+    usedIn: [],
+  },
+];
