@@ -9,6 +9,30 @@
 
 ---
 
+## Status
+
+**✅ IMPLEMENTED** - Core functionality complete as of commit e926fc4
+
+**What's Working:**
+- ✅ Three-panel progressive disclosure layout
+- ✅ Menu list with search, sort, and location counts
+- ✅ Main menu "Primary" badge
+- ✅ Menu editor with hierarchical item display
+- ✅ Add items via page picker (content pages only)
+- ✅ Remove items with confirmation toast
+- ✅ Reorder items with up/down arrow buttons
+- ✅ Create new menus via modal
+- ✅ Template part usage previews with area icons
+- ✅ Empty states for all panels
+- ✅ All CSS following prototype patterns
+
+**Commits:**
+1. `da8d2cc` - Read-only three-panel layout (Phases 1-2)
+2. `8e56b66` - Interactive menu editing (Phases 5-7)
+3. `e926fc4` - Menu creation (Phase 3)
+
+---
+
 ## Overview
 
 This plan implements the Navigation View as specified in the Second Brain note "RSM Prototype — Navigation View Spec". The view demonstrates the **discovery + editing model** for navigation menus, helping users understand what menus they have, where those menus are used, and how to manage their contents.
