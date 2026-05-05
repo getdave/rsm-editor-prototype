@@ -76,10 +76,7 @@ function NavigationView() {
       {
         id: 'locations',
         header: 'Locations',
-        getValue: ({ item }) => {
-          const count = item.usedIn.length;
-          return count === 0 ? '0 locations' : count === 1 ? '1 location' : `${count} locations`;
-        },
+        getValue: ({ item }) => item.usedIn.length,
         render: ({ item }) => {
           const count = item.usedIn.length;
           const text = count === 0 ? '0 locations' : count === 1 ? '1 location' : `${count} locations`;
