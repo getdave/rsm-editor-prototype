@@ -13,7 +13,7 @@ function NavigationView() {
   const { sidebarCollapsed, toggleSidebar } = useAppState();
 
   const [view, setView] = useState({
-    type: 'table',
+    type: 'list',
     search: '',
     filters: [],
     page: 1,
@@ -22,8 +22,9 @@ function NavigationView() {
       field: 'name',
       direction: 'asc',
     },
-    fields: ['name', 'locations'],
-    layout: {},
+    titleField: 'name',
+    fields: ['locations'],
+    layout: { density: 'compact' },
   });
 
   const selectedMenu = menus.find(menu => menu.id === selectedMenuId);
@@ -62,12 +63,12 @@ function NavigationView() {
         header: 'Menu name',
         getValue: ({ item }) => item.name,
         render: ({ item }) => (
-          <div className="nav-dv-name">
+          <span>
             {item.name}
             {item.isPrimary && (
-              <span className="nav-menu-badge">Primary</span>
+              <span className="nav-menu-badge" style={{ marginLeft: '8px' }}>Primary</span>
             )}
-          </div>
+          </span>
         ),
         enableSorting: true,
         enableGlobalSearch: false,
@@ -75,7 +76,10 @@ function NavigationView() {
       {
         id: 'locations',
         header: 'Locations',
-        getValue: ({ item }) => item.usedIn.length,
+        getValue: ({ item }) => {
+          const count = item.usedIn.length;
+          return count === 0 ? '0 locations' : count === 1 ? '1 location' : `${count} locations`;
+        },
         render: ({ item }) => {
           const count = item.usedIn.length;
           const text = count === 0 ? '0 locations' : count === 1 ? '1 location' : `${count} locations`;
