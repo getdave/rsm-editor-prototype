@@ -176,16 +176,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           onClose={() => setShowPagePicker(false)}
         />
       )}
-
-      <div className="nav-menu-editor-footer">
-        <Button
-          variant="secondary"
-          onClick={() => setShowPagePicker(true)}
-          className="nav-add-item-btn"
-        >
-          Add Pages
-        </Button>
-      </div>
     </div>
   );
 }
