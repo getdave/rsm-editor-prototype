@@ -5,6 +5,7 @@
 @import './chrome/topbar.css';
 @import './canvas.css';
 @import './modals-base.css';
+@import './modals/add-page.css';
 @import './views/home.css';
 @import './views/pages.css';
 @import './views/navigation.css';

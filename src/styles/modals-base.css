@@ -78,16 +78,43 @@
 
 .modal-hd {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  align-items: flex-start;
   padding: 16px 18px 12px;
   border-bottom: 1px solid #eee;
+  gap: 16px;
 }
 
 .modal-title {
   font-size: 14px;
   font-weight: 600;
   color: #1e1e1e;
-  flex: 1;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.modal-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #757575;
+  line-height: 1.5;
+  max-width: 500px;
+}
+
+.modal-link {
+  background: none;
+  border: none;
+  color: #3858e9;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+  display: inline;
+}
+
+.modal-link:hover {
+  color: #2a47d4;
 }
 
 .modal-close {

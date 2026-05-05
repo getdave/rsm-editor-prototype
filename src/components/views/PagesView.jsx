@@ -25,7 +25,6 @@ import {
   moreVertical,
 } from "@wordpress/icons";
 import { useAppState } from "../../hooks/useAppState";
-import { pages } from "../../data/mockData";
 import SplitViewLayout from "../../layouts/SplitViewLayout";
 import PreviewCanvas from "../shared/PreviewCanvas";
 import DefinedTerm from "../shared/DefinedTerm";
@@ -323,7 +322,7 @@ function renderAuthorCell(item) {
 
 function PagesView() {
   const navigate = useNavigate();
-  const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode } =
+  const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode, pages, openAddPageModal } =
     useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [frontPageId, setFrontPageId] = useState(
@@ -742,7 +741,7 @@ function PagesView() {
               variant="primary"
               icon={plus}
               iconSize={16}
-              onClick={() => console.log("Add page")}
+              onClick={openAddPageModal}
             >
               Add page
             </Button>

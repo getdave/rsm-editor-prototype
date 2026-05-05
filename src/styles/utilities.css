@@ -108,3 +108,13 @@
 .defined-term:hover {
   border-bottom-color: #3858e9;
 }
+
+/* ── SNACKBAR STYLING ── */
+
+/* Position snackbar - bottom left with spacing */
+.components-snackbar {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 100000;
+}

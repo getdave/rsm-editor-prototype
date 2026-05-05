@@ -1,11 +1,14 @@
 import { createContext, useContext, useState } from 'react';
-import { pages } from '../data/mockData';
+import { pages as pagesData } from '../data/mockData';
 
 const AppStateContext = createContext(null);
 
 export function AppStateProvider({ children }) {
   // Sidebar state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  
+  // Pages state (mutable for adding new pages)
+  const [pages, setPages] = useState(pagesData);
   
   // Current page
   const [currentPage, setCurrentPage] = useState(pages[0]); // Home page
@@ -17,9 +20,13 @@ export function AppStateProvider({ children }) {
   const [siteIdentityModalOpen, setSiteIdentityModalOpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [addPageModalOpen, setAddPageModalOpen] = useState(false);
 
   // Site visibility status — drives the header indicator dot.
   const [siteStatus] = useState('live');
+  
+  // Snackbar state
+  const [snackbarMessage, setSnackbarMessage] = useState(null);
 
   // Site settings (mirrors WP General Settings — backs the DataForm in the
   // Settings modal so prototype edits round-trip until a refresh).
@@ -75,6 +82,26 @@ export function AppStateProvider({ children }) {
     setCommandPaletteOpen(false);
   };
 
+  const openAddPageModal = () => {
+    setAddPageModalOpen(true);
+  };
+
+  const closeAddPageModal = () => {
+    setAddPageModalOpen(false);
+  };
+
+  const showSnackbar = (message) => {
+    setSnackbarMessage(message);
+  };
+
+  const dismissSnackbar = () => {
+    setSnackbarMessage(null);
+  };
+
+  const addPage = (newPage) => {
+    setPages(prev => [...prev, newPage]);
+  };
+
   const markDirty = () => {
     setHasUnsavedChanges(true);
   };
@@ -88,6 +115,10 @@ export function AppStateProvider({ children }) {
     // Sidebar state
     sidebarCollapsed,
     toggleSidebar,
+    
+    // Pages state
+    pages,
+    addPage,
     
     // Current page
     currentPage,
@@ -107,9 +138,17 @@ export function AppStateProvider({ children }) {
     commandPaletteOpen,
     openCommandPalette,
     closeCommandPalette,
+    addPageModalOpen,
+    openAddPageModal,
+    closeAddPageModal,
 
     // Site status
     siteStatus,
+
+    // Snackbar state
+    snackbarMessage,
+    showSnackbar,
+    dismissSnackbar,
 
     // Site settings
     siteSettings,
