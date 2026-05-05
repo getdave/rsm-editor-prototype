@@ -198,7 +198,7 @@ function AddPageModalContent() {
                     {layouts.map((layout) => (
                       <Tooltip key={layout.id} text={layout.tooltip}>
                         <button
-                          className="apm-layout-card"
+                          className={`apm-layout-card ${layout.pattern === 'scratch' ? 'apm-layout-scratch' : ''}`}
                           onClick={() => handleSelectLayout(layout)}
                         >
                           <div className="apm-layout-preview">
