@@ -256,6 +256,7 @@ Cursor isolates agents in separate Git checkouts. This repo includes [`.cursor/w
 
 - **`npm ci`** in the new checkout (Cursor [recommends installing dependencies per worktree](https://cursor.com/docs/configuration/worktrees) instead of symlinking `node_modules`).
 - **`.env.local`** with a **stable `VITE_PORT`** derived from the worktree path (reduces port clashes between parallel agents). If your main workspace has `.env.local`, non-`VITE_PORT` lines are copied into the worktree first.
+  - **Port range**: Cursor worktrees use ports **5174–5973** (800 possible ports). The port is deterministically calculated from the worktree's absolute path using a checksum, so the same worktree always gets the same port.
 
 Scripts live next to the config: [`.cursor/setup-worktree-unix.sh`](.cursor/setup-worktree-unix.sh), [`.cursor/setup-worktree-windows.ps1`](.cursor/setup-worktree-windows.ps1). If setup fails, use the editor **Output** panel and choose **Worktrees Setup** (per Cursor docs).
 
@@ -280,6 +281,13 @@ npm run dev
 ```
 
 Vite reads `VITE_PORT` from `.env.local`, so each worktree can use a different localhost port. Prefer a simple convention: `5173` for the main trunk clone, then `5174`, `5175`, … for additional worktrees.
+
+**List and manage worktrees**:
+
+```bash
+npm run worktree:list                           # See all worktrees
+npm run worktree:remove -- ../path-to-worktree  # Remove a worktree
+```
 
 **How you know which preview is which**
 

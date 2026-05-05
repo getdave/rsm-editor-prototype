@@ -7,6 +7,8 @@
     "dev": "vite",
     "dev:port": "vite --port",
     "worktree:create": "bash scripts/create-worktree.sh",
+    "worktree:list": "git worktree list",
+    "worktree:remove": "git worktree remove",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
