@@ -25,6 +25,7 @@ import {
   moreVertical,
   help,
 } from "@wordpress/icons";
+import { Page } from "@wordpress/admin-ui";
 import { useAppState } from "../../hooks/useAppState";
 import SplitViewLayout from "../../layouts/SplitViewLayout";
 import PreviewCanvas from "../shared/PreviewCanvas";
@@ -847,57 +848,6 @@ function PagesView() {
         getItemId={(item) => item.id}
         getItemLevel={(item) => item.level ?? 0}
       >
-        <div className="pp-hd">
-          <span className="pp-title">Pages</span>
-          <div className="pp-hd-actions">
-            {activeCategory === "content" && (
-              <Button
-                variant="primary"
-                icon={plus}
-                iconSize={16}
-                onClick={openAddPageModal}
-              >
-                Add page
-              </Button>
-            )}
-            {activeCategory === "dynamic" && (
-              <Button
-                variant="secondary"
-                onClick={() => navigate("/templates")}
-              >
-                All Templates
-              </Button>
-            )}
-            <span className="pp-hd-more-wrap">
-              {readingConfigureMenuNeedsAttention ? (
-                <VisuallyHidden>
-                  Homepage or posts page configuration needs attention.
-                  Configure it in this menu.
-                </VisuallyHidden>
-              ) : null}
-              <DropdownMenu
-                icon={moreVertical}
-                label={
-                  readingConfigureMenuNeedsAttention
-                    ? "More options. Homepage settings need attention; choose Configure homepage."
-                    : "More page options"
-                }
-                toggleProps={{
-                  variant: "tertiary",
-                  className: readingConfigureMenuNeedsAttention
-                    ? "pp-hd-more-toggle-attention"
-                    : undefined,
-                }}
-                controls={[
-                  {
-                    title: "Configure homepage",
-                    onClick: () => setConfigureHomepageOpen(true),
-                  },
-                ]}
-              />
-            </span>
-          </div>
-        </div>
         {visibleTabs.length > 1 ? (
           <div className="pp-tabs">
             {visibleTabs.map((tab) => (
@@ -1015,7 +965,60 @@ function PagesView() {
   );
 
   return (
-    <div className="pages-panel show">
+    <Page
+      className="pages-panel show"
+      title="Pages"
+      actions={
+        <>
+          {activeCategory === "content" && (
+            <Button
+              variant="primary"
+              icon={plus}
+              iconSize={16}
+              onClick={openAddPageModal}
+            >
+              Add page
+            </Button>
+          )}
+          {activeCategory === "dynamic" && (
+            <Button
+              variant="secondary"
+              onClick={() => navigate("/templates")}
+            >
+              All Templates
+            </Button>
+          )}
+          <span className="pp-hd-more-wrap">
+            {readingConfigureMenuNeedsAttention ? (
+              <VisuallyHidden>
+                Homepage or posts page configuration needs attention.
+                Configure it in this menu.
+              </VisuallyHidden>
+            ) : null}
+            <DropdownMenu
+              icon={moreVertical}
+              label={
+                readingConfigureMenuNeedsAttention
+                  ? "More options. Homepage settings need attention; choose Configure homepage."
+                  : "More page options"
+              }
+              toggleProps={{
+                variant: "tertiary",
+                className: readingConfigureMenuNeedsAttention
+                  ? "pp-hd-more-toggle-attention"
+                  : undefined,
+              }}
+              controls={[
+                {
+                  title: "Configure homepage",
+                  onClick: () => setConfigureHomepageOpen(true),
+                },
+              ]}
+            />
+          </span>
+        </>
+      }
+    >
       <SplitViewLayout
         mode={hasPreviewPanel ? "list" : "grid"}
         stageContent={stageContent}
@@ -1038,7 +1041,7 @@ function PagesView() {
           />
         </div>
       )}
-    </div>
+    </Page>
   );
 }
 
