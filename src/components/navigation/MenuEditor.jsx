@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Button } from '@wordpress/components';
-import { arrowLeft, chevronDown, chevronRight, chevronUp, chevronDown as arrowDown, page as pageIcon, close } from '@wordpress/icons';
+import { Button, Tooltip } from '@wordpress/components';
+import { arrowLeft, chevronDown, chevronRight, chevronUp, chevronDown as arrowDown, page as pageIcon, close, plus } from '@wordpress/icons';
 import { pages } from '../../data/mockData';
 import PagePicker from './PagePicker';
 
@@ -165,7 +165,18 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
             <p className="nav-empty-hint">Click "Add item" below to get started</p>
           </div>
         ) : (
-          menu.items.map((item, index) => renderMenuItem(item, 0, menu.items, index))
+          <>
+            {menu.items.map((item, index) => renderMenuItem(item, 0, menu.items, index))}
+            <Tooltip text="Add page">
+              <button
+                className="nav-add-page-btn"
+                onClick={() => setShowPagePicker(true)}
+                aria-label="Add page"
+              >
+                {plus}
+              </button>
+            </Tooltip>
+          </>
         )}
       </div>
 
