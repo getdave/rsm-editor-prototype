@@ -43,11 +43,11 @@ const DESIGN_NAV_ITEMS = [
     kind: 'group',
     id: 'style-elements-group',
     items: [
-      { kind: 'item', id: 'colors', icon: color, label: 'Colors', href: '#', tip: 'Colors' },
-      { kind: 'item', id: 'fonts', icon: typography, label: 'Fonts', href: '#', tip: 'Fonts' },
-      { kind: 'item', id: 'background', icon: background, label: 'Background', href: '#', tip: 'Background' },
-      { kind: 'item', id: 'shadows', icon: shadow, label: 'Shadows', href: '#', tip: 'Shadows' },
-      { kind: 'item', id: 'layout', icon: layout, label: 'Layout', href: '#', tip: 'Layout' },
+      { kind: 'item', id: 'colors', icon: color, label: 'Colors', path: '/design/styles/colors', tip: 'Colors' },
+      { kind: 'item', id: 'fonts', icon: typography, label: 'Fonts', path: '/design/styles/typography', tip: 'Fonts' },
+      { kind: 'item', id: 'background', icon: background, label: 'Background', path: '/design/styles/background', tip: 'Background' },
+      { kind: 'item', id: 'shadows', icon: shadow, label: 'Shadows', path: '/design/styles/shadows', tip: 'Shadows' },
+      { kind: 'item', id: 'layout', icon: layout, label: 'Layout', path: '/design/styles/layout', tip: 'Layout' },
     ],
   },
 ];

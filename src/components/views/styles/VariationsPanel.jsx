@@ -1,0 +1,133 @@
+import { useState } from 'react';
+import StylesPanelHeader from './StylesPanelHeader';
+import {
+  styleVariations,
+  colorVariations,
+  typographyVariations,
+} from '../../../data/mockData';
+
+/**
+ * A single variation tile: large "Aa" preview with two color dots, used in
+ * both the main variations grid and the Typography section.
+ */
+function VariationTile({ variation, isActive, onClick, showColors = true }) {
+  const headingFont = variation.typography?.headingFont || 'inherit';
+  const swatchPrimary = variation.colors?.primary || '#1e1e1e';
+  const swatchSecondary =
+    variation.colors?.accent || variation.colors?.secondary || '#888';
+  const bg = variation.colors?.background || '#ffffff';
+  const text = variation.colors?.secondary || variation.colors?.primary || '#1e1e1e';
+
+  return (
+    <button
+      type="button"
+      className={`styles-variation-tile ${isActive ? 'is-active' : ''}`}
+      onClick={onClick}
+      style={{ background: bg, color: text }}
+      aria-label={variation.name}
+    >
+      <span className="styles-variation-aa" style={{ fontFamily: headingFont }}>
+        Aa
+      </span>
+      {showColors && (
+        <span className="styles-variation-dots" aria-hidden="true">
+          <span
+            className="styles-variation-dot"
+            style={{ background: swatchPrimary }}
+          />
+          <span
+            className="styles-variation-dot"
+            style={{ background: swatchSecondary }}
+          />
+        </span>
+      )}
+    </button>
+  );
+}
+
+/**
+ * A color-palette tile shown in the COLOR VARIATIONS section: 4 horizontal
+ * color bars side-by-side.
+ */
+function ColorPaletteTile({ palette, isActive, onClick }) {
+  return (
+    <button
+      type="button"
+      className={`styles-color-tile ${isActive ? 'is-active' : ''}`}
+      onClick={onClick}
+      aria-label={palette.name}
+    >
+      {palette.colors.map((c, idx) => (
+        <span key={idx} className="styles-color-bar" style={{ background: c }} />
+      ))}
+    </button>
+  );
+}
+
+function VariationsPanel() {
+  const defaultVariation = styleVariations.find((v) => v.isDefault) ?? styleVariations[0];
+  const [activeVariationId, setActiveVariationId] = useState(defaultVariation.id);
+  const [activeColorId, setActiveColorId] = useState(colorVariations[0].id);
+  const [activeTypoId, setActiveTypoId] = useState(typographyVariations[0].id);
+
+  return (
+    <div className="styles-panel">
+      <StylesPanelHeader subtitle="Browse styles" />
+
+      <p className="styles-panel-description">
+        Choose a variation to change the look of the site.
+      </p>
+
+      <div className="styles-variation-grid">
+        {styleVariations.map((v) => (
+          <VariationTile
+            key={v.id}
+            variation={v}
+            isActive={v.id === activeVariationId}
+            onClick={() => setActiveVariationId(v.id)}
+          />
+        ))}
+      </div>
+
+      <div className="styles-panel-section">
+        <div className="styles-panel-section-label">Color variations</div>
+        <div className="styles-color-grid">
+          {colorVariations.map((p) => (
+            <ColorPaletteTile
+              key={p.id}
+              palette={p}
+              isActive={p.id === activeColorId}
+              onClick={() => setActiveColorId(p.id)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="styles-panel-section">
+        <div className="styles-panel-section-label">Typography</div>
+        <div className="styles-typo-grid">
+          {typographyVariations.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              className={`styles-typo-tile ${
+                t.id === activeTypoId ? 'is-active' : ''
+              }`}
+              onClick={() => setActiveTypoId(t.id)}
+              aria-label={t.name}
+            >
+              <span
+                className="styles-typo-aa"
+                style={{ fontFamily: t.headingFont }}
+              >
+                Aa
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default VariationsPanel;

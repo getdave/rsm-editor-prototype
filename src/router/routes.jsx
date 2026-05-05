@@ -4,6 +4,12 @@ import PreviewView from '../components/views/PreviewView';
 import PagesView from '../components/views/PagesView';
 import EditingView from '../components/views/EditingView';
 import StylesView from '../components/views/StylesView';
+import VariationsPanel from '../components/views/styles/VariationsPanel';
+import ColorsPanel from '../components/views/styles/ColorsPanel';
+import TypographyPanel from '../components/views/styles/TypographyPanel';
+import BackgroundPanel from '../components/views/styles/BackgroundPanel';
+import ShadowsPanel from '../components/views/styles/ShadowsPanel';
+import LayoutPanel from '../components/views/styles/LayoutPanel';
 import ThemesInstalledView from '../components/views/ThemesInstalledView';
 import ThemesBrowseView from '../components/views/ThemesBrowseView';
 
@@ -23,7 +29,18 @@ export const router = createBrowserRouter([
         path: 'design',
         children: [
           { index: true, element: <Navigate to="styles" replace /> },
-          { path: 'styles', element: <StylesView /> },
+          {
+            path: 'styles',
+            element: <StylesView />,
+            children: [
+              { index: true, element: <VariationsPanel /> },
+              { path: 'colors', element: <ColorsPanel /> },
+              { path: 'typography', element: <TypographyPanel /> },
+              { path: 'background', element: <BackgroundPanel /> },
+              { path: 'shadows', element: <ShadowsPanel /> },
+              { path: 'layout', element: <LayoutPanel /> },
+            ],
+          },
           {
             path: 'themes',
             children: [

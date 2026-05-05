@@ -541,3 +541,76 @@ export const availableThemes = [
     screenshot: cssGradient("#ef4444", "#1e1e1e"),
   },
 ];
+
+// ── Styles panel mock data ────────────────────────────────────────────
+// Mirrors the data shapes in Gutenberg's Site Editor styles panel: color
+// variations, typography presets, theme color palettes, font families, etc.
+
+// Color palette variations shown under the "COLOR VARIATIONS" section
+// of the Browse Styles panel.
+export const colorVariations = [
+  { id: "cv-1", name: "Sunshine", colors: ["#000000", "#ffffff", "#fde68a", "#f9c0e1"] },
+  { id: "cv-2", name: "Charcoal", colors: ["#1e1e1e", "#f5f5f5", "#e0e0e0", "#7c2d12"] },
+  { id: "cv-3", name: "Sandy",    colors: ["#f4ede4", "#1f2937", "#fbbf24", "#f97316"] },
+  { id: "cv-4", name: "Greenery", colors: ["#bbf7d0", "#365314", "#a3e635", "#d9f99d"] },
+  { id: "cv-5", name: "Ink",      colors: ["#000000", "#ffffff", "#3b82f6", "#fb923c"] },
+  { id: "cv-6", name: "Mist",     colors: ["#e2e8f0", "#1e1e1e", "#8b5cf6", "#fde68a"] },
+  { id: "cv-7", name: "Wine",     colors: ["#3b0a0a", "#fef2f2", "#fef9c3", "#f9a8d4"] },
+  { id: "cv-8", name: "Royal",    colors: ["#312e81", "#34d399", "#7c3aed", "#1e1e1e"] },
+];
+
+// Typography variations shown under the "TYPOGRAPHY" section.
+export const typographyVariations = [
+  { id: "tv-1", name: "Default", headingFont: "DM Sans", bodyFont: "DM Sans" },
+  { id: "tv-2", name: "Modern",  headingFont: "Inter",   bodyFont: "Inter" },
+  { id: "tv-3", name: "Serif",   headingFont: "Lora",    bodyFont: "Source Sans Pro" },
+  { id: "tv-4", name: "Compact", headingFont: "IBM Plex Sans", bodyFont: "IBM Plex Sans" },
+  { id: "tv-5", name: "Editorial", headingFont: "Playfair Display", bodyFont: "Lora" },
+  { id: "tv-6", name: "Mono",    headingFont: "JetBrains Mono", bodyFont: "JetBrains Mono" },
+];
+
+// Theme palette shown on the Colors panel (matches Gutenberg's "Palette" group).
+export const themePalette = [
+  { slug: "base",                color: "#ffffff", name: "Base" },
+  { slug: "contrast",            color: "#1e1e1e", name: "Contrast" },
+  { slug: "primary",             color: "#3858e9", name: "Primary" },
+  { slug: "secondary",           color: "#7f54b3", name: "Secondary" },
+  { slug: "accent",              color: "#00a32a", name: "Accent" },
+  { slug: "tertiary",            color: "#f59e0b", name: "Tertiary" },
+];
+
+// Per-element colors shown on the Colors panel (Gutenberg "Elements" group).
+export const colorElements = [
+  { slug: "background", name: "Background", color: "#ffffff" },
+  { slug: "text",       name: "Text",       color: "#1e1e1e" },
+  { slug: "caption",    name: "Caption",    color: "#555555" },
+  { slug: "button",     name: "Button",     color: "#3858e9" },
+  { slug: "heading",    name: "Heading",    color: "#1e1e1e" },
+  { slug: "link",       name: "Link",       color: "#3858e9" },
+];
+
+// Typography "Elements" list shown on the Typography panel.
+export const typographyElements = [
+  { slug: "text",     name: "Text",     family: "DM Sans" },
+  { slug: "link",     name: "Link",     family: "DM Sans" },
+  { slug: "heading",  name: "Headings", family: "DM Sans" },
+  { slug: "caption",  name: "Captions", family: "DM Sans" },
+  { slug: "button",   name: "Buttons",  family: "DM Sans" },
+];
+
+// Shadow presets shown on the Shadows panel.
+export const shadowPresets = [
+  { slug: "natural",  name: "Natural",  value: "6px 6px 9px rgba(0, 0, 0, 0.2)" },
+  { slug: "deep",     name: "Deep",     value: "12px 12px 50px rgba(0, 0, 0, 0.4)" },
+  { slug: "sharp",    name: "Sharp",    value: "6px 6px 0px rgba(0, 0, 0, 0.2)" },
+  { slug: "outlined", name: "Outlined", value: "6px 6px 0px -3px #FFF, 6px 6px #000" },
+  { slug: "crisp",    name: "Crisp",    value: "6px 6px 0px #000" },
+];
+
+// Layout panel defaults (matches Gutenberg's layout section).
+export const layoutDefaults = {
+  contentSize: "650px",
+  wideSize: "1200px",
+  padding: { top: "0", right: "0", bottom: "0", left: "0" },
+  blockSpacing: "1.5rem",
+};
