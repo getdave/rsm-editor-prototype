@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
+import { Tooltip } from '@wordpress/components';
 import { navigationMenus as initialMenus } from '../../data/mockData';
 import { useAppState } from '../../hooks/useAppState';
 import MenuEditor from '../navigation/MenuEditor';
@@ -66,7 +67,9 @@ function NavigationView() {
           <span>
             {item.name}
             {item.isPrimary && (
-              <span className="nav-menu-badge" style={{ marginLeft: '8px' }}>Primary</span>
+              <Tooltip text="The menu that is currently assigned to the Header template part">
+                <span className="nav-menu-badge" style={{ marginLeft: '8px' }}>Primary</span>
+              </Tooltip>
             )}
           </span>
         ),
