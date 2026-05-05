@@ -20,12 +20,17 @@ export const getPageContent = (page) => {
     return getDefaultContent();
   }
 
+  if (page.isPostsPage) {
+    return getBlogPageAsPostsIndexContent(page);
+  }
+
   // Map page types to content
   const contentMap = {
     // Content Pages (CPT: page) - Regular pages created by users
     'home': getHomeContent(),
     'about': getAboutContent(),
     'gallery': getGalleryContent(),
+    'blog': getDefaultContent(page),
     'contact': getContactContent(),
     
     // System Pages (Special-purpose Templates)
@@ -38,6 +43,8 @@ export const getPageContent = (page) => {
     
     // Archive Templates (Template Hierarchy)
     'product-list': getProductListContent(),
+    /** Blog index at `/` when homepage displays latest posts (home.php hierarchy) */
+    'blog-home-root': getBlogListContent(),
     'blog-list': getBlogListContent(),
     
     // Single Templates (Template Hierarchy)
@@ -339,6 +346,29 @@ function getBlogListContent() {
   };
 }
 
+/** Content Page (CPT) assigned as “Posts page” in Reading settings — shows latest posts */
+function getBlogPageAsPostsIndexContent(page) {
+  const archive = getBlogListContent();
+  return {
+    ...archive,
+    title: page?.name ?? archive.title,
+    subtitle: archive.subtitle,
+    wordpressContext: {
+      type: "page",
+      templateFile: "home.html",
+      isPostsPage: true,
+    },
+    sections: archive.sections.map((section, i) =>
+      i === 0 && section.type === "archive-header"
+        ? {
+            ...section,
+            title: page?.name ?? section.title,
+          }
+        : section
+    ),
+  };
+}
+
 // Single Templates (Template Hierarchy)
 
 function getProductSingleContent() {
@@ -442,6 +472,7 @@ export const getEditModeContent = (page) => {
 function getPlaceholderTitle(pageId, layout) {
   // Specific titles for known page types
   if (pageId === 'product-list') return 'Product Category Title';
+  if (pageId === 'blog-home-root') return 'Blog Homepage';
   if (pageId === 'blog-list') return 'Blog Archive Title';
   if (pageId === 'product-single') return 'Product Title';
   if (pageId === 'blog-single') return 'Post Title';

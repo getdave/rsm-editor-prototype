@@ -591,6 +591,26 @@ body {
   border-left-color: #3858e9;
 }
 
+/* Sidebar page row: front-page badge overlays icon (top-left) */
+.pi-media-thumb {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 40px;
+}
+
+.pi-media-thumb .pp-front-page-overlay,
+.pi-media-thumb .pp-posts-page-overlay {
+  top: -1px;
+  left: -1px;
+  padding: 1px 3px;
+  font-size: 6px;
+  letter-spacing: 0.04em;
+}
+
 .pi-ico {
   font-size: 11px;
   color: #555;
@@ -619,6 +639,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .pi-name.sys {
@@ -1783,6 +1804,55 @@ body {
   background: #2a47d4;
 }
 
+/* Configure homepage (Reading settings) modal */
+.ch-reading-modal.modal-box {
+  width: min(400px, calc(100vw - 48px));
+  max-width: 400px;
+}
+
+.ch-reading-body {
+  padding-bottom: 8px;
+}
+
+.ch-reading-intro {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #555;
+}
+
+.ch-reading-radio.components-base-control {
+  margin-bottom: 0;
+}
+
+.ch-reading-static {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.ch-reading-static .components-base-control__field {
+  margin-bottom: 0;
+}
+
+.ch-reading-field-warning {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #755100;
+  background: #fcf9e8;
+  border: 1px solid #edc949;
+  border-radius: 4px;
+}
+
+.ch-reading-footer.modal-footer {
+  justify-content: flex-end;
+}
+
 /* Split View Layout - Generic reusable pattern for stage + canvas views */
 .split-view {
   width: 100%;
@@ -1857,8 +1927,35 @@ body {
   flex-shrink: 0;
 }
 
-.pp-hd .components-button {
+.pp-hd-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin-left: auto;
+}
+
+.pp-hd-more-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.pp-hd-more-toggle-attention.components-button {
+  position: relative;
+}
+
+.pp-hd-more-toggle-attention.components-button::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d63638;
+  box-shadow: 0 0 0 2px #fff;
+  pointer-events: none;
 }
 
 .pp-title {
@@ -1881,20 +1978,80 @@ body {
 /* Controls row: sits below tabs */
 .pp-toolbar-controls {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 16px 6px 20px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 8px 16px 8px 20px;
   border-bottom: 1px solid #e0e0e0;
   background: #fff;
   flex-shrink: 0;
-  flex-wrap: nowrap;
+}
+
+/* Notice + view options + drafts: one row, two columns */
+.pp-notice-toolbar-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.pp-notice-toolbar-col--notice {
+  flex: 1;
+  min-width: 0;
+}
+
+.pp-notice-toolbar-col--actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.pp-latest-posts-home-tip {
+  padding: 10px 14px;
+  margin: 0 0 10px;
+  background: #fcf9e8;
+  border-left: 4px solid #dba617;
+  border-radius: 2px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #1e1e1e;
+}
+
+.pp-toolbar-row-options {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.pp-view-options-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pp-view-options-toggle .pp-view-options-chevron {
+  display: inline-flex;
+  line-height: 0;
+}
+
+.pp-view-options-toggle .pp-view-options-chevron svg {
+  width: 18px;
+  height: 18px;
 }
 
 /* Let search grow but cap it so the other controls stay visible */
-.pp-toolbar-controls .dataviews-search {
+.pp-toolbar-row-options .dataviews-search {
   flex: 1;
-  max-width: 220px;
+  min-width: 160px;
+  max-width: 280px;
 }
 
 
@@ -1909,7 +2066,7 @@ body {
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   font-family: inherit;
-  transition: color 0.12s;
+  transition: color 0.12s, background 0.12s;
 }
 
 .pp-tab:hover {
@@ -1919,6 +2076,32 @@ body {
 .pp-tab.on {
   color: #1e1e1e;
   border-bottom-color: #3858e9;
+}
+
+/* Spacer to push system toggle to the right */
+.pp-toolbar-spacer {
+  flex: 1;
+}
+
+/* System pages toggle in toolbar */
+.pp-system-toggle.components-base-control {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  margin-left: 8px;
+  border-left: 1px solid #e0e0e0;
+}
+
+.pp-system-toggle .components-base-control__field {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.pp-system-toggle .components-toggle-control__label {
+  font-size: 13px;
+  color: #757575;
 }
 
 /* DataViews integration wrapper */
@@ -1946,18 +2129,145 @@ body {
   padding-top: 12px;
 }
 
-.pp-tab-desc {
-  padding: 12px 20px 0;
+/* Pages DataViews: icon tile + front-page label (absolute top-left on tile) */
+.pp-media-thumb {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.pp-media-thumb--grid {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  max-width: none;
+}
+
+.pp-media-thumb-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pp-front-page-overlay {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 2;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3858e9;
+  background: rgba(56, 88, 233, 0.1);
+  border: 1px solid rgba(56, 88, 233, 0.45);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.pp-posts-page-overlay {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 2;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #007017;
+  background: rgba(0, 112, 23, 0.1);
+  border: 1px solid rgba(0, 112, 23, 0.42);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+/* Title column: compact house icon for front page (matches text size) */
+.pp-title-cell-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  min-width: 0;
+}
+
+.pp-title-cell-tooltip-wrap {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.pp-title-glyph-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  color: #646970;
+  vertical-align: middle;
+}
+
+.pp-title-glyph-icon--posts {
+  color: #007017;
+}
+
+.pp-title-glyph-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  display: block;
+}
+
+.pp-title-cell-name {
+  min-width: 0;
+}
+
+.pp-menu-empty,
+.pp-author-empty {
+  color: #a0a0a0;
 }
 
 .pp-tab-desc-content {
-  padding: 12px 16px;
-  background: #f0f6fc;
-  border-left: 4px solid #3582c4;
-  border-radius: 2px;
+  margin: 0;
+  padding: 0;
   font-size: 13px;
-  line-height: 1.4;
-  color: #1e1e1e;
+  line-height: 1.5;
+  color: #505050;
+}
+
+.pp-desc-link {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: #2271b1;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.pp-desc-link:hover {
+  text-decoration: underline;
+  color: #135e96;
 }
 
 /* WordPress Tooltip styling for defined terms */

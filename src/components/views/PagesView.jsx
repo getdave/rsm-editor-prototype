@@ -1,6 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Notice } from "@wordpress/components";
+import {
+  Button,
+  DropdownMenu,
+  RadioControl,
+  SelectControl,
+  ToggleControl,
+  Tooltip,
+  VisuallyHidden,
+} from "@wordpress/components";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
 import { createInterpolateElement } from "@wordpress/element";
 import {
@@ -10,7 +18,11 @@ import {
   copy,
   home,
   page as pageIcon,
+  postList,
   seen,
+  chevronDown,
+  chevronUp,
+  moreVertical,
 } from "@wordpress/icons";
 import { useAppState } from "../../hooks/useAppState";
 import { pages } from "../../data/mockData";
@@ -30,13 +42,8 @@ const TABS = [
   {
     value: "content",
     label: "Content",
-    description: null,
-  },
-  {
-    value: "system",
-    label: "System",
     description:
-      "System pages are automatically created by WordPress, your theme, or plugins.",
+      "These pages are created by an author or automatically created by a Plugin or WordPress.",
   },
   {
     value: "dynamic",
@@ -47,8 +54,12 @@ const TABS = [
         term: (
           <DefinedTerm definition="Reusable page layouts in WordPress. Examples: Single Post template (for blog posts), Product Archive template (for product listings), Search Results template." />
         ),
-      }
+      },
     ),
+    descriptionLink: {
+      text: "View all Templates",
+      action: "view-templates",
+    },
   },
 ];
 
@@ -56,6 +67,10 @@ const STATUS_ELEMENTS = [
   { value: "live", label: "Live" },
   { value: "draft", label: "Draft" },
 ];
+
+const SYSTEM_FILTER_HIDE = Object.freeze([
+  { field: "isSystem", operator: "is", value: false },
+]);
 
 const DEFAULT_VIEW = {
   type: "list",
@@ -66,15 +81,216 @@ const DEFAULT_VIEW = {
   sort: undefined,
   titleField: "name",
   mediaField: "media",
-  fields: ["status", "inMenu", "badges"],
+  fields: ["status", "inMenu", "authorDisplay"],
   layout: { density: "compact" },
 };
 
 const DEFAULT_LAYOUTS = {
   list: { layout: { density: "compact" } },
-  grid: { badgeFields: ["badges"], layout: { previewSize: 170 } },
+  grid: { badgeFields: ["authorDisplay"], layout: { previewSize: 60 } },
   table: {},
 };
+
+const READING_DISPLAY_LATEST = "latest";
+const READING_DISPLAY_STATIC = "static";
+
+/** Synthetic dynamic row — blog index at `/` when Reading uses “your latest posts” */
+const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = "blog-home-root";
+
+const blogHomepageRootTemplateRow = Object.freeze({
+  id: BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
+  slug: "",
+  name: "Blog Homepage",
+  type: "Dynamic Page",
+  isLive: true,
+  inMenu: false,
+  isSystem: false,
+  isDynamic: true,
+  category: "dynamic",
+  status: "live",
+  level: 0,
+  authorDisplay: "WordPress",
+  titleTooltip:
+    "Used at your site's main web address while the homepage shows your latest posts. Visitors see your newest posts listed first.",
+  isFrontPage: true,
+});
+
+function readingPageOptionLabel(p) {
+  const prefix = p.level > 0 ? `${"— ".repeat(p.level)}` : "";
+  return `${prefix}${p.name}`;
+}
+
+function ConfigureHomepageReadingModal({
+  onClose,
+  onApply,
+  initialHomepageDisplayMode,
+  initialFrontPageId,
+  initialPostsPageId,
+  readingSelectPages,
+}) {
+  const [mode, setMode] = useState(initialHomepageDisplayMode);
+  const [homePageId, setHomePageId] = useState(initialFrontPageId);
+  const [postsPageIdDraft, setPostsPageIdDraft] = useState(initialPostsPageId);
+
+  const homepageOptions = useMemo(() => {
+    const rows = readingSelectPages.map((p) => ({
+      label: readingPageOptionLabel(p),
+      value: p.id,
+    }));
+    const out = [{ label: "— Select —", value: "" }, ...rows];
+    if (homePageId && !readingSelectPages.some((p) => p.id === homePageId)) {
+      out.push({
+        label: `Unavailable (${homePageId})`,
+        value: homePageId,
+      });
+    }
+    return out;
+  }, [readingSelectPages, homePageId]);
+
+  const homePageResolved =
+    homePageId && readingSelectPages.some((p) => p.id === homePageId);
+  let homepageWarning = null;
+  if (mode === READING_DISPLAY_STATIC) {
+    if (homePageId && !homePageResolved) {
+      homepageWarning =
+        "That page isn't listed here (for example if it isn't published as Live yet). Pick a Live page—the one visitors should see when they open your site's main web address.";
+    } else if (!homePageId) {
+      homepageWarning =
+        "No homepage chosen. Pick which page should open at your site's main web address. Until then, people visiting that will usually see a blog-style list of your newest posts.";
+    }
+  }
+
+  const postsPageUnset = mode === READING_DISPLAY_STATIC && !postsPageIdDraft;
+
+  const postsPageWarning = postsPageUnset
+    ? "No posts Page set. There’s no bookmarkable URL dedicated to listing recent posts; posts still surface through archives, category links, and similar views."
+    : null;
+  const postsPageOptions = useMemo(() => {
+    const rows = readingSelectPages
+      .filter((p) => p.id !== homePageId)
+      .map((p) => ({ label: readingPageOptionLabel(p), value: p.id }));
+    return [{ label: "— Select —", value: "" }, ...rows];
+  }, [readingSelectPages, homePageId]);
+
+  const handleDisplayModeChange = (next) => {
+    if (next === READING_DISPLAY_LATEST) {
+      setMode(READING_DISPLAY_LATEST);
+      setHomePageId("");
+      setPostsPageIdDraft("");
+    } else {
+      setMode(READING_DISPLAY_STATIC);
+      setHomePageId((prev) => prev || "home");
+      setPostsPageIdDraft((prev) => prev || "blog");
+    }
+  };
+
+  const handleHomepageSelect = (id) => {
+    setHomePageId(id);
+    if (id === postsPageIdDraft) {
+      setPostsPageIdDraft("");
+    }
+  };
+
+  const handleDone = () => {
+    onApply({
+      homepageDisplayMode: mode,
+      frontPageId: homePageId,
+      postsPageId: postsPageIdDraft,
+    });
+  };
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="configure-homepage-modal-title"
+      className="modal-box ch-reading-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="modal-hd">
+        <span id="configure-homepage-modal-title" className="modal-title">
+          Configure site homepage
+        </span>
+        <button
+          type="button"
+          className="modal-close"
+          aria-label="Close dialog"
+          onClick={onClose}
+        >
+          ×
+        </button>
+      </div>
+      <div className="modal-body ch-reading-body">
+        <p className="ch-reading-intro">
+          Controls what visitors see at your site&apos;s main address.
+        </p>
+
+        <RadioControl
+          className="ch-reading-radio"
+          label="Your homepage displays"
+          selected={mode}
+          options={[
+            {
+              label: "Your latest posts",
+              value: READING_DISPLAY_LATEST,
+              description:
+                "Visitors land on your main web address and see your newest blog posts listed first. This works well for a blog or magazine-style site.",
+            },
+            {
+              label: "A static page",
+              value: READING_DISPLAY_STATIC,
+              description:
+                "Visitors land on one page you edit (often labeled Home), similar to a storefront or brochure site. You choose that page below.",
+            },
+          ]}
+          onChange={handleDisplayModeChange}
+        />
+
+        {mode === READING_DISPLAY_STATIC && (
+          <div className="ch-reading-static">
+            <div className="ch-reading-field">
+              <SelectControl
+                __next40pxDefaultSize
+                label="Homepage"
+                value={homePageId || ""}
+                options={homepageOptions}
+                onChange={handleHomepageSelect}
+              />
+              {homepageWarning ? (
+                <p className="ch-reading-field-warning" role="note">
+                  {homepageWarning}
+                </p>
+              ) : null}
+            </div>
+            <div className="ch-reading-field">
+              <SelectControl
+                __next40pxDefaultSize
+                label="Posts page"
+                help="Optional. Uses the blog index; page content isn't used on the front of the site."
+                value={postsPageIdDraft || ""}
+                options={postsPageOptions}
+                onChange={(v) => setPostsPageIdDraft(v || "")}
+              />
+              {postsPageWarning ? (
+                <p className="ch-reading-field-warning" role="note">
+                  {postsPageWarning}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="modal-footer ch-reading-footer">
+        <Button variant="tertiary" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button variant="primary" onClick={handleDone}>
+          Done
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 function AddNewCard() {
   return (
@@ -89,13 +305,85 @@ function AddNewCard() {
   );
 }
 
+function renderAuthorCell(item) {
+  const text = item.authorDisplay ?? "";
+  if (!text) {
+    return <span className="pp-author-empty">—</span>;
+  }
+  const style = text !== "John Doe" ? BADGE_STYLES[text] : undefined;
+  if (style) {
+    return (
+      <span className="pp-badge" style={style}>
+        {text}
+      </span>
+    );
+  }
+  return <span>{text}</span>;
+}
+
 function PagesView() {
   const navigate = useNavigate();
   const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode } =
     useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
+  const [frontPageId, setFrontPageId] = useState(
+    () => pages.find((p) => p.isFrontPage)?.id ?? "home",
+  );
+  const [postsPageId, setPostsPageId] = useState(
+    () => pages.find((p) => p.isPostsPage)?.id ?? "blog",
+  );
   const [activeCategory, setActiveCategory] = useState("content");
   const [view, setView] = useState({ ...DEFAULT_VIEW, type: pagesViewMode });
+  const [showDrafts, setShowDrafts] = useState(false);
+  const [viewOptionsOpen, setViewOptionsOpen] = useState(false);
+  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
+    READING_DISPLAY_STATIC,
+  );
+  const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
+
+  const readingSelectPages = useMemo(
+    () => pages.filter((p) => p.category === "content" && p.status === "live"),
+    [],
+  );
+
+  const readingConfigureMenuNeedsAttention = useMemo(() => {
+    if (homepageDisplayMode !== READING_DISPLAY_STATIC) {
+      return false;
+    }
+    if (!frontPageId) {
+      return true;
+    }
+    if (!readingSelectPages.some((p) => p.id === frontPageId)) {
+      return true;
+    }
+    if (!postsPageId) {
+      return true;
+    }
+    if (!readingSelectPages.some((p) => p.id === postsPageId)) {
+      return true;
+    }
+    return false;
+  }, [
+    homepageDisplayMode,
+    frontPageId,
+    postsPageId,
+    readingSelectPages,
+  ]);
+
+  const isGridLayout = view.type === "grid";
+
+  useEffect(() => {
+    if (!configureHomepageOpen) {
+      return;
+    }
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setConfigureHomepageOpen(false);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [configureHomepageOpen]);
 
   const fields = useMemo(
     () => [
@@ -104,12 +392,23 @@ function PagesView() {
         label: "Icon",
         render: ({ item }) => (
           <span
-            style={{
-              color: item.id === "home" ? "#3858e9" : "#999",
-              display: "flex",
-            }}
+            className={
+              isGridLayout
+                ? "pp-media-thumb pp-media-thumb--grid"
+                : "pp-media-thumb"
+            }
           >
-            {item.id === "home" ? home : pageIcon}
+            <span
+              className="pp-media-thumb-icon"
+              style={{ color: "#999", display: "flex" }}
+            >
+              {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
+            </span>
+            {item.isFrontPage ? (
+              <span className="pp-front-page-overlay">Front page</span>
+            ) : item.isPostsPage ? (
+              <span className="pp-posts-page-overlay">Posts page</span>
+            ) : null}
           </span>
         ),
         enableSorting: false,
@@ -123,16 +422,38 @@ function PagesView() {
         label: "Title",
         enableHiding: false,
         enableGlobalSearch: true,
-        render: ({ item }) => (
-          <span
-            style={{
-              color: item.id === "home" ? "#3858e9" : "inherit",
-              fontWeight: item.id === "home" ? 600 : "inherit",
-            }}
-          >
-            {item.name}
-          </span>
-        ),
+        render: ({ item }) => {
+          const title = (
+            <span className="pp-title-cell-inner">
+              {item.isFrontPage ? (
+                <span
+                  className="pp-title-glyph-icon"
+                  aria-hidden="true"
+                  title="Front page"
+                >
+                  {home}
+                </span>
+              ) : item.isPostsPage ? (
+                <span
+                  className="pp-title-glyph-icon pp-title-glyph-icon--posts"
+                  aria-hidden="true"
+                  title="Posts page"
+                >
+                  {postList}
+                </span>
+              ) : null}
+              <span className="pp-title-cell-name">{item.name}</span>
+            </span>
+          );
+          if (!item.titleTooltip) {
+            return title;
+          }
+          return (
+            <Tooltip text={item.titleTooltip} delay={400} placement="top">
+              <span className="pp-title-cell-tooltip-wrap">{title}</span>
+            </Tooltip>
+          );
+        },
       },
       {
         id: "status",
@@ -155,39 +476,46 @@ function PagesView() {
       {
         id: "inMenu",
         type: "boolean",
-        label: "In menu",
+        label: "Menu",
         enableSorting: false,
+        enableHiding: true,
+        enableGlobalSearch: false,
+        getValue: ({ item }) => Boolean(item.inMenu),
+        render: ({ item }) =>
+          item.inMenu ? (
+            <span className="pp-badge pp-nav">Main Menu</span>
+          ) : (
+            <span className="pp-menu-empty">—</span>
+          ),
+      },
+      {
+        id: "isSystem",
+        type: "boolean",
+        label: "System template",
+        getValue: ({ item }) => Boolean(item.isSystem),
+        filterBy: {
+          operators: ["is", "isNot"],
+        },
+        enableSorting: true,
         enableHiding: true,
         enableGlobalSearch: false,
         render: ({ item }) =>
-          item.inMenu ? <span className="pp-badge pp-nav">In menu</span> : null,
+          item.isSystem ? (
+            <span className="pp-badge pp-draft">System</span>
+          ) : null,
       },
       {
-        id: "badges",
-        label: "Source",
-        enableSorting: false,
+        id: "authorDisplay",
+        type: "text",
+        label: "Author",
+        enableSorting: true,
         enableHiding: true,
         enableGlobalSearch: false,
-        getValue: ({ item }) => item.badges ?? [],
-        render: ({ item }) => {
-          if (!item.badges || item.badges.length === 0) return null;
-          return (
-            <span style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
-              {item.badges.map((badge) => (
-                <span
-                  key={badge}
-                  className="pp-badge"
-                  style={BADGE_STYLES[badge] ?? {}}
-                >
-                  {badge}
-                </span>
-              ))}
-            </span>
-          );
-        },
+        getValue: ({ item }) => item.authorDisplay ?? "",
+        render: ({ item }) => renderAuthorCell(item),
       },
     ],
-    [],
+    [isGridLayout],
   );
 
   const actions = useMemo(
@@ -220,14 +548,138 @@ function PagesView() {
         icon: copy,
         callback: (items) => console.log("Duplicate:", items[0].slug),
       },
+      {
+        id: "set-as-homepage",
+        label: "Set as Homepage",
+        isEligible: (item) =>
+          item.category === "content" &&
+          item.id !== frontPageId &&
+          !item.isPostsPage,
+        callback: (items, { onActionPerformed } = {}) => {
+          setHomepageDisplayMode(READING_DISPLAY_STATIC);
+          setFrontPageId(items[0].id);
+          if (items[0].id === postsPageId) {
+            setPostsPageId("");
+          }
+          setPreviewPage(items[0]);
+          onActionPerformed?.(items);
+        },
+      },
+      {
+        id: "set-as-homepage-current",
+        label: "Set as Homepage",
+        isEligible: (item) =>
+          item.category === "content" && item.id === frontPageId,
+        disabled: true,
+        callback: () => {},
+      },
+      {
+        id: "set-as-homepage-posts-page",
+        label: "Set as Homepage",
+        isEligible: (item) =>
+          item.category === "content" &&
+          item.isPostsPage &&
+          item.id !== frontPageId,
+        disabled: true,
+        callback: () => {},
+      },
+      {
+        id: "set-as-posts-page",
+        label: "Set as Posts page",
+        isEligible: (item) =>
+          item.category === "content" &&
+          item.id !== postsPageId &&
+          item.id !== frontPageId,
+        callback: (items, { onActionPerformed } = {}) => {
+          setHomepageDisplayMode(READING_DISPLAY_STATIC);
+          setPostsPageId(items[0].id);
+          setPreviewPage(items[0]);
+          onActionPerformed?.(items);
+        },
+      },
+      {
+        id: "set-as-posts-page-current",
+        label: "Set as Posts page",
+        isEligible: (item) =>
+          item.category === "content" && item.id === postsPageId,
+        disabled: true,
+        callback: () => {},
+      },
+      {
+        id: "set-as-posts-page-is-front-page",
+        label: "Set as Posts page",
+        isEligible: (item) =>
+          item.category === "content" &&
+          item.id === frontPageId &&
+          item.id !== postsPageId,
+        disabled: true,
+        callback: () => {},
+      },
     ],
-    [navigate, setCurrentPage, setPreviewPage],
+    [
+      navigate,
+      setCurrentPage,
+      setPreviewPage,
+      frontPageId,
+      postsPageId,
+      setHomepageDisplayMode,
+    ],
   );
 
-  const categoryPages = useMemo(
-    () => pages.filter((p) => p.category === activeCategory),
-    [activeCategory],
-  );
+  const categoryPages = useMemo(() => {
+    let filtered = pages
+      .map((p) => ({
+        ...p,
+        isFrontPage:
+          homepageDisplayMode === READING_DISPLAY_STATIC &&
+          Boolean(frontPageId) &&
+          p.category === "content" &&
+          p.id === frontPageId,
+        isPostsPage:
+          homepageDisplayMode === READING_DISPLAY_STATIC &&
+          Boolean(postsPageId) &&
+          p.category === "content" &&
+          p.id === postsPageId,
+      }))
+      .filter((p) => p.category === activeCategory);
+
+    if (activeCategory === "content" && !showDrafts) {
+      filtered = filtered.filter((p) => p.status !== "draft");
+    }
+
+    if (
+      activeCategory === "dynamic" &&
+      homepageDisplayMode === READING_DISPLAY_LATEST &&
+      !filtered.some((p) => p.id === BLOG_HOMEPAGE_ROOT_TEMPLATE_ID)
+    ) {
+      filtered = [blogHomepageRootTemplateRow, ...filtered];
+    }
+
+    return filtered;
+  }, [
+    activeCategory,
+    showDrafts,
+    frontPageId,
+    postsPageId,
+    homepageDisplayMode,
+  ]);
+
+  const handleReadingModalApply = (draft) => {
+    if (draft.homepageDisplayMode === READING_DISPLAY_LATEST) {
+      setHomepageDisplayMode(READING_DISPLAY_LATEST);
+      setFrontPageId("");
+      setPostsPageId("");
+    } else {
+      setHomepageDisplayMode(READING_DISPLAY_STATIC);
+      setFrontPageId(draft.frontPageId || "");
+      setPostsPageId(draft.postsPageId || "");
+    }
+    setConfigureHomepageOpen(false);
+  };
+
+  const handleReadingModalClose = () => {
+    setConfigureHomepageOpen(false);
+  };
 
   const { data: processedData, paginationInfo } = useMemo(
     () => filterSortAndPaginate(categoryPages, view, fields),
@@ -245,7 +697,12 @@ function PagesView() {
 
   const handleTabClick = (value) => {
     setActiveCategory(value);
-    setView((prev) => ({ ...prev, page: 1, search: "", filters: [] }));
+    setView((prev) => ({
+      ...prev,
+      page: 1,
+      search: "",
+      filters: value === "dynamic" ? [...SYSTEM_FILTER_HIDE] : [],
+    }));
   };
 
   const activeTab = TABS.find((t) => t.value === activeCategory);
@@ -280,14 +737,44 @@ function PagesView() {
       >
         <div className="pp-hd">
           <span className="pp-title">Pages</span>
-          <Button
-            variant="primary"
-            icon={plus}
-            iconSize={16}
-            onClick={() => console.log("Add page")}
-          >
-            Add page
-          </Button>
+          <div className="pp-hd-actions">
+            <Button
+              variant="primary"
+              icon={plus}
+              iconSize={16}
+              onClick={() => console.log("Add page")}
+            >
+              Add page
+            </Button>
+            <span className="pp-hd-more-wrap">
+              {readingConfigureMenuNeedsAttention ? (
+                <VisuallyHidden>
+                  Homepage or posts page configuration needs attention.
+                  Configure it in this menu.
+                </VisuallyHidden>
+              ) : null}
+              <DropdownMenu
+                icon={moreVertical}
+                label={
+                  readingConfigureMenuNeedsAttention
+                    ? "More options. Homepage settings need attention; choose Configure homepage."
+                    : "More page options"
+                }
+                toggleProps={{
+                  variant: "tertiary",
+                  className: readingConfigureMenuNeedsAttention
+                    ? "pp-hd-more-toggle-attention"
+                    : undefined,
+                }}
+                controls={[
+                  {
+                    title: "Configure homepage",
+                    onClick: () => setConfigureHomepageOpen(true),
+                  },
+                ]}
+              />
+            </span>
+          </div>
         </div>
         <div className="pp-tabs">
           {TABS.map((tab) => (
@@ -301,17 +788,73 @@ function PagesView() {
           ))}
         </div>
         <div className="pp-toolbar-controls">
-          <DataViews.Search />
-          <DataViews.FiltersToggle />
-          <DataViews.LayoutSwitcher />
-        </div>
-        {activeTab?.description && (
-          <div className="pp-tab-desc">
-            <div className="pp-tab-desc-content">
-              {activeTab.description}
+          <div className="pp-notice-toolbar-row">
+            <div className="pp-notice-toolbar-col pp-notice-toolbar-col--notice">
+              {homepageDisplayMode === READING_DISPLAY_LATEST &&
+                activeCategory === "content" && (
+                  <div
+                    className="pp-latest-posts-home-tip"
+                    role="status"
+                  >
+                    Looking for your Homepage? It&apos;s under{" "}
+                    <button
+                      type="button"
+                      className="pp-desc-link"
+                      onClick={() => handleTabClick("dynamic")}
+                    >
+                      Dynamic
+                    </button>
+                    .
+                  </div>
+                )}
+              {activeTab?.description && (
+                <p className="pp-tab-desc-content">
+                  {activeTab.description}
+                  {activeTab.descriptionLink && (
+                    <>
+                      {" "}
+                      <button
+                        type="button"
+                        className="pp-desc-link"
+                        onClick={() => navigate("/templates")}
+                      >
+                        {activeTab.descriptionLink.text} →
+                      </button>
+                    </>
+                  )}
+                </p>
+              )}
+            </div>
+            <div className="pp-notice-toolbar-col pp-notice-toolbar-col--actions">
+              <Button
+                variant="tertiary"
+                className="pp-view-options-toggle"
+                onClick={() => setViewOptionsOpen((o) => !o)}
+                aria-expanded={viewOptionsOpen}
+              >
+                View options
+                <span className="pp-view-options-chevron">
+                  {viewOptionsOpen ? chevronUp : chevronDown}
+                </span>
+              </Button>
+              {activeCategory === "content" && (
+                <ToggleControl
+                  label="Show drafts"
+                  checked={showDrafts}
+                  onChange={setShowDrafts}
+                  className="pp-system-toggle"
+                />
+              )}
             </div>
           </div>
-        )}
+          {viewOptionsOpen && (
+            <div className="pp-toolbar-row-options">
+              <DataViews.Search />
+              <DataViews.FiltersToggle />
+              <DataViews.LayoutSwitcher />
+            </div>
+          )}
+        </div>
         <div className="pp-dv-filters">
           <DataViews.FiltersToggled />
         </div>
@@ -339,6 +882,22 @@ function PagesView() {
         canvasContent={canvasContent}
         gridContent={stageContent}
       />
+      {configureHomepageOpen && (
+        <div
+          className="modal-overlay"
+          role="presentation"
+          onClick={handleReadingModalClose}
+        >
+          <ConfigureHomepageReadingModal
+            onClose={handleReadingModalClose}
+            onApply={handleReadingModalApply}
+            initialHomepageDisplayMode={homepageDisplayMode}
+            initialFrontPageId={frontPageId}
+            initialPostsPageId={postsPageId}
+            readingSelectPages={readingSelectPages}
+          />
+        </div>
+      )}
     </div>
   );
 }
