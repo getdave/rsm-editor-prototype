@@ -1,17 +1,24 @@
 import { useState } from 'react';
-import { navigationMenus } from '../../data/mockData';
+import { navigationMenus as initialMenus } from '../../data/mockData';
 import MenuList from '../navigation/MenuList';
 import MenuEditor from '../navigation/MenuEditor';
 import MenuPreviews from '../navigation/MenuPreviews';
 
 function NavigationView() {
+  const [menus, setMenus] = useState(initialMenus);
   const [selectedMenuId, setSelectedMenuId] = useState('main-menu');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('alphabetical');
 
-  const selectedMenu = navigationMenus.find(menu => menu.id === selectedMenuId);
+  const selectedMenu = menus.find(menu => menu.id === selectedMenuId);
 
-  const filteredMenus = navigationMenus.filter(menu =>
+  const updateMenu = (menuId, updates) => {
+    setMenus(prev => prev.map(menu =>
+      menu.id === menuId ? { ...menu, ...updates } : menu
+    ));
+  };
+
+  const filteredMenus = menus.filter(menu =>
     menu.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -37,6 +44,7 @@ function NavigationView() {
         <>
           <MenuEditor
             menu={selectedMenu}
+            onUpdateMenu={(updates) => updateMenu(selectedMenuId, updates)}
             onBack={() => setSelectedMenuId(null)}
           />
           <MenuPreviews menu={selectedMenu} />

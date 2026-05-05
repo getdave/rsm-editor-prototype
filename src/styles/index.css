@@ -3,7 +3,7 @@
 @import './chrome/sidebar.css';
 @import './chrome/topbar.css';
 @import './canvas.css';
-@import './modals-base.css';
+@antml:parameter name="modals-base.css';
 @import './modals/add-page.css';
 @import './views/home.css';
 @import './views/pages.css';
