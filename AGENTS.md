@@ -250,6 +250,19 @@ Only work directly on `trunk` for:
 
 Use **git worktrees** when you want several features (or agents) in parallel, each with its own checkout and dev server.
 
+#### Cursor worktrees (Agents Window, `/worktree`, CLI)
+
+Cursor isolates agents in separate Git checkouts. This repo includes [`.cursor/worktrees.json`](.cursor/worktrees.json) so Cursor runs a proper setup when it creates a worktree:
+
+- **`npm ci`** in the new checkout (Cursor [recommends installing dependencies per worktree](https://cursor.com/docs/configuration/worktrees) instead of symlinking `node_modules`).
+- **`.env.local`** with a **stable `VITE_PORT`** derived from the worktree path (reduces port clashes between parallel agents). If your main workspace has `.env.local`, non-`VITE_PORT` lines are copied into the worktree first.
+
+Scripts live next to the config: [`.cursor/setup-worktree-unix.sh`](.cursor/setup-worktree-unix.sh), [`.cursor/setup-worktree-windows.ps1`](.cursor/setup-worktree-windows.ps1). If setup fails, use the editor **Output** panel and choose **Worktrees Setup** (per Cursor docs).
+
+Editor commands: **`/worktree`**, **`/best-of-n`**, **`/apply-worktree`**, **`/delete-worktree`**. Full details: [Cursor — Worktrees](https://cursor.com/docs/configuration/worktrees).
+
+#### Manual / CLI git worktrees (sibling folder)
+
 **Create a worktree** from the main clone (run at the repo root):
 
 ```bash
