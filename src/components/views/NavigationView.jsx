@@ -8,7 +8,7 @@ import AddMenuModal from '../navigation/AddMenuModal';
 
 function NavigationView() {
   const [menus, setMenus] = useState(initialMenus);
-  const [selectedMenuId, setSelectedMenuId] = useState('main-menu');
+  const [selectedMenuId, setSelectedMenuId] = useState(null);
   const [showAddMenuModal, setShowAddMenuModal] = useState(false);
   const { sidebarCollapsed, toggleSidebar } = useAppState();
 
@@ -22,6 +22,7 @@ function NavigationView() {
       field: 'name',
       direction: 'asc',
     },
+    fields: ['name', 'locations'],
     layout: { density: 'compact' },
   });
 
