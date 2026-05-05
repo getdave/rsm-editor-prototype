@@ -65,11 +65,12 @@ function NavigationView() {
           <MenuPreviews menu={selectedMenu} />
         </>
       )}
-      <AddMenuModal
-        isOpen={showAddMenuModal}
-        onClose={() => setShowAddMenuModal(false)}
-        onAddMenu={addMenu}
-      />
+      {showAddMenuModal && (
+        <AddMenuModal
+          onClose={() => setShowAddMenuModal(false)}
+          onAddMenu={addMenu}
+        />
+      )}
     </div>
   );
 }

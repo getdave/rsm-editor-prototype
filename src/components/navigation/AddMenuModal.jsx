@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Button, TextControl } from '@wordpress/components';
 
-function AddMenuModal({ isOpen, onClose, onAddMenu }) {
+function AddMenuModal({ onClose, onAddMenu }) {
   const [menuName, setMenuName] = useState('');
 
   const handleSubmit = () => {
