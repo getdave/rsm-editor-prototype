@@ -149,6 +149,13 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           className="nav-back-btn"
         />
         <h2 className="nav-panel-title">{menu.name}</h2>
+        <Button
+          variant="secondary"
+          onClick={() => setShowPagePicker(true)}
+          className="nav-header-add-btn"
+        >
+          Add Pages
+        </Button>
       </div>
 
       <div className="nav-menu-editor-items">
