@@ -13,12 +13,14 @@ function PreviewView() {
 
   return (
     <div className="cs-stack">
-      <div className="cs-stack-canvas">
-        <PreviewCanvas
-          page={currentPage}
-          onEdit={handleEdit}
-          onPageChange={setCurrentPage}
-        />
+      <div className="cs-stack-canvas preview-body">
+        <div className="preview-body-canvas">
+          <PreviewCanvas
+            page={currentPage}
+            onEdit={handleEdit}
+            onPageChange={setCurrentPage}
+          />
+        </div>
       </div>
       <ContentSuggestions />
     </div>
