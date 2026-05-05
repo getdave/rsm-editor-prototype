@@ -176,7 +176,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           onClick={() => setShowPagePicker(true)}
           className="nav-add-item-btn"
         >
-          Add item
+          Add Pages
         </Button>
       </div>
     </div>
