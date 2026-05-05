@@ -1,0 +1,196 @@
+/* ── Site Editor header ──
+   Persistent bar above the body on every main route (suppressed on the
+   dedicated /pages/:pageId/edit canvas, which has its own toolbar).
+   Matches the sidebar's dark surface so they read as one chrome. */
+.site-editor-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 4px 12px;
+  background: #1e1e1e;
+  border-bottom: 1px solid #2a2a2a;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.seh-anchor {
+  display: flex;
+  align-items: center;
+}
+
+/* Site identity — single button wrapping logo + title + pencil-on-hover.
+   Mirrors trunk's .site-anchor-edit pattern. */
+.seh-identity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.seh-identity:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.seh-logo {
+  width: 32px;
+  height: 32px;
+  background: #3858e9;
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font: 700 13px 'DM Sans', sans-serif;
+}
+
+.seh-logo::before {
+  content: 'W';
+}
+
+.seh-title {
+  flex: 1;
+  min-width: 0;
+  color: #e0e0e0;
+  font-size: 13px;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.seh-pencil {
+  display: none;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #999;
+}
+
+.seh-pencil svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.seh-identity:hover .seh-pencil,
+.seh-identity:focus-visible .seh-pencil {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seh-search {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 16px 0 12px;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 2px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  color: #e0e0e0;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.seh-search:hover,
+.seh-search:focus-visible {
+  background: #333;
+  border-color: #4a4a4a;
+  color: #fff;
+  outline: none;
+}
+
+.seh-search-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+}
+
+.seh-search-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.seh-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seh-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 2px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.seh-save:disabled {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+}
+
+.seh-save:not(:disabled):hover {
+  background: #e0e0e0;
+}
+
+.seh-status {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+}
+
+.seh-status-dot {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #555;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.seh-status.is-live .seh-status-dot {
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.22);
+}
+
+.seh-status.is-private .seh-status-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.22);
+}
