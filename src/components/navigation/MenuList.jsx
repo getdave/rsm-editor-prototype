@@ -9,6 +9,7 @@ function MenuList({
   onSearchChange,
   sortBy,
   onSortChange,
+  onAddMenu,
 }) {
   const getLocationText = (count) => {
     if (count === 0) return '0 locations';
@@ -23,7 +24,7 @@ function MenuList({
         <Button
           icon={plus}
           label="Add menu"
-          onClick={() => {}}
+          onClick={onAddMenu}
           className="nav-add-menu-btn"
         />
       </div>
