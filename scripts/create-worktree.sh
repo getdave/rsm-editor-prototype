@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Creates a sibling-directory git worktree. Installs deps with npm ci (no symlinked node_modules).
+# https://cursor.com/docs/configuration/worktrees
 set -euo pipefail
 
 usage() {
@@ -34,16 +36,18 @@ else
 fi
 
 {
+  if [[ -f "${ROOT}/.env.local" ]]; then
+    grep -v '^VITE_PORT=' "${ROOT}/.env.local" | grep -v '^VITE_BRANCH_NAME=' || true
+  fi
   echo "VITE_PORT=${PORT}"
   echo "VITE_BRANCH_NAME=${FEATURE_NAME}"
-} > "${WORKTREE_DIR}/.env.local"
+} > "${WORKTREE_DIR}/.env.local.tmp"
+mv "${WORKTREE_DIR}/.env.local.tmp" "${WORKTREE_DIR}/.env.local"
 
-if [[ -d "${ROOT}/node_modules" ]]; then
-  ln -sfn "${ROOT}/node_modules" "${WORKTREE_DIR}/node_modules"
-  echo "Linked node_modules from main clone."
-else
-  echo "No node_modules in main clone; run npm install in ${WORKTREE_DIR} before npm run dev." >&2
-fi
+# Install dependencies in the worktree (do not symlink node_modules — see Cursor worktrees guidance).
+(cd "${WORKTREE_DIR}" && npm ci)
+
+echo "Installed dependencies with npm ci."
 
 echo ""
 echo "Worktree ready: ${WORKTREE_DIR}"

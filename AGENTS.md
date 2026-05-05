@@ -270,7 +270,7 @@ npm run worktree:create -- feature/my-change 5174
 # or: bash scripts/create-worktree.sh feature/my-change 5174
 ```
 
-This adds a sibling directory `../rsm-prototyping-feature-my-change`, checks out branch `feature/my-change` (creating it if needed), writes `.env.local` with a unique **`VITE_PORT`** and optional **`VITE_BRANCH_NAME`** (fallback when Git cannot resolve the branch), and symlinks `node_modules` from the main clone when possible.
+This adds a sibling directory `../rsm-prototyping-feature-my-change`, checks out branch `feature/my-change` (creating it if needed), writes **`.env.local`** with **`VITE_PORT`** (and **`VITE_BRANCH_NAME`** as a fallback for tooling), copies any other keys from the main clone’s `.env.local` when present, and runs **`npm ci`** in the new checkout. Per **[Cursor’s worktrees docs](https://cursor.com/docs/configuration/worktrees)**, do **not** symlink `node_modules` into worktrees — use a normal install (`npm ci` here; **pnpm**/**bun** are fine if you adapt the script).
 
 **Run the dev server** in that directory:
 
