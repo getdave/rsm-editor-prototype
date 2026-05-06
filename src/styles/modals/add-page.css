@@ -562,6 +562,36 @@
   gap: 20px;
 }
 
+/* Primary page title field — stronger hierarchy than global modal fields */
+.apm-form > .m-field .m-lbl {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-bottom: 8px;
+}
+
+.apm-form > .m-field .m-input {
+  font-size: 16px;
+  font-weight: 500;
+  padding: 12px 14px;
+  min-height: 48px;
+  border-width: 2px;
+  border-color: #949494;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.apm-form > .m-field .m-input:focus {
+  border-color: #3858e9;
+  box-shadow: 0 0 0 1px #3858e9;
+}
+
+.apm-form > .m-field {
+  margin-bottom: 0;
+}
+
 /* Advanced panel + page options */
 .apm-panel.components-panel__body {
   border: 1px solid #dcdcde;
