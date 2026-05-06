@@ -9,8 +9,7 @@
   justify-content: space-between;
   height: 56px;
   padding: 4px 12px;
-  background: #1e1e1e;
-  border-bottom: 1px solid #2a2a2a;
+  background: var(--wp-chrome-bg, #1e1e1e);
   flex-shrink: 0;
   z-index: 10;
 }

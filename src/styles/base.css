@@ -6,7 +6,7 @@
 
 body {
   font-family: 'DM Sans', sans-serif;
-  background: #111;
+  background: var(--wp-chrome-bg, #1e1e1e);
   margin: 0;
   height: 100vh;
   overflow: hidden;

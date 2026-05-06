@@ -8,12 +8,11 @@
 }
 
 /* ── MAIN AREA ──
-   The main area is part of the same dark surface as the sidebar.
-   Inner panels (preview canvas, edit card, split-view stage) sit on
-   top of this material as raised light surfaces. */
+   Dark editor chrome (--wp-chrome-bg). Routed views (e.g. Pages) float light
+   “area” cards on this surface per Foundations page-areas diagram. */
 .main {
   flex: 1;
-  background: #1e1e1e;
+  background: var(--wp-chrome-bg, #1e1e1e);
   overflow: hidden;
   position: relative;
   min-width: 0;

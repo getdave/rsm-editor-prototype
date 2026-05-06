@@ -27,7 +27,6 @@ import {
 } from "@wordpress/icons";
 import { Page } from "@wordpress/admin-ui";
 import { useAppState } from "../../hooks/useAppState";
-import SplitViewLayout from "../../layouts/SplitViewLayout";
 import PreviewCanvas from "../shared/PreviewCanvas";
 import DefinedTerm from "../shared/DefinedTerm";
 
@@ -897,23 +896,6 @@ function PagesView() {
                     )}
                   </div>
                 )}
-              {activeTab?.description && (
-                <p className="pp-tab-desc-content">
-                  {activeTab.description}
-                  {activeTab.descriptionLink && (
-                    <>
-                      {" "}
-                      <button
-                        type="button"
-                        className="pp-desc-link"
-                        onClick={() => navigate("/templates")}
-                      >
-                        {activeTab.descriptionLink.text} →
-                      </button>
-                    </>
-                  )}
-                </p>
-              )}
             </div>
             <div className="pp-notice-toolbar-col pp-notice-toolbar-col--actions">
               <Button
@@ -964,67 +946,92 @@ function PagesView() {
     />
   );
 
+  /** Layout: Foundations → Sidebar (RootLayout) + Content Frame + Preview Frame (list). */
+  const pageActions = (
+    <>
+      {activeCategory === "content" && (
+        <Button
+          variant="primary"
+          icon={plus}
+          iconSize={16}
+          onClick={openAddPageModal}
+        >
+          Add page
+        </Button>
+      )}
+      {activeCategory === "dynamic" && (
+        <Button
+          variant="secondary"
+          onClick={() => navigate("/templates")}
+        >
+          All Templates
+        </Button>
+      )}
+      <span className="pp-hd-more-wrap">
+        {readingConfigureMenuNeedsAttention ? (
+          <VisuallyHidden>
+            Homepage or posts page configuration needs attention.
+            Configure it in this menu.
+          </VisuallyHidden>
+        ) : null}
+        <DropdownMenu
+          icon={moreVertical}
+          label={
+            readingConfigureMenuNeedsAttention
+              ? "More options. Homepage settings need attention; choose Configure homepage."
+              : "More page options"
+          }
+          toggleProps={{
+            variant: "tertiary",
+            className: readingConfigureMenuNeedsAttention
+              ? "pp-hd-more-toggle-attention"
+              : undefined,
+          }}
+          controls={[
+            {
+              title: "Configure homepage",
+              onClick: () => setConfigureHomepageOpen(true),
+            },
+          ]}
+        />
+      </span>
+    </>
+  );
+
   return (
-    <Page
-      className="pages-panel show"
-      title="Pages"
-      actions={
-        <>
-          {activeCategory === "content" && (
-            <Button
-              variant="primary"
-              icon={plus}
-              iconSize={16}
-              onClick={openAddPageModal}
+    <>
+      <div className="pages-panel show">
+        {hasPreviewPanel ? (
+          <div className="split-view list">
+            <Page
+              className="split-view-stage pages-content-frame"
+              title="Pages"
+              subTitle={activeTab?.description || undefined}
+              actions={pageActions}
+              showSidebarToggle={false}
             >
-              Add page
-            </Button>
-          )}
-          {activeCategory === "dynamic" && (
-            <Button
-              variant="secondary"
-              onClick={() => navigate("/templates")}
+              {stageContent}
+            </Page>
+            <div
+              className="split-view-canvas pages-preview-frame"
+              role="region"
+              aria-label="Preview"
             >
-              All Templates
-            </Button>
-          )}
-          <span className="pp-hd-more-wrap">
-            {readingConfigureMenuNeedsAttention ? (
-              <VisuallyHidden>
-                Homepage or posts page configuration needs attention.
-                Configure it in this menu.
-              </VisuallyHidden>
-            ) : null}
-            <DropdownMenu
-              icon={moreVertical}
-              label={
-                readingConfigureMenuNeedsAttention
-                  ? "More options. Homepage settings need attention; choose Configure homepage."
-                  : "More page options"
-              }
-              toggleProps={{
-                variant: "tertiary",
-                className: readingConfigureMenuNeedsAttention
-                  ? "pp-hd-more-toggle-attention"
-                  : undefined,
-              }}
-              controls={[
-                {
-                  title: "Configure homepage",
-                  onClick: () => setConfigureHomepageOpen(true),
-                },
-              ]}
-            />
-          </span>
-        </>
-      }
-    >
-      <SplitViewLayout
-        mode={hasPreviewPanel ? "list" : "grid"}
-        stageContent={stageContent}
-        canvasContent={canvasContent}
-        gridContent={stageContent}
-      />
+              {canvasContent}
+            </div>
+          </div>
+        ) : (
+          <Page
+            className="pages-panel__grid pages-content-frame"
+            title="Pages"
+            subTitle={activeTab?.description || undefined}
+            actions={pageActions}
+            showSidebarToggle={false}
+          >
+            <div className="split-view-grid">{stageContent}</div>
+          </Page>
+        )}
+      </div>
       {configureHomepageOpen && (
         <div
           className="modal-overlay"
@@ -1041,7 +1048,7 @@ function PagesView() {
           />
         </div>
       )}
-    </Page>
+    </>
   );
 }
 
