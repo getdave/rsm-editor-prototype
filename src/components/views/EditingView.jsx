@@ -18,7 +18,6 @@ import {
 } from '@wordpress/icons';
 import ExitSplitButton from '../shared/ExitSplitButton';
 import DocumentActions from '../shared/DocumentActions';
-import InCanvasNav from '../shared/InCanvasNav';
 import EditorLeftPanel from './EditorLeftPanel';
 import SettingsSidebar from './SettingsSidebar';
 import { getEditModeContent } from '../../services/pageContentService';
@@ -144,7 +143,7 @@ function EditingView() {
     siteTitle,
     toggleListView,
     toggleSettingsSidebar,
-    keepMenuFixed,
+    menuExpanded,
   } = useAppState();
   const [selectedBlockId, setSelectedBlockId] = useState('section-0');
 
@@ -432,10 +431,17 @@ function EditingView() {
   const leftPanelMode = listViewOpen ? 'list' : isInserterOpen ? 'inserter' : null;
 
   return (
-    <div className={`edit-canvas ${true ? 'show' : ''}`}>
-      {/* In-canvas narrow nav — hidden by default; toggled via Exit menu */}
-      {keepMenuFixed && <InCanvasNav />}
-
+    <div
+      className={`edit-canvas ${true ? 'show' : ''}`}
+      style={{
+        // When the menu is expanded the canvas keeps its full original
+        // width so its left edge sits flush against the 208px sidebar
+        // while its right side runs 208px off the viewport. .main is
+        // told to allow overflow so the canvas can extend past it.
+        width: menuExpanded ? '100vw' : '100%',
+        transition: 'width 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+      }}
+    >
       <div className="editor-col">
         {/* Canvas toolbar — full width; panels sit below this */}
         <div className="canvas-toolbar">

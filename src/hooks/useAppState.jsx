@@ -21,8 +21,9 @@ export function AppStateProvider({ children }) {
   // group. Most-recent first, deduplicated, capped at 3.
   const [recentPages, setRecentPages] = useState([]);
 
-  // When true, the in-canvas narrow nav strip stays visible. Off by default.
-  const [keepMenuFixed, setKeepMenuFixed] = useState(false);
+  // When true (only inside the editor), the chrome sidebar expands back to
+  // full width and the canvas slides off-screen to the right.
+  const [menuExpanded, setMenuExpanded] = useState(false);
   
   // Site identity
   const [siteTitle, setSiteTitle] = useState('My Photography Site');
@@ -150,13 +151,14 @@ export function AppStateProvider({ children }) {
     });
   };
 
-  const toggleKeepMenuFixed = () => {
-    setKeepMenuFixed((prev) => !prev);
+  const toggleMenuExpanded = () => {
+    setMenuExpanded((prev) => !prev);
   };
 
   const value = {
     // Sidebar state
     sidebarCollapsed,
+    setSidebarCollapsed,
     toggleSidebar,
 
     // Pages state
@@ -176,9 +178,10 @@ export function AppStateProvider({ children }) {
     // Recent docs
     recentPages,
 
-    // In-canvas narrow nav
-    keepMenuFixed,
-    toggleKeepMenuFixed,
+    // Menu-expanded state for in-editor chrome sidebar
+    menuExpanded,
+    setMenuExpanded,
+    toggleMenuExpanded,
     
     // Site identity
     siteTitle,

@@ -34,6 +34,8 @@ function ExitSplitButton() {
     editorReferrer,
     recentPages,
     selectPage,
+    menuExpanded,
+    setMenuExpanded,
   } = useAppState();
   const referrer = metaForReferrer(editorReferrer);
 
@@ -43,12 +45,21 @@ function ExitSplitButton() {
     alert("🎉 Pretend you're back in wp-admin! (This is a prototype.)");
   };
 
+  // Navigate straight to the target. The chrome auto-resets via
+  // RootLayout's useEffect on route change — no pre-collapse needed.
+  // Pre-collapsing caused a visible 208 → 48 → 208 sidebar bounce
+  // because the in-editor branch added .collapsed before the admin
+  // branch took over.
+  const navigateSmooth = (target) => {
+    navigate(target);
+  };
+
   return (
     <div className="split-button">
       <Button
         variant="secondary"
         className="split-button-main"
-        onClick={() => navigate(referrer.target)}
+        onClick={() => navigateSmooth(referrer.target)}
       >
         Exit
       </Button>
@@ -68,7 +79,7 @@ function ExitSplitButton() {
               <MenuItem
                 icon={referrer.icon}
                 onClick={() => {
-                  navigate(referrer.target);
+                  navigateSmooth(referrer.target);
                   onClose();
                 }}
               >
@@ -77,7 +88,7 @@ function ExitSplitButton() {
               <MenuItem
                 icon={home}
                 onClick={() => {
-                  navigate('/');
+                  navigateSmooth('/');
                   onClose();
                 }}
               >
@@ -103,7 +114,7 @@ function ExitSplitButton() {
                     icon={pageIcon}
                     onClick={() => {
                       selectPage(p);
-                      navigate(`/pages/${p.id}/edit`);
+                      navigateSmooth(`/pages/${p.id}/edit`);
                       onClose();
                     }}
                   >

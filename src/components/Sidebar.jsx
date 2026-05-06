@@ -9,8 +9,9 @@ import {
   navigation,
   styles,
   settings,
-  chevronRight,
+  menu,
   chevronLeft,
+  chevronRight,
   chevronUp,
   chevronDown,
   wordpress,
@@ -52,15 +53,29 @@ const DESIGN_NAV_ITEMS = [
   },
 ];
 
+const EDIT_ROUTE_PATTERN = /^\/pages\/[^/]+\/edit$/;
+
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { sidebarCollapsed } = useAppState();
+  const {
+    sidebarCollapsed,
+    recentPages,
+    menuExpanded,
+    toggleMenuExpanded,
+    selectPage,
+  } = useAppState();
   const isDesignSection = location.pathname.startsWith('/design');
+  const isEditCanvas = EDIT_ROUTE_PATTERN.test(location.pathname);
   const [collapsedGroups, setCollapsedGroups] = useState({});
 
   const toggleGroup = (groupId) => {
     setCollapsedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
+  };
+
+  // Direct navigation. RootLayout's route effect resets menuExpanded.
+  const navigateSmooth = (target) => {
+    navigate(target);
   };
 
   const isItemActive = (itemPath) => {
@@ -172,6 +187,116 @@ function Sidebar() {
     }
     return null;
   };
+
+  // Inside the editor the sidebar shows three sections: a menu-toggle
+  // button (top, 64px), the root nav (middle), and recent documents
+  // (bottom, flex-grow). Reuses the same .sidebar / .sidebar.collapsed
+  // / .admin-root-nav / .ni / .sb-customize classes.
+  if (isEditCanvas) {
+    const isCollapsed = sidebarCollapsed && !menuExpanded;
+    const sectionDivider = '1px solid #2a2a2a';
+    return (
+      <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+        {/* Section 1 — 64px-tall row that aligns with .canvas-toolbar.
+            Collapsed: hamburger button pinned to the leftmost 48px column.
+            Expanded: a .ni-styled "Hide menu" action that mirrors the
+            other root-nav items (icon + label) and collapses the menu. */}
+        {menuExpanded ? (
+          <nav
+            className="admin-root-nav"
+            style={{
+              flex: '0 0 64px',
+              justifyContent: 'center',
+              borderBottom: sectionDivider,
+            }}
+          >
+            <Tooltip text="Hide menu" placement="right">
+              <div
+                className="ni"
+                role="button"
+                tabIndex={0}
+                onClick={toggleMenuExpanded}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleMenuExpanded();
+                  }
+                }}
+              >
+                <span className="ni-ico">{chevronLeft}</span>
+                <span className="ni-label">Hide menu</span>
+              </div>
+            </Tooltip>
+          </nav>
+        ) : (
+          <div
+            className="sidebar-bottom"
+            style={{
+              display: 'flex',
+              height: 64,
+              flex: '0 0 64px',
+              marginTop: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: 48,
+              alignSelf: 'flex-start',
+              borderTop: 'none',
+              borderBottom: sectionDivider,
+              padding: 0,
+            }}
+          >
+            <Tooltip text="Expand menu" placement="right">
+              <button
+                type="button"
+                className="sb-customize"
+                aria-label="Expand menu"
+                aria-expanded={menuExpanded}
+                onClick={toggleMenuExpanded}
+              >
+                {menu}
+              </button>
+            </Tooltip>
+          </div>
+        )}
+
+        {/* Section 2 — root nav icons. */}
+        <nav
+          className="admin-root-nav"
+          style={{ flex: '0 0 auto', borderBottom: sectionDivider }}
+        >
+          {ADMIN_NAV_ITEMS.map((item) => (
+            <Tooltip key={item.id} text={item.tip} placement="right">
+              <div
+                className="ni"
+                onClick={() => navigateSmooth(item.path)}
+              >
+                <span className="ni-ico">{item.icon}</span>
+                <span className="ni-label">{item.label}</span>
+              </div>
+            </Tooltip>
+          ))}
+        </nav>
+
+        {/* Section 3 — recent documents. Flex-grows to fill the rest. */}
+        <nav className="admin-root-nav" style={{ flex: '1 0 0' }}>
+          {recentPages.map((p) => (
+            <Tooltip key={p.id} text={p.name} placement="right">
+              <div
+                className="ni"
+                onClick={() => {
+                  selectPage(p);
+                  navigateSmooth(`/pages/${p.id}/edit`);
+                }}
+              >
+                <span className="ni-ico">{pageIcon}</span>
+                <span className="ni-label">{p.name}</span>
+              </div>
+            </Tooltip>
+          ))}
+        </nav>
+      </div>
+    );
+  }
 
   return (
     <div

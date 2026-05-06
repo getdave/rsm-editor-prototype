@@ -17,11 +17,25 @@ function RootLayout() {
   const {
     snackbarMessage,
     dismissSnackbar,
+    setSidebarCollapsed,
     setEditorReferrer,
+    setMenuExpanded,
+    menuExpanded,
   } = useAppState();
 
   const isEditCanvas = EDIT_ROUTE_PATTERN.test(location.pathname);
   const prevPathRef = useRef(location.pathname);
+
+  // Collapse the chrome sidebar to its narrow 48px form when entering the
+  // editor; expand it back when leaving. Idempotent so React StrictMode's
+  // double-fire in dev doesn't flip the state twice. Always reset
+  // menu-expanded on route change so navigating between recent docs (or
+  // exiting the editor) closes the menu cleanly.
+  useEffect(() => {
+    const isEdit = EDIT_ROUTE_PATTERN.test(location.pathname);
+    setSidebarCollapsed(isEdit);
+    setMenuExpanded(false);
+  }, [location.pathname]);
 
   // Capture the route the user was on before entering the edit canvas so the
   // split-Exit button knows where to take them back. Cleared on exit.
@@ -38,7 +52,7 @@ function RootLayout() {
 
   return (
     <>
-      <div className={`app-shell ${isEditCanvas ? 'is-edit-canvas' : ''}`}>
+      <div className={`app-shell ${isEditCanvas ? 'is-edit-canvas' : ''} ${menuExpanded ? 'is-menu-expanded' : ''}`}>
         <SiteEditorHeader />
         <div className="body">
           <Sidebar />

@@ -18,6 +18,13 @@
   min-width: 0;
 }
 
+/* When the menu is expanded, the canvas keeps its full viewport width
+   and slides 208px off the right edge of the screen. .main has to let
+   that overflow render past its box; the body itself stays clipped. */
+.app-shell.is-menu-expanded .main {
+  overflow: visible;
+}
+
 /* Shared canvas wrapper */
 .canvas {
   width: 100%;
