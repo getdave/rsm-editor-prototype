@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Button,
   DropdownMenu,
@@ -318,6 +318,8 @@ function renderAuthorCell(item) {
 
 function PagesView() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const showDynamicPagesTab = searchParams.get("dynamic") === "true";
   const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode, pages, openAddPageModal } =
     useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
@@ -335,6 +337,26 @@ function PagesView() {
     READING_DISPLAY_STATIC,
   );
   const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
+
+  const visibleTabs = useMemo(
+    () =>
+      TABS.filter(
+        (tab) => tab.value !== "dynamic" || showDynamicPagesTab,
+      ),
+    [showDynamicPagesTab],
+  );
+
+  useEffect(() => {
+    if (showDynamicPagesTab || activeCategory !== "dynamic") {
+      return;
+    }
+    setActiveCategory("content");
+    setView((prev) => ({
+      ...prev,
+      page: 1,
+      filters: [],
+    }));
+  }, [showDynamicPagesTab, activeCategory]);
 
   const readingSelectPages = useMemo(
     () => pages.filter((p) => p.category === "content" && p.status === "live"),
@@ -781,18 +803,22 @@ function PagesView() {
             </span>
           </div>
         </div>
-        <div className="pp-tabs">
-          {TABS.map((tab) => (
-            <button
-              key={tab.value}
-              className={`pp-tab${activeCategory === tab.value ? " on" : ""}`}
-              onClick={() => handleTabClick(tab.value)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-        <div className="pp-toolbar-controls">
+        {visibleTabs.length > 1 ? (
+          <div className="pp-tabs">
+            {visibleTabs.map((tab) => (
+              <button
+                key={tab.value}
+                className={`pp-tab${activeCategory === tab.value ? " on" : ""}`}
+                onClick={() => handleTabClick(tab.value)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        <div
+          className={`pp-toolbar-controls${visibleTabs.length <= 1 ? " pp-toolbar-controls--solo-category" : ""}`}
+        >
           <div className="pp-notice-toolbar-row">
             <div className="pp-notice-toolbar-col pp-notice-toolbar-col--notice">
               {homepageDisplayMode === READING_DISPLAY_LATEST &&
@@ -801,15 +827,32 @@ function PagesView() {
                     className="pp-latest-posts-home-tip"
                     role="status"
                   >
-                    Looking for your Homepage? It&apos;s under{" "}
-                    <button
-                      type="button"
-                      className="pp-desc-link"
-                      onClick={() => handleTabClick("dynamic")}
-                    >
-                      Dynamic
-                    </button>
-                    .
+                    {showDynamicPagesTab ? (
+                      <>
+                        Looking for your Homepage? It&apos;s under{" "}
+                        <button
+                          type="button"
+                          className="pp-desc-link"
+                          onClick={() => handleTabClick("dynamic")}
+                        >
+                          Dynamic
+                        </button>
+                        .
+                      </>
+                    ) : (
+                      <>
+                        Looking for your blog homepage? It&apos;s a
+                        template-backed page — open{" "}
+                        <button
+                          type="button"
+                          className="pp-desc-link"
+                          onClick={() => navigate("/templates")}
+                        >
+                          Templates
+                        </button>
+                        .
+                      </>
+                    )}
                   </div>
                 )}
               {activeTab?.description && (
