@@ -513,10 +513,9 @@ function EditingView() {
             iconSize={20}
           />
 
-          {!hasUnsavedChanges && <span className="ct-saved">Saved</span>}
           <Button
             variant="primary"
-            className={`ct-save ${hasUnsavedChanges ? 'show' : ''}`}
+            className="ct-save show"
             onClick={save}
           >
             Save

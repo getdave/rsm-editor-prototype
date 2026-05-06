@@ -1,4 +1,4 @@
-import { Button, Dropdown, MenuGroup, MenuItem } from '@wordpress/components';
+import { Button, DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import {
   chevronDown,
   home,
@@ -19,7 +19,7 @@ const REFERRER_META = [
 ];
 
 function metaForReferrer(referrer) {
-  if (!referrer) return { label: 'Exit', icon: home, target: '/' };
+  if (!referrer) return { label: 'Home', icon: home, target: '/' };
   for (const meta of REFERRER_META) {
     if (referrer.startsWith(meta.prefix)) {
       return { label: meta.label, icon: meta.icon, target: meta.prefix };
@@ -33,8 +33,6 @@ function ExitSplitButton() {
   const {
     editorReferrer,
     recentPages,
-    keepMenuFixed,
-    toggleKeepMenuFixed,
     selectPage,
   } = useAppState();
   const referrer = metaForReferrer(editorReferrer);
@@ -46,22 +44,25 @@ function ExitSplitButton() {
   };
 
   return (
-    <div style={{ display: 'flex' }}>
-      <Button className="ct-exit" onClick={() => navigate(referrer.target)}>
-        {referrer.label}
+    <div className="split-button">
+      <Button
+        variant="secondary"
+        className="split-button-main"
+        onClick={() => navigate(referrer.target)}
+      >
+        Exit
       </Button>
-      <Dropdown
-        renderToggle={({ isOpen, onToggle }) => (
-          <Button
-            className="ct-icon-btn"
-            onClick={onToggle}
-            aria-expanded={isOpen}
-            label="Exit options"
-            icon={chevronDown}
-            iconSize={20}
-          />
-        )}
-        renderContent={({ onClose }) => (
+      <DropdownMenu
+        icon={chevronDown}
+        label="Exit options"
+        className="split-button-dropdown"
+        popoverProps={{ placement: 'bottom-start' }}
+        toggleProps={{
+          variant: 'secondary',
+          className: 'split-button-toggle',
+        }}
+      >
+        {({ onClose }) => (
           <>
             <MenuGroup>
               <MenuItem
@@ -71,7 +72,7 @@ function ExitSplitButton() {
                   onClose();
                 }}
               >
-                {referrer.label === 'Exit' ? 'Home' : referrer.label}
+                {referrer.label}
               </MenuItem>
               <MenuItem
                 icon={home}
@@ -111,19 +112,9 @@ function ExitSplitButton() {
                 ))
               )}
             </MenuGroup>
-            <MenuGroup>
-              <MenuItem
-                onClick={() => {
-                  toggleKeepMenuFixed();
-                  onClose();
-                }}
-              >
-                {keepMenuFixed ? '✓ Keep menu fixed' : 'Keep menu fixed'}
-              </MenuItem>
-            </MenuGroup>
           </>
         )}
-      />
+      </DropdownMenu>
     </div>
   );
 }

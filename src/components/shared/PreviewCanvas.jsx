@@ -3,7 +3,6 @@ import { desktop, tablet, mobile } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { getPageContent } from '../../services/pageContentService';
 import { pages } from '../../data/mockData';
-import UrlBar from './UrlBar';
 
 /**
  * Reusable Preview Canvas Component
@@ -267,26 +266,34 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {} }) {
   return (
     <div className="canvas" style={{ flexDirection: 'column', padding: 0, width: '100%' }}>
       <div className="preview-bar">
+        <Button
+          variant="primary"
+          className="ct-edit"
+          onClick={onEdit}
+        >
+          Edit
+        </Button>
+
         <div className="ct-space"></div>
-        <UrlBar page={page} />
+        <span className="ct-btn" style={{ cursor: 'default' }}>{page.name}</span>
         <div className="ct-space"></div>
-        
+
         <div className="ct-view-modes">
-          <Button 
+          <Button
             className={`ct-view-btn ${selectedDevice === 'desktop' ? 'active' : ''}`}
             onClick={() => setSelectedDevice('desktop')}
             label="Desktop view"
             icon={desktop}
             iconSize={20}
           />
-          <Button 
+          <Button
             className={`ct-view-btn ${selectedDevice === 'tablet' ? 'active' : ''}`}
             onClick={() => setSelectedDevice('tablet')}
             label="Tablet view"
             icon={tablet}
             iconSize={20}
           />
-          <Button 
+          <Button
             className={`ct-view-btn ${selectedDevice === 'mobile' ? 'active' : ''}`}
             onClick={() => setSelectedDevice('mobile')}
             label="Mobile view"
@@ -294,14 +301,6 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {} }) {
             iconSize={20}
           />
         </div>
-        
-        <Button 
-          variant="primary"
-          className="ct-edit" 
-          onClick={onEdit}
-        >
-          Edit
-        </Button>
       </div>
       <div className="preview-canvas-area">
         <div className="site-card">
