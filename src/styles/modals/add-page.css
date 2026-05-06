@@ -562,8 +562,8 @@
   gap: 20px;
 }
 
-/* Primary page title field — stronger hierarchy than global modal fields */
-.apm-form > .m-field .m-lbl {
+/* Primary page title field — Add Page modal only */
+.apm-modal .apm-form > .m-field .m-lbl {
   font-size: 13px;
   font-weight: 600;
   color: #1e1e1e;
@@ -572,7 +572,7 @@
   margin-bottom: 8px;
 }
 
-.apm-form > .m-field .m-input {
+.apm-modal .apm-form > .m-field .m-input {
   font-size: 16px;
   font-weight: 500;
   padding: 12px 14px;
@@ -583,12 +583,12 @@
   box-sizing: border-box;
 }
 
-.apm-form > .m-field .m-input:focus {
+.apm-modal .apm-form > .m-field .m-input:focus {
   border-color: #3858e9;
   box-shadow: 0 0 0 1px #3858e9;
 }
 
-.apm-form > .m-field {
+.apm-modal .apm-form > .m-field {
   margin-bottom: 0;
 }
 
