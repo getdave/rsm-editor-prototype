@@ -562,7 +562,7 @@
   gap: 20px;
 }
 
-/* Page Options Panel */
+/* Advanced panel + page options */
 .apm-panel.components-panel__body {
   border: 1px solid #dcdcde;
   border-radius: 2px;
@@ -573,10 +573,27 @@
   padding: 11px 16px;
 }
 
+.apm-panel .apm-page-template-select.components-base-control {
+  margin-bottom: 0;
+}
+
+.apm-panel .apm-page-template-select .components-select-control__input {
+  width: 100%;
+  max-width: 100%;
+}
+
 .apm-checkbox-group {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding: 16px;
+}
+
+/* Checkboxes shown in the main form (outside panel) */
+.apm-checkbox-group--inline {
+  border: 1px solid #dcdcde;
+  border-radius: 2px;
+  background: #fff;
   padding: 16px;
 }
 

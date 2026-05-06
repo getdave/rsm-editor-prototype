@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, DropdownMenu, MenuItem, CheckboxControl, Tooltip, PanelBody } from '@wordpress/components';
+import { Button, DropdownMenu, MenuItem, CheckboxControl, Tooltip, PanelBody, SelectControl } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { chevronDown, plus } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
@@ -27,6 +27,15 @@ function AddPageModalContent() {
   const [showLive, setShowLive] = useState(true);
   const [addToMenu, setAddToMenu] = useState(false);
   const [showAllLayouts, setShowAllLayouts] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState('page-default');
+
+  const pageTemplateOptions = [
+    { value: 'page-default', label: 'Page (default)' },
+    { value: 'page-full-width', label: 'Full Width' },
+    { value: 'page-no-header', label: 'No Header' },
+    { value: 'page-no-footer', label: 'No Footer' },
+    { value: 'page-blank-canvas', label: 'Blank Canvas' },
+  ];
 
   // Curated starter layouts (shown by default)
   const starterLayouts = [
@@ -64,6 +73,7 @@ function AddPageModalContent() {
     setSelectedLayout(null);
     setPageTitle('');
     setShowAllLayouts(false); // Reset to curated view
+    setSelectedTemplate('page-default');
   };
 
   const handleFooterBack = () => {
@@ -76,6 +86,7 @@ function AddPageModalContent() {
     setSelectedLayout(null);
     setPageTitle('');
     setShowAllLayouts(false);
+    setSelectedTemplate('page-default');
   };
 
   const handleSelectLayout = (layout) => {
@@ -108,6 +119,7 @@ function AddPageModalContent() {
       isSystem: false,
       category: 'content',
       level: 0,
+      template: selectedTemplate,
       ...(selectedLayout && { layoutId: selectedLayout }),
     };
   };
@@ -364,29 +376,38 @@ function AddPageModalContent() {
                       />
                     </div>
 
-                    <PanelBody title="Page Options" initialOpen className="apm-panel">
-                      <div className="apm-checkbox-group">
-                        <div className="apm-checkbox-item">
-                          <CheckboxControl
-                            label="Publish immediately"
-                            checked={showLive}
-                            onChange={setShowLive}
-                          />
-                          <p className="apm-checkbox-help">
-                            Your page will be visible to visitors immediately
-                          </p>
-                        </div>
-                        <div className="apm-checkbox-item">
-                          <CheckboxControl
-                            label="Add to navigation menu"
-                            checked={addToMenu}
-                            onChange={setAddToMenu}
-                          />
-                          <p className="apm-checkbox-help">
-                            Include this page in your site's main navigation
-                          </p>
-                        </div>
+                    <div className="apm-checkbox-group apm-checkbox-group--inline">
+                      <div className="apm-checkbox-item">
+                        <CheckboxControl
+                          label="Publish immediately"
+                          checked={showLive}
+                          onChange={setShowLive}
+                        />
+                        <p className="apm-checkbox-help">
+                          Your page will be visible to visitors immediately
+                        </p>
                       </div>
+                      <div className="apm-checkbox-item">
+                        <CheckboxControl
+                          label="Add to navigation menu"
+                          checked={addToMenu}
+                          onChange={setAddToMenu}
+                        />
+                        <p className="apm-checkbox-help">
+                          Include this page in your site's main navigation
+                        </p>
+                      </div>
+                    </div>
+
+                    <PanelBody title="Advanced" initialOpen={false} className="apm-panel">
+                      <SelectControl
+                        label="Page Template"
+                        value={selectedTemplate}
+                        options={pageTemplateOptions}
+                        onChange={setSelectedTemplate}
+                        help="Choose a template to control the layout and structure of this page"
+                        className="apm-page-template-select"
+                      />
                     </PanelBody>
                   </div>
                 </>
