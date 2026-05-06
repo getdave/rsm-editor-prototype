@@ -1,0 +1,537 @@
+/* Pages panel */
+.pages-panel {
+  width: 100%;
+  height: 100%;
+  display: none;
+  flex-direction: column;
+  background: #f5f5f5;
+}
+
+.pages-panel.show {
+  display: flex;
+}
+
+.pp-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Pages panel heading */
+.pp-hd {
+  display: flex;
+  align-items: center;
+  padding: 16px 16px 16px 20px;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.pp-hd-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.pp-hd-more-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.pp-hd-more-toggle-attention.components-button {
+  position: relative;
+}
+
+.pp-hd-more-toggle-attention.components-button::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d63638;
+  box-shadow: 0 0 0 2px #fff;
+  pointer-events: none;
+}
+
+.pp-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+
+/* Category tabs row */
+.pp-tabs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0 8px 0 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+}
+
+/* Controls row: sits below tabs */
+.pp-toolbar-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 8px 16px 8px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+/* Notice + view options + drafts: one row, two columns */
+.pp-notice-toolbar-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.pp-notice-toolbar-col--notice {
+  flex: 1;
+  min-width: 0;
+}
+
+.pp-notice-toolbar-col--actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.pp-latest-posts-home-tip {
+  padding: 10px 14px;
+  margin: 0 0 10px;
+  background: #fcf9e8;
+  border-left: 4px solid #dba617;
+  border-radius: 2px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #1e1e1e;
+}
+
+.pp-toolbar-row-options {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.pp-view-options-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pp-view-options-toggle .pp-view-options-chevron {
+  display: inline-flex;
+  line-height: 0;
+}
+
+.pp-view-options-toggle .pp-view-options-chevron svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Let search grow but cap it so the other controls stay visible */
+.pp-toolbar-row-options .dataviews-search {
+  flex: 1;
+  min-width: 160px;
+  max-width: 280px;
+}
+
+
+.pp-tab {
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #757575;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font-family: inherit;
+  transition: color 0.12s, background 0.12s;
+}
+
+.pp-tab:hover {
+  color: #1e1e1e;
+}
+
+.pp-tab.on {
+  color: #1e1e1e;
+  border-bottom-color: #3858e9;
+}
+
+/* Spacer to push system toggle to the right */
+.pp-toolbar-spacer {
+  flex: 1;
+}
+
+/* System pages toggle in toolbar */
+.pp-system-toggle.components-base-control {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  margin-left: 8px;
+  border-left: 1px solid #e0e0e0;
+}
+
+.pp-system-toggle .components-base-control__field {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.pp-system-toggle .components-toggle-control__label {
+  font-size: 13px;
+  color: #757575;
+}
+
+/* DataViews integration wrapper */
+.pp-dataviews {
+  --wp-dataviews-color-background: #fff;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* DataViews renders a .dataviews-wrapper div — make it fill and flex */
+.pp-dataviews .dataviews-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Scrollable area — only the list/grid and pagination scroll */
+.pp-dv-scroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-top: 12px;
+}
+
+/* Pages DataViews: icon tile + front-page label (absolute top-left on tile) */
+.pp-media-thumb {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.pp-media-thumb--grid {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  max-width: none;
+}
+
+.pp-media-thumb-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pp-front-page-overlay {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 2;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3858e9;
+  background: rgba(56, 88, 233, 0.1);
+  border: 1px solid rgba(56, 88, 233, 0.45);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.pp-posts-page-overlay {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 2;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #007017;
+  background: rgba(0, 112, 23, 0.1);
+  border: 1px solid rgba(0, 112, 23, 0.42);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+/* Title column: compact house icon for front page (matches text size) */
+.pp-title-cell-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  min-width: 0;
+}
+
+.pp-title-cell-tooltip-wrap {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.pp-title-glyph-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  color: #646970;
+  vertical-align: middle;
+}
+
+.pp-title-glyph-icon--posts {
+  color: #007017;
+}
+
+.pp-title-glyph-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  display: block;
+}
+
+.pp-title-cell-name {
+  min-width: 0;
+}
+
+.pp-menu-empty,
+.pp-author-empty {
+  color: #a0a0a0;
+}
+
+.pp-tab-desc-content {
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #505050;
+}
+
+.pp-desc-link {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: #2271b1;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.pp-desc-link:hover {
+  text-decoration: underline;
+  color: #135e96;
+}
+
+/* Align filter chips and bulk-select bar with the toolbar */
+.pp-dv-filters {
+  padding: 6px 16px 6px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.pp-dv-filters:empty {
+  display: none;
+}
+
+.pp-dv-bulk {
+  padding: 4px 16px 4px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.pp-dv-bulk:empty {
+  display: none;
+}
+
+
+/* Badges used in render functions */
+.pp-badge {
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.pp-live {
+  background: rgba(0, 163, 42, 0.1);
+  color: #00a32a;
+}
+
+.pp-draft {
+  background: #f0f0f0;
+  color: #888;
+}
+
+.pp-nav {
+  background: rgba(56, 88, 233, 0.1);
+  color: #3858e9;
+}
+
+/* Grid mode: Add New card sits before DataViews grid */
+.pp-grid-with-add {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 16px;
+}
+
+.pp-grid-with-add .pp-card-add {
+  margin-bottom: 16px;
+  max-width: 200px;
+}
+
+/* Add new card */
+.pp-card-add {
+  border: 2px dashed #d0d0d0;
+  background: #fafafa;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pp-card-add:hover {
+  border-color: #3858e9;
+  background: #f8f9ff;
+  box-shadow: 0 2px 8px rgba(56, 88, 233, 0.1);
+}
+
+.pp-card-add .pp-card-thumb {
+  background: transparent;
+  border-bottom: none;
+}
+
+.pp-card-icon-add {
+  color: #3858e9;
+}
+
+.pp-card-add .pp-card-name {
+  color: #3858e9;
+  text-align: center;
+  font-weight: 500;
+}
+
+.pp-card-thumb {
+  background: #f5f5f5;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.pp-card-icon {
+  color: #999;
+  display: flex;
+}
+
+.pp-card-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.pp-card-body {
+  padding: 10px 12px;
+}
+
+.pp-card-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #1e1e1e;
+}
+
+/* Configure homepage (Reading settings) modal */
+.ch-reading-modal.modal-box {
+  width: min(400px, calc(100vw - 48px));
+  max-width: 400px;
+}
+
+.ch-reading-body {
+  padding-bottom: 8px;
+}
+
+.ch-reading-intro {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #555;
+}
+
+.ch-reading-radio.components-base-control {
+  margin-bottom: 0;
+}
+
+.ch-reading-static {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.ch-reading-static .components-base-control__field {
+  margin-bottom: 0;
+}
+
+.ch-reading-field-warning {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #755100;
+  background: #fcf9e8;
+  border: 1px solid #edc949;
+  border-radius: 4px;
+}
+
+.ch-reading-footer.modal-footer {
+  justify-content: flex-end;
+}

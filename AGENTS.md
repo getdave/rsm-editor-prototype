@@ -34,7 +34,11 @@ This is a **React prototype** addressing WordPress Site Editor complexity throug
 
 ### Styling
 - **Plain CSS only** - No Tailwind, CSS Modules, styled-components, or CSS-in-JS
-- All styles in `src/styles/index.css`
+- Styles organized in `src/styles/` with subdirectories:
+  - `chrome/` - Persistent editor frame (sidebar, topbar)
+  - `views/` - One CSS file per route (home, pages, etc.)
+  - Root level - Shared styles (canvas, modals-base, utilities, etc.)
+- `index.css` imports all CSS files in the correct order
 - Use semantic class names (e.g., `.sidebar`, `.pp-row`, `.ct-toolbar`)
 - WordPress component styles imported via `@wordpress/components/build-style/style.css`
 
@@ -110,7 +114,8 @@ resolve: {
 2. Add route in `src/router/routes.jsx`
 3. Add navigation item in `Sidebar.jsx` if needed
 4. Use `useAppState()` for shared state
-5. Add styles to `src/styles/index.css` with consistent naming
+5. Add styles to new file `src/styles/views/your-view.css`
+6. Import the new CSS file in `src/styles/index.css`
 
 ### Adding Modal/Dialog
 1. Create component in `src/components/modals/`
@@ -126,6 +131,38 @@ Rather than documenting specific patterns here (which evolve as the prototype de
 - How components compose (read existing view files)
 
 ## Styling Guidelines
+
+### CSS Organization
+
+Styles are organized in `src/styles/` by UI area:
+
+```
+src/styles/
+├── index.css              # Main entry (imports all files)
+├── base.css               # Reset, fonts, body, root
+├── chrome/                # Persistent editor frame
+│   ├── sidebar.css        # Navigation, advanced menu
+│   └── topbar.css         # Site identity, search, save
+├── canvas.css             # All canvas-area (toolbar, editing, inserter)
+├── modals-base.css        # Shared modal styles
+├── views/                 # One file per route
+│   ├── home.css           # PreviewView + ContentSuggestions
+│   ├── pages.css          # PagesView + reading settings modal
+│   └── [other-view].css   # Future views
+├── templates-preview.css  # WP template hierarchy previews (Layer 2)
+├── command-palette.css    # Command palette
+├── floating.css           # Floating panels, tooltips
+└── utilities.css          # Icons, badges, scrollbars
+```
+
+**Where to add new styles:**
+- **View-specific styles** → `views/your-view.css`
+- **Chrome updates** → `chrome/sidebar.css` or `chrome/topbar.css`
+- **Canvas/editing** → `canvas.css`
+- **Shared utilities** → `utilities.css`
+- **New modals** → Modal base styles in `modals-base.css`, view-specific content in the view's CSS file
+
+**Important:** After creating a new CSS file, import it in `src/styles/index.css` in the correct order.
 
 ### Class Naming Conventions
 - Component prefix: `.sidebar`, `.topbar`, `.canvas`
@@ -242,7 +279,11 @@ npm run dev  # Starts on http://localhost:5173
 - `src/hooks/useAppState.jsx` - Shared state
 
 ### For Styling
-- `src/styles/index.css` - All CSS (single file)
+- `src/styles/index.css` - Main CSS entry (imports all files)
+- `src/styles/chrome/` - Sidebar and topbar styles
+- `src/styles/views/` - View-specific styles (one file per route)
+- `src/styles/canvas.css` - Canvas-area styles (toolbar, editing, inserter)
+- `src/styles/utilities.css` - Shared utilities (icons, badges, scrollbars)
 
 ### For Data
 - `src/data/mockData.js` - Pages, sections, site data

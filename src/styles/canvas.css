@@ -1,0 +1,707 @@
+/* ── BODY ── */
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  position: relative;
+}
+
+/* ── MAIN AREA ──
+   The main area is part of the same dark surface as the sidebar.
+   Inner panels (preview canvas, edit card, split-view stage) sit on
+   top of this material as raised light surfaces. */
+.main {
+  flex: 1;
+  background: #1e1e1e;
+  overflow: hidden;
+  position: relative;
+  min-width: 0;
+}
+
+/* Shared canvas wrapper */
+.canvas {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.site-card {
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* URL bar — used in canvas toolbar and preview bar */
+.url-bar {
+  height: 28px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 0;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.url-bar:hover {
+  border-color: #aaa;
+  background: #e8e8e8;
+}
+
+.url-domain {
+  color: #aaa;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.url-slash {
+  color: #ccc;
+  font-size: 11px;
+  padding: 0 1px;
+}
+
+.url-slug {
+  color: #444;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.url-pipe {
+  width: 1px;
+  height: 12px;
+  background: #ddd;
+  margin: 0 9px;
+  flex-shrink: 0;
+}
+
+.url-entity {
+  color: #1e1e1e;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.url-type {
+  color: #999;
+  font-size: 10px;
+  margin-left: 4px;
+  background: rgba(0, 0, 0, 0.07);
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.url-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00a32a;
+  margin: 0 5px 0 8px;
+  flex-shrink: 0;
+}
+
+.url-status {
+  color: #00a32a;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.url-draft-dot {
+  background: #888;
+}
+
+.url-draft {
+  color: #888;
+}
+
+/* Browse bar — preview state */
+.preview-bar {
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.preview-canvas-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  position: relative;
+}
+
+/* Edit button in preview bar */
+.ct-edit {
+  padding: 8px 16px;
+  background: #3858e9;
+  color: #fff;
+  border: 1px solid #3858e9;
+  border-radius: 4px;
+  font: 500 12px 'DM Sans', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.12s;
+  height: 36px;
+}
+
+.ct-edit:hover {
+  background: #2a47d4;
+  border-color: #2a47d4;
+}
+
+/* ── GUTENBERG CANVAS TOOLBAR ── */
+.canvas-toolbar {
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 6px;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.ct-btn {
+  height: 36px;
+  min-width: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1e1e1e;
+  font-size: 13px;
+  padding: 0 8px;
+  gap: 5px;
+  transition: background 0.12s;
+}
+
+.ct-btn:hover {
+  background: #f0f0f0;
+}
+
+.ct-btn.primary {
+  background: #3858e9;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 400;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  padding: 0;
+}
+
+.ct-btn.primary:hover {
+  background: #2a47d4;
+}
+
+.ct-sep {
+  width: 1px;
+  height: 20px;
+  background: #e0e0e0;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.ct-space {
+  flex: 1;
+}
+
+.ct-label {
+  font-size: 11px;
+  color: #757575;
+}
+
+/* View mode switcher */
+.ct-view-modes {
+  display: flex;
+  gap: 0;
+  background: #f0f0f0;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.ct-view-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #757575;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+}
+
+.ct-view-btn:hover {
+  color: #1e1e1e;
+}
+
+.ct-view-btn.active {
+  background: #fff;
+  color: #1e1e1e;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Icon buttons */
+.ct-icon-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: #1e1e1e;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+}
+
+.ct-icon-btn:hover {
+  background: #f0f0f0;
+}
+
+/* Save status and button */
+.ct-saved {
+  color: #00a32a;
+  font-size: 11px;
+  padding: 0 8px;
+  font-weight: 500;
+}
+
+/* Save and Exit button group */
+.ct-save {
+  padding: 8px 16px;
+  background: #3858e9;
+  color: #fff;
+  border: 1px solid #3858e9;
+  font: 500 12px 'DM Sans', sans-serif;
+  cursor: pointer;
+  display: none;
+  transition: background 0.12s;
+  height: 36px;
+}
+
+.ct-save:hover {
+  background: #2a47d4;
+  border-color: #2a47d4;
+}
+
+.ct-save.show {
+  display: block;
+  border-radius: 4px 0 0 4px;
+}
+
+.ct-exit {
+  padding: 8px 16px;
+  background: transparent;
+  color: #1e1e1e;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font: 500 12px 'DM Sans', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.12s;
+  height: 36px;
+}
+
+.ct-exit:hover {
+  border-color: #999;
+  background: #f9f9f9;
+}
+
+/* When Save is shown, Exit button connects to it */
+.ct-save.show + .ct-exit {
+  border-radius: 0 4px 4px 0;
+  border-left: none;
+}
+
+/* Editing canvas — flex row so inserter shifts canvas */
+.edit-canvas {
+  display: none;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.edit-canvas.show {
+  display: flex;
+}
+
+/* Editor column (toolbar + scroll area) */
+.editor-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Edit scroll area */
+.edit-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.edit-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.g-el {
+  position: relative;
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.g-el:hover {
+  opacity: 0.75;
+}
+
+.g-badge {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  background: #f0b849;
+  color: #1e1e1e;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  z-index: 5;
+  white-space: nowrap;
+}
+
+.e-sec {
+  position: relative;
+  border: 2px solid transparent;
+  transition: border-color 0.12s;
+  cursor: pointer;
+}
+
+.e-sec:hover {
+  border-color: #3858e9;
+}
+
+.e-sec.sel {
+  border-color: #3858e9;
+  background: #fafbff;
+}
+
+.sec-bar {
+  position: absolute;
+  top: -32px;
+  left: 0;
+  background: #1e1e1e;
+  border-radius: 4px;
+  display: none;
+  align-items: center;
+  padding: 3px;
+  gap: 1px;
+  z-index: 20;
+}
+
+.e-sec.sel .sec-bar {
+  display: flex;
+}
+
+.sb-btn {
+  padding: 3px 7px;
+  border: none;
+  background: transparent;
+  color: #ccc;
+  font: 11px 'DM Sans', sans-serif;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sb-btn:hover {
+  background: #333;
+}
+
+.sb-div {
+  width: 1px;
+  height: 14px;
+  background: #333;
+  margin: 0 2px;
+}
+
+.sec-group {
+  position: relative;
+}
+
+.add-sec {
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  background: #1e1e1e;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font: 500 11px 'DM Sans', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.12s;
+  line-height: 1;
+}
+
+.add-sec:hover {
+  background: #3858e9;
+}
+
+.sec-group:hover .add-sec,
+.add-sec:hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Section inserter — left sidebar that shifts the canvas */
+.ins-panel {
+  width: 0;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 0.2s;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-right: 1px solid #e0e0e0;
+}
+
+.ins-panel.show {
+  width: 300px;
+}
+
+.ins-hd {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px 11px;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.ins-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
+  flex: 1;
+}
+
+.ins-close {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #aaa;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.ins-close:hover {
+  background: #f0f0f0;
+  color: #1e1e1e;
+}
+
+.ins-search-wrap {
+  padding: 10px 14px;
+  flex-shrink: 0;
+  border-bottom: 1px solid #eee;
+}
+
+.ins-search {
+  width: 100%;
+  padding: 6px 9px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font: 12px 'DM Sans', sans-serif;
+  outline: none;
+  background: #fafafa;
+}
+
+.ins-search:focus {
+  border-color: #3858e9;
+  background: #fff;
+}
+
+.ins-cats {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  flex-shrink: 0;
+  border-bottom: 1px solid #eee;
+}
+
+.c-btn {
+  padding: 4px 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 20px;
+  font: 11px 'DM Sans', sans-serif;
+  cursor: pointer;
+  color: #888;
+}
+
+.c-btn.on {
+  background: #1e1e1e;
+  border-color: #1e1e1e;
+  color: #fff;
+}
+
+.ins-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+}
+
+.ins-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.s-opt {
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.s-opt:hover {
+  border-color: #3858e9;
+  box-shadow: 0 0 0 2px #e8edff;
+}
+
+.s-prev {
+  height: 60px;
+  background: #f5f5f5;
+  padding: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ln {
+  height: 5px;
+  background: #e0e0e0;
+  border-radius: 2px;
+}
+
+.ln.s {
+  width: 45%;
+}
+
+.ln.m {
+  width: 68%;
+}
+
+.ln.f {
+  width: 100%;
+}
+
+.ln.img {
+  height: 24px;
+  background: #d0d0d0;
+  border-radius: 2px;
+}
+
+.s-lbl {
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #1e1e1e;
+}
+
+/* Split View Layout - Generic reusable pattern for stage + canvas views */
+.split-view {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.split-view.list {
+  flex-direction: row;
+  gap: 0;
+}
+
+.split-view.grid {
+  flex-direction: column;
+}
+
+/* Stage - WordPress terminology for list/management area */
+.split-view-stage {
+  width: 40%;
+  min-width: 360px;
+  overflow: hidden;
+  background: #fff;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Canvas - WordPress terminology for preview area */
+.split-view-canvas {
+  flex: 1;
+  display: flex;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* Grid mode - full width */
+.split-view-grid {
+  width: 100%;
+  background: #f5f5f5;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}

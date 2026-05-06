@@ -1,0 +1,110 @@
+/* Green live dot in pages strip */
+.pi-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00a32a;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+/* WordPress SVG icons */
+.icon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  flex-shrink: 0;
+  display: block;
+}
+
+.icon-sm {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+  flex-shrink: 0;
+  display: block;
+}
+
+.divider {
+  height: 1px;
+  background: #2a2a2a;
+  margin: 4px 0;
+  flex-shrink: 0;
+}
+
+.ps-hd {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px 6px;
+  flex-shrink: 0;
+}
+
+.ps-title {
+  color: #777;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex: 1;
+}
+
+.ps-add {
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: #2a2a2a;
+  color: #888;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.ps-add:hover {
+  background: #3858e9;
+  color: #fff;
+}
+
+.ps-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.ps-list::-webkit-scrollbar {
+  width: 3px;
+}
+
+.ps-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+/* WordPress Tooltip styling for defined terms */
+.components-tooltip {
+  max-width: 280px;
+  white-space: normal;
+  text-align: left;
+}
+
+/* Defined term with tooltip (wiki-style) */
+.defined-term {
+  border-bottom: 1px dotted #666;
+  cursor: help;
+  text-decoration: none;
+}
+
+.defined-term:hover {
+  border-bottom-color: #3858e9;
+}

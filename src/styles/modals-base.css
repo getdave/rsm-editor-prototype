@@ -1,0 +1,355 @@
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.modal-title {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+
+.modal-message {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.modal-new-value {
+  margin: 0 0 24px;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #1e1e1e;
+}
+
+.modal-new-value strong {
+  color: #3858e9;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 8px;
+  width: 380px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+.modal-hd {
+  display: flex;
+  align-items: center;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e1e1e;
+  flex: 1;
+}
+
+.modal-close {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: #999;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: #f5f5f5;
+  color: #1e1e1e;
+}
+
+.modal-body {
+  padding: 16px 18px;
+}
+
+.m-field {
+  margin-bottom: 14px;
+}
+
+.m-lbl {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 5px;
+}
+
+.m-input {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font: 13px 'DM Sans', sans-serif;
+  color: #1e1e1e;
+  outline: none;
+}
+
+.m-input:focus {
+  border-color: #3858e9;
+}
+
+.m-logo-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.m-logo-preview {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #3858e9, #764ba2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+}
+
+.m-logo-placeholder {
+  font-size: 48px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.m-logo-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.m-logo-btn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 4px;
+  font: 500 13px 'DM Sans', sans-serif;
+  cursor: pointer;
+  color: #1e1e1e;
+  transition: all 0.15s ease;
+}
+
+.m-logo-btn:hover {
+  border-color: #3858e9;
+  color: #3858e9;
+}
+
+.m-logo-btn.primary {
+  background: #3858e9;
+  border-color: #3858e9;
+  color: #fff;
+}
+
+.m-logo-btn.primary:hover {
+  background: #2a47d1;
+  border-color: #2a47d1;
+  color: #fff;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 18px 16px;
+  border-top: 1px solid #eee;
+}
+
+.m-cancel {
+  padding: 7px 14px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 4px;
+  font: 500 12px 'DM Sans', sans-serif;
+  cursor: pointer;
+  color: #555;
+}
+
+.m-cancel:hover {
+  background: #f5f5f5;
+}
+
+.m-ok {
+  padding: 7px 14px;
+  border: none;
+  background: #3858e9;
+  color: #fff;
+  border-radius: 4px;
+  font: 500 12px 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+
+.m-ok:hover {
+  background: #2a47d4;
+}
+
+/* ── SETTINGS MODAL ── */
+.settings-modal-overlay {
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 40px;
+}
+
+.settings-modal {
+  background: #fff;
+  border-radius: 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+  color: #1e1e1e;
+}
+
+.settings-modal-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72px;
+  padding: 16px 40px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.settings-modal-title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 500;
+  color: #1e1e1e;
+}
+
+.settings-modal-close.components-button {
+  height: 32px;
+  width: 32px;
+}
+
+.settings-modal-body {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+  padding: 24px 40px 40px;
+  min-height: 0;
+}
+
+.settings-tabs {
+  width: 160px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-tab {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 2px;
+  background: transparent;
+  color: #1e1e1e;
+  font-size: 13px;
+  line-height: 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.settings-tab:hover {
+  background: #f0f0f0;
+}
+
+.settings-tab.is-active {
+  background: rgba(56, 88, 233, 0.04);
+  color: #3858e9;
+  font-weight: 500;
+}
+
+.settings-pane {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.settings-pane-placeholder {
+  padding: 16px 0;
+  color: #757575;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 720px;
+}
+
+/* DataForm renders its own layout; give the form room and align spacing
+   with the modal body. We rely on the @wordpress/dataviews defaults for
+   field appearance and only normalise outer spacing. */
+.settings-form .dataforms-layouts-regular {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}

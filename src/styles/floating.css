@@ -1,0 +1,251 @@
+/* Floating tooltip (JS-driven, avoids overflow:hidden clipping) */
+.floating-tip {
+  position: fixed;
+  background: #333;
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 9999;
+  border: 1px solid #444;
+  pointer-events: none;
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Floating sidebar toggle */
+.sidebar-toggle {
+  position: absolute;
+  top: 12px;
+  left: 270px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: #fff;
+  color: #1e1e1e;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: left 0.2s, background 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
+}
+
+.sidebar-toggle:hover {
+  background: #f5f5f5;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-toggle svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+/* Adjust position when sidebar is collapsed */
+.sidebar.collapsed ~ .sidebar-toggle {
+  left: 60px;
+}
+
+/* Floating pages panel (position:fixed, driven by JS) */
+.pages-fp {
+  position: fixed;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  z-index: 9999;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+  width: 252px;
+  max-height: 420px;
+  overflow: hidden;
+}
+
+.pages-fp.show {
+  display: flex;
+}
+
+.pages-fp-hd {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid #2a2a2a;
+  flex-shrink: 0;
+}
+
+.pages-fp-title {
+  color: #666;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex: 1;
+}
+
+.pages-fp-add {
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: #2a2a2a;
+  color: #888;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.pages-fp-add:hover {
+  background: #3858e9;
+  color: #fff;
+}
+
+.pages-fp-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.pages-fp-body::-webkit-scrollbar {
+  width: 3px;
+}
+
+.pages-fp-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+/* shared row styles (used inside floating panel) */
+.pi {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.12s;
+}
+
+.pi:hover {
+  background: #252525;
+  border-left-color: #3858e9;
+}
+
+/* Sidebar page row: front-page badge overlays icon (top-left) */
+.pi-media-thumb {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 40px;
+}
+
+.pi-media-thumb .pp-front-page-overlay,
+.pi-media-thumb .pp-posts-page-overlay {
+  top: -1px;
+  left: -1px;
+  padding: 1px 3px;
+  font-size: 6px;
+  letter-spacing: 0.04em;
+}
+
+.pi-ico {
+  font-size: 11px;
+  color: #555;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pi-ico svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.pi-ico.home-ico {
+  color: #3858e9;
+}
+
+.pi-name {
+  flex: 1;
+  font-size: 12px;
+  color: #bbb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.pi-name.sys {
+  color: #555;
+}
+
+.pi-badges {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.pb {
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.pb-draft {
+  background: #2a2a2a;
+  color: #666;
+}
+
+.pb-nav {
+  background: rgba(56, 88, 233, 0.15);
+  color: #4f70f5;
+}
+
+.pb-sys {
+  background: rgba(255, 255, 255, 0.05);
+  color: #666;
+}
+
+.pb-wp {
+  background: rgba(33, 117, 155, 0.15);
+  color: #21759b;
+}
+
+.pb-theme {
+  background: rgba(46, 162, 125, 0.15);
+  color: #2ea27d;
+}
+
+.pb-template {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+}
+
+.pb-woo {
+  background: rgba(127, 84, 179, 0.15);
+  color: #7f54b3;
+}
+
+.ps-sys-label {
+  padding: 5px 12px 3px;
+  font-size: 9px;
+  font-weight: 600;
+  color: #444;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
