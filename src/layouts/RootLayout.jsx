@@ -15,8 +15,6 @@ const EDIT_ROUTE_PATTERN = /\/pages\/[^/]+\/edit$/;
 function RootLayout() {
   const location = useLocation();
   const {
-    sidebarCollapsed,
-    toggleSidebar,
     snackbarMessage,
     dismissSnackbar,
     setEditorReferrer,
@@ -24,19 +22,6 @@ function RootLayout() {
 
   const isEditCanvas = EDIT_ROUTE_PATTERN.test(location.pathname);
   const prevPathRef = useRef(location.pathname);
-
-  // Auto-collapse sidebar when entering edit mode
-  useEffect(() => {
-    const isEditRoute = location.pathname.includes('/edit');
-
-    if (isEditRoute && !sidebarCollapsed) {
-      // Collapse sidebar when entering edit mode
-      toggleSidebar();
-    } else if (!isEditRoute && sidebarCollapsed) {
-      // Expand sidebar when leaving edit mode
-      toggleSidebar();
-    }
-  }, [location.pathname]);
 
   // Capture the route the user was on before entering the edit canvas so the
   // split-Exit button knows where to take them back. Cleared on exit.
@@ -53,12 +38,14 @@ function RootLayout() {
 
   return (
     <>
-      {!isEditCanvas && <SiteEditorHeader />}
-      <div className="body">
-        {!isEditCanvas && <Sidebar />}
-        <main className="main">
-          <Outlet />
-        </main>
+      <div className={`app-shell ${isEditCanvas ? 'is-edit-canvas' : ''}`}>
+        <SiteEditorHeader />
+        <div className="body">
+          <Sidebar />
+          <main className="main">
+            <Outlet />
+          </main>
+        </div>
       </div>
       <SiteIdentityModal />
       <SettingsModal />
