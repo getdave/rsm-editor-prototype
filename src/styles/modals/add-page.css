@@ -562,7 +562,37 @@
   gap: 20px;
 }
 
-/* Page Options Panel */
+/* Primary page title field — Add Page modal only */
+.apm-modal .apm-form > .m-field .m-lbl {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-bottom: 8px;
+}
+
+.apm-modal .apm-form > .m-field .m-input {
+  font-size: 16px;
+  font-weight: 500;
+  padding: 12px 14px;
+  min-height: 48px;
+  border-width: 2px;
+  border-color: #949494;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.apm-modal .apm-form > .m-field .m-input:focus {
+  border-color: #3858e9;
+  box-shadow: 0 0 0 1px #3858e9;
+}
+
+.apm-modal .apm-form > .m-field {
+  margin-bottom: 0;
+}
+
+/* Advanced panel + page options */
 .apm-panel.components-panel__body {
   border: 1px solid #dcdcde;
   border-radius: 2px;
@@ -573,11 +603,19 @@
   padding: 11px 16px;
 }
 
+.apm-panel .apm-page-template-select.components-base-control {
+  margin-bottom: 0;
+}
+
+.apm-panel .apm-page-template-select .components-select-control__input {
+  width: 100%;
+  max-width: 100%;
+}
+
 .apm-checkbox-group {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px;
 }
 
 .apm-checkbox-item {
