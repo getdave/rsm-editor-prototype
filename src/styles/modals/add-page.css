@@ -586,15 +586,6 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px;
-}
-
-/* Checkboxes shown in the main form (outside panel) */
-.apm-checkbox-group--inline {
-  border: 1px solid #dcdcde;
-  border-radius: 2px;
-  background: #fff;
-  padding: 16px;
 }
 
 .apm-checkbox-item {

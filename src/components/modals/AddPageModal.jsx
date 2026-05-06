@@ -373,7 +373,7 @@ function AddPageModalContent() {
                       />
                     </div>
 
-                    <div className="apm-checkbox-group apm-checkbox-group--inline">
+                    <div className="apm-checkbox-group">
                       <div className="apm-checkbox-item">
                         <CheckboxControl
                           label="Publish immediately"
