@@ -31,10 +31,7 @@ function AddPageModalContent() {
 
   const pageTemplateOptions = [
     { value: 'page-default', label: 'Page (default)' },
-    { value: 'page-full-width', label: 'Full Width' },
-    { value: 'page-no-header', label: 'No Header' },
-    { value: 'page-no-footer', label: 'No Footer' },
-    { value: 'page-blank-canvas', label: 'Blank Canvas' },
+    { value: 'page-with-header', label: 'Page (with header)' },
   ];
 
   // Curated starter layouts (shown by default)
