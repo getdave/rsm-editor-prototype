@@ -3112,6 +3112,21 @@ body {
   min-height: 0;
 }
 
+.apm-modal .modal-footer.apm-modal-footer {
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.apm-modal-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
 /* Path option cards (2-column grid) */
 .apm-options {
   display: grid;

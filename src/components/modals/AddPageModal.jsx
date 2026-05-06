@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, DropdownMenu, MenuItem, CheckboxControl, Tooltip, PanelBody } from '@wordpress/components';
+import { createInterpolateElement } from '@wordpress/element';
 import { chevronDown, plus } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
+import DefinedTerm from '../shared/DefinedTerm';
 
 function AddPageModal() {
   const { addPageModalOpen } = useAppState();
@@ -62,6 +64,18 @@ function AddPageModalContent() {
     setSelectedLayout(null);
     setPageTitle('');
     setShowAllLayouts(false); // Reset to curated view
+  };
+
+  const handleFooterBack = () => {
+    if (selectedPath === 'layout' && !selectedLayout) {
+      setSelectedPath(null);
+      setShowAllLayouts(false);
+      return;
+    }
+    setSelectedPath(null);
+    setSelectedLayout(null);
+    setPageTitle('');
+    setShowAllLayouts(false);
   };
 
   const handleSelectLayout = (layout) => {
@@ -125,9 +139,14 @@ function AddPageModalContent() {
             <span className="modal-title">Add a new page</span>
             {selectedPath === 'layout' && !selectedLayout && (
               <p className="modal-subtitle">
-                Choose from predefined layouts built using <Tooltip text="Reusable design blocks you can combine and customize to build pages">
-                  <button className="modal-link" onClick={() => { closeAddPageModal(); navigate('/patterns'); }}>patterns</button>
-                </Tooltip> that you can customize.
+                {createInterpolateElement(
+                  'Choose from predefined layouts built using <term>patterns</term> that you can customize.',
+                  {
+                    term: (
+                      <DefinedTerm definition="Reusable design blocks you can combine and customize to build pages." />
+                    ),
+                  },
+                )}
               </p>
             )}
           </div>
@@ -140,19 +159,6 @@ function AddPageModalContent() {
           {!selectedPath ? (
             <>
               <div className="apm-options">
-                <button
-                  className="apm-option-card"
-                  onClick={() => handleSelectPath('scratch')}
-                >
-                  <div className="apm-option-preview apm-preview-scratch">
-                    <div className="apm-preview-icon">{plus}</div>
-                  </div>
-                  <div className="apm-option-title">Start from scratch</div>
-                  <div className="apm-option-desc">
-                    Create a blank page and add sections as you go
-                  </div>
-                </button>
-
                 <button
                   className="apm-option-card"
                   onClick={() => handleSelectPath('layout')}
@@ -168,7 +174,20 @@ function AddPageModalContent() {
                   </div>
                   <div className="apm-option-title">Choose a layout</div>
                   <div className="apm-option-desc">
-                    Start with a pre-designed page template
+                    Start with a pre-designed page layout
+                  </div>
+                </button>
+
+                <button
+                  className="apm-option-card"
+                  onClick={() => handleSelectPath('scratch')}
+                >
+                  <div className="apm-option-preview apm-preview-scratch">
+                    <div className="apm-preview-icon">{plus}</div>
+                  </div>
+                  <div className="apm-option-title">Start from scratch</div>
+                  <div className="apm-option-desc">
+                    Create a blank page and add sections as you go
                   </div>
                 </button>
               </div>
@@ -188,12 +207,6 @@ function AddPageModalContent() {
             <>
               {selectedPath === 'layout' && !selectedLayout ? (
                 <>
-                  <button
-                    className="apm-back"
-                    onClick={() => setSelectedPath(null)}
-                  >
-                    ← Back to options
-                  </button>
                   <div className="apm-layouts-grid">
                     {layouts.map((layout) => (
                       <Tooltip key={layout.id} text={layout.tooltip}>
@@ -335,17 +348,6 @@ function AddPageModalContent() {
                 </>
               ) : (
                 <>
-                  <button
-                    className="apm-back"
-                    onClick={() => {
-                      setSelectedPath(null);
-                      setSelectedLayout(null);
-                      setPageTitle('');
-                    }}
-                  >
-                    ← Back to options
-                  </button>
-
                   <div className="apm-form">
                     <div className="m-field">
                       <label className="m-lbl" htmlFor="page-title">
@@ -362,7 +364,7 @@ function AddPageModalContent() {
                       />
                     </div>
 
-                    <PanelBody title="Page Options" initialOpen={false} className="apm-panel">
+                    <PanelBody title="Page Options" initialOpen className="apm-panel">
                       <div className="apm-checkbox-group">
                         <div className="apm-checkbox-item">
                           <CheckboxControl
@@ -393,46 +395,52 @@ function AddPageModalContent() {
           )}
         </div>
 
-        {selectedPath && (selectedPath !== 'layout' || selectedLayout) && (
-          <div className="modal-footer">
-            <Button variant="secondary" onClick={closeAddPageModal}>
-              Cancel
+        {selectedPath && (
+          <div className="modal-footer apm-modal-footer">
+            <Button variant="tertiary" onClick={handleFooterBack}>
+              ← Back to options
             </Button>
-
-            <div className="split-button">
-              <Button
-                variant="primary"
-                onClick={handleCreateAndEdit}
-                disabled={!canCreate}
-                className="split-button-main"
-              >
-                Create and Edit
+            <div className="apm-modal-footer-actions">
+              <Button variant="secondary" onClick={closeAddPageModal}>
+                Cancel
               </Button>
+              {(selectedPath !== 'layout' || selectedLayout) && (
+                <div className="split-button">
+                  <Button
+                    variant="primary"
+                    onClick={handleCreateAndEdit}
+                    disabled={!canCreate}
+                    className="split-button-main"
+                  >
+                    Create and Edit
+                  </Button>
 
-              <DropdownMenu
-                icon={chevronDown}
-                label="More options"
-                className="split-button-dropdown"
-                popoverProps={{ placement: 'bottom-end' }}
-                toggleProps={{
-                  disabled: !canCreate,
-                  variant: 'primary',
-                  className: 'split-button-toggle',
-                }}
-              >
-                {({ onClose }) => (
-                  <>
-                    <MenuItem
-                      onClick={() => {
-                        handleCreate();
-                        onClose();
-                      }}
-                    >
-                      Create only
-                    </MenuItem>
-                  </>
-                )}
-              </DropdownMenu>
+                  <DropdownMenu
+                    icon={chevronDown}
+                    label="More options"
+                    className="split-button-dropdown"
+                    popoverProps={{ placement: 'bottom-end' }}
+                    toggleProps={{
+                      disabled: !canCreate,
+                      variant: 'primary',
+                      className: 'split-button-toggle',
+                    }}
+                  >
+                    {({ onClose }) => (
+                      <>
+                        <MenuItem
+                          onClick={() => {
+                            handleCreate();
+                            onClose();
+                          }}
+                        >
+                          Create only
+                        </MenuItem>
+                      </>
+                    )}
+                  </DropdownMenu>
+                </div>
+              )}
             </div>
           </div>
         )}
