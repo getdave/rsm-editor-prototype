@@ -159,7 +159,7 @@
   padding: 7px 9px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font: 13px 'DM Sans', sans-serif;
+  font: 13px var(--wp-font-family);
   color: #1e1e1e;
   outline: none;
 }
@@ -203,7 +203,7 @@
   border: 1px solid #ddd;
   background: #fff;
   border-radius: 4px;
-  font: 500 13px 'DM Sans', sans-serif;
+  font: 500 13px var(--wp-font-family);
   cursor: pointer;
   color: #1e1e1e;
   transition: all 0.15s ease;
@@ -239,7 +239,7 @@
   border: 1px solid #ddd;
   background: #fff;
   border-radius: 4px;
-  font: 500 12px 'DM Sans', sans-serif;
+  font: 500 12px var(--wp-font-family);
   cursor: pointer;
   color: #555;
 }
@@ -254,7 +254,7 @@
   background: #3858e9;
   color: #fff;
   border-radius: 4px;
-  font: 500 12px 'DM Sans', sans-serif;
+  font: 500 12px var(--wp-font-family);
   cursor: pointer;
 }
 

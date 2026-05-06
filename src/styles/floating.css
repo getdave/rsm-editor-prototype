@@ -10,7 +10,7 @@
   z-index: 9999;
   border: 1px solid #444;
   pointer-events: none;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--wp-font-family);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 

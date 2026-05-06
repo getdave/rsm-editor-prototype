@@ -51,7 +51,7 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  font: 700 13px 'DM Sans', sans-serif;
+  font: 700 13px var(--wp-font-family);
 }
 
 .seh-logo::before {

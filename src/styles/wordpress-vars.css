@@ -54,6 +54,17 @@
     0 3px 3px rgba(0, 0, 0, 0.02),
     0 4px 4px rgba(0, 0, 0, 0.01);
   
-  /* Font */
-  --wp-font-family: 'DM Sans', sans-serif;
+  /* Font — WordPress admin / WPDS body stack (@wordpress/theme design-tokens.css) */
+  --wp-font-family: var(
+    --wpds-typography-font-family-body,
+    -apple-system,
+    system-ui,
+    "Segoe UI",
+    Roboto,
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    "Helvetica Neue",
+    sans-serif
+  );
 }

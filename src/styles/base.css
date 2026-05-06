@@ -5,7 +5,7 @@
 }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--wp-font-family);
   background: var(--wp-chrome-bg, #1e1e1e);
   margin: 0;
   height: 100vh;
