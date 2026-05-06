@@ -55,10 +55,6 @@ const TABS = [
         ),
       },
     ),
-    descriptionLink: {
-      text: "View all Templates",
-      action: "view-templates",
-    },
   },
 ];
 
@@ -737,14 +733,24 @@ function PagesView() {
         <div className="pp-hd">
           <span className="pp-title">Pages</span>
           <div className="pp-hd-actions">
-            <Button
-              variant="primary"
-              icon={plus}
-              iconSize={16}
-              onClick={openAddPageModal}
-            >
-              Add page
-            </Button>
+            {activeCategory === "content" && (
+              <Button
+                variant="primary"
+                icon={plus}
+                iconSize={16}
+                onClick={openAddPageModal}
+              >
+                Add page
+              </Button>
+            )}
+            {activeCategory === "dynamic" && (
+              <Button
+                variant="secondary"
+                onClick={() => navigate("/templates")}
+              >
+                All Templates
+              </Button>
+            )}
             <span className="pp-hd-more-wrap">
               {readingConfigureMenuNeedsAttention ? (
                 <VisuallyHidden>
