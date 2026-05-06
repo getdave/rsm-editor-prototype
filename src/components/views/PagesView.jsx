@@ -25,7 +25,6 @@ import {
   moreVertical,
 } from "@wordpress/icons";
 import { useAppState } from "../../hooks/useAppState";
-import { pages } from "../../data/mockData";
 import SplitViewLayout from "../../layouts/SplitViewLayout";
 import PreviewCanvas from "../shared/PreviewCanvas";
 import DefinedTerm from "../shared/DefinedTerm";
@@ -56,10 +55,6 @@ const TABS = [
         ),
       },
     ),
-    descriptionLink: {
-      text: "View all Templates",
-      action: "view-templates",
-    },
   },
 ];
 
@@ -323,7 +318,7 @@ function renderAuthorCell(item) {
 
 function PagesView() {
   const navigate = useNavigate();
-  const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode } =
+  const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode, pages, openAddPageModal } =
     useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [frontPageId, setFrontPageId] = useState(
@@ -738,14 +733,24 @@ function PagesView() {
         <div className="pp-hd">
           <span className="pp-title">Pages</span>
           <div className="pp-hd-actions">
-            <Button
-              variant="primary"
-              icon={plus}
-              iconSize={16}
-              onClick={() => console.log("Add page")}
-            >
-              Add page
-            </Button>
+            {activeCategory === "content" && (
+              <Button
+                variant="primary"
+                icon={plus}
+                iconSize={16}
+                onClick={openAddPageModal}
+              >
+                Add page
+              </Button>
+            )}
+            {activeCategory === "dynamic" && (
+              <Button
+                variant="secondary"
+                onClick={() => navigate("/templates")}
+              >
+                All Templates
+              </Button>
+            )}
             <span className="pp-hd-more-wrap">
               {readingConfigureMenuNeedsAttention ? (
                 <VisuallyHidden>
