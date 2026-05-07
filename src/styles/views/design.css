@@ -1,2 +1,384 @@
-/* Design/Styles view styles */
-/* Placeholder for future Design view implementation */
+/* ── DESIGN VIEW (/design/*) ── */
+/* Layout glue only — visual treatment comes from existing trunk classes
+   (.pp-card, .pp-tab, .pp-inner, .pp-hd, .ni) and @wordpress/components defaults. */
+
+.styles-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+.styles-list-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.styles-swatches { display: inline-flex; gap: 4px; }
+.styles-swatch { width: 16px; height: 16px; border-radius: 50%; }
+.styles-list-name { flex: 1; }
+
+/* Themes views (/design/themes/installed and /design/themes/browse) */
+.themes-view {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: auto;
+  flex: 1;
+  min-width: 0;
+}
+.themes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.themes-active-wrap {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.themes-active-screenshot {
+  flex: 1 1 280px;
+  min-width: 0;
+  max-width: 320px;
+  aspect-ratio: 4 / 3;
+  background-size: cover;
+  background-position: center;
+}
+.themes-active-details {
+  flex: 1 1 280px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.themes-active-actions { display: flex; gap: 8px; margin-top: auto; }
+.themes-active-version { font-weight: 400; opacity: 0.7; margin-left: 4px; }
+.themes-add-row { display: flex; }
+.theme-card { display: flex; flex-direction: column; }
+.theme-card-thumb {
+  aspect-ratio: 4 / 3;
+  background-size: cover;
+  background-position: center;
+}
+.theme-card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.theme-card-meta { font-size: 12px; opacity: 0.7; }
+
+.themes-browse-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.themes-browse-actions { display: flex; gap: 8px; }
+.themes-empty { padding: 24px; text-align: center; opacity: 0.6; }
+/* ── Styles panels (Site Editor parity) ── */
+/* Dark surface around the white stage + canvas — matches the prototype's
+   root view (post-merge `.main` is also #1e1e1e). The white panels read
+   as raised cards on top. */
+.pages-panel.design-panel { background: #1e1e1e; }
+
+/* Outer split-view layout overrides for the design section: a fixed-width
+   380px white stage panel and a flex-grow white canvas, with 16px padding
+   around the pair and 16px gap between them — mirrors the prototype's
+   home canvas framing. */
+.design-panel .split-view.list {
+  flex-direction: row;
+  gap: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+.design-panel .split-view-stage {
+  width: 380px;
+  min-width: 380px;
+  flex: 0 0 380px;
+  border-right: none;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.design-panel .split-view-canvas {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.styles-view { padding: 0; overflow: hidden; }
+.styles-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Title bar: "Styles" + preview / overflow icons. */
+.styles-panel-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.styles-panel-title { font-size: 14px; font-weight: 600; }
+.styles-panel-titlebar-actions { display: flex; gap: 4px; }
+
+/* Breadcrumb row — back-to-Styles or static label for the index. */
+.styles-panel-breadcrumb { font-size: 14px; }
+.styles-panel-breadcrumb-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+}
+.styles-panel-breadcrumb-icon { display: inline-flex; width: 18px; height: 18px; }
+.styles-panel-breadcrumb-icon svg { width: 18px; height: 18px; fill: currentColor; }
+.styles-panel-breadcrumb-static { font-weight: 600; }
+.styles-panel-description { margin: 0; color: #555; font-size: 13px; }
+
+/* Section group — uppercase label + content. */
+.styles-panel-section { display: flex; flex-direction: column; gap: 8px; }
+.styles-panel-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #1e1e1e;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.styles-panel-section-label-action {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: #555;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.styles-panel-section-label-action svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* Sentence-case section heading (used for "Elements" within Colors,
+   "Background image" in Background, "Dimensions" in Layout). Includes
+   an optional 3-dot menu icon on the right. */
+.styles-panel-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+}
+.styles-panel-heading {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+.styles-panel-heading-action {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: #555;
+  display: inline-flex;
+}
+.styles-panel-heading-action svg { width: 20px; height: 20px; fill: currentColor; }
+
+/* Bordered card grouping a list of rows (PALETTE / Elements / FONTS / etc.). */
+.styles-section-card {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+}
+.styles-section-card .styles-row {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 0;
+}
+.styles-section-card .styles-row:last-child { border-bottom: none; }
+.styles-section-card .styles-row-clickable:hover { background: #f7f7f7; }
+
+/* Input-like read-only row used by the Layout panel. Looks like a Gutenberg
+   number input with a leading icon and a trailing unit label. */
+.styles-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+  background: #fff;
+}
+.styles-input-row-icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  color: #1e1e1e;
+}
+.styles-input-row-icon svg { width: 18px; height: 18px; fill: currentColor; }
+.styles-input-row-value {
+  flex: 1;
+  font-size: 13px;
+  color: #1e1e1e;
+}
+.styles-input-row-unit { font-size: 12px; color: #007cba; }
+
+/* Add-button row used for "Add background image" and similar empty states. */
+.styles-action-card {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0;
+  overflow: hidden;
+}
+.styles-action-button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 14px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #1e1e1e;
+  text-align: center;
+}
+.styles-action-button:hover { background: #f7f7f7; }
+
+/* Stack of overlapping color circles used by the Colors > PALETTE row. */
+.styles-color-stack {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.styles-color-stack-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  margin-left: -8px;
+  box-sizing: border-box;
+}
+.styles-color-stack-circle:first-child { margin-left: 0; }
+
+/* Variation tile grid (the main "Browse styles" grid). */
+.styles-variation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.styles-variation-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+}
+.styles-variation-tile.is-active { border-color: #1e1e1e; box-shadow: 0 0 0 1px #1e1e1e; }
+.styles-variation-aa { font-size: 36px; font-weight: 500; line-height: 1; }
+.styles-variation-dots {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.styles-variation-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Color variation tile grid: 2 columns of horizontal-bar swatches. */
+.styles-color-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.styles-color-tile {
+  display: flex;
+  height: 36px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+}
+.styles-color-tile.is-active { border-color: #1e1e1e; box-shadow: 0 0 0 1px #1e1e1e; }
+.styles-color-bar { flex: 1; }
+
+/* Typography tile grid: 3 columns of large Aa previews. */
+.styles-typo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.styles-typo-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #fff;
+  padding: 0;
+}
+.styles-typo-tile.is-active { border-color: #1e1e1e; box-shadow: 0 0 0 1px #1e1e1e; }
+.styles-typo-aa { font-size: 28px; font-weight: 500; }
+
+/* Row list used by Colors, Typography, Shadows, Layout panels. */
+.styles-row-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+.styles-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 4px;
+  font-size: 13px;
+  border-radius: 4px;
+}
+.styles-row-clickable { cursor: pointer; }
+.styles-row-clickable:hover { background: #f5f5f5; }
+.styles-row-name { flex: 1; }
+.styles-row-meta { color: #757575; font-size: 12px; }
+.styles-row-chevron { color: #999; font-size: 16px; line-height: 1; }
+.styles-row-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+.styles-row-aa {
+  width: 32px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.styles-row-shadow {
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Empty card used on Background panel. */
+.styles-empty-card {
+  border: 1px dashed #ddd;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.styles-empty-card-text { margin: 0; color: #757575; font-size: 13px; }
+

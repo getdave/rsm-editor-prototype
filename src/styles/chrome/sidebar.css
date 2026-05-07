@@ -431,3 +431,61 @@
   height: 20px;
   fill: currentColor;
 }
+
+/* ── DESIGN SECTION SIDEBAR ── */
+/* Sidebar additions for /design/* — section header, design nav grouping,
+   slide transition between admin and design panes. The .ni / .ni-ico /
+   .ni-label / .ni-chevron styles above are reused as-is. */
+
+/* Anchor reset for sub-nav links so the underline doesn't leak through.
+   Color cascades naturally from `.ni { color: #bbb }`. */
+.ni.ni-child { text-decoration: none; }
+
+/* Section header sits between the Back row and the first nav group. */
+.ni-section-header {
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ni-section-header .ni-section-title,
+.ni-section-header .ni-section-desc {
+  margin: 0;
+  color: #fff;
+}
+.ni-section-header .ni-section-title { font-size: 20px; }
+.ni-section-header .ni-section-desc { font-size: 13px; }
+
+/* Design sidebar grouping: 24px between groups, 8px within a group. */
+.admin-root-nav.design-nav { gap: 24px; }
+.admin-root-nav.design-nav .ni-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Sidebar nav slider — admin nav slides out to the left, design nav slides
+   in from the right. Both panes always render; .sidebar's overflow:hidden
+   clips off-screen content so it never bleeds outside the sidebar. */
+.sidebar-nav-slider {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+.sidebar-nav-pane {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.3s ease;
+}
+.sidebar-nav-pane-admin { transform: translateX(0); }
+.sidebar-nav-pane-design { transform: translateX(100%); }
+.sidebar-nav-slider.is-design .sidebar-nav-pane-admin { transform: translateX(-100%); }
+.sidebar-nav-slider.is-design .sidebar-nav-pane-design { transform: translateX(0); }
+
+/* Hide sidebar-bottom when the design section is active. Fade matches the
+   nav slider's 0.3s timing for a cohesive transition. */
+.sidebar-bottom { transition: opacity 0.3s ease; }
+.sidebar.is-design-section .sidebar-bottom {
+  opacity: 0;
+  pointer-events: none;
+}

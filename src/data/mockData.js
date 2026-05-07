@@ -287,3 +287,330 @@ export const sections = [
   { id: "latest-posts", name: "Latest posts", categories: ["Posts"] },
   { id: "post-grid", name: "Post grid", categories: ["Posts"] },
 ];
+
+// ── Design section mock data ──────────────────────────────────────────
+const cssGradient = (a, b) => `linear-gradient(135deg, ${a} 0%, ${b} 100%)`;
+
+export const styleVariations = [
+  {
+    id: "default",
+    name: "Default",
+    isDefault: true,
+    colors: { primary: "#3858e9", secondary: "#1e1e1e", accent: "#00a32a", background: "#ffffff" },
+    typography: { headingFont: "DM Sans", bodyFont: "DM Sans" },
+  },
+  {
+    id: "minimal",
+    name: "Minimal",
+    colors: { primary: "#111827", secondary: "#6b7280", accent: "#9ca3af", background: "#ffffff" },
+  },
+  {
+    id: "bold",
+    name: "Bold",
+    colors: { primary: "#ef4444", secondary: "#111827", accent: "#f59e0b", background: "#fffbeb" },
+  },
+  {
+    id: "pastel",
+    name: "Pastel",
+    colors: { primary: "#a78bfa", secondary: "#ec4899", accent: "#34d399", background: "#fdf4ff" },
+  },
+  {
+    id: "editorial",
+    name: "Editorial",
+    colors: { primary: "#1f2937", secondary: "#7c2d12", accent: "#92400e", background: "#fef3c7" },
+  },
+  {
+    id: "newsletter",
+    name: "Newsletter",
+    colors: { primary: "#0f172a", secondary: "#334155", accent: "#0ea5e9", background: "#f8fafc" },
+  },
+];
+
+export const installedThemes = [
+  {
+    id: "twentytwentysix",
+    slug: "twentytwentysix",
+    name: "Twenty Twenty-Six",
+    isActive: true,
+    version: "1.0",
+    author: "WordPress.org",
+    authorUrl: "https://wordpress.org/",
+    description: "A versatile default theme that adapts to a wide range of websites.",
+    screenshot: cssGradient("#3858e9", "#7f54b3"),
+  },
+  {
+    id: "twentytwentyfive",
+    slug: "twentytwentyfive",
+    name: "Twenty Twenty-Five",
+    isActive: false,
+    version: "1.4",
+    author: "WordPress.org",
+    authorUrl: "https://wordpress.org/",
+    description: "Designed for longevity and adaptability.",
+    screenshot: cssGradient("#0ea5e9", "#1e1e1e"),
+  },
+  {
+    id: "twentytwentyfour",
+    slug: "twentytwentyfour",
+    name: "Twenty Twenty-Four",
+    isActive: false,
+    version: "1.3",
+    author: "WordPress.org",
+    authorUrl: "https://wordpress.org/",
+    description: "Built for entrepreneurs, creators, and small businesses.",
+    screenshot: cssGradient("#1f2937", "#92400e"),
+  },
+  {
+    id: "astra",
+    slug: "astra",
+    name: "Astra",
+    isActive: false,
+    version: "4.6",
+    author: "Brainstorm Force",
+    authorUrl: "https://wpastra.com/",
+    description: "Fast, fully customizable, beautiful WordPress theme.",
+    screenshot: cssGradient("#0f172a", "#0ea5e9"),
+  },
+  {
+    id: "kadence",
+    slug: "kadence",
+    name: "Kadence",
+    isActive: false,
+    version: "1.1",
+    author: "Kadence WP",
+    authorUrl: "https://kadencewp.com/",
+    description: "A lightweight, fast theme for builders and creators.",
+    screenshot: cssGradient("#a78bfa", "#ec4899"),
+  },
+  {
+    id: "generatepress",
+    slug: "generatepress",
+    name: "GeneratePress",
+    isActive: false,
+    version: "3.4",
+    author: "Tom Usborne",
+    authorUrl: "https://generatepress.com/",
+    description: "Lightweight WordPress theme. Less than 10KB gzipped.",
+    screenshot: cssGradient("#111827", "#9ca3af"),
+  },
+];
+
+export const availableThemes = [
+  {
+    id: "theme-1",
+    slug: "cover",
+    name: "Cover",
+    author: "Automattic",
+    rating: 4.7,
+    downloads: 120000,
+    lastUpdated: "2026-04-12",
+    tags: ["featured", "popular", "block"],
+    description: "Bold magazine layout with parallax hero.",
+    screenshot: cssGradient("#1f2937", "#ef4444"),
+  },
+  {
+    id: "theme-2",
+    slug: "aurora",
+    name: "Aurora",
+    author: "Pixelgrade",
+    rating: 4.5,
+    downloads: 88000,
+    lastUpdated: "2026-04-04",
+    tags: ["featured", "block"],
+    description: "Editorial blog with fluid typography.",
+    screenshot: cssGradient("#a78bfa", "#0ea5e9"),
+  },
+  {
+    id: "theme-3",
+    slug: "storefront",
+    name: "Storefront",
+    author: "WooCommerce",
+    rating: 4.6,
+    downloads: 540000,
+    lastUpdated: "2026-03-29",
+    tags: ["popular"],
+    description: "eCommerce-first theme by WooCommerce.",
+    screenshot: cssGradient("#7f54b3", "#3858e9"),
+  },
+  {
+    id: "theme-4",
+    slug: "arc",
+    name: "Arc",
+    author: "WordPress.org",
+    rating: 4.3,
+    downloads: 32000,
+    lastUpdated: "2026-04-22",
+    tags: ["latest", "block"],
+    description: "Modular block patterns for portfolios.",
+    screenshot: cssGradient("#34d399", "#0f172a"),
+  },
+  {
+    id: "theme-5",
+    slug: "novel",
+    name: "Novel",
+    author: "Modern Tribe",
+    rating: 4.4,
+    downloads: 21000,
+    lastUpdated: "2026-04-18",
+    tags: ["latest", "favorites"],
+    description: "Long-form reading layout for writers.",
+    screenshot: cssGradient("#92400e", "#fef3c7"),
+  },
+  {
+    id: "theme-6",
+    slug: "studio",
+    name: "Studio",
+    author: "Anders Norén",
+    rating: 4.8,
+    downloads: 95000,
+    lastUpdated: "2026-04-09",
+    tags: ["featured", "popular", "favorites", "block"],
+    description: "Portfolio-friendly grid theme.",
+    screenshot: cssGradient("#111827", "#f59e0b"),
+  },
+  {
+    id: "theme-7",
+    slug: "shoreline",
+    name: "Shoreline",
+    author: "CSSIgniter",
+    rating: 4.2,
+    downloads: 14500,
+    lastUpdated: "2026-03-30",
+    tags: ["latest"],
+    description: "Coastal hospitality theme.",
+    screenshot: cssGradient("#0ea5e9", "#fef3c7"),
+  },
+  {
+    id: "theme-8",
+    slug: "monolith",
+    name: "Monolith",
+    author: "Themify",
+    rating: 4.1,
+    downloads: 9000,
+    lastUpdated: "2026-02-25",
+    tags: ["popular", "block"],
+    description: "Heavy-typography editorial theme.",
+    screenshot: cssGradient("#1e1e1e", "#6b7280"),
+  },
+  {
+    id: "theme-9",
+    slug: "pulse",
+    name: "Pulse",
+    author: "Elmastudio",
+    rating: 4.0,
+    downloads: 6700,
+    lastUpdated: "2026-04-15",
+    tags: ["favorites"],
+    description: "Magazine layout with sticky sidebar.",
+    screenshot: cssGradient("#ec4899", "#7c2d12"),
+  },
+  {
+    id: "theme-10",
+    slug: "parallel",
+    name: "Parallel",
+    author: "WordPress.org",
+    rating: 4.6,
+    downloads: 47000,
+    lastUpdated: "2026-04-21",
+    tags: ["latest", "block", "featured"],
+    description: "Default-feeling block theme with patterns.",
+    screenshot: cssGradient("#3858e9", "#34d399"),
+  },
+  {
+    id: "theme-11",
+    slug: "vesper",
+    name: "Vesper",
+    author: "Array Themes",
+    rating: 4.3,
+    downloads: 18000,
+    lastUpdated: "2026-03-12",
+    tags: ["popular"],
+    description: "Dark-mode-first journalism theme.",
+    screenshot: cssGradient("#0f172a", "#a78bfa"),
+  },
+  {
+    id: "theme-12",
+    slug: "cardinal",
+    name: "Cardinal",
+    author: "Anariel Design",
+    rating: 4.5,
+    downloads: 25000,
+    lastUpdated: "2026-04-02",
+    tags: ["featured", "favorites", "block"],
+    description: "Bold red-accent business theme.",
+    screenshot: cssGradient("#ef4444", "#1e1e1e"),
+  },
+];
+
+// ── Styles panel mock data ────────────────────────────────────────────
+// Mirrors the data shapes in Gutenberg's Site Editor styles panel: color
+// variations, typography presets, theme color palettes, font families, etc.
+
+// Color palette variations shown under the "COLOR VARIATIONS" section
+// of the Browse Styles panel.
+export const colorVariations = [
+  { id: "cv-1", name: "Sunshine", colors: ["#000000", "#ffffff", "#fde68a", "#f9c0e1"] },
+  { id: "cv-2", name: "Charcoal", colors: ["#1e1e1e", "#f5f5f5", "#e0e0e0", "#7c2d12"] },
+  { id: "cv-3", name: "Sandy",    colors: ["#f4ede4", "#1f2937", "#fbbf24", "#f97316"] },
+  { id: "cv-4", name: "Greenery", colors: ["#bbf7d0", "#365314", "#a3e635", "#d9f99d"] },
+  { id: "cv-5", name: "Ink",      colors: ["#000000", "#ffffff", "#3b82f6", "#fb923c"] },
+  { id: "cv-6", name: "Mist",     colors: ["#e2e8f0", "#1e1e1e", "#8b5cf6", "#fde68a"] },
+  { id: "cv-7", name: "Wine",     colors: ["#3b0a0a", "#fef2f2", "#fef9c3", "#f9a8d4"] },
+  { id: "cv-8", name: "Royal",    colors: ["#312e81", "#34d399", "#7c3aed", "#1e1e1e"] },
+];
+
+// Typography variations shown under the "TYPOGRAPHY" section.
+export const typographyVariations = [
+  { id: "tv-1", name: "Default", headingFont: "DM Sans", bodyFont: "DM Sans" },
+  { id: "tv-2", name: "Modern",  headingFont: "Inter",   bodyFont: "Inter" },
+  { id: "tv-3", name: "Serif",   headingFont: "Lora",    bodyFont: "Source Sans Pro" },
+  { id: "tv-4", name: "Compact", headingFont: "IBM Plex Sans", bodyFont: "IBM Plex Sans" },
+  { id: "tv-5", name: "Editorial", headingFont: "Playfair Display", bodyFont: "Lora" },
+  { id: "tv-6", name: "Mono",    headingFont: "JetBrains Mono", bodyFont: "JetBrains Mono" },
+];
+
+// Theme palette shown on the Colors panel (matches Gutenberg's "Palette" group).
+export const themePalette = [
+  { slug: "base",                color: "#ffffff", name: "Base" },
+  { slug: "contrast",            color: "#1e1e1e", name: "Contrast" },
+  { slug: "primary",             color: "#3858e9", name: "Primary" },
+  { slug: "secondary",           color: "#7f54b3", name: "Secondary" },
+  { slug: "accent",              color: "#00a32a", name: "Accent" },
+  { slug: "tertiary",            color: "#f59e0b", name: "Tertiary" },
+];
+
+// Per-element colors shown on the Colors panel (Gutenberg "Elements" group).
+export const colorElements = [
+  { slug: "background", name: "Background", color: "#ffffff" },
+  { slug: "text",       name: "Text",       color: "#1e1e1e" },
+  { slug: "caption",    name: "Caption",    color: "#555555" },
+  { slug: "button",     name: "Button",     color: "#3858e9" },
+  { slug: "heading",    name: "Heading",    color: "#1e1e1e" },
+  { slug: "link",       name: "Link",       color: "#3858e9" },
+];
+
+// Typography "Elements" list shown on the Typography panel.
+export const typographyElements = [
+  { slug: "text",     name: "Text",     family: "DM Sans" },
+  { slug: "link",     name: "Link",     family: "DM Sans" },
+  { slug: "heading",  name: "Headings", family: "DM Sans" },
+  { slug: "caption",  name: "Captions", family: "DM Sans" },
+  { slug: "button",   name: "Buttons",  family: "DM Sans" },
+];
+
+// Shadow presets shown on the Shadows panel.
+export const shadowPresets = [
+  { slug: "natural",  name: "Natural",  value: "6px 6px 9px rgba(0, 0, 0, 0.2)" },
+  { slug: "deep",     name: "Deep",     value: "12px 12px 50px rgba(0, 0, 0, 0.4)" },
+  { slug: "sharp",    name: "Sharp",    value: "6px 6px 0px rgba(0, 0, 0, 0.2)" },
+  { slug: "outlined", name: "Outlined", value: "6px 6px 0px -3px #FFF, 6px 6px #000" },
+  { slug: "crisp",    name: "Crisp",    value: "6px 6px 0px #000" },
+];
+
+// Layout panel defaults (matches Gutenberg's layout section).
+export const layoutDefaults = {
+  contentSize: "650px",
+  wideSize: "1200px",
+  padding: { top: "0", right: "0", bottom: "0", left: "0" },
+  blockSpacing: "1.5rem",
+};
