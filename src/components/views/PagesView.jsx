@@ -246,7 +246,7 @@ function ConfigureHomepageReadingModal({
       </div>
       <div className="modal-body ch-reading-body">
         <p className="ch-reading-intro">
-          Controls what visitors see at your site&apos;s main address.
+          Controls what visitors see at your site&apos;s main address (https://example.com).
         </p>
 
         <RadioControl
@@ -295,7 +295,14 @@ function ConfigureHomepageReadingModal({
               <SelectControl
                 __next40pxDefaultSize
                 label="Posts page"
-                help="Optional. Uses the Posts page template; page content isn't used on the front of the site."
+                help={createInterpolateElement(
+                  "Optional. The Page you pick here sets the URL for your Posts listing (e.g. /blog). Its own content is never shown — WordPress displays Posts there using your Posts <term>Template</term>.",
+                  {
+                    term: (
+                      <DefinedTerm definition={WP_TEMPLATE_TERM_DEFINITION} />
+                    ),
+                  },
+                )}
                 value={postsPageIdDraft || ""}
                 options={postsPageOptions}
                 onChange={(v) => setPostsPageIdDraft(v || "")}
