@@ -78,6 +78,7 @@ function ExitSplitButton() {
             <MenuGroup>
               <MenuItem
                 icon={referrer.icon}
+                iconPosition="left"
                 onClick={() => {
                   navigateSmooth(referrer.target);
                   onClose();
@@ -86,16 +87,8 @@ function ExitSplitButton() {
                 {referrer.label}
               </MenuItem>
               <MenuItem
-                icon={home}
-                onClick={() => {
-                  navigateSmooth('/');
-                  onClose();
-                }}
-              >
-                Home
-              </MenuItem>
-              <MenuItem
                 icon={wordpress}
+                iconPosition="left"
                 onClick={() => {
                   goToDashboard();
                   onClose();
@@ -112,6 +105,7 @@ function ExitSplitButton() {
                   <MenuItem
                     key={p.id}
                     icon={pageIcon}
+                    iconPosition="left"
                     onClick={() => {
                       selectPage(p);
                       navigateSmooth(`/pages/${p.id}/edit`);
