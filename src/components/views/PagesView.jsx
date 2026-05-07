@@ -23,6 +23,7 @@ import {
   chevronDown,
   chevronUp,
   moreVertical,
+  help,
 } from "@wordpress/icons";
 import { useAppState } from "../../hooks/useAppState";
 import SplitViewLayout from "../../layouts/SplitViewLayout";
@@ -32,6 +33,9 @@ import DefinedTerm from "../shared/DefinedTerm";
 /** Tooltip primer (concept from WP template hierarchy) */
 const WP_TEMPLATE_TERM_DEFINITION =
   "A design WordPress applies automatically to a type of content — e.g. all blog posts, all search results. You edit the template once; WordPress uses it everywhere that type appears.";
+
+const POSTS_PAGE_SELECT_HELP_TOOLTIP =
+  "Optional. The Page you pick here sets the URL for your Posts listing (e.g. /blog). Its own content is never shown — WordPress displays Posts there using your Posts Template.";
 
 const BADGE_STYLES = {
   WordPress: { background: "rgba(33,117,155,.12)", color: "#21759b" },
@@ -251,6 +255,7 @@ function ConfigureHomepageReadingModal({
 
         <RadioControl
           className="ch-reading-radio"
+          hideLabelFromVision
           label="Your homepage displays"
           selected={mode}
           options={[
@@ -294,15 +299,29 @@ function ConfigureHomepageReadingModal({
             <div className="ch-reading-field">
               <SelectControl
                 __next40pxDefaultSize
-                label="Posts page"
-                help={createInterpolateElement(
-                  "Optional. The Page you pick here sets the URL for your Posts listing (e.g. /blog). Its own content is never shown — WordPress displays Posts there using your Posts <term>Template</term>.",
-                  {
-                    term: (
-                      <DefinedTerm definition={WP_TEMPLATE_TERM_DEFINITION} />
-                    ),
-                  },
-                )}
+                label={
+                  <span className="ch-reading-label-with-help">
+                    Posts page
+                    <Tooltip
+                      text={POSTS_PAGE_SELECT_HELP_TOOLTIP}
+                      delay={400}
+                      placement="top"
+                    >
+                      <button
+                        type="button"
+                        className="ch-reading-field-help-trigger"
+                        aria-label="Help: Posts page"
+                      >
+                        <span
+                          className="ch-reading-field-help-trigger-icon"
+                          aria-hidden
+                        >
+                          {help}
+                        </span>
+                      </button>
+                    </Tooltip>
+                  </span>
+                }
                 value={postsPageIdDraft || ""}
                 options={postsPageOptions}
                 onChange={(v) => setPostsPageIdDraft(v || "")}
