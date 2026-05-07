@@ -29,6 +29,10 @@ import SplitViewLayout from "../../layouts/SplitViewLayout";
 import PreviewCanvas from "../shared/PreviewCanvas";
 import DefinedTerm from "../shared/DefinedTerm";
 
+/** Tooltip primer (concept from WP template hierarchy) */
+const WP_TEMPLATE_TERM_DEFINITION =
+  "A design WordPress applies automatically to a type of content — e.g. all blog posts, all search results. You edit the template once; WordPress uses it everywhere that type appears.";
+
 const BADGE_STYLES = {
   WordPress: { background: "rgba(33,117,155,.12)", color: "#21759b" },
   Template: { background: "rgba(245,158,11,.12)", color: "#d97706" },
@@ -51,7 +55,7 @@ const TABS = [
       "Dynamic pages use <term>Templates</term> that automatically generate pages from your content.",
       {
         term: (
-          <DefinedTerm definition="Reusable page layouts in WordPress. Examples: Single Post template (for blog posts), Product Archive template (for product listings), Search Results template." />
+          <DefinedTerm definition={WP_TEMPLATE_TERM_DEFINITION} />
         ),
       },
     ),
@@ -255,8 +259,14 @@ function ConfigureHomepageReadingModal({
             {
               label: "Your latest posts",
               value: READING_DISPLAY_LATEST,
-              description:
-                "Visitors see your posts listed first. This works well for a blog. WordPress generates this automatically using a Template — there's no page to create or edit.",
+              description: createInterpolateElement(
+                "Visitors see your posts listed first. This works well for a blog. WordPress generates this Page automatically using a <term>Template</term>.",
+                {
+                  term: (
+                    <DefinedTerm definition={WP_TEMPLATE_TERM_DEFINITION} />
+                  ),
+                },
+              ),
             },
             {
               label: "Your Chosen Content Page",
