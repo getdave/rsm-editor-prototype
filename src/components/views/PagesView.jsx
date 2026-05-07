@@ -54,9 +54,7 @@ const TABS = [
     description: createInterpolateElement(
       "Dynamic pages use <term>Templates</term> that automatically generate pages from your content.",
       {
-        term: (
-          <DefinedTerm definition={WP_TEMPLATE_TERM_DEFINITION} />
-        ),
+        term: <DefinedTerm definition={WP_TEMPLATE_TERM_DEFINITION} />,
       },
     ),
   },
@@ -260,7 +258,7 @@ function ConfigureHomepageReadingModal({
               label: "Your latest posts",
               value: READING_DISPLAY_LATEST,
               description: createInterpolateElement(
-                "Visitors see your posts listed first. This works well for a blog. WordPress generates this Page automatically using a <term>Template</term>.",
+                "Visitors see a list of your Posts. This works well for a blog-style site. WordPress generates this Page automatically using a <term>Template</term>.",
                 {
                   term: (
                     <DefinedTerm definition={WP_TEMPLATE_TERM_DEFINITION} />
@@ -269,9 +267,9 @@ function ConfigureHomepageReadingModal({
               ),
             },
             {
-              label: "Your Chosen Content Page",
+              label: "Your chosen content Page",
               value: READING_DISPLAY_STATIC,
-              description: `Visitors land on one page you create (often labeled "Home"). You choose that page below.`,
+              description: `Visitors land on one page you create and manage (often labeled "Home"). You can choose that page below.`,
             },
           ]}
           onChange={handleDisplayModeChange}
