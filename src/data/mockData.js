@@ -288,6 +288,50 @@ export const sections = [
   { id: "post-grid", name: "Post grid", categories: ["Posts"] },
 ];
 
+export const inserterBlocks = [
+  { id: "paragraph", name: "Paragraph", category: "text", iconKey: "paragraph", essential: true },
+  { id: "heading", name: "Heading", category: "text", iconKey: "heading", essential: true },
+  { id: "image", name: "Image", category: "media", iconKey: "image", essential: true },
+  { id: "gallery", name: "Gallery", category: "media", iconKey: "gallery", essential: true },
+  { id: "video", name: "Video", category: "media", iconKey: "video", essential: true },
+  { id: "columns", name: "Columns", category: "design", iconKey: "column", essential: true },
+  { id: "list", name: "List", category: "text", iconKey: "list" },
+  { id: "quote", name: "Quote", category: "text", iconKey: "quote" },
+  { id: "code", name: "Code", category: "text", iconKey: "code" },
+  { id: "preformatted", name: "Preformatted", category: "text", iconKey: "preformatted" },
+  { id: "pullquote", name: "Pullquote", category: "text", iconKey: "pullquote" },
+  { id: "table", name: "Table", category: "text", iconKey: "table" },
+  { id: "verse", name: "Verse", category: "text", iconKey: "verse" },
+  { id: "classic", name: "Classic", category: "text", iconKey: "classic" },
+  { id: "math", name: "Math", category: "text", iconKey: "math" },
+  { id: "audio", name: "Audio", category: "media", iconKey: "audio" },
+  { id: "cover", name: "Cover", category: "media", iconKey: "cover" },
+  { id: "file", name: "File", category: "media", iconKey: "file" },
+  { id: "media-text", name: "Media & Text", category: "media", iconKey: "media" },
+  { id: "playlist", name: "Playlist", category: "media", iconKey: "media" },
+  { id: "button", name: "Buttons", category: "design", iconKey: "button" },
+  { id: "separator", name: "Separator", category: "design", iconKey: "separator" },
+  { id: "icon-block", name: "Icon", category: "design", iconKey: "symbol" },
+  { id: "form", name: "Form", category: "theme", iconKey: "symbol" },
+  { id: "comments-form", name: "Comments Form", category: "theme", iconKey: "postCommentsForm" },
+  { id: "privacy-form", name: "Privacy Request", category: "theme", iconKey: "shield" },
+];
+
+export const inserterBlockCategories = [
+  { id: "text", label: "Text" },
+  { id: "media", label: "Media" },
+  { id: "design", label: "Design" },
+  { id: "theme", label: "Theme" },
+];
+
+export const inserterPatterns = [
+  { id: "pat-hero", name: "Hero with image", previewKind: "hero" },
+  { id: "pat-twocol", name: "Two-column intro", previewKind: "twoCol" },
+  { id: "pat-gallery", name: "Gallery grid", previewKind: "gallery" },
+  { id: "pat-cta", name: "Call to action", previewKind: "cta" },
+  { id: "pat-feature", name: "Feature list", previewKind: "features" },
+];
+
 // ── Design section mock data ──────────────────────────────────────────
 const cssGradient = (a, b) => `linear-gradient(135deg, ${a} 0%, ${b} 100%)`;
 
