@@ -23,11 +23,19 @@ import {
   chevronDown,
   chevronUp,
   moreVertical,
+  help,
 } from "@wordpress/icons";
 import { useAppState } from "../../hooks/useAppState";
 import SplitViewLayout from "../../layouts/SplitViewLayout";
 import PreviewCanvas from "../shared/PreviewCanvas";
 import DefinedTerm from "../shared/DefinedTerm";
+
+/** Tooltip primer (concept from WP template hierarchy) */
+const WP_TEMPLATE_TERM_DEFINITION =
+  "A design WordPress applies automatically to a type of content — e.g. all blog posts, all search results. You edit the template once; WordPress uses it everywhere that type appears.";
+
+const POSTS_PAGE_SELECT_HELP_TOOLTIP =
+  "Optional. The Page you pick here sets the URL for your Posts listing (e.g. /blog). Its own content is never shown — WordPress displays Posts there using your Posts Template.";
 
 const BADGE_STYLES = {
   WordPress: { background: "rgba(33,117,155,.12)", color: "#21759b" },
@@ -50,9 +58,7 @@ const TABS = [
     description: createInterpolateElement(
       "Dynamic pages use <term>Templates</term> that automatically generate pages from your content.",
       {
-        term: (
-          <DefinedTerm definition="Reusable page layouts in WordPress. Examples: Single Post template (for blog posts), Product Archive template (for product listings), Search Results template." />
-        ),
+        term: <DefinedTerm definition={WP_TEMPLATE_TERM_DEFINITION} />,
       },
     ),
   },
@@ -122,7 +128,7 @@ const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = "blog-home-root";
 const blogHomepageRootTemplateRow = Object.freeze({
   id: BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
   slug: "",
-  name: "Blog Homepage",
+  name: "Posts page",
   type: "Dynamic Page",
   isLive: true,
   inMenu: false,
@@ -244,25 +250,31 @@ function ConfigureHomepageReadingModal({
       </div>
       <div className="modal-body ch-reading-body">
         <p className="ch-reading-intro">
-          Controls what visitors see at your site&apos;s main address.
+          Controls what visitors see at your site&apos;s main address (https://example.com).
         </p>
 
         <RadioControl
           className="ch-reading-radio"
+          hideLabelFromVision
           label="Your homepage displays"
           selected={mode}
           options={[
             {
               label: "Your latest posts",
               value: READING_DISPLAY_LATEST,
-              description:
-                "Visitors land on your main web address and see your newest blog posts listed first. This works well for a blog or magazine-style site.",
+              description: createInterpolateElement(
+                "Visitors see a list of your Posts. This works well for a blog-style site. WordPress generates this Page automatically using a <term>Template</term>.",
+                {
+                  term: (
+                    <DefinedTerm definition={WP_TEMPLATE_TERM_DEFINITION} />
+                  ),
+                },
+              ),
             },
             {
-              label: "A static page",
+              label: "Your chosen content Page",
               value: READING_DISPLAY_STATIC,
-              description:
-                "Visitors land on one page you edit (often labeled Home), similar to a storefront or brochure site. You choose that page below.",
+              description: `Visitors land on one page you create and manage (often labeled "Home"). You can choose that page below.`,
             },
           ]}
           onChange={handleDisplayModeChange}
@@ -287,8 +299,29 @@ function ConfigureHomepageReadingModal({
             <div className="ch-reading-field">
               <SelectControl
                 __next40pxDefaultSize
-                label="Posts page"
-                help="Optional. Uses the blog index; page content isn't used on the front of the site."
+                label={
+                  <span className="ch-reading-label-with-help">
+                    Posts page
+                    <Tooltip
+                      text={POSTS_PAGE_SELECT_HELP_TOOLTIP}
+                      delay={400}
+                      placement="top"
+                    >
+                      <button
+                        type="button"
+                        className="ch-reading-field-help-trigger"
+                        aria-label="Help: Posts page"
+                      >
+                        <span
+                          className="ch-reading-field-help-trigger-icon"
+                          aria-hidden
+                        >
+                          {help}
+                        </span>
+                      </button>
+                    </Tooltip>
+                  </span>
+                }
                 value={postsPageIdDraft || ""}
                 options={postsPageOptions}
                 onChange={(v) => setPostsPageIdDraft(v || "")}
@@ -344,8 +377,14 @@ function PagesView() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const showDynamicPagesTab = searchParams.get("dynamic") === "true";
-  const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode, pages, openAddPageModal } =
-    useAppState();
+  const {
+    currentPage,
+    setCurrentPage,
+    pagesViewMode,
+    setPagesViewMode,
+    pages,
+    openAddPageModal,
+  } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [frontPageId, setFrontPageId] = useState(
     () => pages.find((p) => p.isFrontPage)?.id ?? "home",
@@ -365,10 +404,7 @@ function PagesView() {
   const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
 
   const visibleTabs = useMemo(
-    () =>
-      TABS.filter(
-        (tab) => tab.value !== "dynamic" || showDynamicPagesTab,
-      ),
+    () => TABS.filter((tab) => tab.value !== "dynamic" || showDynamicPagesTab),
     [showDynamicPagesTab],
   );
 
@@ -406,12 +442,7 @@ function PagesView() {
       return true;
     }
     return false;
-  }, [
-    homepageDisplayMode,
-    frontPageId,
-    postsPageId,
-    readingSelectPages,
-  ]);
+  }, [homepageDisplayMode, frontPageId, postsPageId, readingSelectPages]);
 
   const isGridLayout = view.type === "grid";
 
@@ -445,13 +476,13 @@ function PagesView() {
               className="pp-media-thumb-icon"
               style={{ color: "#999", display: "flex" }}
             >
-              {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
-            </span>
-            {isGridLayout && item.isFrontPage ? (
-              <span className="pp-front-page-overlay">Front page</span>
-            ) : isGridLayout && item.isPostsPage ? (
-              <span className="pp-posts-page-overlay">Posts page</span>
-            ) : null}
+            {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
+          </span>
+            {item.isFrontPage ? (
+              <span className="pp-front-page-overlay">Homepage</span>
+            ) : item.isPostsPage ? (
+            <span className="pp-posts-page-overlay">Posts page</span>
+          ) : null}
           </span>
         ),
         enableSorting: false,
@@ -472,7 +503,7 @@ function PagesView() {
                 <span
                   className="pp-title-glyph-icon"
                   aria-hidden="true"
-                  title="Front page"
+                  title="Homepage"
                 >
                   {home}
                 </span>
@@ -887,10 +918,7 @@ function PagesView() {
             <div className="pp-notice-toolbar-col pp-notice-toolbar-col--notice">
               {homepageDisplayMode === READING_DISPLAY_LATEST &&
                 activeCategory === "content" && (
-                  <div
-                    className="pp-latest-posts-home-tip"
-                    role="status"
-                  >
+                  <div className="pp-latest-posts-home-tip" role="status">
                     {showDynamicPagesTab ? (
                       <>
                         Looking for your Homepage? It&apos;s under{" "}
