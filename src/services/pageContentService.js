@@ -472,7 +472,7 @@ export const getEditModeContent = (page) => {
 function getPlaceholderTitle(pageId, layout) {
   // Specific titles for known page types
   if (pageId === 'product-list') return 'Product Category Title';
-  if (pageId === 'blog-home-root') return 'Blog Homepage';
+  if (pageId === 'blog-home-root') return 'Blog Home';
   if (pageId === 'blog-list') return 'Blog Archive Title';
   if (pageId === 'product-single') return 'Product Title';
   if (pageId === 'blog-single') return 'Post Title';

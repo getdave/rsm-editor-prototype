@@ -113,24 +113,25 @@ const DEFAULT_LAYOUTS = {
   table: {},
 };
 
-/** Synthetic dynamic row — blog index at `/` when Reading uses “your latest posts” */
+/** Blog index at `/` when Reading uses “your latest posts” (e.g. home.html) */
 const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = "blog-home-root";
 
-const blogHomepageRootTemplateRow = Object.freeze({
+/** Shown on Published with the same list affordances as a static Home row */
+const blogHomepageContentListRow = Object.freeze({
   id: BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
   slug: "",
-  name: "Posts page",
-  type: "Dynamic Page",
+  name: "Blog Home",
+  type: "Page",
   isLive: true,
-  inMenu: false,
+  inMenu: true,
   isSystem: false,
   isDynamic: true,
-  category: "dynamic",
+  category: "content",
   status: "live",
   level: 0,
-  authorDisplay: "WordPress",
+  authorDisplay: "John Doe",
   titleTooltip:
-    "Used at your site's main web address while the homepage shows your latest posts. Visitors see your newest posts listed first.",
+    "Your site’s main address shows your latest posts. Editing uses the blog home template (for example home.html).",
   isFrontPage: true,
 });
 
@@ -663,6 +664,7 @@ function PagesView() {
         id: "duplicate",
         label: "Duplicate",
         icon: copy,
+        isEligible: (item) => item.id !== BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
         callback: (items) => console.log("Duplicate:", items[0].slug),
       },
       {
@@ -680,7 +682,11 @@ function PagesView() {
         isEligible: (item) =>
           item.category === "content" &&
           item.id !== frontPageId &&
-          !item.isPostsPage,
+          !item.isPostsPage &&
+          !(
+            item.id === BLOG_HOMEPAGE_ROOT_TEMPLATE_ID &&
+            homepageDisplayMode === READING_DISPLAY_LATEST
+          ),
         callback: (items, { onActionPerformed } = {}) => {
           setHomepageDisplayMode(READING_DISPLAY_STATIC);
           setFrontPageId(items[0].id);
@@ -695,7 +701,9 @@ function PagesView() {
         id: "set-as-homepage-current",
         label: "Set as Homepage",
         isEligible: (item) =>
-          item.category === "content" && item.id === frontPageId,
+          (item.category === "content" && item.id === frontPageId) ||
+          (item.id === BLOG_HOMEPAGE_ROOT_TEMPLATE_ID &&
+            homepageDisplayMode === READING_DISPLAY_LATEST),
         disabled: true,
         callback: () => {},
       },
@@ -715,7 +723,8 @@ function PagesView() {
         isEligible: (item) =>
           item.category === "content" &&
           item.id !== postsPageId &&
-          item.id !== frontPageId,
+          item.id !== frontPageId &&
+          item.id !== BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
         callback: (items, { onActionPerformed } = {}) => {
           setHomepageDisplayMode(READING_DISPLAY_STATIC);
           setPostsPageId(items[0].id);
@@ -787,11 +796,10 @@ function PagesView() {
       });
 
       if (
-        showDynamicPagesTab &&
         homepageDisplayMode === READING_DISPLAY_LATEST &&
         !filtered.some((p) => p.id === BLOG_HOMEPAGE_ROOT_TEMPLATE_ID)
       ) {
-        filtered = [blogHomepageRootTemplateRow, ...filtered];
+        filtered = [blogHomepageContentListRow, ...filtered];
       }
     } else {
       filtered = [];
@@ -935,8 +943,8 @@ function PagesView() {
               <div className="pp-latest-posts-home-tip" role="status">
                 {showDynamicPagesTab ? (
                   <>
-                    Latest posts on the homepage? Look for{" "}
-                    <strong>Posts page</strong> in this list.
+                    Latest posts on the homepage? Look for the{" "}
+                    <strong>Blog Home</strong> row in this list.
                   </>
                 ) : (
                   <>

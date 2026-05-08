@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 import { pages as pagesData } from '../data/mockData';
 
-/** Mirrors WP Reading settings — homepage displays latest posts vs static page */
+/** Mirrors WP Reading settings — homepage displays latest posts vs a static page */
 export const READING_DISPLAY_LATEST = 'latest';
 export const READING_DISPLAY_STATIC = 'static';
 
@@ -92,6 +92,17 @@ export function AppStateProvider({ children }) {
   const toggleSettingsSidebar = () => {
     setSettingsSidebarOpen((prev) => !prev);
   };
+
+  // Reading / homepage settings (persists across routes; mirrors WP Settings → Reading)
+  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
+    READING_DISPLAY_STATIC,
+  );
+  const [frontPageId, setFrontPageId] = useState(
+    () => pagesData.find((p) => p.isFrontPage)?.id ?? 'home',
+  );
+  const [postsPageId, setPostsPageId] = useState(
+    () => pagesData.find((p) => p.isPostsPage)?.id ?? 'blog',
+  );
 
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => !prev);
@@ -270,6 +281,14 @@ export function AppStateProvider({ children }) {
     settingsSidebarOpen,
     setSettingsSidebarOpen,
     toggleSettingsSidebar,
+
+    // Reading / homepage (Settings → Reading)
+    homepageDisplayMode,
+    setHomepageDisplayMode,
+    frontPageId,
+    setFrontPageId,
+    postsPageId,
+    setPostsPageId,
   };
 
   return (
