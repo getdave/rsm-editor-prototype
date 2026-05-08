@@ -101,20 +101,22 @@ function ExitSplitButton() {
               {recentPages.length === 0 ? (
                 <MenuItem disabled>No recent documents</MenuItem>
               ) : (
-                recentPages.slice(0, 3).map((p) => (
-                  <MenuItem
-                    key={p.id}
-                    icon={pageIcon}
-                    iconPosition="left"
-                    onClick={() => {
-                      selectPage(p);
-                      navigateSmooth(`/pages/${p.id}/edit`);
-                      onClose();
-                    }}
-                  >
-                    {p.name}
-                  </MenuItem>
-                ))
+                <div style={{ maxHeight: 192, overflowY: 'auto' }}>
+                  {recentPages.slice(0, 6).map((p) => (
+                    <MenuItem
+                      key={p.id}
+                      icon={pageIcon}
+                      iconPosition="left"
+                      onClick={() => {
+                        selectPage(p);
+                        navigateSmooth(`/pages/${p.id}/edit`);
+                        onClose();
+                      }}
+                    >
+                      {p.name}
+                    </MenuItem>
+                  ))}
+                </div>
               )}
             </MenuGroup>
           </>

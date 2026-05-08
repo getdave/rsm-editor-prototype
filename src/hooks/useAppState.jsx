@@ -140,14 +140,18 @@ export function AppStateProvider({ children }) {
     setPages((list) => list.map((p) => (p.id === currentPage.id ? { ...p, name } : p)));
   };
 
-  // Wrap setCurrentPage so picking a page in the editor also bumps it to the
-  // top of the recents list (deduped, capped at 3 entries).
+  // Wrap setCurrentPage so picking a page also lands it in the recents
+  // list. Stable insertion order with FIFO eviction:
+  //   - First time a page is opened, it joins at position 1 (top).
+  //   - Existing entries shift down; cap at 6 evicts the bottom entry.
+  //   - Re-visiting a page already in the list does NOT change order, so
+  //     positions stay predictable as the user hops between docs.
   const selectPage = (page) => {
     if (!page) return;
     setCurrentPage(page);
     setRecentPages((prev) => {
-      const filtered = prev.filter((p) => p.id !== page.id);
-      return [page, ...filtered].slice(0, 3);
+      if (prev.some((p) => p.id === page.id)) return prev;
+      return [page, ...prev].slice(0, 6);
     });
   };
 

@@ -277,8 +277,21 @@ function Sidebar() {
           ))}
         </nav>
 
-        {/* Section 3 — recent documents. Flex-grows to fill the rest. */}
-        <nav className="admin-root-nav" style={{ flex: '1 0 0' }}>
+        {/* Section 3 — recent documents. Heading only when expanded so it
+            doesn't wrap awkwardly inside the 48px strip. Reuses the same
+            uppercase MenuGroup heading style as the Exit popover. */}
+        {!isCollapsed && (
+          <div
+            className="components-menu-group__label"
+            style={{ padding: '12px 12px 4px' }}
+          >
+            Recent documents
+          </div>
+        )}
+        <nav
+          className="admin-root-nav"
+          style={{ flex: '1 0 0', overflowY: 'auto' }}
+        >
           {recentPages.map((p) => (
             <Tooltip key={p.id} text={p.name} placement="right">
               <div
