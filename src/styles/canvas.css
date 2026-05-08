@@ -543,9 +543,7 @@
 /* Between-sections inserter: blue pill with + and label */
 .add-sec {
   position: absolute;
-  bottom: -14px;
   left: 50%;
-  transform: translateX(-50%);
   z-index: 10;
   opacity: 0;
   pointer-events: none;
@@ -566,8 +564,20 @@
   justify-content: center;
   gap: 6px;
   white-space: nowrap;
-  transition: opacity 0.12s, background 0.12s, box-shadow 0.12s, transform 0.12s;
+  transition: opacity 0.22s ease-out, background 0.12s, box-shadow 0.12s, transform 0.12s;
   line-height: 1;
+}
+
+.add-sec--top {
+  top: -14px;
+  bottom: auto;
+  transform: translateX(-50%);
+}
+
+.add-sec--bottom {
+  bottom: -14px;
+  top: auto;
+  transform: translateX(-50%);
 }
 
 .add-sec::before {
@@ -579,6 +589,16 @@
   background: linear-gradient(to right, transparent, rgba(0, 124, 186, 0.35), transparent);
   transform: translateX(-50%);
   z-index: -1;
+}
+
+.add-sec--top::before {
+  bottom: 0;
+  transform: translate(-50%, 50%);
+}
+
+.add-sec--bottom::before {
+  top: 0;
+  transform: translate(-50%, -50%);
 }
 
 .add-sec:hover {
@@ -607,8 +627,15 @@
   top: 0.5px;
 }
 
-.sec-group:hover .add-sec,
-.add-sec:hover {
+/* Split inserter: show top/bottom/both from pointer position (see EditingView.jsx: INSERTER_* constants) */
+.sec-group[data-inserter='none'] .add-sec {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sec-group[data-inserter='top'] .add-sec--top,
+.sec-group[data-inserter='bottom'] .add-sec--bottom,
+.sec-group[data-inserter='both'] .add-sec {
   opacity: 1;
   pointer-events: auto;
 }

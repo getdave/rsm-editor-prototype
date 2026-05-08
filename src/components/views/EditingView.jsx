@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { Button } from '@wordpress/components';
@@ -26,6 +26,106 @@ import {
   HEADER_META,
   TEMPLATE_ROOT_META,
 } from '../../utils/editCanvasBlockMeta';
+
+/** Below this block height (px), both inserters show on hover — avoids flicker on short sections. */
+const INSERTER_SPLIT_MIN_HEIGHT_PX = 88;
+
+/** Wait after pointer leaves before hiding inserters (syncs with opacity transition in canvas.css). */
+const INSERTER_HIDE_DELAY_MS = 160;
+
+function useSplitInserterPlacement() {
+  const measureRef = useRef(null);
+  const hideTimeoutRef = useRef(null);
+  const [placement, setPlacement] = useState('none');
+
+  const clearHideTimeout = () => {
+    if (hideTimeoutRef.current != null) {
+      window.clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  };
+
+  useEffect(() => () => clearHideTimeout(), []);
+
+  const updateFromClientY = (clientY) => {
+    clearHideTimeout();
+    const el = measureRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const h = rect.height;
+    if (h < INSERTER_SPLIT_MIN_HEIGHT_PX) {
+      setPlacement('both');
+      return;
+    }
+    const y = clientY - rect.top;
+    setPlacement(y < h / 2 ? 'top' : 'bottom');
+  };
+
+  return {
+    measureRef,
+    placement,
+    onGroupMouseEnter: (e) => updateFromClientY(e.clientY),
+    onGroupMouseMove: (e) => updateFromClientY(e.clientY),
+    onGroupMouseLeave: () => {
+      clearHideTimeout();
+      hideTimeoutRef.current = window.setTimeout(() => {
+        hideTimeoutRef.current = null;
+        setPlacement('none');
+      }, INSERTER_HIDE_DELAY_MS);
+    },
+  };
+}
+
+function AddSectionInserterButton({ variant, onAdd }) {
+  return (
+    <button
+      type="button"
+      className={`add-sec add-sec--${variant}`}
+      onClick={onAdd}
+      aria-label={variant === 'top' ? 'Add section above' : 'Add section below'}
+    >
+      <span className="add-sec-plus" aria-hidden>{plus}</span>
+      <span className="add-sec-label">Add Section</span>
+    </button>
+  );
+}
+
+function EditableSectionGroup({
+  section,
+  index,
+  selectedBlockId,
+  setSelectedBlockId,
+  openInserter,
+  renderBlockToolbar,
+  renderSectionContent,
+}) {
+  const blockId = `section-${index}`;
+  const meta = getSectionMeta(section);
+  const selected = selectedBlockId === blockId;
+  const { measureRef, placement, onGroupMouseEnter, onGroupMouseMove, onGroupMouseLeave } =
+    useSplitInserterPlacement();
+
+  return (
+    <div
+      className="sec-group"
+      data-inserter={placement}
+      onMouseEnter={onGroupMouseEnter}
+      onMouseMove={onGroupMouseMove}
+      onMouseLeave={onGroupMouseLeave}
+    >
+      <AddSectionInserterButton variant="top" onAdd={openInserter} />
+      <div
+        ref={measureRef}
+        className={`e-sec ${selected ? 'sel' : ''}`}
+        onClick={() => setSelectedBlockId(blockId)}
+      >
+        {selected && renderBlockToolbar(meta)}
+        {renderSectionContent(section)}
+      </div>
+      <AddSectionInserterButton variant="bottom" onAdd={openInserter} />
+    </div>
+  );
+}
 
 function EditingView() {
   const navigate = useNavigate();
@@ -152,27 +252,19 @@ function EditingView() {
     }
   };
 
-  // Render editable section with toolbar
-  const renderEditableSection = (section, index) => {
-    const blockId = `section-${index}`;
-    const meta = getSectionMeta(section);
-    const selected = selectedBlockId === blockId;
-    return (
-      <div key={blockId} className="sec-group">
-        <div
-          className={`e-sec ${selected ? 'sel' : ''}`}
-          onClick={() => setSelectedBlockId(blockId)}
-        >
-          {selected && renderBlockToolbar(meta)}
-          {renderSectionContent(section)}
-        </div>
-        <button type="button" className="add-sec" onClick={openInserter} aria-label="Add section">
-          <span className="add-sec-plus" aria-hidden>{plus}</span>
-          <span className="add-sec-label">Add Section</span>
-        </button>
-      </div>
-    );
-  };
+  // Render editable section with split inserters (top vs bottom by pointer position)
+  const renderEditableSection = (section, index) => (
+    <EditableSectionGroup
+      key={`section-${index}`}
+      section={section}
+      index={index}
+      selectedBlockId={selectedBlockId}
+      setSelectedBlockId={setSelectedBlockId}
+      openInserter={openInserter}
+      renderBlockToolbar={renderBlockToolbar}
+      renderSectionContent={renderSectionContent}
+    />
+  );
 
   // Render template layout without notice banner
   const renderTemplateLayout = (content) => {
@@ -445,24 +537,37 @@ function EditingView() {
           {/* Edit scroll area */}
           <div className="edit-scroll">
             <div className={`edit-card preview-device-${selectedDevice}`}>
-            {/* Header (global) */}
-            <div className="sec-group">
-              <div
-                className={`g-el p-header e-block ${selectedBlockId === 'header' ? 'sel' : ''}`}
-                onClick={() => setSelectedBlockId('header')}
-              >
-                {selectedBlockId === 'header' && renderBlockToolbar(HEADER_META)}
-                <span className="p-sitename">{siteTitle}</span>
-                <div className="p-nav">
-                  <a href="#" style={{ color: 'rgba(255,255,255,.6)', fontSize: '11px', textDecoration: 'none' }}>Home</a>
-                  <a href="#" style={{ color: 'rgba(255,255,255,.6)', fontSize: '11px', textDecoration: 'none', marginLeft: '14px' }}>About</a>
-                </div>
-                <div className="g-badge">⟳ Global — Header</div>
+            {/* Header (template part — no section inserters) */}
+            <div
+              className={`g-el p-header e-block ${selectedBlockId === 'header' ? 'sel' : ''}`}
+              onClick={() => setSelectedBlockId('header')}
+            >
+              {selectedBlockId === 'header' && renderBlockToolbar(HEADER_META)}
+              <span className="p-sitename">{siteTitle}</span>
+              <div className="p-nav">
+                <a
+                  href="#"
+                  style={{
+                    color: 'rgba(255,255,255,.6)',
+                    fontSize: '11px',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Home
+                </a>
+                <a
+                  href="#"
+                  style={{
+                    color: 'rgba(255,255,255,.6)',
+                    fontSize: '11px',
+                    textDecoration: 'none',
+                    marginLeft: '14px',
+                  }}
+                >
+                  About
+                </a>
               </div>
-              <button type="button" className="add-sec" onClick={openInserter} aria-label="Add section">
-                <span className="add-sec-plus" aria-hidden>{plus}</span>
-                <span className="add-sec-label">Add Section</span>
-              </button>
+              <div className="g-badge">⟳ Global — Header</div>
             </div>
 
             {/* Dynamic sections based on current page */}
@@ -478,18 +583,16 @@ function EditingView() {
               content.sections.map((section, index) => renderEditableSection(section, index))
             )}
 
-            {/* Footer (global) */}
-            <div className="sec-group">
-              <div
-                className={`g-el p-footer e-block ${selectedBlockId === 'footer' ? 'sel' : ''}`}
-                style={{ position: 'relative' }}
-                onClick={() => setSelectedBlockId('footer')}
-              >
-                {selectedBlockId === 'footer' && renderBlockToolbar(FOOTER_META)}
-                <span className="p-ft">© 2026 {siteTitle}</span>
-                <span className="p-ft">Privacy Policy</span>
-                <div className="g-badge">⟳ Global — Footer</div>
-              </div>
+            {/* Footer (template part — no section inserters) */}
+            <div
+              className={`g-el p-footer e-block ${selectedBlockId === 'footer' ? 'sel' : ''}`}
+              style={{ position: 'relative' }}
+              onClick={() => setSelectedBlockId('footer')}
+            >
+              {selectedBlockId === 'footer' && renderBlockToolbar(FOOTER_META)}
+              <span className="p-ft">© 2026 {siteTitle}</span>
+              <span className="p-ft">Privacy Policy</span>
+              <div className="g-badge">⟳ Global — Footer</div>
             </div>
             </div>
           </div>
