@@ -1437,6 +1437,18 @@
   padding: 12px 14px;
 }
 
+.ins-footer {
+  flex-shrink: 0;
+  padding: 12px 14px;
+  border-top: 1px solid #eee;
+  background: #fff;
+}
+
+.ins-explore-btn.components-button {
+  width: 100%;
+  justify-content: center;
+}
+
 .ins-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

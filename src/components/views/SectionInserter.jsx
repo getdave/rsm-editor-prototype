@@ -214,6 +214,14 @@ export function SectionInserterContent() {
         {tab === 'patterns' && renderPatternsTab()}
         {tab === 'media' && renderMediaTab()}
       </div>
+
+      {(tab === 'patterns' || tab === 'media') && (
+        <div className="ins-footer">
+          <Button variant="secondary" className="ins-explore-btn">
+            Explore all {tab}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
