@@ -24,6 +24,7 @@ import {
   chevronUp,
   moreVertical,
   help,
+  closeSmall,
 } from "@wordpress/icons";
 import { Page } from "@wordpress/admin-ui";
 import {
@@ -120,7 +121,7 @@ const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = "blog-home-root";
 const blogHomepageContentListRow = Object.freeze({
   id: BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
   slug: "",
-  name: "Blog Home",
+  name: "Home (Latest Posts)",
   type: "Page",
   isLive: true,
   inMenu: true,
@@ -131,7 +132,7 @@ const blogHomepageContentListRow = Object.freeze({
   level: 0,
   authorDisplay: "John Doe",
   titleTooltip:
-    "Your site’s main address shows your latest posts. Editing uses the blog home template (for example home.html).",
+    "Your site’s main address shows your latest posts. Editing uses the home template for latest posts (for example home.html).",
   isFrontPage: true,
 });
 
@@ -411,6 +412,8 @@ function PagesView() {
     setPostsPageId,
     setPageStatus,
     showSnackbar,
+    latestPostsReadingNoticeDismissed,
+    dismissLatestPostsReadingNotice,
   } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [activeCategory, setActiveCategory] = useState("published");
@@ -940,14 +943,48 @@ function PagesView() {
         >
           {homepageDisplayMode === READING_DISPLAY_LATEST &&
             activeCategory === "published" && (
-              <div className="pp-latest-posts-home-tip" role="status">
+              <>
+                {!latestPostsReadingNoticeDismissed && (
+                  <div
+                    className="pp-latest-posts-reading-notice"
+                    role="status"
+                  >
+                    <p className="pp-latest-posts-reading-notice__text">
+                      Your site homepage is configured to show your Latest Posts.
+                      You can change this under{" "}
+                      <button
+                        type="button"
+                        className="pp-desc-link"
+                        onClick={() => setConfigureHomepageOpen(true)}
+                      >
+                        Homepage Settings
+                      </button>
+                      .
+                    </p>
+                    <button
+                      type="button"
+                      className="pp-latest-posts-reading-notice__dismiss"
+                      onClick={dismissLatestPostsReadingNotice}
+                      aria-label="Dismiss notice"
+                    >
+                      <span
+                        className="pp-latest-posts-reading-notice__dismiss-icon"
+                        aria-hidden
+                      >
+                        {closeSmall}
+                      </span>
+                    </button>
+                  </div>
+                )}
                 {showDynamicPagesTab ? (
-                  <>
-                    Latest posts on the homepage? Look for the{" "}
-                    <strong>Blog Home</strong> row in this list.
-                  </>
+                  <div className="pp-latest-posts-home-tip" role="status">
+                    Your blog home is the{" "}
+                    <strong>Home (Latest Posts)</strong> row above. Static pages
+                    you add appear below; other template-backed views are mixed
+                    into this list when you show them.
+                  </div>
                 ) : (
-                  <>
+                  <div className="pp-latest-posts-home-tip" role="status">
                     Latest posts on the homepage? Edit that layout in{" "}
                     <button
                       type="button"
@@ -957,9 +994,9 @@ function PagesView() {
                       Templates
                     </button>
                     .
-                  </>
+                  </div>
                 )}
-              </div>
+              </>
             )}
           {viewOptionsOpen && (
             <div className="pp-toolbar-row-options">

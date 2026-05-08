@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { pages as pagesData } from '../data/mockData';
 
 /** Mirrors WP Reading settings — homepage displays latest posts vs a static page */
@@ -103,6 +103,20 @@ export function AppStateProvider({ children }) {
   const [postsPageId, setPostsPageId] = useState(
     () => pagesData.find((p) => p.isPostsPage)?.id ?? 'blog',
   );
+
+  /** PagesView: dismissable banner when Reading is “latest posts”; reset when leaving that mode */
+  const [latestPostsReadingNoticeDismissed, setLatestPostsReadingNoticeDismissed] =
+    useState(false);
+
+  useEffect(() => {
+    if (homepageDisplayMode !== READING_DISPLAY_LATEST) {
+      setLatestPostsReadingNoticeDismissed(false);
+    }
+  }, [homepageDisplayMode]);
+
+  const dismissLatestPostsReadingNotice = () => {
+    setLatestPostsReadingNoticeDismissed(true);
+  };
 
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => !prev);
@@ -289,6 +303,9 @@ export function AppStateProvider({ children }) {
     setFrontPageId,
     postsPageId,
     setPostsPageId,
+
+    latestPostsReadingNoticeDismissed,
+    dismissLatestPostsReadingNotice,
   };
 
   return (
