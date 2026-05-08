@@ -111,7 +111,6 @@ function PatternCard({ pattern, onInsert }) {
 export function SectionInserterContent() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [tab, setTab] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
 
   const closeInserter = () => {
     searchParams.delete('inserter');
@@ -122,12 +121,7 @@ export function SectionInserterContent() {
     closeInserter();
   };
 
-  const term = searchTerm.trim().toLowerCase();
-  const matches = (name) => !term || name.toLowerCase().includes(term);
-
   const essentialBlocks = inserterBlocks.filter((b) => b.essential);
-  const filteredBlocks = inserterBlocks.filter((b) => matches(b.name));
-  const filteredPatterns = inserterPatterns.filter((p) => matches(p.name));
 
   const groupHeadingStyle = {
     textTransform: 'uppercase',
@@ -156,7 +150,7 @@ export function SectionInserterContent() {
   const renderBlocksTab = () => (
     <>
       {inserterBlockCategories.map((cat) => {
-        const blocksInCat = filteredBlocks.filter((b) => b.category === cat.id);
+        const blocksInCat = inserterBlocks.filter((b) => b.category === cat.id);
         if (blocksInCat.length === 0) return null;
         return (
           <div key={cat.id}>
@@ -174,7 +168,7 @@ export function SectionInserterContent() {
 
   const renderPatternsTab = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '12px' }}>
-      {filteredPatterns.map((p) => (
+      {inserterPatterns.map((p) => (
         <PatternCard key={p.id} pattern={p} onInsert={handleInsert} />
       ))}
     </div>
@@ -188,6 +182,21 @@ export function SectionInserterContent() {
 
   return (
     <div className="list-view-inner" role="region" aria-label="Inserter">
+      <div className="ins-search-row">
+        <input
+          className="ins-search"
+          type="search"
+          placeholder="Search"
+          aria-label="Search blocks, patterns, and media"
+        />
+        <Button
+          className="lv-close"
+          label="Close inserter"
+          icon={wpIcons.closeSmall}
+          onClick={closeInserter}
+        />
+      </div>
+
       <div className="lv-tabs">
         {TABS.map((t) => (
           <button
@@ -199,21 +208,6 @@ export function SectionInserterContent() {
             {t.label}
           </button>
         ))}
-        <Button
-          className="lv-close"
-          label="Close inserter"
-          icon={wpIcons.closeSmall}
-          onClick={closeInserter}
-        />
-      </div>
-
-      <div className="ins-search-wrap">
-        <input
-          className="ins-search"
-          placeholder="Search"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
       </div>
 
       <div className="ins-list">
