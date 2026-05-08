@@ -54,6 +54,18 @@ export function AppStateProvider({ children }) {
   // Pages view mode (list/grid)
   const [pagesViewMode, setPagesViewMode] = useState('grid');
 
+  // Edit canvas: List View panel and block inspector sidebar (WordPress-style)
+  const [listViewOpen, setListViewOpen] = useState(false);
+  const [settingsSidebarOpen, setSettingsSidebarOpen] = useState(false);
+
+  const toggleListView = () => {
+    setListViewOpen((prev) => !prev);
+  };
+
+  const toggleSettingsSidebar = () => {
+    setSettingsSidebarOpen((prev) => !prev);
+  };
+
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => !prev);
   };
@@ -165,7 +177,15 @@ export function AppStateProvider({ children }) {
     
     // Pages view mode
     pagesViewMode,
-    setPagesViewMode
+    setPagesViewMode,
+
+    // Edit canvas panels
+    listViewOpen,
+    setListViewOpen,
+    toggleListView,
+    settingsSidebarOpen,
+    setSettingsSidebarOpen,
+    toggleSettingsSidebar,
   };
 
   return (
