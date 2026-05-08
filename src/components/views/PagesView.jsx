@@ -122,7 +122,7 @@ const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = "blog-home-root";
 const blogHomepageRootTemplateRow = Object.freeze({
   id: BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
   slug: "",
-  name: "Blog Homepage",
+  name: "Posts page",
   type: "Dynamic Page",
   isLive: true,
   inMenu: false,
@@ -256,13 +256,12 @@ function ConfigureHomepageReadingModal({
               label: "Your latest posts",
               value: READING_DISPLAY_LATEST,
               description:
-                "Visitors land on your main web address and see your newest blog posts listed first. This works well for a blog or magazine-style site.",
+                "Visitors see your posts listed first. This works well for a blog. WordPress generates this automatically using a Template — there's no page to create or edit.",
             },
             {
-              label: "A static page",
+              label: "Your Chosen Content Page",
               value: READING_DISPLAY_STATIC,
-              description:
-                "Visitors land on one page you edit (often labeled Home), similar to a storefront or brochure site. You choose that page below.",
+              description: `Visitors land on one page you create (often labeled "Home"). You choose that page below.`,
             },
           ]}
           onChange={handleDisplayModeChange}
@@ -288,7 +287,7 @@ function ConfigureHomepageReadingModal({
               <SelectControl
                 __next40pxDefaultSize
                 label="Posts page"
-                help="Optional. Uses the blog index; page content isn't used on the front of the site."
+                help="Optional. Uses the Posts page template; page content isn't used on the front of the site."
                 value={postsPageIdDraft || ""}
                 options={postsPageOptions}
                 onChange={(v) => setPostsPageIdDraft(v || "")}
@@ -344,8 +343,14 @@ function PagesView() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const showDynamicPagesTab = searchParams.get("dynamic") === "true";
-  const { currentPage, setCurrentPage, pagesViewMode, setPagesViewMode, pages, openAddPageModal } =
-    useAppState();
+  const {
+    currentPage,
+    setCurrentPage,
+    pagesViewMode,
+    setPagesViewMode,
+    pages,
+    openAddPageModal,
+  } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [frontPageId, setFrontPageId] = useState(
     () => pages.find((p) => p.isFrontPage)?.id ?? "home",
@@ -365,10 +370,7 @@ function PagesView() {
   const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
 
   const visibleTabs = useMemo(
-    () =>
-      TABS.filter(
-        (tab) => tab.value !== "dynamic" || showDynamicPagesTab,
-      ),
+    () => TABS.filter((tab) => tab.value !== "dynamic" || showDynamicPagesTab),
     [showDynamicPagesTab],
   );
 
@@ -406,12 +408,7 @@ function PagesView() {
       return true;
     }
     return false;
-  }, [
-    homepageDisplayMode,
-    frontPageId,
-    postsPageId,
-    readingSelectPages,
-  ]);
+  }, [homepageDisplayMode, frontPageId, postsPageId, readingSelectPages]);
 
   const isGridLayout = view.type === "grid";
 
@@ -445,13 +442,13 @@ function PagesView() {
               className="pp-media-thumb-icon"
               style={{ color: "#999", display: "flex" }}
             >
-              {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
-            </span>
-            {isGridLayout && item.isFrontPage ? (
-              <span className="pp-front-page-overlay">Front page</span>
-            ) : isGridLayout && item.isPostsPage ? (
-              <span className="pp-posts-page-overlay">Posts page</span>
-            ) : null}
+            {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
+          </span>
+            {item.isFrontPage ? (
+              <span className="pp-front-page-overlay">Homepage</span>
+            ) : item.isPostsPage ? (
+            <span className="pp-posts-page-overlay">Posts page</span>
+          ) : null}
           </span>
         ),
         enableSorting: false,
@@ -472,7 +469,7 @@ function PagesView() {
                 <span
                   className="pp-title-glyph-icon"
                   aria-hidden="true"
-                  title="Front page"
+                  title="Homepage"
                 >
                   {home}
                 </span>
@@ -887,10 +884,7 @@ function PagesView() {
             <div className="pp-notice-toolbar-col pp-notice-toolbar-col--notice">
               {homepageDisplayMode === READING_DISPLAY_LATEST &&
                 activeCategory === "content" && (
-                  <div
-                    className="pp-latest-posts-home-tip"
-                    role="status"
-                  >
+                  <div className="pp-latest-posts-home-tip" role="status">
                     {showDynamicPagesTab ? (
                       <>
                         Looking for your Homepage? It&apos;s under{" "}
