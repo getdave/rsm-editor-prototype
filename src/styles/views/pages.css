@@ -419,6 +419,21 @@
   color: #3858e9;
 }
 
+.pp-author-badge:not([style]) {
+  background: #f0f0f0;
+  color: #505050;
+}
+
+.pp-page-role--front {
+  background: rgba(0, 0, 0, 0.06);
+  color: #505050;
+}
+
+.pp-page-role--posts {
+  background: rgba(0, 0, 0, 0.06);
+  color: #505050;
+}
+
 /* Grid mode: Add New card sits before DataViews grid */
 .pp-grid-with-add {
   display: flex;

@@ -59,13 +59,21 @@ const TABS = [
 ];
 
 const STATUS_ELEMENTS = [
-  { value: "live", label: "Live" },
+  { value: "live", label: "Published" },
   { value: "draft", label: "Draft" },
 ];
 
 const SYSTEM_FILTER_HIDE = Object.freeze([
   { field: "isSystem", operator: "is", value: false },
 ]);
+
+const DATAVIEW_FIELDS_DEFAULT = ["status", "inMenu", "authorDisplay"];
+const DATAVIEW_FIELDS_LIST = [
+  "status",
+  "pageRole",
+  "inMenu",
+  "authorDisplay",
+];
 
 const DEFAULT_VIEW = {
   type: "list",
@@ -76,9 +84,28 @@ const DEFAULT_VIEW = {
   sort: undefined,
   titleField: "name",
   mediaField: "media",
-  fields: ["status", "inMenu", "authorDisplay"],
+  fields: [...DATAVIEW_FIELDS_DEFAULT],
   layout: { density: "compact" },
 };
+
+function createPagesDataViewState(mode) {
+  const next = { ...DEFAULT_VIEW, type: mode };
+  if (mode === "list") {
+    return {
+      ...next,
+      showMedia: false,
+      fields: [...DATAVIEW_FIELDS_LIST],
+    };
+  }
+  if (mode === "table") {
+    return {
+      ...next,
+      showMedia: false,
+      fields: [...DATAVIEW_FIELDS_DEFAULT],
+    };
+  }
+  return { ...next, fields: [...DATAVIEW_FIELDS_DEFAULT] };
+}
 
 const DEFAULT_LAYOUTS = {
   list: { layout: { density: "compact" } },
@@ -148,7 +175,7 @@ function ConfigureHomepageReadingModal({
   if (mode === READING_DISPLAY_STATIC) {
     if (homePageId && !homePageResolved) {
       homepageWarning =
-        "That page isn't listed here (for example if it isn't published as Live yet). Pick a Live page—the one visitors should see when they open your site's main web address.";
+        "That page isn't listed here (for example if it isn't Live yet). Pick a Live page—the one visitors should see when they open your site's main web address.";
     } else if (!homePageId) {
       homepageWarning =
         "No homepage chosen. Pick which page should open at your site's main web address. Until then, people visiting that will usually see a blog-style list of your newest posts.";
@@ -305,15 +332,12 @@ function renderAuthorCell(item) {
   if (!text) {
     return <span className="pp-author-empty">—</span>;
   }
-  const style = text !== "John Doe" ? BADGE_STYLES[text] : undefined;
-  if (style) {
-    return (
-      <span className="pp-badge" style={style}>
-        {text}
-      </span>
-    );
-  }
-  return <span>{text}</span>;
+  const style = BADGE_STYLES[text] ?? undefined;
+  return (
+    <span className="pp-badge pp-author-badge" style={style}>
+      {text}
+    </span>
+  );
 }
 
 function PagesView() {
@@ -330,7 +354,9 @@ function PagesView() {
     () => pages.find((p) => p.isPostsPage)?.id ?? "blog",
   );
   const [activeCategory, setActiveCategory] = useState("content");
-  const [view, setView] = useState({ ...DEFAULT_VIEW, type: pagesViewMode });
+  const [view, setView] = useState(() =>
+    createPagesDataViewState(pagesViewMode),
+  );
   const [showDrafts, setShowDrafts] = useState(false);
   const [viewOptionsOpen, setViewOptionsOpen] = useState(false);
   const [homepageDisplayMode, setHomepageDisplayMode] = useState(
@@ -421,9 +447,9 @@ function PagesView() {
             >
               {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
             </span>
-            {item.isFrontPage ? (
+            {isGridLayout && item.isFrontPage ? (
               <span className="pp-front-page-overlay">Front page</span>
-            ) : item.isPostsPage ? (
+            ) : isGridLayout && item.isPostsPage ? (
               <span className="pp-posts-page-overlay">Posts page</span>
             ) : null}
           </span>
@@ -487,7 +513,29 @@ function PagesView() {
           item.status === "draft" ? (
             <span className="pp-badge pp-draft">Draft</span>
           ) : (
-            <span className="pp-badge pp-live">Live</span>
+            <span className="pp-badge pp-live">Published</span>
+          ),
+      },
+      {
+        id: "pageRole",
+        type: "text",
+        label: "Homepage",
+        enableSorting: false,
+        enableHiding: true,
+        enableGlobalSearch: false,
+        getValue: ({ item }) =>
+          item.isFrontPage ? "front" : item.isPostsPage ? "posts" : "",
+        render: ({ item }) =>
+          item.isFrontPage ? (
+            <span className="pp-badge pp-page-role pp-page-role--front">
+              Front page
+            </span>
+          ) : item.isPostsPage ? (
+            <span className="pp-badge pp-page-role pp-page-role--posts">
+              Posts page
+            </span>
+          ) : (
+            <span className="pp-menu-empty">—</span>
           ),
       },
       {
@@ -704,10 +752,26 @@ function PagesView() {
   );
 
   const handleChangeView = (newView) => {
-    if (newView.type !== view.type) {
+    const layoutChanged = newView.type !== view.type;
+    if (layoutChanged) {
       setPagesViewMode(newView.type);
     }
-    setView(newView);
+    let showMedia = newView.showMedia;
+    if (newView.type === "list" || newView.type === "table") {
+      showMedia = false;
+    } else if (layoutChanged) {
+      showMedia = true;
+    } else if (showMedia === undefined) {
+      showMedia = true;
+    }
+    let fields = newView.fields;
+    if (layoutChanged) {
+      fields =
+        newView.type === "list"
+          ? [...DATAVIEW_FIELDS_LIST]
+          : [...DATAVIEW_FIELDS_DEFAULT];
+    }
+    setView({ ...newView, showMedia, fields });
   };
 
   const hasPreviewPanel = view.type === "list";
