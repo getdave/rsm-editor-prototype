@@ -166,9 +166,9 @@ function EditingView() {
           {selected && renderBlockToolbar(meta)}
           {renderSectionContent(section)}
         </div>
-        <button type="button" className="add-sec" onClick={openInserter} aria-label="Add block">
-          <span className="add-sec-line" aria-hidden />
-          <span className="add-sec-plus">{plus}</span>
+        <button type="button" className="add-sec" onClick={openInserter} aria-label="Add section">
+          <span className="add-sec-plus" aria-hidden>{plus}</span>
+          <span className="add-sec-label">Add Section</span>
         </button>
       </div>
     );
@@ -459,9 +459,9 @@ function EditingView() {
                 </div>
                 <div className="g-badge">⟳ Global — Header</div>
               </div>
-              <button type="button" className="add-sec" onClick={openInserter} aria-label="Add block">
-                <span className="add-sec-line" aria-hidden />
-                <span className="add-sec-plus">{plus}</span>
+              <button type="button" className="add-sec" onClick={openInserter} aria-label="Add section">
+                <span className="add-sec-plus" aria-hidden>{plus}</span>
+                <span className="add-sec-label">Add Section</span>
               </button>
             </div>
 

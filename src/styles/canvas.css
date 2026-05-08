@@ -382,7 +382,8 @@
   flex: 1;
   min-width: 0;
   overflow-y: auto;
-  padding: 16px;
+  /* Extra top padding so floating block toolbars above the first block aren’t clipped */
+  padding: 48px 16px 16px 16px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -395,7 +396,6 @@
   border-radius: 3px;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
   overflow: hidden;
-  padding-top: 48px;
   box-sizing: border-box;
   transition: max-width 0.2s ease;
 }
@@ -454,14 +454,15 @@
   border-color: #007cba;
 }
 
+/* Selection wash only on page content blocks — not header/footer (template parts keep .p-header / .p-footer surfaces) */
 .e-sec.sel,
-.template-edit-root.sel,
-.g-el.e-block.sel {
+.template-edit-root.sel {
   border-color: #007cba;
   background: rgba(0, 124, 186, 0.04);
 }
 
 .g-el.e-block.sel {
+  border-color: #007cba;
   opacity: 1;
 }
 
@@ -539,29 +540,33 @@
   position: relative;
 }
 
-/* Between-blocks inserter — circular + on a horizontal rule (WP-style) */
+/* Between-sections inserter: blue pill with + and label */
 .add-sec {
   position: absolute;
-  bottom: -13px;
+  bottom: -14px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
   opacity: 0;
   pointer-events: none;
-  width: 28px;
-  height: 28px;
-  padding: 0;
+  width: auto;
+  min-height: 30px;
+  padding: 6px 14px;
   margin: 0;
   border: none;
-  border-radius: 50%;
-  background: #fff;
-  color: #1e1e1e;
-  box-shadow: 0 0 0 1px #949494, 0 2px 6px rgba(0, 0, 0, 0.15);
+  border-radius: 999px;
+  background: #007cba;
+  color: #fff;
+  font: 600 11px 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: 0.02em;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 124, 186, 0.35);
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.12s, box-shadow 0.12s, color 0.12s;
+  gap: 6px;
+  white-space: nowrap;
+  transition: opacity 0.12s, background 0.12s, box-shadow 0.12s, transform 0.12s;
   line-height: 1;
 }
 
@@ -569,34 +574,37 @@
   content: '';
   position: absolute;
   left: 50%;
-  width: 120px;
+  width: min(100%, 200px);
   height: 1px;
-  background: #ddd;
+  background: linear-gradient(to right, transparent, rgba(0, 124, 186, 0.35), transparent);
   transform: translateX(-50%);
   z-index: -1;
 }
 
 .add-sec:hover {
-  color: #007cba;
-  box-shadow: 0 0 0 1px #007cba, 0 2px 8px rgba(0, 124, 186, 0.25);
+  background: #006099;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(0, 124, 186, 0.5), 0 4px 14px rgba(0, 124, 186, 0.4);
 }
 
 .add-sec-plus {
   display: inline-flex;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
 }
 
 .add-sec-plus svg {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   fill: currentColor;
 }
 
-.add-sec-line {
-  display: none;
+.add-sec-label {
+  position: relative;
+  top: 0.5px;
 }
 
 .sec-group:hover .add-sec,
