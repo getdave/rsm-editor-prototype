@@ -950,16 +950,21 @@ function PagesView() {
                     role="status"
                   >
                     <p className="pp-latest-posts-reading-notice__text">
-                      Your site homepage is configured to show your Latest Posts.
-                      You can change this under{" "}
-                      <button
-                        type="button"
-                        className="pp-desc-link"
-                        onClick={() => setConfigureHomepageOpen(true)}
-                      >
-                        Homepage Settings
-                      </button>
-                      .
+                      {createInterpolateElement(
+                        "Your site homepage is configured to show your <term>Latest Posts</term>. You can change this under <link>Homepage Settings</link>.",
+                        {
+                          term: (
+                            <DefinedTerm definition="A blog-style listing of your most recent Posts, displayed in reverse chronological order." />
+                          ),
+                          link: (
+                            <button
+                              type="button"
+                              className="pp-desc-link"
+                              onClick={() => setConfigureHomepageOpen(true)}
+                            />
+                          ),
+                        }
+                      )}
                     </p>
                     <button
                       type="button"
