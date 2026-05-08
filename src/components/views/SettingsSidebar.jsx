@@ -148,30 +148,17 @@ function BlockTab({ icon: Icon, label, description, showLayoutAlternatives }) {
           <SectionLayoutAlternatives />
         </Accordion>
       ) : null}
-      <Accordion title="Color" defaultOpen>
-        <div className="ss-color-row">
-          <span className="ss-label">Text</span>
-          <button type="button" className="ss-swatch ss-swatch-empty" aria-label="Text color" />
-        </div>
-        <div className="ss-color-row">
-          <span className="ss-label">Background</span>
-          <button type="button" className="ss-swatch ss-swatch-empty" aria-label="Background color" />
-        </div>
+      <Accordion title="Color">
+        <p className="ss-muted">Color controls would appear here.</p>
       </Accordion>
       <Accordion title="Typography">
-        <div className="ss-segmented">
-          {['S', 'M', 'L', 'XL', 'XXL'].map((s) => (
-            <button key={s} type="button" className={`ss-seg ${s === 'M' ? 'active' : ''}`}>
-              {s}
-            </button>
-          ))}
-        </div>
+        <p className="ss-muted">Typography options would appear here.</p>
       </Accordion>
       <Accordion title="Dimensions">
         <p className="ss-muted">Spacing and size controls would appear here.</p>
       </Accordion>
       <Accordion title="Advanced">
-        <p className="ss-muted">Additional CSS and HTML anchor settings.</p>
+        <p className="ss-muted">Additional settings would appear here.</p>
       </Accordion>
     </>
   );
