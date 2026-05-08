@@ -1,14 +1,60 @@
-/* Pages panel */
+/* Pages panel — Gutenberg Foundations / Layout + Storybook page-areas diagram
+   (dark chrome, 12px gutter, 8px radius, #949494 stroke, raised white frames).
+   @see https://wordpress.github.io/gutenberg/?path=/docs/foundations-layout--page */
 .pages-panel {
   width: 100%;
   height: 100%;
   display: none;
   flex-direction: column;
-  background: #f5f5f5;
+  background: transparent;
+  box-sizing: border-box;
 }
 
 .pages-panel.show {
   display: flex;
+  padding: var(--wp-page-area-gap, 12px);
+}
+
+/* List: content frame + preview frame share gutter (diagram ~12px between cards) */
+.pages-panel .split-view.list {
+  flex: 1;
+  min-height: 0;
+  gap: var(--wp-page-area-gap, 12px);
+}
+
+/* Raised list frames — match areas.svg */
+.pages-panel .split-view-stage {
+  border-right: none;
+  background: var(--wp-page-area-surface, #fff);
+  border-radius: var(--wp-page-area-radius, 8px);
+  border: var(--wp-page-area-border, 1px solid #949494);
+  box-shadow: var(--wp-page-area-shadow);
+  overflow: hidden;
+  min-height: 0;
+}
+
+.pages-panel .split-view-canvas.pages-preview-frame {
+  background: var(--wp-page-area-surface, #fff);
+  border-radius: var(--wp-page-area-radius, 8px);
+  border: var(--wp-page-area-border, 1px solid #949494);
+  box-shadow: var(--wp-page-area-shadow);
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Grid: single full-width content frame */
+.pages-panel.show > .pages-panel__grid {
+  flex: 1;
+  min-height: 0;
+  background: var(--wp-page-area-surface, #fff);
+  border-radius: var(--wp-page-area-radius, 8px);
+  border: var(--wp-page-area-border, 1px solid #949494);
+  box-shadow: var(--wp-page-area-shadow);
+  overflow: hidden;
+}
+
+.pages-panel .split-view-grid {
+  background: var(--wp-page-area-surface, #fff);
 }
 
 .pp-inner {
@@ -88,9 +134,9 @@
   flex-shrink: 0;
 }
 
-/* When category tabs are hidden (single-tab mode), keep separator below header row */
+/* Single-tab mode: no top border — @wordpress/admin-ui Page header already has border-block-end */
 .pp-toolbar-controls--solo-category {
-  border-top: 1px solid #e0e0e0;
+  border-top: none;
 }
 
 /* Notice + view options + drafts: one row, two columns */

@@ -5,15 +5,17 @@
 }
 
 body {
-  font-family: 'DM Sans', sans-serif;
-  background: #111;
+  font-family: var(--wp-font-family);
+  background: var(--wp-chrome-bg, #1e1e1e);
   margin: 0;
   height: 100vh;
   overflow: hidden;
+  position: relative; /* @wordpress/ui portaled overlays */
 }
 
 #root {
   display: flex;
   flex-direction: column;
   height: 100%;
+  isolation: isolate; /* @wordpress/ui portaled overlays */
 }

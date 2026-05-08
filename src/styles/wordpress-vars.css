@@ -35,7 +35,36 @@
   --wp-bg-dark: #1e1e1e;
   --wp-bg-light: #e8e8e8;
   --wp-bg-card: #fff;
+
+  /* Editor chrome — WP default dark UI (WPDS + @wordpress/components fallbacks) */
+  --wp-chrome-bg: var(
+    --wpds-color-bg-interactive-neutral-strong-active,
+    #1e1e1e
+  );
+  --wp-chrome-divider: var(--wp-gray-800, #2a2a2a);
+
+  /* Raised content / preview frames on chrome (spacing from Storybook areas.svg) */
+  --wp-page-area-gap: 12px;
+  --wp-page-area-radius: 8px;
+  --wp-page-area-border: 1px solid #949494;
+  --wp-page-area-surface: #fff;
+  --wp-page-area-shadow:
+    0 0.5px 1px rgba(0, 0, 0, 0.03),
+    0 1px 2px rgba(0, 0, 0, 0.02),
+    0 3px 3px rgba(0, 0, 0, 0.02),
+    0 4px 4px rgba(0, 0, 0, 0.01);
   
-  /* Font */
-  --wp-font-family: 'DM Sans', sans-serif;
+  /* Font — WordPress admin / WPDS body stack (@wordpress/theme design-tokens.css) */
+  --wp-font-family: var(
+    --wpds-typography-font-family-body,
+    -apple-system,
+    system-ui,
+    "Segoe UI",
+    Roboto,
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    "Helvetica Neue",
+    sans-serif
+  );
 }

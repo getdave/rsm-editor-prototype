@@ -2,10 +2,9 @@
 .sidebar {
   width: 208px;
   min-width: 208px;
-  background: #1e1e1e;
+  background: var(--wp-chrome-bg, #1e1e1e);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #2a2a2a;
   transition: width 0.2s, min-width 0.2s;
   overflow: hidden;
   align-self: stretch;
@@ -294,8 +293,8 @@
   left: 100%;
   bottom: 0;
   margin-left: 8px;
-  background: #1e1e1e;
-  border: 1px solid #2a2a2a;
+  background: var(--wp-chrome-bg, #1e1e1e);
+  border: 1px solid var(--wp-chrome-divider, #2a2a2a);
   border-radius: 6px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   padding: 4px;
