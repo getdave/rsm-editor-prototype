@@ -1,8 +1,21 @@
-import { Button } from '@wordpress/components';
-import { desktop, tablet, mobile } from '@wordpress/icons';
+import { Button, Tooltip } from '@wordpress/components';
+import {
+  desktop,
+  tablet,
+  mobile,
+  home,
+  page as pageIcon,
+  postList,
+} from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { getPageContent } from '../../services/pageContentService';
 import { pages } from '../../data/mockData';
+
+function docTypeIcon(p) {
+  if (p?.isFrontPage) return home;
+  if (p?.isPostsPage) return postList;
+  return pageIcon;
+}
 
 /**
  * Reusable Preview Canvas Component
@@ -275,7 +288,39 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {} }) {
         </Button>
 
         <div className="ct-space"></div>
-        <span className="ct-btn" style={{ cursor: 'default' }}>{page.name}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span
+            aria-hidden="true"
+            style={{ display: 'inline-flex', width: 24, height: 24, color: '#1e1e1e' }}
+          >
+            {docTypeIcon(page)}
+          </span>
+          <span className="ct-btn" style={{ cursor: 'default' }}>{page.name}</span>
+          <Tooltip
+            text={page.isLive ? 'Page is live' : 'Page is a draft'}
+            placement="bottom"
+          >
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 16,
+                height: 16,
+                borderRadius: 2,
+                background: '#fff',
+                flexShrink: 0,
+              }}
+            >
+              <span
+                className={`url-dot${page.isLive ? '' : ' url-draft-dot'}`}
+                style={{ margin: 0 }}
+                role="status"
+                aria-label={page.isLive ? 'Page is live' : 'Page is a draft'}
+              />
+            </span>
+          </Tooltip>
+        </div>
         <div className="ct-space"></div>
 
         <div className="ct-view-modes">

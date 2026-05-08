@@ -1,7 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Dropdown, MenuGroup, MenuItem, Tooltip } from '@wordpress/components';
-import { chevronDown } from '@wordpress/icons';
+import {
+  chevronDown,
+  home,
+  page as pageIcon,
+  postList,
+} from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
+
+function docTypeIcon(page) {
+  if (page?.isFrontPage) return home;
+  if (page?.isPostsPage) return postList;
+  return pageIcon;
+}
 
 function DocumentActions() {
   const { currentPage, setCurrentPageName } = useAppState();
@@ -41,41 +52,67 @@ function DocumentActions() {
     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
       <Tooltip text="Rename page" placement="bottom">
         <span
-          ref={ref}
           className="ct-btn"
-          contentEditable={editing}
-          suppressContentEditableWarning
-          role="textbox"
-          tabIndex={0}
           onClick={() => !editing && setEditing(true)}
-          onBlur={editing ? commit : undefined}
-          onKeyDown={(e) => {
-            if (!editing) return;
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              commit();
-            } else if (e.key === 'Escape') {
-              e.preventDefault();
-              cancel();
-            }
-          }}
           style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
             cursor: editing ? 'text' : 'pointer',
-            minWidth: 80,
-            outline: 'none',
             padding: '0 8px',
           }}
         >
-          {currentPage.name}
+          <span
+            aria-hidden="true"
+            contentEditable={false}
+            style={{ display: 'inline-flex', width: 24, height: 24, color: '#1e1e1e' }}
+          >
+            {docTypeIcon(currentPage)}
+          </span>
+          <span
+            ref={ref}
+            contentEditable={editing}
+            suppressContentEditableWarning
+            role="textbox"
+            tabIndex={0}
+            onBlur={editing ? commit : undefined}
+            onKeyDown={(e) => {
+              if (!editing) return;
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                commit();
+              } else if (e.key === 'Escape') {
+                e.preventDefault();
+                cancel();
+              }
+            }}
+            style={{ outline: 'none' }}
+          >
+            {currentPage.name}
+          </span>
         </span>
       </Tooltip>
 
       <Tooltip text={statusLabel} placement="bottom">
         <span
-          className={`url-dot${isLive ? '' : ' url-draft-dot'}`}
-          role="status"
-          aria-label={statusLabel}
-        />
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 16,
+            height: 16,
+            borderRadius: 2,
+            background: '#fff',
+            flexShrink: 0,
+          }}
+        >
+          <span
+            className={`url-dot${isLive ? '' : ' url-draft-dot'}`}
+            style={{ margin: 0 }}
+            role="status"
+            aria-label={statusLabel}
+          />
+        </span>
       </Tooltip>
 
       <Dropdown

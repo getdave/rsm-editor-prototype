@@ -498,26 +498,34 @@ function PagesView() {
         enableHiding: false,
         enableGlobalSearch: true,
         render: ({ item }) => {
+          const docIcon = item.isFrontPage
+            ? home
+            : item.isPostsPage
+              ? postList
+              : pageIcon;
+          const isLive = item.status !== "draft";
+          const statusLabel = isLive ? "Page is live" : "Page is a draft";
           const title = (
             <span className="pp-title-cell-inner">
-              {item.isFrontPage ? (
-                <span
-                  className="pp-title-glyph-icon"
-                  aria-hidden="true"
-                  title="Homepage"
-                >
-                  {home}
-                </span>
-              ) : item.isPostsPage ? (
-                <span
-                  className="pp-title-glyph-icon pp-title-glyph-icon--posts"
-                  aria-hidden="true"
-                  title="Posts page"
-                >
-                  {postList}
-                </span>
-              ) : null}
+              <span
+                className={`pp-title-glyph-icon${item.isPostsPage ? " pp-title-glyph-icon--posts" : ""}`}
+                aria-hidden="true"
+                title={
+                  item.isFrontPage
+                    ? "Homepage"
+                    : item.isPostsPage
+                      ? "Posts page"
+                      : undefined
+                }
+              >
+                {docIcon}
+              </span>
               <span className="pp-title-cell-name">{item.name}</span>
+              <span
+                className={`url-dot${isLive ? "" : " url-draft-dot"}`}
+                role="status"
+                aria-label={statusLabel}
+              />
             </span>
           );
           if (!item.titleTooltip) {
