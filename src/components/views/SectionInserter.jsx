@@ -117,9 +117,7 @@ export function SectionInserterContent() {
     setSearchParams(searchParams);
   };
 
-  const handleInsert = () => {
-    closeInserter();
-  };
+  const handleInsert = () => {};
 
   const essentialBlocks = inserterBlocks.filter((b) => b.essential);
 
