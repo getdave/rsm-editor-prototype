@@ -1,20 +1,57 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
-import { Button, ButtonGroup } from '@wordpress/components';
-import { undo, redo, desktop, tablet, mobile, drawerRight, moreVertical, plus, listView } from '@wordpress/icons';
+import { Button } from '@wordpress/components';
+import {
+  chevronDown,
+  chevronUp,
+  desktop,
+  dragHandle,
+  drawerRight,
+  listView,
+  mobile,
+  moreVertical,
+  plus,
+  redo,
+  tablet,
+  undo,
+} from '@wordpress/icons';
 import UrlBar from '../shared/UrlBar';
-import SectionInserter from './SectionInserter';
+import EditorLeftPanel from './EditorLeftPanel';
+import SettingsSidebar from './SettingsSidebar';
 import { getEditModeContent } from '../../services/pageContentService';
+import {
+  FOOTER_META,
+  getSectionMeta,
+  HEADER_META,
+  TEMPLATE_ROOT_META,
+} from '../../utils/editCanvasBlockMeta';
 
 function EditingView() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { currentPage, hasUnsavedChanges, save, selectedDevice, setSelectedDevice, siteTitle } = useAppState();
-  const [selectedSection, setSelectedSection] = useState(1);
-  
+  const {
+    currentPage,
+    hasUnsavedChanges,
+    listViewOpen,
+    save,
+    selectedDevice,
+    settingsSidebarOpen,
+    setListViewOpen,
+    setSelectedDevice,
+    setSettingsSidebarOpen,
+    siteTitle,
+    toggleListView,
+    toggleSettingsSidebar,
+  } = useAppState();
+  const [selectedBlockId, setSelectedBlockId] = useState('section-0');
+
   // Get page-specific content for editing
   const content = getEditModeContent(currentPage);
+
+  useEffect(() => {
+    setSelectedBlockId(content.isTemplate ? 'template' : 'section-0');
+  }, [currentPage?.id, content.isTemplate]);
 
   const isInserterOpen = searchParams.get('inserter') === 'true';
   
@@ -23,8 +60,46 @@ function EditingView() {
       searchParams.delete('inserter');
       setSearchParams(searchParams);
     } else {
+      setListViewOpen(false);
       setSearchParams({ inserter: 'true' });
     }
+  };
+
+  const openInserter = () => {
+    setListViewOpen(false);
+    setSearchParams({ inserter: 'true' });
+  };
+
+  const handleToggleListView = () => {
+    if (!listViewOpen) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('inserter');
+      setSearchParams(next);
+    }
+    toggleListView();
+  };
+
+  const renderBlockToolbar = (meta) => {
+    const Icon = meta.icon;
+    return (
+      <div
+        className="sec-bar block-toolbar"
+        role="toolbar"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <div className="bt-pill">
+          <Button className="bt-pill-icon" label={meta.label} icon={Icon} iconSize={24} />
+          <span className="bt-pill-label">{meta.label}</span>
+        </div>
+        <span className="bt-sep" aria-hidden />
+        <Button className="bt-tb-btn" label="Drag" icon={dragHandle} iconSize={24} />
+        <Button className="bt-tb-btn" label="Move up" icon={chevronUp} iconSize={24} />
+        <Button className="bt-tb-btn" label="Move down" icon={chevronDown} iconSize={24} />
+        <span className="bt-sep" aria-hidden />
+        <Button className="bt-tb-btn" label="Options" icon={moreVertical} iconSize={24} />
+      </div>
+    );
   };
 
   // Render section content based on type
@@ -79,27 +154,21 @@ function EditingView() {
 
   // Render editable section with toolbar
   const renderEditableSection = (section, index) => {
+    const blockId = `section-${index}`;
+    const meta = getSectionMeta(section);
+    const selected = selectedBlockId === blockId;
     return (
-      <div key={index} className="sec-group">
-        <div 
-          className={`e-sec ${selectedSection === index ? 'sel' : ''}`}
-          onClick={() => setSelectedSection(index)}
+      <div key={blockId} className="sec-group">
+        <div
+          className={`e-sec ${selected ? 'sel' : ''}`}
+          onClick={() => setSelectedBlockId(blockId)}
         >
-          <div className="sec-bar">
-            <button className="sb-btn">↑</button>
-            <button className="sb-btn">↓</button>
-            <div className="sb-div"></div>
-            <button className="sb-btn">Change design</button>
-            <div className="sb-div"></div>
-            <button className="sb-btn" style={{ color: '#f87171' }}>Delete</button>
-          </div>
+          {selected && renderBlockToolbar(meta)}
           {renderSectionContent(section)}
         </div>
-        <button 
-          className="add-sec" 
-          onClick={() => setSearchParams({ inserter: 'true' })}
-        >
-          + Add section
+        <button type="button" className="add-sec" onClick={openInserter} aria-label="Add block">
+          <span className="add-sec-line" aria-hidden />
+          <span className="add-sec-plus">{plus}</span>
         </button>
       </div>
     );
@@ -263,14 +332,14 @@ function EditingView() {
     }
   };
 
+  const pageInspectorTitle = content.title || currentPage?.name || 'Untitled';
+
+  const leftPanelMode = listViewOpen ? 'list' : isInserterOpen ? 'inserter' : null;
+
   return (
     <div className={`edit-canvas ${true ? 'show' : ''}`}>
-      {/* Section inserter */}
-      <SectionInserter />
-
-      {/* Editor column */}
       <div className="editor-col">
-        {/* Canvas toolbar */}
+        {/* Canvas toolbar — full width; panels sit below this */}
         <div className="canvas-toolbar">
           {/* Left side controls */}
           <Button 
@@ -293,10 +362,11 @@ function EditingView() {
             iconSize={20}
           />
           <Button 
-            className="ct-btn" 
+            className={`ct-btn ${listViewOpen ? 'active' : ''}`}
             label="Document Overview"
             icon={listView}
             iconSize={20}
+            onClick={handleToggleListView}
           />
           
           <div className="ct-space"></div>
@@ -329,10 +399,11 @@ function EditingView() {
           </div>
           
           <Button 
-            className="ct-icon-btn" 
+            className={`ct-icon-btn ${settingsSidebarOpen ? 'active' : ''}`}
             label="Toggle settings sidebar"
             icon={drawerRight}
             iconSize={20}
+            onClick={toggleSettingsSidebar}
           />
           
           <Button 
@@ -358,12 +429,29 @@ function EditingView() {
           </Button>
         </div>
 
-        {/* Edit scroll area */}
-        <div className="edit-scroll">
-          <div className="edit-card">
+        <div className="editor-workspace">
+          <EditorLeftPanel
+            mode={leftPanelMode}
+            listViewProps={{
+              onClose: () => setListViewOpen(false),
+              sections: content.sections,
+              isTemplate: Boolean(content.isTemplate),
+              selectedBlockId,
+              onSelectBlock: setSelectedBlockId,
+              pageTitle: pageInspectorTitle,
+            }}
+          />
+
+          {/* Edit scroll area */}
+          <div className="edit-scroll">
+            <div className={`edit-card preview-device-${selectedDevice}`}>
             {/* Header (global) */}
             <div className="sec-group">
-              <div className="g-el p-header">
+              <div
+                className={`g-el p-header e-block ${selectedBlockId === 'header' ? 'sel' : ''}`}
+                onClick={() => setSelectedBlockId('header')}
+              >
+                {selectedBlockId === 'header' && renderBlockToolbar(HEADER_META)}
                 <span className="p-sitename">{siteTitle}</span>
                 <div className="p-nav">
                   <a href="#" style={{ color: 'rgba(255,255,255,.6)', fontSize: '11px', textDecoration: 'none' }}>Home</a>
@@ -371,28 +459,48 @@ function EditingView() {
                 </div>
                 <div className="g-badge">⟳ Global — Header</div>
               </div>
-              <button 
-                className="add-sec" 
-                onClick={() => setSearchParams({ inserter: 'true' })}
-              >
-                + Add section
+              <button type="button" className="add-sec" onClick={openInserter} aria-label="Add block">
+                <span className="add-sec-line" aria-hidden />
+                <span className="add-sec-plus">{plus}</span>
               </button>
             </div>
 
             {/* Dynamic sections based on current page */}
             {content.isTemplate ? (
-              renderTemplateLayout(content)
+              <div
+                className={`template-edit-root e-block ${selectedBlockId === 'template' ? 'sel' : ''}`}
+                onClick={() => setSelectedBlockId('template')}
+              >
+                {selectedBlockId === 'template' && renderBlockToolbar(TEMPLATE_ROOT_META)}
+                {renderTemplateLayout(content)}
+              </div>
             ) : (
               content.sections.map((section, index) => renderEditableSection(section, index))
             )}
 
             {/* Footer (global) */}
-            <div className="g-el p-footer" style={{ position: 'relative' }}>
-              <span className="p-ft">© 2026 {siteTitle}</span>
-              <span className="p-ft">Privacy Policy</span>
-              <div className="g-badge">⟳ Global — Footer</div>
+            <div className="sec-group">
+              <div
+                className={`g-el p-footer e-block ${selectedBlockId === 'footer' ? 'sel' : ''}`}
+                style={{ position: 'relative' }}
+                onClick={() => setSelectedBlockId('footer')}
+              >
+                {selectedBlockId === 'footer' && renderBlockToolbar(FOOTER_META)}
+                <span className="p-ft">© 2026 {siteTitle}</span>
+                <span className="p-ft">Privacy Policy</span>
+                <div className="g-badge">⟳ Global — Footer</div>
+              </div>
+            </div>
             </div>
           </div>
+
+          <SettingsSidebar
+            isOpen={settingsSidebarOpen}
+            onClose={() => setSettingsSidebarOpen(false)}
+            pageTitle={pageInspectorTitle}
+            selectedBlockId={selectedBlockId}
+            sections={content.sections}
+          />
         </div>
       </div>
     </div>
