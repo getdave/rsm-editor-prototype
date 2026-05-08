@@ -75,17 +75,7 @@ function ExitSplitButton() {
       >
         {({ onClose }) => (
           <>
-            <MenuGroup>
-              <MenuItem
-                icon={referrer.icon}
-                iconPosition="left"
-                onClick={() => {
-                  navigateSmooth(referrer.target);
-                  onClose();
-                }}
-              >
-                {referrer.label}
-              </MenuItem>
+            <MenuGroup label="Go back to">
               <MenuItem
                 icon={wordpress}
                 iconPosition="left"
