@@ -45,6 +45,9 @@ export default function ListViewPanel({
             {meta.icon}
           </span>
           <span className="lv-label">{meta.label}</span>
+          {meta.isPatternSection ? (
+            <span className="lv-row-badge">section</span>
+          ) : null}
         </span>
       </button>
     );

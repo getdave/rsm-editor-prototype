@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import {
@@ -60,7 +60,78 @@ function PageTab({ pageTitle }) {
   );
 }
 
-function BlockTab({ icon: Icon, label, description }) {
+function WireframeHeroLead() {
+  return (
+    <div className="ss-wf ss-wf-hero-lead">
+      <div className="ss-wf-hero-band" />
+      <div className="ss-wf-stack">
+        <div className="ss-wf-line ss-wf-line--lg" />
+        <div className="ss-wf-line" />
+        <div className="ss-wf-line ss-wf-line--sm" />
+      </div>
+    </div>
+  );
+}
+
+function WireframeSplit() {
+  return (
+    <div className="ss-wf ss-wf-split">
+      <div className="ss-wf-split-media" />
+      <div className="ss-wf-split-copy">
+        <div className="ss-wf-line ss-wf-line--lg" />
+        <div className="ss-wf-line" />
+        <div className="ss-wf-line" />
+        <div className="ss-wf-line ss-wf-line--sm" />
+      </div>
+    </div>
+  );
+}
+
+function WireframeStacked() {
+  return (
+    <div className="ss-wf ss-wf-stacked">
+      <div className="ss-wf-line ss-wf-line--lg" />
+      <div className="ss-wf-line" />
+      <div className="ss-wf-line" />
+      <div className="ss-wf-line ss-wf-line--sm" />
+      <div className="ss-wf-line ss-wf-line--xs" />
+    </div>
+  );
+}
+
+function WireframeGallery() {
+  return (
+    <div className="ss-wf ss-wf-gallery">
+      {[0, 1, 2, 3].map((i) => (
+        <div key={i} className="ss-wf-gallery-cell" />
+      ))}
+    </div>
+  );
+}
+
+const SECTION_LAYOUT_PRESETS = [
+  { id: 'hero-lead', title: 'Hero lead', Wireframe: WireframeHeroLead },
+  { id: 'split', title: 'Split media', Wireframe: WireframeSplit },
+  { id: 'stacked', title: 'Text stack', Wireframe: WireframeStacked },
+  { id: 'gallery', title: 'Image grid', Wireframe: WireframeGallery },
+];
+
+function SectionLayoutAlternatives() {
+  return (
+    <div className="ss-layout-grid">
+      {SECTION_LAYOUT_PRESETS.map(({ id, title, Wireframe }) => (
+        <button key={id} type="button" className="ss-layout-card">
+          <div className="ss-layout-thumb" aria-hidden>
+            <Wireframe />
+          </div>
+          <span className="ss-layout-title">{title}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function BlockTab({ icon: Icon, label, description, showLayoutAlternatives }) {
   return (
     <>
       <div className="ss-block-intro">
@@ -72,30 +143,22 @@ function BlockTab({ icon: Icon, label, description }) {
           <p className="ss-block-desc">{description}</p>
         </div>
       </div>
-      <Accordion title="Color" defaultOpen>
-        <div className="ss-color-row">
-          <span className="ss-label">Text</span>
-          <button type="button" className="ss-swatch ss-swatch-empty" aria-label="Text color" />
-        </div>
-        <div className="ss-color-row">
-          <span className="ss-label">Background</span>
-          <button type="button" className="ss-swatch ss-swatch-empty" aria-label="Background color" />
-        </div>
+      {showLayoutAlternatives ? (
+        <Accordion title="Layout" defaultOpen>
+          <SectionLayoutAlternatives />
+        </Accordion>
+      ) : null}
+      <Accordion title="Color">
+        <p className="ss-muted">Color controls would appear here.</p>
       </Accordion>
       <Accordion title="Typography">
-        <div className="ss-segmented">
-          {['S', 'M', 'L', 'XL', 'XXL'].map((s) => (
-            <button key={s} type="button" className={`ss-seg ${s === 'M' ? 'active' : ''}`}>
-              {s}
-            </button>
-          ))}
-        </div>
+        <p className="ss-muted">Typography options would appear here.</p>
       </Accordion>
       <Accordion title="Dimensions">
         <p className="ss-muted">Spacing and size controls would appear here.</p>
       </Accordion>
       <Accordion title="Advanced">
-        <p className="ss-muted">Additional CSS and HTML anchor settings.</p>
+        <p className="ss-muted">Additional settings would appear here.</p>
       </Accordion>
     </>
   );
@@ -118,6 +181,8 @@ function descriptionForLabel(label) {
 
 /**
  * Right-hand inspector (Page / Block tabs), WordPress Site Editor style.
+ * @param {number} props.focusBlockTabSignal — increment to focus the Block/Section tab
+ * @param {number} props.flashSignal — increment to run panel highlight (when already open; parent decides)
  */
 export default function SettingsSidebar({
   isOpen,
@@ -126,10 +191,36 @@ export default function SettingsSidebar({
   selectedBlockId,
   sections = [],
   isTemplate,
+  focusBlockTabSignal = 0,
+  flashSignal = 0,
 }) {
   const [tab, setTab] = useState('page');
+  const [flashHighlight, setFlashHighlight] = useState(false);
 
-  let blockMeta = { icon: TEMPLATE_ROOT_META.icon, label: 'Block' };
+  useEffect(() => {
+    if (focusBlockTabSignal > 0) {
+      setTab('block');
+    }
+  }, [focusBlockTabSignal]);
+
+  useEffect(() => {
+    if (flashSignal <= 0 || !isOpen) {
+      return undefined;
+    }
+    setFlashHighlight(false);
+    const raf = window.requestAnimationFrame(() => {
+      setFlashHighlight(true);
+    });
+    const t = window.setTimeout(() => {
+      setFlashHighlight(false);
+    }, 920);
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(t);
+    };
+  }, [flashSignal, isOpen]);
+
+  let blockMeta = { icon: TEMPLATE_ROOT_META.icon, label: 'Block', isPatternSection: false };
   if (selectedBlockId === 'header') {
     blockMeta = HEADER_META;
   } else if (selectedBlockId === 'footer') {
@@ -142,11 +233,15 @@ export default function SettingsSidebar({
     blockMeta = getSectionMeta(section);
   }
 
-  const blockDescription = descriptionForLabel(blockMeta.label);
+  const blockDescription = blockMeta.isPatternSection
+    ? 'Built from a section pattern—a ready-made group of blocks you can customise on the canvas.'
+    : descriptionForLabel(blockMeta.label);
+
+  const inspectorTabLabel = blockMeta.isPatternSection ? 'Section' : 'Block';
 
   return (
     <div
-      className={`settings-sidebar ${isOpen ? 'open' : ''}`}
+      className={`settings-sidebar ${isOpen ? 'open' : ''}${flashHighlight ? ' flash-highlight' : ''}`}
       role="region"
       aria-label="Settings"
       aria-hidden={!isOpen}
@@ -165,7 +260,7 @@ export default function SettingsSidebar({
             className={`ss-tab-strip ${tab === 'block' ? 'active' : ''}`}
             onClick={() => setTab('block')}
           >
-            Block
+            {inspectorTabLabel}
           </button>
         </div>
         <Button className="ss-close" label="Close settings" icon={closeSmall} onClick={onClose} />
@@ -177,6 +272,7 @@ export default function SettingsSidebar({
             icon={blockMeta.icon}
             label={blockMeta.label}
             description={blockDescription}
+            showLayoutAlternatives={blockMeta.isPatternSection}
           />
         )}
       </div>

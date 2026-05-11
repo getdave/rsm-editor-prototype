@@ -13,6 +13,7 @@ import {
   moreVertical,
   plus,
   redo,
+  styles,
   tablet,
   undo,
 } from '@wordpress/icons';
@@ -146,6 +147,10 @@ function EditingView() {
     menuExpanded,
   } = useAppState();
   const [selectedBlockId, setSelectedBlockId] = useState('section-0');
+  /** Incremented when opening the inspector to the Block tab (e.g. section toolbar Design). */
+  const [inspectorBlockTabSignal, setInspectorBlockTabSignal] = useState(0);
+  /** Incremented to run the attention flash only when the inspector is already open (Design control). */
+  const [inspectorFlashSignal, setInspectorFlashSignal] = useState(0);
 
 
   // Get page-specific content for editing
@@ -183,22 +188,57 @@ function EditingView() {
 
   const renderBlockToolbar = (meta) => {
     const Icon = meta.icon;
+    const isPatternSection = Boolean(meta.isPatternSection);
     return (
       <div
-        className="sec-bar block-toolbar"
+        className={`sec-bar block-toolbar${isPatternSection ? ' block-toolbar--pattern-section' : ''}`}
         role="toolbar"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
       >
         <div className="bt-pill">
-          <Button className="bt-pill-icon" label={meta.label} icon={Icon} iconSize={24} />
+          <Button
+            className="bt-pill-icon"
+            label={`${meta.label} — toggle document overview`}
+            icon={Icon}
+            iconSize={24}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggleListView();
+            }}
+          />
           <span className="bt-pill-label">{meta.label}</span>
         </div>
         <span className="bt-sep" aria-hidden />
         <Button className="bt-tb-btn" label="Drag" icon={dragHandle} iconSize={24} />
-        <Button className="bt-tb-btn" label="Move up" icon={chevronUp} iconSize={24} />
-        <Button className="bt-tb-btn" label="Move down" icon={chevronDown} iconSize={24} />
+        <div className="bt-move-stack" role="group" aria-label="Reorder">
+          <button type="button" className="bt-move-btn" aria-label="Move up">
+            <span className="bt-move-icon" aria-hidden>{chevronUp}</span>
+          </button>
+          <button type="button" className="bt-move-btn" aria-label="Move down">
+            <span className="bt-move-icon" aria-hidden>{chevronDown}</span>
+          </button>
+        </div>
         <span className="bt-sep" aria-hidden />
+        {isPatternSection ? (
+          <>
+            <Button
+              className="bt-tb-edit"
+              variant="tertiary"
+              icon={styles}
+              label="Change Design"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (settingsSidebarOpen) {
+                  setInspectorFlashSignal((n) => n + 1);
+                }
+                setInspectorBlockTabSignal((n) => n + 1);
+                setSettingsSidebarOpen(true);
+              }}
+            />
+            <span className="bt-sep" aria-hidden />
+          </>
+        ) : null}
         <Button className="bt-tb-btn" label="Options" icon={moreVertical} iconSize={24} />
       </div>
     );
@@ -610,6 +650,8 @@ function EditingView() {
             pageTitle={pageInspectorTitle}
             selectedBlockId={selectedBlockId}
             sections={content.sections}
+            focusBlockTabSignal={inspectorBlockTabSignal}
+            flashSignal={inspectorFlashSignal}
           />
         </div>
       </div>
