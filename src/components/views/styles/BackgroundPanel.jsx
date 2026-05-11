@@ -1,4 +1,5 @@
 import { Button } from '@wordpress/components';
+import { Card, Stack, Text } from '@wordpress/ui';
 import { moreVertical } from '@wordpress/icons';
 import StylesPanelHeader from './StylesPanelHeader';
 
@@ -13,25 +14,34 @@ function BackgroundPanel() {
     <div className="styles-panel">
       <StylesPanelHeader title="Background" />
 
-      <p className="styles-panel-description">
+      <Text variant="body-sm" className="styles-panel-description">
         Set styles for the site's background.
-      </p>
+      </Text>
 
       <div className="styles-panel-section">
-        <div className="styles-panel-heading-row">
-          <h3 className="styles-panel-heading">Background image</h3>
+        <Stack
+          direction="row"
+          align="center"
+          justify="space-between"
+          className="styles-panel-heading-row"
+        >
+          <Text variant="heading-sm" className="styles-panel-heading">
+            Background image
+          </Text>
           <Button
             icon={moreVertical}
             label="Background options"
             iconSize={20}
             className="styles-panel-heading-action"
           />
-        </div>
-        <div className="styles-action-card">
-          <button type="button" className="styles-action-button">
-            Add background image
-          </button>
-        </div>
+        </Stack>
+        <Card.Root className="styles-action-card">
+          <Card.Content>
+            <button type="button" className="styles-action-button">
+              Add background image
+            </button>
+          </Card.Content>
+        </Card.Root>
       </div>
     </div>
   );

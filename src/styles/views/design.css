@@ -198,17 +198,7 @@
 .styles-section-card .styles-row:last-child { border-bottom: none; }
 .styles-section-card .styles-row-clickable:hover { background: #f7f7f7; }
 
-/* Input-like read-only row used by the Layout panel. Looks like a Gutenberg
-   number input with a leading icon and a trailing unit label. */
-.styles-input-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 8px 12px;
-  background: #fff;
-}
+/* Leading icon slot passed to UnitControl's `prefix` in LayoutPanel. */
 .styles-input-row-icon {
   display: inline-flex;
   width: 18px;
@@ -216,12 +206,6 @@
   color: #1e1e1e;
 }
 .styles-input-row-icon svg { width: 18px; height: 18px; fill: currentColor; }
-.styles-input-row-value {
-  flex: 1;
-  font-size: 13px;
-  color: #1e1e1e;
-}
-.styles-input-row-unit { font-size: 12px; color: #007cba; }
 
 /* Add-button row used for "Add background image" and similar empty states. */
 .styles-action-card {

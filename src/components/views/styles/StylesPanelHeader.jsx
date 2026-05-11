@@ -1,4 +1,5 @@
 import { Button } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import { seen, moreVertical } from '@wordpress/icons';
 
 /**
@@ -15,16 +16,28 @@ import { seen, moreVertical } from '@wordpress/icons';
 function StylesPanelHeader({ title = 'Styles', subtitle }) {
   return (
     <>
-      <div className="styles-panel-titlebar">
-        <span className="styles-panel-title">{title}</span>
-        <div className="styles-panel-titlebar-actions">
+      <Stack
+        direction="row"
+        align="center"
+        justify="space-between"
+        className="styles-panel-titlebar"
+      >
+        <Text variant="heading-md" className="styles-panel-title">{title}</Text>
+        <Stack
+          direction="row"
+          align="center"
+          gap="xs"
+          className="styles-panel-titlebar-actions"
+        >
           <Button icon={seen} label="Style book" iconSize={20} />
           <Button icon={moreVertical} label="More options" iconSize={20} />
-        </div>
-      </div>
+        </Stack>
+      </Stack>
       {subtitle && (
         <div className="styles-panel-breadcrumb">
-          <span className="styles-panel-breadcrumb-static">{subtitle}</span>
+          <Text variant="heading-sm" className="styles-panel-breadcrumb-static">
+            {subtitle}
+          </Text>
         </div>
       )}
     </>

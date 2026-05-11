@@ -1,4 +1,5 @@
 import { Button } from '@wordpress/components';
+import { Card, Stack, Text } from '@wordpress/ui';
 import { moreVertical } from '@wordpress/icons';
 import StylesPanelHeader from './StylesPanelHeader';
 import { themePalette, colorElements } from '../../../data/mockData';
@@ -20,14 +21,16 @@ function ColorsPanel() {
     <div className="styles-panel">
       <StylesPanelHeader title="Colors" />
 
-      <p className="styles-panel-description">
+      <Text variant="body-sm" className="styles-panel-description">
         Palette colors and the application of those colors on site elements.
-      </p>
+      </Text>
 
       <div className="styles-panel-section">
-        <div className="styles-panel-section-label">Palette</div>
-        <div className="styles-section-card">
-          <div className="styles-row styles-row-clickable">
+        <Text variant="body-sm" className="styles-panel-section-label">
+          Palette
+        </Text>
+        <Card.Root className="styles-section-card">
+          <Card.Content className="styles-row styles-row-clickable">
             <span className="styles-color-stack" aria-hidden="true">
               {stackPreview.map((p) => (
                 <span
@@ -37,25 +40,37 @@ function ColorsPanel() {
                 />
               ))}
             </span>
-            <span className="styles-row-name">Edit palette</span>
+            <Text variant="body-md" className="styles-row-name">
+              Edit palette
+            </Text>
             <span className="styles-row-chevron" aria-hidden="true">›</span>
-          </div>
-        </div>
+          </Card.Content>
+        </Card.Root>
       </div>
 
       <div className="styles-panel-section">
-        <div className="styles-panel-heading-row">
-          <h3 className="styles-panel-heading">Elements</h3>
+        <Stack
+          direction="row"
+          align="center"
+          justify="space-between"
+          className="styles-panel-heading-row"
+        >
+          <Text variant="heading-sm" className="styles-panel-heading">
+            Elements
+          </Text>
           <Button
             icon={moreVertical}
             label="Element options"
             iconSize={20}
             className="styles-panel-heading-action"
           />
-        </div>
-        <div className="styles-section-card">
+        </Stack>
+        <Card.Root className="styles-section-card">
           {colorElements.map((item) => (
-            <div key={item.slug} className="styles-row styles-row-clickable">
+            <Card.Content
+              key={item.slug}
+              className="styles-row styles-row-clickable"
+            >
               <span
                 className="styles-row-swatch"
                 style={{
@@ -64,10 +79,12 @@ function ColorsPanel() {
                 }}
                 aria-hidden="true"
               />
-              <span className="styles-row-name">{item.name}</span>
-            </div>
+              <Text variant="body-md" className="styles-row-name">
+                {item.name}
+              </Text>
+            </Card.Content>
           ))}
-        </div>
+        </Card.Root>
       </div>
     </div>
   );
