@@ -176,6 +176,14 @@
   margin: 0;
 }
 
+/* DocumentActions — rename affordance inside the canvas toolbar. The
+   .ct-btn class supplies the flex layout, padding, and hover; this rule
+   only handles the cursor flip between view (pointer) and edit (text)
+   modes and the no-outline editable region. */
+.doc-actions-name { cursor: pointer; }
+.doc-actions-name.is-editing { cursor: text; }
+.doc-actions-name-text { outline: none; }
+
 .preview-canvas-area {
   flex: 1;
   overflow-y: auto;
