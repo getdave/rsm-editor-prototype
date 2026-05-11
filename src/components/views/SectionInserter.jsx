@@ -11,11 +11,13 @@ import {
 } from '../../data/mockData';
 
 const TABS = [
-  { id: 'all', label: 'All' },
   { id: 'blocks', label: 'Blocks' },
   { id: 'patterns', label: 'Patterns' },
   { id: 'media', label: 'Media' },
 ];
+
+const DEFAULT_TAB = 'blocks';
+const VALID_TAB_IDS = TABS.map((t) => t.id);
 
 function getIcon(iconKey) {
   return wpIcons[iconKey] ?? wpIcons.blockDefault;
@@ -105,12 +107,18 @@ function PatternCard({ pattern, onInsert }) {
 }
 
 /**
- * Tabbed inserter sidebar (All / Blocks / Patterns / Media).
+ * Tabbed inserter sidebar (Blocks / Patterns / Media).
  * Mirrors the "List View / Outline" tab pattern from ListViewPanel.
+ * The active tab on first render comes from the `?inserter=<tab>` URL
+ * param when it names a valid tab, so callers can deep-link to a tab
+ * (e.g. `?inserter=patterns` from the Pages "Edit" action).
  */
 export function SectionInserterContent() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [tab, setTab] = useState('all');
+  const initialTab = VALID_TAB_IDS.includes(searchParams.get('inserter'))
+    ? searchParams.get('inserter')
+    : DEFAULT_TAB;
+  const [tab, setTab] = useState(initialTab);
 
   const closeInserter = () => {
     searchParams.delete('inserter');
@@ -119,31 +127,12 @@ export function SectionInserterContent() {
 
   const handleInsert = () => {};
 
-  const essentialBlocks = inserterBlocks.filter((b) => b.essential);
-
   const groupHeadingStyle = {
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
     color: '#757575',
     padding: '12px 4px 8px',
   };
-
-  const renderAllTab = () => (
-    <>
-      <div className="s-lbl" style={groupHeadingStyle}>Essential blocks</div>
-      <div className="ins-grid">
-        {essentialBlocks.map((b) => (
-          <BlockCard key={b.id} block={b} onInsert={handleInsert} />
-        ))}
-      </div>
-      <div className="s-lbl" style={groupHeadingStyle}>Patterns</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {inserterPatterns.slice(0, 3).map((p) => (
-          <PatternCard key={p.id} pattern={p} onInsert={handleInsert} />
-        ))}
-      </div>
-    </>
-  );
 
   const renderBlocksTab = () => (
     <>
@@ -209,7 +198,6 @@ export function SectionInserterContent() {
       </div>
 
       <div className="ins-list">
-        {tab === 'all' && renderAllTab()}
         {tab === 'blocks' && renderBlocksTab()}
         {tab === 'patterns' && renderPatternsTab()}
         {tab === 'media' && renderMediaTab()}

@@ -638,7 +638,7 @@ function PagesView() {
         icon: pencil,
         callback: (items) => {
           selectPage(items[0]);
-          navigate(`/pages/${items[0].id}/edit`);
+          navigate(`/pages/${items[0].id}/edit?inserter=patterns`);
         },
       },
       {
@@ -849,7 +849,7 @@ function PagesView() {
         onClickItem={(item) => {
           if (!hasPreviewPanel) {
             selectPage(item);
-            navigate(`/pages/${item.id}/edit`);
+            navigate(`/pages/${item.id}/edit?inserter=patterns`);
           } else {
             setPreviewPage(item);
           }
@@ -951,7 +951,7 @@ function PagesView() {
   const canvasContent = (
     <PreviewCanvas
       page={previewPage}
-      onEdit={() => navigate(`/pages/${previewPage.id}/edit`)}
+      onEdit={() => navigate(`/pages/${previewPage.id}/edit?inserter=patterns`)}
       onPageChange={setPreviewPage}
     />
   );

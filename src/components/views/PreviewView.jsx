@@ -8,7 +8,7 @@ function PreviewView() {
   const { currentPage, setCurrentPage } = useAppState();
 
   const handleEdit = () => {
-    navigate(`/pages/${currentPage.id}/edit`);
+    navigate(`/pages/${currentPage.id}/edit?inserter=patterns`);
   };
 
   return (
