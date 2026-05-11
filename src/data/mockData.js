@@ -723,37 +723,4 @@ export const navigationMenus = [
     ],
     usedIn: ["header-main", "header-promo"],
   },
-  {
-    id: "footer-menu",
-    name: "Footer menu",
-    isPrimary: false,
-    items: [
-      {
-        id: "nav-f1",
-        pageId: "about",
-        label: "About",
-        children: [],
-      },
-      {
-        id: "nav-f2",
-        pageId: "contact",
-        label: "Contact",
-        children: [],
-      },
-      {
-        id: "nav-f3",
-        pageId: "privacy-policy",
-        label: "Privacy",
-        children: [],
-      },
-    ],
-    usedIn: ["footer-main"],
-  },
-  {
-    id: "mobile-menu",
-    name: "Mobile menu",
-    isPrimary: false,
-    items: [],
-    usedIn: [],
-  },
 ];

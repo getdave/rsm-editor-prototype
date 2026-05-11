@@ -13,6 +13,7 @@ function NavigationView() {
   const navigate = useNavigate();
   const [menus, setMenus] = useState(initialMenus);
   const [selectedMenuId, setSelectedMenuId] = useState(null);
+  const [forceShowList, setForceShowList] = useState(false);
   const [showAddMenuModal, setShowAddMenuModal] = useState(false);
   const [previewPage, setPreviewPage] = useState(
     () => pages.find((p) => p.isFrontPage) || pages[0],
@@ -34,18 +35,26 @@ function NavigationView() {
     layout: { density: 'compact' },
   });
 
-  const selectedMenu = menus.find(menu => menu.id === selectedMenuId);
+  const resolvedMenuId =
+    menus.length === 1 && menus[0] && !forceShowList
+      ? menus[0].id
+      : selectedMenuId;
+
+  const selectedMenu =
+    resolvedMenuId != null
+      ? menus.find((menu) => menu.id === resolvedMenuId)
+      : null;
 
   // Auto-collapse sidebar when drilling into a menu; restore when back at list.
-  // Depends only on selectedMenuId so toggling the sidebar manually on those routes does not fight this effect.
+  // Depends only on resolvedMenuId so toggling the sidebar manually on those routes does not fight this effect.
   useEffect(() => {
-    if (selectedMenuId && !sidebarCollapsed) {
+    if (resolvedMenuId && !sidebarCollapsed) {
       toggleSidebar();
-    } else if (!selectedMenuId && sidebarCollapsed) {
+    } else if (!resolvedMenuId && sidebarCollapsed) {
       toggleSidebar();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional selectedMenuId-only coupling (see above)
-  }, [selectedMenuId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional resolvedMenuId-only coupling (see above)
+  }, [resolvedMenuId]);
 
   const updateMenu = (menuId, updates) => {
     setMenus(prev => prev.map(menu =>
@@ -63,6 +72,7 @@ function NavigationView() {
     };
     setMenus(prev => [...prev, newMenu]);
     setSelectedMenuId(newMenu.id);
+    setForceShowList(false);
   };
 
   const fields = useMemo(
@@ -111,6 +121,7 @@ function NavigationView() {
         isPrimary: true,
         callback: (items) => {
           setSelectedMenuId(items[0].id);
+          setForceShowList(false);
         },
       },
     ],
@@ -182,8 +193,11 @@ function NavigationView() {
           <div className="split-view list">
             <MenuEditor
               menu={selectedMenu}
-              onUpdateMenu={(updates) => updateMenu(selectedMenuId, updates)}
-              onBack={() => setSelectedMenuId(null)}
+              onUpdateMenu={(updates) => updateMenu(resolvedMenuId, updates)}
+              onBack={() => {
+                setSelectedMenuId(null);
+                setForceShowList(true);
+              }}
             />
             <div
               className="split-view-canvas nav-preview-frame"
