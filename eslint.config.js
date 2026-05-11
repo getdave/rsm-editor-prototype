@@ -2,6 +2,7 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import wordpress from '@wordpress/eslint-plugin'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
@@ -21,12 +22,18 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
+    plugins: {
+      '@wordpress': wordpress,
+    },
     languageOptions: {
       globals: {
         ...globals.browser,
         __RSM_DEV_BRANCH_LABEL__: 'readonly',
       },
       parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+    rules: {
+      '@wordpress/use-recommended-components': 'error',
     },
   },
 ])

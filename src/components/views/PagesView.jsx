@@ -7,8 +7,8 @@ import {
   SelectControl,
   ToggleControl,
   Tooltip,
-  VisuallyHidden,
 } from "@wordpress/components";
+import { VisuallyHidden } from "@wordpress/ui";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
 import { createInterpolateElement } from "@wordpress/element";
 import {
