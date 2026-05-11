@@ -22,10 +22,7 @@ function StylesView() {
   );
 
   const canvasContent = (
-    <div
-      className="edit-site-layout__canvas-container"
-      style={{ display: 'flex', flex: 1, minHeight: 0 }}
-    >
+    <div className="edit-site-layout__canvas-container styles-view-canvas">
       <PreviewCanvas
         page={previewPage}
         onEdit={() => navigate(`/pages/${previewPage.id}/edit`)}

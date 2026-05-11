@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Text } from '@wordpress/ui';
 import { useAppState } from '../hooks/useAppState';
 
 function CommandPalette() {
@@ -129,8 +130,8 @@ function CommandPaletteContent() {
                 onMouseEnter={() => setActive(i)}
                 onClick={() => run(cmd)}
               >
-                <span className="cp-item-label">{cmd.label}</span>
-                <span className="cp-item-group">{cmd.group}</span>
+                <Text variant="body-md" className="cp-item-label">{cmd.label}</Text>
+                <Text variant="body-sm" className="cp-item-group">{cmd.group}</Text>
               </li>
             ))
           )}
