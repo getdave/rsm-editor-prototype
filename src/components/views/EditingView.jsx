@@ -160,7 +160,7 @@ function EditingView() {
     setSelectedBlockId(content.isTemplate ? 'template' : 'section-0');
   }, [currentPage?.id, content.isTemplate]);
 
-  const isInserterOpen = searchParams.get('inserter') === 'true';
+  const isInserterOpen = searchParams.get('inserter') != null;
   
   const toggleInserter = () => {
     if (isInserterOpen) {

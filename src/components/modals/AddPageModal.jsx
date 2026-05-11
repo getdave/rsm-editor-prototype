@@ -127,7 +127,10 @@ function AddPageModalContent() {
     addPage(newPage);
     showSnackbar(`Page "${newPage.name}" created`);
     closeAddPageModal();
-    navigate(`/pages/${newPage.id}/edit`);
+    const editPath = `/pages/${newPage.id}/edit`;
+    navigate(
+      selectedPath === 'scratch' ? `${editPath}?inserter=blocks` : editPath,
+    );
   };
 
   const handleCreate = () => {
