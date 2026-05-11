@@ -119,6 +119,7 @@ export function SectionInserterContent() {
     ? searchParams.get('inserter')
     : DEFAULT_TAB;
   const [tab, setTab] = useState(initialTab);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const closeInserter = () => {
     searchParams.delete('inserter');
@@ -133,6 +134,18 @@ export function SectionInserterContent() {
     color: '#757575',
     padding: '12px 4px 8px',
   };
+
+  const trimmedSearch = searchTerm.trim().toLowerCase();
+  const isSearching = trimmedSearch.length > 0;
+  const nameMatches = (name) => name.toLowerCase().includes(trimmedSearch);
+  const blockMatches = isSearching
+    ? inserterBlocks.filter((b) => nameMatches(b.name))
+    : [];
+  const patternMatches = isSearching
+    ? inserterPatterns.filter((p) => nameMatches(p.name))
+    : [];
+  // Media has no underlying data yet, so it never contributes search hits.
+  const hasAnyMatch = blockMatches.length + patternMatches.length > 0;
 
   const renderBlocksTab = () => (
     <>
@@ -167,6 +180,36 @@ export function SectionInserterContent() {
     </div>
   );
 
+  const renderSearchResults = () => (
+    <>
+      {!hasAnyMatch && (
+        <div className="s-lbl" style={{ padding: '16px 4px', color: '#757575' }}>
+          No results for &ldquo;{searchTerm.trim()}&rdquo;
+        </div>
+      )}
+      {blockMatches.length > 0 && (
+        <div>
+          <div className="s-lbl" style={groupHeadingStyle}>Blocks</div>
+          <div className="ins-grid">
+            {blockMatches.map((b) => (
+              <BlockCard key={b.id} block={b} onInsert={handleInsert} />
+            ))}
+          </div>
+        </div>
+      )}
+      {patternMatches.length > 0 && (
+        <div>
+          <div className="s-lbl" style={groupHeadingStyle}>Patterns</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {patternMatches.map((p) => (
+              <PatternCard key={p.id} pattern={p} onInsert={handleInsert} />
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div className="list-view-inner" role="region" aria-label="Inserter">
       <div className="ins-search-row">
@@ -175,6 +218,8 @@ export function SectionInserterContent() {
           type="search"
           placeholder="Search"
           aria-label="Search blocks, patterns, and media"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
         <Button
           className="lv-close"
@@ -184,31 +229,37 @@ export function SectionInserterContent() {
         />
       </div>
 
-      <div className="lv-tabs">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            className={`lv-tab ${tab === t.id ? 'active' : ''}`}
-            onClick={() => setTab(t.id)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {isSearching ? (
+        <div className="ins-list">{renderSearchResults()}</div>
+      ) : (
+        <>
+          <div className="lv-tabs">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                className={`lv-tab ${tab === t.id ? 'active' : ''}`}
+                onClick={() => setTab(t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
 
-      <div className="ins-list">
-        {tab === 'blocks' && renderBlocksTab()}
-        {tab === 'patterns' && renderPatternsTab()}
-        {tab === 'media' && renderMediaTab()}
-      </div>
+          <div className="ins-list">
+            {tab === 'blocks' && renderBlocksTab()}
+            {tab === 'patterns' && renderPatternsTab()}
+            {tab === 'media' && renderMediaTab()}
+          </div>
 
-      {(tab === 'patterns' || tab === 'media') && (
-        <div className="ins-footer">
-          <Button variant="secondary" className="ins-explore-btn">
-            Explore all {tab}
-          </Button>
-        </div>
+          {(tab === 'patterns' || tab === 'media') && (
+            <div className="ins-footer">
+              <Button variant="secondary" className="ins-explore-btn">
+                Explore all {tab}
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
