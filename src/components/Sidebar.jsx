@@ -195,7 +195,6 @@ function Sidebar() {
   // / .admin-root-nav / .ni / .sb-customize classes.
   if (isEditCanvas) {
     const isCollapsed = sidebarCollapsed && !menuExpanded;
-    const sectionDivider = '1px solid #2a2a2a';
     return (
       <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
         {/* Section 1 — 64px-tall row that aligns with .canvas-toolbar.
@@ -203,14 +202,7 @@ function Sidebar() {
             Expanded: a .ni-styled "Hide menu" action that mirrors the
             other root-nav items (icon + label) and collapses the menu. */}
         {menuExpanded ? (
-          <nav
-            className="admin-root-nav"
-            style={{
-              flex: '0 0 64px',
-              justifyContent: 'center',
-              borderBottom: sectionDivider,
-            }}
-          >
+          <nav className="admin-root-nav editor-sidebar-section editor-sidebar-toggle-row">
             <Tooltip text="Hide menu" placement="right">
               <div
                 className="ni"
@@ -225,26 +217,16 @@ function Sidebar() {
                 }}
               >
                 <span className="ni-ico">{chevronLeft}</span>
-                <span className="ni-label">Hide menu</span>
+                <Text variant="body-md" className="ni-label">Hide menu</Text>
               </div>
             </Tooltip>
           </nav>
         ) : (
-          <div
-            className="sidebar-bottom"
-            style={{
-              display: 'flex',
-              height: 64,
-              flex: '0 0 64px',
-              marginTop: 0,
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: 48,
-              alignSelf: 'flex-start',
-              borderTop: 'none',
-              borderBottom: sectionDivider,
-              padding: 0,
-            }}
+          <Stack
+            direction="row"
+            align="center"
+            justify="center"
+            className="sidebar-bottom editor-sidebar-section editor-sidebar-hamburger"
           >
             <Tooltip text="Expand menu" placement="right">
               <button
@@ -257,14 +239,11 @@ function Sidebar() {
                 {menu}
               </button>
             </Tooltip>
-          </div>
+          </Stack>
         )}
 
         {/* Section 2 — root nav icons. */}
-        <nav
-          className="admin-root-nav"
-          style={{ flex: '0 0 auto', borderBottom: sectionDivider }}
-        >
+        <nav className="admin-root-nav editor-sidebar-section editor-sidebar-root-nav">
           {ADMIN_NAV_ITEMS.map((item) => (
             <Tooltip key={item.id} text={item.tip} placement="right">
               <div
@@ -272,7 +251,7 @@ function Sidebar() {
                 onClick={() => navigateSmooth(item.path)}
               >
                 <span className="ni-ico">{item.icon}</span>
-                <span className="ni-label">{item.label}</span>
+                <Text variant="body-md" className="ni-label">{item.label}</Text>
               </div>
             </Tooltip>
           ))}
@@ -282,17 +261,14 @@ function Sidebar() {
             doesn't wrap awkwardly inside the 48px strip. Reuses the same
             uppercase MenuGroup heading style as the Exit popover. */}
         {!isCollapsed && (
-          <div
-            className="components-menu-group__label"
-            style={{ padding: '12px 12px 4px' }}
+          <Text
+            variant="body-sm"
+            className="components-menu-group__label editor-sidebar-recent-heading"
           >
             Recent documents
-          </div>
+          </Text>
         )}
-        <nav
-          className="admin-root-nav"
-          style={{ flex: '1 0 0', overflowY: 'auto' }}
-        >
+        <nav className="admin-root-nav editor-sidebar-recent-list">
           {recentPages.map((p) => (
             <Tooltip key={p.id} text={p.name} placement="right">
               <div
@@ -303,7 +279,7 @@ function Sidebar() {
                 }}
               >
                 <span className="ni-ico">{pageIcon}</span>
-                <span className="ni-label">{p.name}</span>
+                <Text variant="body-md" className="ni-label">{p.name}</Text>
               </div>
             </Tooltip>
           ))}
