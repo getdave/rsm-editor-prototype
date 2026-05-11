@@ -1,2 +1,477 @@
-/* Navigation view styles */
-/* Placeholder for future Navigation view implementation */
+/* Navigation view — matches Pages panel / Foundations page-area layout */
+
+.nav-panel {
+  width: 100%;
+  height: 100%;
+  display: none;
+  flex-direction: column;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.nav-panel.show {
+  display: flex;
+  padding: var(--wp-page-area-gap, 12px);
+}
+
+/* Single full-width content frame (menu list) */
+.nav-panel.show > .nav-content-frame {
+  flex: 1;
+  min-height: 0;
+  background: var(--wp-page-area-surface, #fff);
+  border-radius: var(--wp-page-area-radius, 8px);
+  border: var(--wp-page-area-border, 1px solid #949494);
+  box-shadow: var(--wp-page-area-shadow);
+  overflow: hidden;
+}
+
+/* Split: editor + preview with gutter between raised cards */
+.nav-panel .split-view.list {
+  flex: 1;
+  min-height: 0;
+  gap: var(--wp-page-area-gap, 12px);
+}
+
+.nav-panel .split-view-stage {
+  border-right: none;
+  background: var(--wp-page-area-surface, #fff);
+  border-radius: var(--wp-page-area-radius, 8px);
+  border: var(--wp-page-area-border, 1px solid #949494);
+  box-shadow: var(--wp-page-area-shadow);
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-panel .split-view-canvas.nav-preview-frame {
+  background: var(--wp-page-area-surface, #fff);
+  border-radius: var(--wp-page-area-radius, 8px);
+  border: var(--wp-page-area-border, 1px solid #949494);
+  box-shadow: var(--wp-page-area-shadow);
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* DataViews shell (menu list) — mirrors .pp-inner / .pp-dataviews */
+.nav-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.nav-dataviews {
+  --wp-dataviews-color-background: #fff;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.nav-dataviews .dataviews-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Menu editor (split-view stage) */
+.nav-editor-inner {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.nav-menu-editor-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px 16px;
+}
+
+/* Menu preview column — mirrors preview chrome spacing */
+.nav-preview-canvas {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-preview-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.nav-preview-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e1e1e;
+  margin: 0;
+}
+
+.nav-preview-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  min-height: 0;
+}
+
+.nav-preview-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nav-preview-item {
+  margin: 0;
+  padding: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: border-color 0.12s, background 0.12s, box-shadow 0.12s;
+}
+
+.nav-preview-item:hover {
+  border-color: #3858e9;
+  background: #f8f9ff;
+  box-shadow: 0 0 0 1px rgba(56, 88, 233, 0.15);
+}
+
+.nav-preview-thumbnail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.nav-preview-icon {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  color: #505050;
+  flex-shrink: 0;
+}
+
+.nav-preview-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.nav-preview-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e1e1e;
+}
+
+/* DataViews cells */
+.nav-menu-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(56, 88, 233, 0.12);
+  color: #3858e9;
+}
+
+.nav-dv-locations {
+  color: #505050;
+  font-size: 13px;
+}
+
+.nav-dv-locations-zero {
+  color: #a0a0a0;
+  font-size: 13px;
+}
+
+/* Menu item rows */
+.nav-menu-item-wrapper {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.nav-menu-item-wrapper:last-child {
+  border-bottom: none;
+}
+
+.nav-menu-editor-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 8px 8px 0;
+}
+
+.nav-item-toggle {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #1e1e1e;
+  cursor: pointer;
+}
+
+.nav-item-toggle:hover {
+  background: #f0f0f0;
+}
+
+.nav-item-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.nav-item-spacer {
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.nav-item-icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  color: #646970;
+  flex-shrink: 0;
+}
+
+.nav-item-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.nav-item-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: #1e1e1e;
+}
+
+.nav-item-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.nav-item-move,
+.nav-item-remove {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #757575;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-item-move:hover:not(:disabled),
+.nav-item-remove:hover {
+  background: #f0f0f0;
+  color: #1e1e1e;
+}
+
+.nav-item-move:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.nav-item-move svg,
+.nav-item-remove svg {
+  width: 16px;
+  height: 16px;
+}
+
+.nav-menu-children {
+  border-left: 1px solid #e8e8e8;
+  margin-left: 12px;
+}
+
+/* Empty states */
+.nav-empty-state {
+  padding: 32px 16px;
+  text-align: center;
+  color: #757575;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.nav-empty-state p {
+  margin: 0 0 8px;
+}
+
+.nav-empty-state p:last-child {
+  margin-bottom: 0;
+}
+
+.nav-empty-hint {
+  font-size: 12px;
+  color: #949494;
+}
+
+/* Floating add (+) below menu items */
+.nav-add-page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 12px auto 0;
+  padding: 0;
+  border: 1px dashed #c0c0c0;
+  border-radius: 50%;
+  background: #fafafa;
+  color: #3858e9;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.nav-add-page-btn:hover {
+  border-color: #3858e9;
+  background: #f0f4ff;
+}
+
+.nav-add-page-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Page picker overlay */
+.nav-page-picker {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+}
+
+.nav-page-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.nav-page-picker-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+
+.nav-page-picker-search {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.nav-page-picker-items {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 8px 0;
+}
+
+.nav-page-picker-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: #757575;
+  font-size: 13px;
+}
+
+.nav-page-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin: 0;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-page-picker-item:hover:not(.in-menu) {
+  background: #f6f7f7;
+}
+
+.nav-page-picker-item.in-menu {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.nav-page-picker-item-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: #1e1e1e;
+}
+
+.nav-page-picker-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: #f0f0f0;
+  color: #505050;
+}
+
+.nav-page-picker-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+/* Add menu modal (WordPress Modal) */
+.nav-modal-content {
+  padding-top: 4px;
+}
+
+.nav-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}

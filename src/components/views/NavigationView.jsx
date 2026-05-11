@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { Tooltip } from '@wordpress/components';
+import { Tooltip, Button } from '@wordpress/components';
+import { Page } from '@wordpress/admin-ui';
 import { navigationMenus as initialMenus } from '../../data/mockData';
 import { useAppState } from '../../hooks/useAppState';
 import MenuEditor from '../navigation/MenuEditor';
@@ -30,13 +31,15 @@ function NavigationView() {
 
   const selectedMenu = menus.find(menu => menu.id === selectedMenuId);
 
-  // Auto-collapse sidebar when menu is selected
+  // Auto-collapse sidebar when drilling into a menu; restore when back at list.
+  // Depends only on selectedMenuId so toggling the sidebar manually on those routes does not fight this effect.
   useEffect(() => {
     if (selectedMenuId && !sidebarCollapsed) {
       toggleSidebar();
     } else if (!selectedMenuId && sidebarCollapsed) {
       toggleSidebar();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional selectedMenuId-only coupling (see above)
   }, [selectedMenuId]);
 
   const updateMenu = (menuId, updates) => {
@@ -68,7 +71,7 @@ function NavigationView() {
             {item.name}
             {item.isPrimary && (
               <Tooltip text="The menu that is currently assigned to the Header template part">
-                <span className="nav-menu-badge" style={{ marginLeft: '8px' }}>Primary</span>
+                <span className="nav-menu-badge">Primary</span>
               </Tooltip>
             )}
           </span>
@@ -114,51 +117,67 @@ function NavigationView() {
     [menus, view, fields]
   );
 
-  return (
-    <div className="nav-view">
-      {!selectedMenu ? (
-        <div className="nav-panel nav-menu-list">
-          <div className="nav-panel-header">
-            <h2 className="nav-panel-title">Navigation</h2>
-            <button
-              className="nav-add-menu-btn components-button is-secondary"
-              onClick={() => setShowAddMenuModal(true)}
-            >
-              Add menu
-            </button>
-          </div>
+  const stageContent = (
+    <div className="nav-inner nav-dataviews">
+      <DataViews
+        data={processedData}
+        fields={fields}
+        view={view}
+        onChangeView={setView}
+        actions={actions}
+        paginationInfo={paginationInfo}
+        defaultLayouts={{ list: {}, table: {} }}
+      >
+        <DataViews.Layout />
+      </DataViews>
+    </div>
+  );
 
-          <div className="nav-dataviews-wrapper">
-            <DataViews
-              data={processedData}
-              fields={fields}
-              view={view}
-              onChangeView={setView}
-              actions={actions}
-              paginationInfo={paginationInfo}
-              defaultLayouts={{ list: {}, table: {} }}
+  const pageActions = (
+    <Button
+      variant="secondary"
+      onClick={() => setShowAddMenuModal(true)}
+    >
+      Add menu
+    </Button>
+  );
+
+  return (
+    <>
+      <div className="nav-panel show">
+        {!selectedMenu ? (
+          <Page
+            className="nav-content-frame"
+            title="Navigation"
+            actions={pageActions}
+            showSidebarToggle={false}
+          >
+            {stageContent}
+          </Page>
+        ) : (
+          <div className="split-view list">
+            <MenuEditor
+              menu={selectedMenu}
+              onUpdateMenu={(updates) => updateMenu(selectedMenuId, updates)}
+              onBack={() => setSelectedMenuId(null)}
+            />
+            <div
+              className="split-view-canvas nav-preview-frame"
+              role="region"
+              aria-label="Preview"
             >
-              <DataViews.Layout />
-            </DataViews>
+              <MenuPreviews menu={selectedMenu} />
+            </div>
           </div>
-        </div>
-      ) : (
-        <>
-          <MenuEditor
-            menu={selectedMenu}
-            onUpdateMenu={(updates) => updateMenu(selectedMenuId, updates)}
-            onBack={() => setSelectedMenuId(null)}
-          />
-          <MenuPreviews menu={selectedMenu} />
-        </>
-      )}
+        )}
+      </div>
       {showAddMenuModal && (
         <AddMenuModal
           onClose={() => setShowAddMenuModal(false)}
           onAddMenu={addMenu}
         />
       )}
-    </div>
+    </>
   );
 }
 

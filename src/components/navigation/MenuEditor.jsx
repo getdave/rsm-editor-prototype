@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, Tooltip } from '@wordpress/components';
+import { Page } from '@wordpress/admin-ui';
 import { arrowLeft, chevronDown, chevronRight, chevronUp, chevronDown as arrowDown, page as pageIcon, close, plus } from '@wordpress/icons';
 import { pages } from '../../data/mockData';
 import PagePicker from './PagePicker';
@@ -74,7 +75,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
   const renderMenuItem = (item, level = 0, siblings = [], index = 0) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.has(item.id);
-    const page = pages.find((p) => p.id === item.pageId);
     const canMoveUp = index > 0;
     const canMoveDown = index < siblings.length - 1;
 
@@ -139,55 +139,69 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     );
   };
 
-  return (
-    <div className="nav-panel nav-menu-editor">
-      <div className="nav-panel-header">
-        <Button
-          icon={arrowLeft}
-          label="Back to menu list"
-          onClick={onBack}
-          className="nav-back-btn"
-        />
-        <h2 className="nav-panel-title">{menu.name}</h2>
-        <Button
-          variant="secondary"
-          onClick={() => setShowPagePicker(true)}
-          className="nav-header-add-btn"
-        >
-          Add Pages
-        </Button>
-      </div>
+  const pageActions = (
+    <>
+      <Button
+        icon={arrowLeft}
+        label="Back to menu list"
+        variant="tertiary"
+        onClick={onBack}
+        className="nav-back-btn"
+      />
+      <Button
+        variant="secondary"
+        onClick={() => setShowPagePicker(true)}
+        className="nav-header-add-btn"
+      >
+        Add Pages
+      </Button>
+    </>
+  );
 
-      <div className="nav-menu-editor-items">
-        {menu.items.length === 0 ? (
-          <div className="nav-empty-state">
-            <p>No items in this menu yet</p>
-            <p className="nav-empty-hint">Click "Add item" below to get started</p>
-          </div>
-        ) : (
-          <>
-            {menu.items.map((item, index) => renderMenuItem(item, 0, menu.items, index))}
-            <Tooltip text="Add page">
-              <button
-                className="nav-add-page-btn"
-                onClick={() => setShowPagePicker(true)}
-                aria-label="Add page"
-              >
-                {plus}
-              </button>
-            </Tooltip>
-          </>
+  return (
+    <Page
+      className="split-view-stage nav-editor-frame"
+      title={menu.name}
+      actions={pageActions}
+      showSidebarToggle={false}
+    >
+      <div className="nav-editor-inner">
+        <div className="nav-menu-editor-items">
+          {menu.items.length === 0 ? (
+            <div className="nav-empty-state">
+              <p>No items in this menu yet</p>
+              <p className="nav-empty-hint">
+                Use &quot;Add Pages&quot; above to add links to this menu.
+              </p>
+            </div>
+          ) : (
+            <>
+              {menu.items.map((item, index) =>
+                renderMenuItem(item, 0, menu.items, index),
+              )}
+              <Tooltip text="Add page">
+                <button
+                  type="button"
+                  className="nav-add-page-btn"
+                  onClick={() => setShowPagePicker(true)}
+                  aria-label="Add page"
+                >
+                  {plus}
+                </button>
+              </Tooltip>
+            </>
+          )}
+        </div>
+
+        {showPagePicker && (
+          <PagePicker
+            menu={menu}
+            onAddItems={handleAddItems}
+            onClose={() => setShowPagePicker(false)}
+          />
         )}
       </div>
-
-      {showPagePicker && (
-        <PagePicker
-          menu={menu}
-          onAddItems={handleAddItems}
-          onClose={() => setShowPagePicker(false)}
-        />
-      )}
-    </div>
+    </Page>
   );
 }
 
