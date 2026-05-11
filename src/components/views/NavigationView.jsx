@@ -7,7 +7,6 @@ import { navigationMenus as initialMenus, pages } from '../../data/mockData';
 import { useAppState } from '../../hooks/useAppState';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import MenuEditor from '../navigation/MenuEditor';
-import MenuPreviews from '../navigation/MenuPreviews';
 import AddMenuModal from '../navigation/AddMenuModal';
 
 function NavigationView() {
@@ -191,7 +190,7 @@ function NavigationView() {
               role="region"
               aria-label="Preview"
             >
-              <MenuPreviews menu={selectedMenu} />
+              {canvasContent}
             </div>
           </div>
         )}

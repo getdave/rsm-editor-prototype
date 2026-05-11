@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button, Tooltip } from '@wordpress/components';
 import { Page } from '@wordpress/admin-ui';
-import { arrowLeft, chevronDown, chevronRight, chevronUp, chevronDown as arrowDown, page as pageIcon, close, plus } from '@wordpress/icons';
+import { chevronDown, chevronRight, chevronUp, chevronDown as arrowDown, page as pageIcon, close, plus } from '@wordpress/icons';
 import { pages } from '../../data/mockData';
 import PagePicker from './PagePicker';
 
@@ -139,29 +139,44 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     );
   };
 
+  const breadcrumbs = (
+    <nav className="nav-editor-breadcrumbs" aria-label="Breadcrumbs">
+      <ul className="nav-editor-breadcrumbs__list">
+        <li className="nav-editor-breadcrumbs__crumb">
+          <button
+            type="button"
+            className="nav-editor-breadcrumbs__parent"
+            onClick={onBack}
+          >
+            Navigation
+          </button>
+          <span className="nav-editor-breadcrumbs__sep" aria-hidden="true">
+            /
+          </span>
+        </li>
+        <li className="nav-editor-breadcrumbs__crumb nav-editor-breadcrumbs__crumb--current">
+          <h1 className="nav-editor-breadcrumbs__title" aria-current="page">
+            {menu.name}
+          </h1>
+        </li>
+      </ul>
+    </nav>
+  );
+
   const pageActions = (
-    <>
-      <Button
-        icon={arrowLeft}
-        label="Back to menu list"
-        variant="tertiary"
-        onClick={onBack}
-        className="nav-back-btn"
-      />
-      <Button
-        variant="secondary"
-        onClick={() => setShowPagePicker(true)}
-        className="nav-header-add-btn"
-      >
-        Add Pages
-      </Button>
-    </>
+    <Button
+      variant="secondary"
+      onClick={() => setShowPagePicker(true)}
+      className="nav-header-add-btn"
+    >
+      Add Pages
+    </Button>
   );
 
   return (
     <Page
       className="split-view-stage nav-editor-frame"
-      title={menu.name}
+      breadcrumbs={breadcrumbs}
       actions={pageActions}
       showSidebarToggle={false}
     >
