@@ -2,9 +2,13 @@ import { useState } from 'react';
 import { Button, DropdownMenu, MenuGroup, MenuItem, Tooltip } from '@wordpress/components';
 import { Page } from '@wordpress/admin-ui';
 import { chevronDown, chevronRight, dragHandle, moreVertical, page as pageIcon, plus } from '@wordpress/icons';
+import { pages as allPages } from '../../data/mockData';
+import RenameMenuItemModal from './RenameMenuItemModal';
 
 function MenuEditor({ menu, onUpdateMenu, onBack }) {
   const [expandedItems, setExpandedItems] = useState(new Set());
+  /** When set, rename modal is open for this menu tree item (by reference shape). */
+  const [renameTarget, setRenameTarget] = useState(null);
 
   const toggleExpanded = (itemId) => {
     setExpandedItems((prev) => {
@@ -53,6 +57,26 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     };
 
     onUpdateMenu({ items: findAndMove([...menu.items]) });
+  };
+
+  const renameItemLabel = (itemId, newLabel) => {
+    const trimmed = newLabel.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const updateInTree = (items) =>
+      items.map((entry) => {
+        if (entry.id === itemId) {
+          return { ...entry, label: trimmed };
+        }
+        if (entry.children?.length) {
+          return { ...entry, children: updateInTree(entry.children) };
+        }
+        return entry;
+      });
+
+    onUpdateMenu({ items: updateInTree([...menu.items]) });
   };
 
   const renderMenuItem = (item, level = 0, siblings = [], index = 0) => {
@@ -119,6 +143,18 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
                     disabled={!canMoveDown}
                   >
                     Move down
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setRenameTarget({
+                        id: item.id,
+                        label: item.label,
+                        pageId: item.pageId,
+                      });
+                      onClose();
+                    }}
+                  >
+                    Rename
                   </MenuItem>
                   <MenuItem
                     onClick={() => {
@@ -227,6 +263,23 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           )}
         </div>
       </div>
+
+      {renameTarget ? (
+        <RenameMenuItemModal
+          key={renameTarget.id}
+          item={renameTarget}
+          linkedPageTitle={
+            renameTarget.pageId
+              ? allPages.find((p) => p.id === renameTarget.pageId)?.name ?? ''
+              : ''
+          }
+          onClose={() => setRenameTarget(null)}
+          onSave={(newLabel) => {
+            renameItemLabel(renameTarget.id, newLabel);
+            setRenameTarget(null);
+          }}
+        />
+      ) : null}
     </Page>
   );
 }
