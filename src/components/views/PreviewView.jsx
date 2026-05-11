@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Stack } from '@wordpress/ui';
 import { useAppState } from '../../hooks/useAppState';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import ContentSuggestions from './ContentSuggestions';
@@ -12,7 +13,7 @@ function PreviewView() {
   };
 
   return (
-    <div className="cs-stack">
+    <Stack direction="column" className="cs-stack">
       <div className="cs-stack-canvas preview-body">
         <div className="preview-body-canvas">
           <PreviewCanvas
@@ -23,7 +24,7 @@ function PreviewView() {
         </div>
       </div>
       <ContentSuggestions />
-    </div>
+    </Stack>
   );
 }
 

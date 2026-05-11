@@ -129,6 +129,13 @@
   color: #888;
 }
 
+/* Preview canvas wrapper — stacks the toolbar on top of the scrollable
+   canvas area. Overrides .canvas defaults (centered row layout, padding). */
+.preview-canvas-root {
+  flex-direction: column;
+  padding: 0;
+}
+
 /* Browse bar — preview state */
 .preview-bar {
   height: 64px;
@@ -139,6 +146,34 @@
   padding: 0 12px;
   gap: 6px;
   flex-shrink: 0;
+}
+
+/* Document cluster (icon + name + status dot) sitting between the Edit
+   button and the device switcher. */
+.preview-bar-doc-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  color: #1e1e1e;
+}
+
+.preview-bar-doc-name {
+  cursor: default;
+}
+
+.preview-bar-doc-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.preview-bar-doc-status .url-dot {
+  margin: 0;
 }
 
 .preview-canvas-area {
