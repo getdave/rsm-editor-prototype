@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Snackbar } from '@wordpress/components';
 import { useAppState } from '../hooks/useAppState';
@@ -15,31 +15,52 @@ const EDIT_ROUTE_PATTERN = /\/pages\/[^/]+\/edit$/;
 
 function RootLayout() {
   const location = useLocation();
-  const { sidebarCollapsed, toggleSidebar, snackbarMessage, dismissSnackbar } = useAppState();
+  const {
+    snackbarMessage,
+    dismissSnackbar,
+    setSidebarCollapsed,
+    setEditorReferrer,
+    setMenuExpanded,
+    menuExpanded,
+  } = useAppState();
 
   const isEditCanvas = EDIT_ROUTE_PATTERN.test(location.pathname);
+  const prevPathRef = useRef(location.pathname);
 
-  // Auto-collapse sidebar when entering edit mode
+  // Collapse the chrome sidebar to its narrow 48px form when entering the
+  // editor; expand it back when leaving. Idempotent so React StrictMode's
+  // double-fire in dev doesn't flip the state twice. Always reset
+  // menu-expanded on route change so navigating between recent docs (or
+  // exiting the editor) closes the menu cleanly.
   useEffect(() => {
-    const isEditRoute = location.pathname.includes('/edit');
+    const isEdit = EDIT_ROUTE_PATTERN.test(location.pathname);
+    setSidebarCollapsed(isEdit);
+    setMenuExpanded(false);
+  }, [location.pathname]);
 
-    if (isEditRoute && !sidebarCollapsed) {
-      // Collapse sidebar when entering edit mode
-      toggleSidebar();
-    } else if (!isEditRoute && sidebarCollapsed) {
-      // Expand sidebar when leaving edit mode
-      toggleSidebar();
+  // Capture the route the user was on before entering the edit canvas so the
+  // split-Exit button knows where to take them back. Cleared on exit.
+  useEffect(() => {
+    const isEdit = EDIT_ROUTE_PATTERN.test(location.pathname);
+    const wasEdit = EDIT_ROUTE_PATTERN.test(prevPathRef.current);
+    if (isEdit && !wasEdit) {
+      setEditorReferrer(prevPathRef.current);
+    } else if (!isEdit) {
+      setEditorReferrer(null);
     }
+    prevPathRef.current = location.pathname;
   }, [location.pathname]);
 
   return (
     <>
-      {!isEditCanvas && <SiteEditorHeader />}
-      <div className="body">
-        <Sidebar />
-        <main className="main">
-          <Outlet />
-        </main>
+      <div className={`app-shell ${isEditCanvas ? 'is-edit-canvas' : ''} ${menuExpanded ? 'is-menu-expanded' : ''}`}>
+        <SiteEditorHeader />
+        <div className="body">
+          <Sidebar />
+          <main className="main">
+            <Outlet />
+          </main>
+        </div>
       </div>
       <SiteIdentityModal />
       <SettingsModal />

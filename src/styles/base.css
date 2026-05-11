@@ -19,3 +19,16 @@ body {
   height: 100%;
   isolation: isolate; /* @wordpress/ui portaled overlays */
 }
+
+/* ── APP SHELL ──
+   Wraps the chrome (header + body) so the Edit / Exit transitions can
+   slide the admin header up off-screen and the root nav off to the left.
+   Both directions share the same easing and duration so Exit feels like
+   the reverse of Edit. */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}

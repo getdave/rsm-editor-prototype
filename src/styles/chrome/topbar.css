@@ -12,6 +12,14 @@
   background: var(--wp-chrome-bg, #1e1e1e);
   flex-shrink: 0;
   z-index: 10;
+  transition: margin-top 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Edit → canvas: header slides up out of the screen and its 56px row
+   collapses out of layout. Exit reverses by removing the class. */
+.app-shell.is-edit-canvas .site-editor-header {
+  margin-top: -56px;
+  pointer-events: none;
 }
 
 .seh-anchor {

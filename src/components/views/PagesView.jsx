@@ -380,6 +380,7 @@ function PagesView() {
   const {
     currentPage,
     setCurrentPage,
+    selectPage,
     pagesViewMode,
     setPagesViewMode,
     pages,
@@ -497,26 +498,34 @@ function PagesView() {
         enableHiding: false,
         enableGlobalSearch: true,
         render: ({ item }) => {
+          const docIcon = item.isFrontPage
+            ? home
+            : item.isPostsPage
+              ? postList
+              : pageIcon;
+          const isLive = item.status !== "draft";
+          const statusLabel = isLive ? "Page is live" : "Page is a draft";
           const title = (
             <span className="pp-title-cell-inner">
-              {item.isFrontPage ? (
-                <span
-                  className="pp-title-glyph-icon"
-                  aria-hidden="true"
-                  title="Homepage"
-                >
-                  {home}
-                </span>
-              ) : item.isPostsPage ? (
-                <span
-                  className="pp-title-glyph-icon pp-title-glyph-icon--posts"
-                  aria-hidden="true"
-                  title="Posts page"
-                >
-                  {postList}
-                </span>
-              ) : null}
+              <span
+                className={`pp-title-glyph-icon${item.isPostsPage ? " pp-title-glyph-icon--posts" : ""}`}
+                aria-hidden="true"
+                title={
+                  item.isFrontPage
+                    ? "Homepage"
+                    : item.isPostsPage
+                      ? "Posts page"
+                      : undefined
+                }
+              >
+                {docIcon}
+              </span>
               <span className="pp-title-cell-name">{item.name}</span>
+              <span
+                className={`url-dot${isLive ? "" : " url-draft-dot"}`}
+                role="status"
+                aria-label={statusLabel}
+              />
             </span>
           );
           if (!item.titleTooltip) {
@@ -628,7 +637,7 @@ function PagesView() {
         label: "Edit",
         icon: pencil,
         callback: (items) => {
-          setCurrentPage(items[0]);
+          selectPage(items[0]);
           navigate(`/pages/${items[0].id}/edit`);
         },
       },
@@ -714,7 +723,7 @@ function PagesView() {
     ],
     [
       navigate,
-      setCurrentPage,
+      selectPage,
       setPreviewPage,
       frontPageId,
       postsPageId,
@@ -754,6 +763,7 @@ function PagesView() {
     return filtered;
   }, [
     activeCategory,
+    pages,
     showDrafts,
     frontPageId,
     postsPageId,
@@ -838,7 +848,7 @@ function PagesView() {
         isItemClickable={() => true}
         onClickItem={(item) => {
           if (!hasPreviewPanel) {
-            setCurrentPage(item);
+            selectPage(item);
             navigate(`/pages/${item.id}/edit`);
           } else {
             setPreviewPage(item);

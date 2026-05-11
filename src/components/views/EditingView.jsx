@@ -16,7 +16,8 @@ import {
   tablet,
   undo,
 } from '@wordpress/icons';
-import UrlBar from '../shared/UrlBar';
+import ExitSplitButton from '../shared/ExitSplitButton';
+import DocumentActions from '../shared/DocumentActions';
 import EditorLeftPanel from './EditorLeftPanel';
 import SettingsSidebar from './SettingsSidebar';
 import { getEditModeContent } from '../../services/pageContentService';
@@ -128,7 +129,6 @@ function EditableSectionGroup({
 }
 
 function EditingView() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     currentPage,
@@ -143,8 +143,10 @@ function EditingView() {
     siteTitle,
     toggleListView,
     toggleSettingsSidebar,
+    menuExpanded,
   } = useAppState();
   const [selectedBlockId, setSelectedBlockId] = useState('section-0');
+
 
   // Get page-specific content for editing
   const content = getEditModeContent(currentPage);
@@ -429,59 +431,71 @@ function EditingView() {
   const leftPanelMode = listViewOpen ? 'list' : isInserterOpen ? 'inserter' : null;
 
   return (
-    <div className={`edit-canvas ${true ? 'show' : ''}`}>
+    <div
+      className={`edit-canvas ${true ? 'show' : ''}`}
+      style={{
+        // When the menu is expanded the canvas keeps its full original
+        // width so its left edge sits flush against the 208px sidebar
+        // while its right side runs 208px off the viewport. .main is
+        // told to allow overflow so the canvas can extend past it.
+        width: menuExpanded ? '100vw' : '100%',
+        transition: 'width 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+      }}
+    >
       <div className="editor-col">
         {/* Canvas toolbar — full width; panels sit below this */}
         <div className="canvas-toolbar">
-          {/* Left side controls */}
-          <Button 
+          {/* Left zone */}
+          <ExitSplitButton />
+          <Button
             variant="primary"
-            className="ct-btn primary" 
+            className="ct-btn primary"
             onClick={toggleInserter}
             icon={plus}
             iconSize={20}
           />
-          <Button 
-            className="ct-btn" 
+          <Button
+            className="ct-btn"
             label="Undo"
             icon={undo}
             iconSize={20}
           />
-          <Button 
-            className="ct-btn" 
+          <Button
+            className="ct-btn"
             label="Redo"
             icon={redo}
             iconSize={20}
           />
-          <Button 
+          <Button
             className={`ct-btn ${listViewOpen ? 'active' : ''}`}
             label="Document Overview"
             icon={listView}
             iconSize={20}
             onClick={handleToggleListView}
           />
-          
+
           <div className="ct-space"></div>
-          <UrlBar page={currentPage} />
+          {/* Center zone */}
+          <DocumentActions />
           <div className="ct-space"></div>
-          
-          {/* Right side controls */}
+
+          {/* Right zone */}
           <div className="ct-view-modes">
-            <Button 
+            <Button
               className={`ct-view-btn ${selectedDevice === 'desktop' ? 'active' : ''}`}
               onClick={() => setSelectedDevice('desktop')}
               label="Desktop view"
               icon={desktop}
               iconSize={20}
             />
-            <Button 
+            <Button
               className={`ct-view-btn ${selectedDevice === 'tablet' ? 'active' : ''}`}
               onClick={() => setSelectedDevice('tablet')}
               label="Tablet view"
               icon={tablet}
               iconSize={20}
             />
-            <Button 
+            <Button
               className={`ct-view-btn ${selectedDevice === 'mobile' ? 'active' : ''}`}
               onClick={() => setSelectedDevice('mobile')}
               label="Mobile view"
@@ -489,35 +503,28 @@ function EditingView() {
               iconSize={20}
             />
           </div>
-          
-          <Button 
+
+          <Button
             className={`ct-icon-btn ${settingsSidebarOpen ? 'active' : ''}`}
             label="Toggle settings sidebar"
             icon={drawerRight}
             iconSize={20}
             onClick={toggleSettingsSidebar}
           />
-          
-          <Button 
-            className="ct-icon-btn" 
+
+          <Button
+            className="ct-icon-btn"
             label="More options"
             icon={moreVertical}
             iconSize={20}
           />
-          
-          {!hasUnsavedChanges && <span className="ct-saved">Saved</span>}
-          <Button 
+
+          <Button
             variant="primary"
-            className={`ct-save ${hasUnsavedChanges ? 'show' : ''}`}
+            className="ct-save show"
             onClick={save}
           >
             Save
-          </Button>
-          <Button 
-            className="ct-exit" 
-            onClick={() => navigate('/')}
-          >
-            Exit
           </Button>
         </div>
 
