@@ -266,20 +266,13 @@
 }
 
 /* Menu item rows */
-.nav-menu-item-wrapper {
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.nav-menu-item-wrapper:last-child {
-  border-bottom: none;
-}
-
 .nav-menu-editor-item {
   display: flex;
   align-items: center;
   gap: 8px;
   min-height: 44px;
   padding: 8px 8px 8px 0;
+  position: relative;
 }
 
 .nav-item-toggle {
@@ -338,12 +331,13 @@
 .nav-item-actions {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
-.nav-item-move,
-.nav-item-remove {
+/* Drag handle — slides in from the right on row hover */
+.nav-item-drag-handle {
   width: 28px;
   height: 28px;
   margin: 0;
@@ -351,26 +345,50 @@
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: #757575;
-  cursor: pointer;
+  color: #949494;
+  cursor: grab;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(8px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
-.nav-item-move:hover:not(:disabled),
-.nav-item-remove:hover {
+.nav-item-drag-handle:active {
+  cursor: grabbing;
+}
+
+.nav-menu-editor-item:hover .nav-item-drag-handle {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.nav-item-drag-handle svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 3-dot menu — WordPress DropdownMenu toggle */
+.nav-item-dropdown .components-button {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0;
+  border-radius: 4px;
+  color: #757575;
+}
+
+.nav-item-dropdown .components-button:hover {
   background: #f0f0f0;
   color: #1e1e1e;
 }
 
-.nav-item-move:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.nav-item-move svg,
-.nav-item-remove svg {
+.nav-item-dropdown .components-button svg {
   width: 16px;
   height: 16px;
 }

@@ -18,6 +18,10 @@ function docTypeIcon(p) {
 }
 
 /**
+ * @typedef {{ id: string, label: string, pageId: string }} HeaderNavItem
+ */
+
+/**
  * Reusable Preview Canvas Component
  * 
  * Displays a site preview with device switcher and edit button.
@@ -33,15 +37,27 @@ function docTypeIcon(p) {
  * @param {object} page - The page/item to preview
  * @param {function} onEdit - Callback when Edit button is clicked
  * @param {function} onPageChange - Callback when a nav link is clicked; parent decides what switching page means
+ * @param {HeaderNavItem[]|null|undefined} headerNavItems - Optional top-level nav links (label + pageId order). When omitted, uses pages with `inMenu`.
  */
-function PreviewCanvas({ page, onEdit, onPageChange = () => {} }) {
+function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }) {
   const { selectedDevice, setSelectedDevice, siteTitle } = useAppState();
   
   // Get WordPress-appropriate content for this page
   const content = getPageContent(page);
   
-  // Get pages that should appear in navigation menu
-  const menuPages = pages.filter(p => p.inMenu);
+  const fallbackMenuPages = pages.filter((p) => p.inMenu);
+
+  const navEntries =
+    headerNavItems !== undefined
+      ? headerNavItems
+          .map((item) => {
+            const targetPage = pages.find((p) => p.id === item.pageId);
+            return targetPage
+              ? { key: item.id, label: item.label, page: targetPage }
+              : null;
+          })
+          .filter(Boolean)
+      : fallbackMenuPages.map((p) => ({ key: p.id, label: p.name, page: p }));
   
   const handleNavClick = (clickedPage) => {
     onPageChange(clickedPage);
@@ -55,16 +71,16 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {} }) {
       <div className="p-header">
         <span className="p-sitename">{siteTitle}</span>
         <div className="p-nav">
-          {menuPages.map(menuPage => (
-            <a 
-              key={menuPage.id}
-              href="#" 
+          {navEntries.map((entry) => (
+            <a
+              key={entry.key}
+              href="#"
               onClick={(e) => {
                 e.preventDefault();
-                handleNavClick(menuPage);
+                handleNavClick(entry.page);
               }}
             >
-              {menuPage.name}
+              {entry.label}
             </a>
           ))}
         </div>

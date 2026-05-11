@@ -133,6 +133,20 @@ function NavigationView() {
     [menus, view, fields]
   );
 
+  /** Top-level menu rows only — matches editor order and labels; drives preview header nav. */
+  const previewHeaderNavItems = useMemo(() => {
+    const menuForPreview =
+      selectedMenu ?? menus.find((m) => m.isPrimary) ?? menus[0];
+    if (!menuForPreview?.items?.length) {
+      return [];
+    }
+    return menuForPreview.items.map((item) => ({
+      id: item.id,
+      label: item.label,
+      pageId: item.pageId,
+    }));
+  }, [selectedMenu, menus]);
+
   const stageContent = (
     <div className="nav-inner nav-dataviews">
       <DataViews
@@ -156,6 +170,7 @@ function NavigationView() {
         navigate(`/pages/${previewPage.id}/edit?inserter=patterns`)
       }
       onPageChange={setPreviewPage}
+      headerNavItems={previewHeaderNavItems}
     />
   );
 

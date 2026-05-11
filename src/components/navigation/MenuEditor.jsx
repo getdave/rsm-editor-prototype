@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Button, Tooltip } from '@wordpress/components';
+import { Button, DropdownMenu, MenuGroup, MenuItem, Tooltip } from '@wordpress/components';
 import { Page } from '@wordpress/admin-ui';
-import { chevronDown, chevronRight, chevronUp, chevronDown as arrowDown, page as pageIcon, close, plus } from '@wordpress/icons';
+import { chevronDown, chevronRight, dragHandle, moreVertical, page as pageIcon, plus } from '@wordpress/icons';
 
 function MenuEditor({ menu, onUpdateMenu, onBack }) {
   const [expandedItems, setExpandedItems] = useState(new Set());
@@ -83,31 +83,63 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
 
           <div className="nav-item-actions">
             <button
-              className="nav-item-move"
-              onClick={() => moveItem(item.id, 'up')}
-              disabled={!canMoveUp}
-              aria-label="Move up"
-              title="Move up"
+              type="button"
+              className="nav-item-drag-handle"
+              aria-label="Drag to reorder"
+              title="Drag to reorder"
             >
-              {chevronUp}
+              {dragHandle}
             </button>
-            <button
-              className="nav-item-move"
-              onClick={() => moveItem(item.id, 'down')}
-              disabled={!canMoveDown}
-              aria-label="Move down"
-              title="Move down"
+
+            <DropdownMenu
+              icon={moreVertical}
+              label="Menu item options"
+              className="nav-item-dropdown"
+              popoverProps={{ placement: 'bottom-end' }}
+              toggleProps={{
+                variant: 'tertiary',
+              }}
             >
-              {arrowDown}
-            </button>
-            <button
-              className="nav-item-remove"
-              onClick={() => removeItem(item.id)}
-              aria-label={`Remove ${item.label}`}
-              title="Remove"
-            >
-              {close}
-            </button>
+              {({ onClose }) => (
+                <MenuGroup>
+                  <MenuItem
+                    onClick={() => {
+                      moveItem(item.id, 'up');
+                      onClose();
+                    }}
+                    disabled={!canMoveUp}
+                  >
+                    Move up
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      moveItem(item.id, 'down');
+                      onClose();
+                    }}
+                    disabled={!canMoveDown}
+                  >
+                    Move down
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      // Placeholder: Add submenu link not yet implemented
+                      onClose();
+                    }}
+                  >
+                    Add submenu link
+                  </MenuItem>
+                  <MenuItem
+                    isDestructive
+                    onClick={() => {
+                      removeItem(item.id);
+                      onClose();
+                    }}
+                  >
+                    Delete
+                  </MenuItem>
+                </MenuGroup>
+              )}
+            </DropdownMenu>
           </div>
         </div>
 
