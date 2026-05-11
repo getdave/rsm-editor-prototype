@@ -2,12 +2,9 @@ import { useState } from 'react';
 import { Button, Tooltip } from '@wordpress/components';
 import { Page } from '@wordpress/admin-ui';
 import { chevronDown, chevronRight, chevronUp, chevronDown as arrowDown, page as pageIcon, close, plus } from '@wordpress/icons';
-import { pages } from '../../data/mockData';
-import PagePicker from './PagePicker';
 
 function MenuEditor({ menu, onUpdateMenu, onBack }) {
   const [expandedItems, setExpandedItems] = useState(new Set());
-  const [showPagePicker, setShowPagePicker] = useState(false);
 
   const toggleExpanded = (itemId) => {
     setExpandedItems((prev) => {
@@ -19,20 +16,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
       }
       return next;
     });
-  };
-
-  const handleAddItems = (pageIds) => {
-    const newItems = pageIds.map((pageId, index) => {
-      const page = pages.find((p) => p.id === pageId);
-      return {
-        id: `nav-${Date.now()}-${index}`,
-        pageId,
-        label: page?.name || 'Untitled',
-        children: [],
-      };
-    });
-
-    onUpdateMenu({ items: [...menu.items, ...newItems] });
   };
 
   const removeItem = (itemId) => {
@@ -166,7 +149,9 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
   const pageActions = (
     <Button
       variant="secondary"
-      onClick={() => setShowPagePicker(true)}
+      onClick={() => {
+        // Placeholder: "Add pages" flow not yet implemented
+      }}
       className="nav-header-add-btn"
     >
       Add Pages
@@ -198,7 +183,9 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
                 <button
                   type="button"
                   className="nav-add-page-btn"
-                  onClick={() => setShowPagePicker(true)}
+                  onClick={() => {
+                    // Placeholder: "Add pages" flow not yet implemented
+                  }}
                   aria-label="Add page"
                 >
                   {plus}
@@ -207,14 +194,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
             </>
           )}
         </div>
-
-        {showPagePicker && (
-          <PagePicker
-            menu={menu}
-            onAddItems={handleAddItems}
-            onClose={() => setShowPagePicker(false)}
-          />
-        )}
       </div>
     </Page>
   );
