@@ -14,19 +14,8 @@
   padding: var(--wp-page-area-gap, 12px);
 }
 
-/* Single full-width content frame (menu list) */
-.nav-panel.show > .nav-content-frame {
-  flex: 1;
-  min-height: 0;
-  background: var(--wp-page-area-surface, #fff);
-  border-radius: var(--wp-page-area-radius, 8px);
-  border: var(--wp-page-area-border, 1px solid #949494);
-  box-shadow: var(--wp-page-area-shadow);
-  overflow: hidden;
-}
-
-/* Split: editor + preview with gutter between raised cards */
-.nav-panel .split-view.list {
+/* Split views (menu list + site preview, or editor + template parts) */
+.nav-panel > .split-view.list {
   flex: 1;
   min-height: 0;
   gap: var(--wp-page-area-gap, 12px);

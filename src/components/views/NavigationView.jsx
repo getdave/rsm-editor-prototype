@@ -1,17 +1,23 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Tooltip, Button } from '@wordpress/components';
 import { Page } from '@wordpress/admin-ui';
-import { navigationMenus as initialMenus } from '../../data/mockData';
+import { navigationMenus as initialMenus, pages } from '../../data/mockData';
 import { useAppState } from '../../hooks/useAppState';
+import PreviewCanvas from '../shared/PreviewCanvas';
 import MenuEditor from '../navigation/MenuEditor';
 import MenuPreviews from '../navigation/MenuPreviews';
 import AddMenuModal from '../navigation/AddMenuModal';
 
 function NavigationView() {
+  const navigate = useNavigate();
   const [menus, setMenus] = useState(initialMenus);
   const [selectedMenuId, setSelectedMenuId] = useState(null);
   const [showAddMenuModal, setShowAddMenuModal] = useState(false);
+  const [previewPage, setPreviewPage] = useState(
+    () => pages.find((p) => p.isFrontPage) || pages[0],
+  );
   const { sidebarCollapsed, toggleSidebar } = useAppState();
 
   const [view, setView] = useState({
@@ -133,6 +139,16 @@ function NavigationView() {
     </div>
   );
 
+  const canvasContent = (
+    <PreviewCanvas
+      page={previewPage}
+      onEdit={() =>
+        navigate(`/pages/${previewPage.id}/edit?inserter=patterns`)
+      }
+      onPageChange={setPreviewPage}
+    />
+  );
+
   const pageActions = (
     <Button
       variant="secondary"
@@ -146,14 +162,23 @@ function NavigationView() {
     <>
       <div className="nav-panel show">
         {!selectedMenu ? (
-          <Page
-            className="nav-content-frame"
-            title="Navigation"
-            actions={pageActions}
-            showSidebarToggle={false}
-          >
-            {stageContent}
-          </Page>
+          <div className="split-view list">
+            <Page
+              className="split-view-stage nav-content-frame"
+              title="Navigation"
+              actions={pageActions}
+              showSidebarToggle={false}
+            >
+              {stageContent}
+            </Page>
+            <div
+              className="split-view-canvas nav-preview-frame"
+              role="region"
+              aria-label="Preview"
+            >
+              {canvasContent}
+            </div>
+          </div>
         ) : (
           <div className="split-view list">
             <MenuEditor
