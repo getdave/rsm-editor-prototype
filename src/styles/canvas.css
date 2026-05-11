@@ -1551,6 +1551,45 @@
   color: #1e1e1e;
 }
 
+/* Section heading inside the inserter — uppercase pill above each group of
+   blocks/patterns. Reuses .s-lbl typography for color/weight; only adds
+   the uppercase treatment and the slightly different padding. */
+.s-lbl.ins-group-heading {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #757575;
+  padding: 12px 4px 8px;
+}
+
+/* "Pending" / "No results for…" placeholder rows. */
+.s-lbl.ins-empty-note {
+  padding: 16px 4px;
+  color: #757575;
+}
+
+/* Vertical patterns list (single column with breathing room between cards). */
+.ins-pattern-list { padding-top: 12px; }
+
+/* Pattern preview wireframes that previously used inline grid styles. */
+.pattern-preview-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  height: 100%;
+}
+
+.pattern-preview-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3px;
+  height: 100%;
+}
+
+.pattern-preview-gallery-cell {
+  background: #d0d0d0;
+  border-radius: 2px;
+}
+
 /* Split View Layout - Generic reusable pattern for stage + canvas views */
 .split-view {
   width: 100%;
