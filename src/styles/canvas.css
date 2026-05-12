@@ -129,6 +129,13 @@
   color: #888;
 }
 
+/* Preview canvas wrapper — stacks the toolbar on top of the scrollable
+   canvas area. Overrides .canvas defaults (centered row layout, padding). */
+.preview-canvas-root {
+  flex-direction: column;
+  padding: 0;
+}
+
 /* Browse bar — preview state */
 .preview-bar {
   height: 64px;
@@ -140,6 +147,42 @@
   gap: 6px;
   flex-shrink: 0;
 }
+
+/* Document cluster (icon + name + status dot) sitting between the Edit
+   button and the device switcher. */
+.preview-bar-doc-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  color: #1e1e1e;
+}
+
+.preview-bar-doc-name {
+  cursor: default;
+}
+
+.preview-bar-doc-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.preview-bar-doc-status .url-dot {
+  margin: 0;
+}
+
+/* DocumentActions — rename affordance inside the canvas toolbar. The
+   .ct-btn class supplies the flex layout, padding, and hover; this rule
+   only handles the cursor flip between view (pointer) and edit (text)
+   modes and the no-outline editable region. */
+.doc-actions-name { cursor: pointer; }
+.doc-actions-name.is-editing { cursor: text; }
+.doc-actions-name-text { outline: none; }
 
 .preview-canvas-area {
   flex: 1;
@@ -1506,6 +1549,45 @@
   font-size: 11px;
   font-weight: 500;
   color: #1e1e1e;
+}
+
+/* Section heading inside the inserter — uppercase pill above each group of
+   blocks/patterns. Reuses .s-lbl typography for color/weight; only adds
+   the uppercase treatment and the slightly different padding. */
+.s-lbl.ins-group-heading {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #757575;
+  padding: 12px 4px 8px;
+}
+
+/* "Pending" / "No results for…" placeholder rows. */
+.s-lbl.ins-empty-note {
+  padding: 16px 4px;
+  color: #757575;
+}
+
+/* Vertical patterns list (single column with breathing room between cards). */
+.ins-pattern-list { padding-top: 12px; }
+
+/* Pattern preview wireframes that previously used inline grid styles. */
+.pattern-preview-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  height: 100%;
+}
+
+.pattern-preview-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3px;
+  height: 100%;
+}
+
+.pattern-preview-gallery-cell {
+  background: #d0d0d0;
+  border-radius: 2px;
 }
 
 /* Split View Layout - Generic reusable pattern for stage + canvas views */

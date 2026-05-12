@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Stack, Text } from '@wordpress/ui';
 import { useAppState } from '../../hooks/useAppState';
 import { pages } from '../../data/mockData';
 import PageRow from '../shared/PageRow';
@@ -97,15 +98,15 @@ function PagesFloatingPanel() {
       className={`pages-fp ${isVisible ? 'show' : ''}`}
       style={{ left: `${position.left}px`, bottom: `${position.bottom}px`, top: 'auto' }}
     >
-      <div className="pages-fp-hd">
-        <span className="pages-fp-title">Pages</span>
+      <Stack direction="row" align="center" className="pages-fp-hd">
+        <Text variant="body-sm" className="pages-fp-title">Pages</Text>
         <button className="pages-fp-add">+</button>
-      </div>
+      </Stack>
       <div className="pages-fp-body">
         {contentPages.map((page) => (
           <PageRow key={page.id} page={page} onClick={handlePageClick} />
         ))}
-        <div className="ps-sys-label">System</div>
+        <Text variant="body-sm" className="ps-sys-label">System</Text>
         {systemPages.map((page) => (
           <PageRow key={page.id} page={page} onClick={handlePageClick} />
         ))}

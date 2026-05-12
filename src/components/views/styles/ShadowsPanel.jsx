@@ -1,4 +1,5 @@
 import { Button } from '@wordpress/components';
+import { Card, Stack, Text } from '@wordpress/ui';
 import { plus } from '@wordpress/icons';
 import StylesPanelHeader from './StylesPanelHeader';
 import { shadowPresets } from '../../../data/mockData';
@@ -14,32 +15,44 @@ function ShadowsPanel() {
     <div className="styles-panel">
       <StylesPanelHeader title="Shadows" />
 
-      <p className="styles-panel-description">
+      <Text variant="body-sm" className="styles-panel-description">
         Manage and create shadow styles for use across the site.
-      </p>
+      </Text>
 
       <div className="styles-panel-section">
-        <div className="styles-panel-section-label">Default</div>
-        <div className="styles-section-card">
+        <Text variant="body-sm" className="styles-panel-section-label">
+          Default
+        </Text>
+        <Card.Root className="styles-section-card">
           {shadowPresets.map((item) => (
-            <div key={item.slug} className="styles-row styles-row-clickable">
-              <span className="styles-row-name">{item.name}</span>
+            <Card.Content
+              key={item.slug}
+              className="styles-row styles-row-clickable"
+            >
+              <Text variant="body-md" className="styles-row-name">
+                {item.name}
+              </Text>
               <span className="styles-row-chevron" aria-hidden="true">›</span>
-            </div>
+            </Card.Content>
           ))}
-        </div>
+        </Card.Root>
       </div>
 
       <div className="styles-panel-section">
-        <div className="styles-panel-section-label">
-          <span>Custom</span>
+        <Stack
+          direction="row"
+          align="center"
+          justify="space-between"
+          className="styles-panel-section-label"
+        >
+          <Text variant="body-sm">Custom</Text>
           <Button
             icon={plus}
             label="Create custom shadow"
             iconSize={18}
             className="styles-panel-section-label-action"
           />
-        </div>
+        </Stack>
       </div>
     </div>
   );

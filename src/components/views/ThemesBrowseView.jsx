@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, SearchControl, TabPanel } from '@wordpress/components';
+import { Card, Stack, Text } from '@wordpress/ui';
 import { upload, settings as settingsIcon } from '@wordpress/icons';
 import { availableThemes } from '../../data/mockData';
 
@@ -22,30 +23,36 @@ function ThemesBrowseView() {
       );
 
     if (filtered.length === 0) {
-      return <div className="themes-empty">No themes match your search.</div>;
+      return (
+        <Text variant="body-md" className="themes-empty">
+          No themes match your search.
+        </Text>
+      );
     }
 
     return (
       <div className="themes-grid">
         {filtered.map((t) => (
-          <div key={t.id} className="pp-card theme-card">
+          <Card.Root key={t.id} className="pp-card theme-card">
             <div
               className="theme-card-thumb"
               style={{ backgroundImage: t.screenshot }}
               role="img"
               aria-label={`${t.name} screenshot`}
             />
-            <div className="pp-card-body">
-              <div className="pp-card-name">{t.name}</div>
-              <div className="theme-card-meta">
-                By {t.author} · ★ {t.rating}
-              </div>
-              <div className="theme-card-actions">
-                <Button variant="primary">Install</Button>
-                <Button variant="secondary">Preview</Button>
-              </div>
-            </div>
-          </div>
+            <Card.Content className="pp-card-body">
+              <Stack direction="column" gap="xs">
+                <Text variant="body-md" className="pp-card-name">{t.name}</Text>
+                <Text variant="body-sm" className="theme-card-meta">
+                  By {t.author} · ★ {t.rating}
+                </Text>
+                <Stack direction="row" wrap gap="sm" className="theme-card-actions">
+                  <Button variant="primary">Install</Button>
+                  <Button variant="secondary">Preview</Button>
+                </Stack>
+              </Stack>
+            </Card.Content>
+          </Card.Root>
         ))}
       </div>
     );
@@ -54,22 +61,29 @@ function ThemesBrowseView() {
   return (
     <div className="preview-body">
       <div className="preview-body-canvas themes-view themes-browse">
-        <div className="themes-browse-toolbar">
+        <Stack
+          direction="row"
+          align="center"
+          justify="space-between"
+          wrap
+          gap="md"
+          className="themes-browse-toolbar"
+        >
           <SearchControl
             __nextHasNoMarginBottom
             value={search}
             onChange={setSearch}
             placeholder="Search themes…"
           />
-          <div className="themes-browse-actions">
+          <Stack direction="row" gap="sm" className="themes-browse-actions">
             <Button variant="tertiary" icon={settingsIcon}>
               Filter
             </Button>
             <Button variant="secondary" icon={upload}>
               Upload Theme
             </Button>
-          </div>
-        </div>
+          </Stack>
+        </Stack>
         <TabPanel
           className="themes-browse-tabs"
           tabs={TABS}

@@ -1,4 +1,5 @@
 import { Button, Tooltip } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import {
   desktop,
   tablet,
@@ -277,8 +278,13 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {} }) {
   };
 
   return (
-    <div className="canvas" style={{ flexDirection: 'column', padding: 0, width: '100%' }}>
-      <div className="preview-bar">
+    <div className="canvas preview-canvas-root">
+      <Stack
+        direction="row"
+        align="center"
+        gap="xs"
+        className="preview-bar"
+      >
         <Button
           variant="primary"
           className="ct-edit"
@@ -288,42 +294,31 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {} }) {
         </Button>
 
         <div className="ct-space"></div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span
-            aria-hidden="true"
-            style={{ display: 'inline-flex', width: 24, height: 24, color: '#1e1e1e' }}
-          >
+
+        <Stack direction="row" align="center" gap="xs" className="preview-bar-doc">
+          <span className="preview-bar-doc-icon" aria-hidden="true">
             {docTypeIcon(page)}
           </span>
-          <span className="ct-btn" style={{ cursor: 'default' }}>{page.name}</span>
+          <Text variant="body-md" className="ct-btn preview-bar-doc-name">
+            {page.name}
+          </Text>
           <Tooltip
             text={page.isLive ? 'Page is live' : 'Page is a draft'}
             placement="bottom"
           >
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 16,
-                height: 16,
-                borderRadius: 2,
-                background: '#fff',
-                flexShrink: 0,
-              }}
-            >
+            <span className="preview-bar-doc-status">
               <span
                 className={`url-dot${page.isLive ? '' : ' url-draft-dot'}`}
-                style={{ margin: 0 }}
                 role="status"
                 aria-label={page.isLive ? 'Page is live' : 'Page is a draft'}
               />
             </span>
           </Tooltip>
-        </div>
+        </Stack>
+
         <div className="ct-space"></div>
 
-        <div className="ct-view-modes">
+        <Stack direction="row" align="center" className="ct-view-modes">
           <Button
             className={`ct-view-btn ${selectedDevice === 'desktop' ? 'active' : ''}`}
             onClick={() => setSelectedDevice('desktop')}
@@ -345,8 +340,8 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {} }) {
             icon={mobile}
             iconSize={20}
           />
-        </div>
-      </div>
+        </Stack>
+      </Stack>
       <div className="preview-canvas-area">
         <div className="site-card">
           {renderContent()}

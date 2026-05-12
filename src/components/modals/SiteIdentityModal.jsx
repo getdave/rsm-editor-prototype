@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Stack, Text } from '@wordpress/ui';
 import { useAppState } from '../../hooks/useAppState';
 
 function SiteIdentityModal() {
@@ -41,12 +42,17 @@ function SiteIdentityModalContent() {
   return (
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-hd">
-          <span className="modal-title">Edit site identity</span>
+        <Stack
+          direction="row"
+          align="center"
+          justify="space-between"
+          className="modal-hd"
+        >
+          <Text variant="heading-md" className="modal-title">Edit site identity</Text>
           <button className="modal-close" onClick={closeSiteIdentityModal}>
             ✕
           </button>
-        </div>
+        </Stack>
         <div className="modal-body">
           <div className="m-field">
             <label className="m-lbl" htmlFor="site-identity-title">Site title</label>
@@ -65,25 +71,31 @@ function SiteIdentityModalContent() {
           </div>
           <div className="m-field">
             <label className="m-lbl">Site logo</label>
-            <div className="m-logo-area">
+            <Stack direction="row" align="center" gap="md" className="m-logo-area">
               <div className="m-logo-preview">
                 <div className="m-logo-placeholder" />
               </div>
-              <div className="m-logo-actions">
+              <Stack direction="column" gap="sm" className="m-logo-actions">
                 <button className="m-logo-btn primary">Upload image</button>
                 <button className="m-logo-btn">Choose from library</button>
-              </div>
-            </div>
+              </Stack>
+            </Stack>
           </div>
         </div>
-        <div className="modal-footer">
+        <Stack
+          direction="row"
+          align="center"
+          justify="flex-end"
+          gap="sm"
+          className="modal-footer"
+        >
           <button className="m-cancel" onClick={handleCancel}>
             Cancel
           </button>
           <button className="m-ok" onClick={handleSave}>
             Save changes
           </button>
-        </div>
+        </Stack>
       </div>
     </div>
   );

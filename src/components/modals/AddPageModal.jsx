@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, DropdownMenu, MenuItem, CheckboxControl, Tooltip, PanelBody, SelectControl } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import { createInterpolateElement } from '@wordpress/element';
 import { chevronDown, plus } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
@@ -146,11 +147,16 @@ function AddPageModalContent() {
   return (
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal-box apm-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-hd">
-          <div>
-            <span className="modal-title">Add a new page</span>
+        <Stack
+          direction="row"
+          align="flex-start"
+          justify="space-between"
+          className="modal-hd"
+        >
+          <Stack direction="column" gap="xs">
+            <Text variant="heading-md" className="modal-title">Add a new page</Text>
             {selectedPath === 'layout' && !selectedLayout && (
-              <p className="modal-subtitle">
+              <Text variant="body-sm" className="modal-subtitle">
                 {createInterpolateElement(
                   'Choose from predefined layouts built using <term>patterns</term> that you can customize.',
                   {
@@ -159,13 +165,13 @@ function AddPageModalContent() {
                     ),
                   },
                 )}
-              </p>
+              </Text>
             )}
-          </div>
+          </Stack>
           <button className="modal-close" onClick={closeAddPageModal}>
             ✕
           </button>
-        </div>
+        </Stack>
 
         <div className="modal-body">
           {!selectedPath ? (
@@ -184,10 +190,10 @@ function AddPageModalContent() {
                       </div>
                     </div>
                   </div>
-                  <div className="apm-option-title">Choose a layout</div>
-                  <div className="apm-option-desc">
+                  <Text variant="body-md" className="apm-option-title">Choose a layout</Text>
+                  <Text variant="body-sm" className="apm-option-desc">
                     Start with a pre-designed page layout
-                  </div>
+                  </Text>
                 </button>
 
                 <button
@@ -197,23 +203,23 @@ function AddPageModalContent() {
                   <div className="apm-option-preview apm-preview-scratch">
                     <div className="apm-preview-icon">{plus}</div>
                   </div>
-                  <div className="apm-option-title">Start from scratch</div>
-                  <div className="apm-option-desc">
+                  <Text variant="body-md" className="apm-option-title">Start from scratch</Text>
+                  <Text variant="body-sm" className="apm-option-desc">
                     Create a blank page and add sections as you go
-                  </div>
+                  </Text>
                 </button>
               </div>
-              
-              <div className="apm-tutorial-hint">
-                Unsure where to start? <a 
-                  href="https://learn.wordpress.org/lesson/setting-up-your-pages-posts-site-logo-and-navigation-menu/" 
-                  target="_blank" 
+
+              <Text variant="body-sm" className="apm-tutorial-hint">
+                Unsure where to start? <a
+                  href="https://learn.wordpress.org/lesson/setting-up-your-pages-posts-site-logo-and-navigation-menu/"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="apm-tutorial-link"
                 >
                   Begin with a tutorial
                 </a>
-              </div>
+              </Text>
             </>
           ) : (
             <>
@@ -340,7 +346,7 @@ function AddPageModalContent() {
                             )}
                           </div>
                           </div>
-                          <div className="apm-layout-name">{layout.name}</div>
+                          <Text variant="body-sm" className="apm-layout-name">{layout.name}</Text>
                         </button>
                       </Tooltip>
                     ))}
@@ -383,9 +389,9 @@ function AddPageModalContent() {
                           checked={showLive}
                           onChange={setShowLive}
                         />
-                        <p className="apm-checkbox-help">
+                        <Text variant="body-sm" className="apm-checkbox-help">
                           Your page will be visible to visitors immediately
-                        </p>
+                        </Text>
                       </div>
                       <div className="apm-checkbox-item">
                         <CheckboxControl
@@ -393,9 +399,9 @@ function AddPageModalContent() {
                           checked={addToMenu}
                           onChange={setAddToMenu}
                         />
-                        <p className="apm-checkbox-help">
+                        <Text variant="body-sm" className="apm-checkbox-help">
                           Include this page in your site's main navigation
-                        </p>
+                        </Text>
                       </div>
                     </div>
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import { closeSmall } from '@wordpress/icons';
 import {
   FOOTER_META,
@@ -18,7 +19,7 @@ function Accordion({ title, children, defaultOpen = false }) {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
       >
-        <span className="ss-acc-title">{title}</span>
+        <Text variant="body-md" className="ss-acc-title">{title}</Text>
         <span className="ss-acc-toggle" aria-hidden>
           {open ? '−' : '+'}
         </span>
@@ -32,29 +33,29 @@ function PageTab({ pageTitle }) {
   return (
     <>
       <Accordion title="Status & visibility" defaultOpen>
-        <div className="ss-field-row">
-          <span className="ss-label">Visibility</span>
-          <span className="ss-value">Public</span>
-        </div>
-        <div className="ss-field-row">
-          <span className="ss-label">Publish</span>
-          <span className="ss-value">Immediately</span>
-        </div>
+        <Stack direction="row" align="center" justify="space-between" className="ss-field-row">
+          <Text variant="body-sm" className="ss-label">Visibility</Text>
+          <Text variant="body-sm" className="ss-value">Public</Text>
+        </Stack>
+        <Stack direction="row" align="center" justify="space-between" className="ss-field-row">
+          <Text variant="body-sm" className="ss-label">Publish</Text>
+          <Text variant="body-sm" className="ss-value">Immediately</Text>
+        </Stack>
       </Accordion>
       <Accordion title="Permalink">
         <div className="ss-placeholder-field">
-          <span className="ss-muted">URL slug</span>
+          <Text variant="body-sm" className="ss-muted">URL slug</Text>
           <div className="ss-fake-input">{pageTitle?.toLowerCase().replace(/\s+/g, '-')}</div>
         </div>
       </Accordion>
       <Accordion title="Template">
-        <p className="ss-muted">Template assignment appears here in the Site Editor.</p>
+        <Text variant="body-sm" className="ss-muted">Template assignment appears here in the Site Editor.</Text>
       </Accordion>
       <Accordion title="Discussion">
-        <div className="ss-field-row">
-          <span className="ss-label">Allow comments</span>
-          <span className="ss-value">Closed</span>
-        </div>
+        <Stack direction="row" align="center" justify="space-between" className="ss-field-row">
+          <Text variant="body-sm" className="ss-label">Allow comments</Text>
+          <Text variant="body-sm" className="ss-value">Closed</Text>
+        </Stack>
       </Accordion>
     </>
   );
@@ -124,7 +125,7 @@ function SectionLayoutAlternatives() {
           <div className="ss-layout-thumb" aria-hidden>
             <Wireframe />
           </div>
-          <span className="ss-layout-title">{title}</span>
+          <Text variant="body-sm" className="ss-layout-title">{title}</Text>
         </button>
       ))}
     </div>
@@ -134,31 +135,31 @@ function SectionLayoutAlternatives() {
 function BlockTab({ icon: Icon, label, description, showLayoutAlternatives }) {
   return (
     <>
-      <div className="ss-block-intro">
+      <Stack direction="row" align="flex-start" gap="sm" className="ss-block-intro">
         <span className="ss-block-icon" aria-hidden>
           {Icon}
         </span>
-        <div>
-          <div className="ss-block-title">{label}</div>
-          <p className="ss-block-desc">{description}</p>
-        </div>
-      </div>
+        <Stack direction="column" gap="xs">
+          <Text variant="body-md" className="ss-block-title">{label}</Text>
+          <Text variant="body-sm" className="ss-block-desc">{description}</Text>
+        </Stack>
+      </Stack>
       {showLayoutAlternatives ? (
         <Accordion title="Layout" defaultOpen>
           <SectionLayoutAlternatives />
         </Accordion>
       ) : null}
       <Accordion title="Color">
-        <p className="ss-muted">Color controls would appear here.</p>
+        <Text variant="body-sm" className="ss-muted">Color controls would appear here.</Text>
       </Accordion>
       <Accordion title="Typography">
-        <p className="ss-muted">Typography options would appear here.</p>
+        <Text variant="body-sm" className="ss-muted">Typography options would appear here.</Text>
       </Accordion>
       <Accordion title="Dimensions">
-        <p className="ss-muted">Spacing and size controls would appear here.</p>
+        <Text variant="body-sm" className="ss-muted">Spacing and size controls would appear here.</Text>
       </Accordion>
       <Accordion title="Advanced">
-        <p className="ss-muted">Additional settings would appear here.</p>
+        <Text variant="body-sm" className="ss-muted">Additional settings would appear here.</Text>
       </Accordion>
     </>
   );
@@ -246,8 +247,8 @@ export default function SettingsSidebar({
       aria-label="Settings"
       aria-hidden={!isOpen}
     >
-      <div className="ss-head">
-        <div className="ss-tabs-strip">
+      <Stack direction="row" align="center" className="ss-head">
+        <Stack direction="row" align="center" className="ss-tabs-strip">
           <button
             type="button"
             className={`ss-tab-strip ${tab === 'page' ? 'active' : ''}`}
@@ -262,9 +263,9 @@ export default function SettingsSidebar({
           >
             {inspectorTabLabel}
           </button>
-        </div>
+        </Stack>
         <Button className="ss-close" label="Close settings" icon={closeSmall} onClick={onClose} />
-      </div>
+      </Stack>
       <div className="ss-body">
         {tab === 'page' && <PageTab pageTitle={pageTitle || 'Untitled'} />}
         {tab === 'block' && (

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Text } from '@wordpress/ui';
 import StylesPanelHeader from './StylesPanelHeader';
 import {
   styleVariations,
@@ -74,9 +75,9 @@ function VariationsPanel() {
     <div className="styles-panel">
       <StylesPanelHeader subtitle="Browse styles" />
 
-      <p className="styles-panel-description">
+      <Text variant="body-sm" className="styles-panel-description">
         Choose a variation to change the look of the site.
-      </p>
+      </Text>
 
       <div className="styles-variation-grid">
         {styleVariations.map((v) => (
@@ -90,7 +91,9 @@ function VariationsPanel() {
       </div>
 
       <div className="styles-panel-section">
-        <div className="styles-panel-section-label">Color variations</div>
+        <Text variant="body-sm" className="styles-panel-section-label">
+          Color variations
+        </Text>
         <div className="styles-color-grid">
           {colorVariations.map((p) => (
             <ColorPaletteTile
@@ -104,7 +107,9 @@ function VariationsPanel() {
       </div>
 
       <div className="styles-panel-section">
-        <div className="styles-panel-section-label">Typography</div>
+        <Text variant="body-sm" className="styles-panel-section-label">
+          Typography
+        </Text>
         <div className="styles-typo-grid">
           {typographyVariations.map((t) => (
             <button

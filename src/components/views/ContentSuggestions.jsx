@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@wordpress/components';
+import { Card, Stack, Text } from '@wordpress/ui';
 
 const SUGGESTIONS = [
   { id: 'first-post', title: 'Create your first post' },
@@ -15,21 +16,34 @@ function ContentSuggestions() {
 
   return (
     <section className={`cs-area ${expanded ? '' : 'collapsed'}`}>
-      <div className="cs-head">
-        <span className="cs-title">Learn the basics</span>
-        <div className="cs-actions">
+      <Stack
+        direction="row"
+        align="center"
+        justify="space-between"
+        className="cs-head"
+      >
+        <Text variant="body-md" className="cs-title">
+          Learn the basics
+        </Text>
+        <Stack direction="row" align="center" gap="md" className="cs-actions">
           <Button variant="link" className="cs-action" onClick={() => setExpanded(v => !v)}>
             {expanded ? 'Hide' : 'Show'}
           </Button>
           <Button variant="link" className="cs-action" onClick={() => setDismissed(true)}>
             Dismiss
           </Button>
-        </div>
-      </div>
+        </Stack>
+      </Stack>
       {expanded && (
         <div className="cs-banners">
           {SUGGESTIONS.map(s => (
-            <div key={s.id} className="cs-banner">{s.title}</div>
+            <Card.Root key={s.id} className="cs-banner">
+              <Card.Content className="cs-banner-content">
+                <Text variant="body-md" className="cs-banner-title">
+                  {s.title}
+                </Text>
+              </Card.Content>
+            </Card.Root>
           ))}
         </div>
       )}

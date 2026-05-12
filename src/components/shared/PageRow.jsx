@@ -1,4 +1,5 @@
 import { home, page as pageIcon, postList } from '@wordpress/icons';
+import { Stack, Text } from '@wordpress/ui';
 import LiveBadge from './LiveBadge';
 
 function PageRow({ page: pageData, onClick }) {
@@ -18,17 +19,20 @@ function PageRow({ page: pageData, onClick }) {
           <span className="pp-posts-page-overlay">Posts page</span>
         ) : null}
       </span>
-      <span className={`pi-name ${pageData.isSystem ? 'sys' : ''}`}>
+      <Text
+        variant="body-sm"
+        className={`pi-name ${pageData.isSystem ? 'sys' : ''}`}
+      >
         {pageData.name}
-      </span>
-      <div className="pi-badges">
+      </Text>
+      <Stack direction="row" align="center" className="pi-badges">
         {pageData.isLive && !pageData.isSystem && <LiveBadge />}
         {!pageData.isLive && <span className="pb pb-draft">Draft</span>}
         {pageData.inMenu && <span className="pb pb-nav">Main Menu</span>}
         {pageData.badge === 'WordPress' && <span className="pb pb-wp">WordPress</span>}
         {pageData.badge === 'Theme' && <span className="pb pb-theme">Theme</span>}
         {pageData.badge === 'WooCommerce' && <span className="pb pb-woo">WooCommerce</span>}
-      </div>
+      </Stack>
     </div>
   );
 }

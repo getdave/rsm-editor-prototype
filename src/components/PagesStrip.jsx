@@ -1,10 +1,11 @@
+import { Stack, Text } from '@wordpress/ui';
 import { useAppState } from '../hooks/useAppState';
 import { pages } from '../data/mockData';
 import PageRow from './shared/PageRow';
 
 function PagesStrip() {
   const { setCurrentPage } = useAppState();
-  
+
   const contentPages = pages.filter(p => !p.isSystem);
 
   const handlePageClick = (page) => {
@@ -13,10 +14,10 @@ function PagesStrip() {
 
   return (
     <div className="pages-strip">
-      <div className="ps-hd">
-        <span className="ps-title">Pages</span>
+      <Stack direction="row" align="center" className="ps-hd">
+        <Text variant="body-sm" className="ps-title">Pages</Text>
         <button className="ps-add">+</button>
-      </div>
+      </Stack>
       <div className="ps-list">
         {contentPages.map((page) => (
           <PageRow key={page.id} page={page} onClick={handlePageClick} />

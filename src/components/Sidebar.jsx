@@ -2,6 +2,7 @@ import { Fragment, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppState } from '../hooks/useAppState';
 import { Tooltip } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import {
   home,
   page as pageIcon,
@@ -95,17 +96,17 @@ function Sidebar() {
         <Tooltip text={item.tip} placement="right">
           <div className="ni" onClick={() => navigate(item.path)}>
             <span className="ni-ico">{item.icon}</span>
-            <span className="ni-label">{item.label}</span>
+            <Text variant="body-md" className="ni-label">{item.label}</Text>
           </div>
         </Tooltip>
       );
     }
     if (item.kind === 'header') {
       return (
-        <div className="ni-section-header">
-          <h2 className="ni-section-title">{item.title}</h2>
-          <p className="ni-section-desc">{item.description}</p>
-        </div>
+        <Stack direction="column" gap="xs" className="ni-section-header">
+          <Text variant="heading-lg" className="ni-section-title">{item.title}</Text>
+          <Text variant="body-sm" className="ni-section-desc">{item.description}</Text>
+        </Stack>
       );
     }
     if (item.kind === 'item') {
@@ -116,7 +117,7 @@ function Sidebar() {
           <Tooltip text={item.tip} placement="right">
             <a href={item.href} className="ni ni-child">
               <span className="ni-ico">{item.icon}</span>
-              <span className="ni-label">{item.label}</span>
+              <Text variant="body-md" className="ni-label">{item.label}</Text>
             </a>
           </Tooltip>
         );
@@ -128,7 +129,7 @@ function Sidebar() {
             onClick={() => navigate(item.path)}
           >
             <span className="ni-ico">{item.icon}</span>
-            <span className="ni-label">{item.label}</span>
+            <Text variant="body-md" className="ni-label">{item.label}</Text>
             {item.chevron && <span className="ni-chevron">{chevronRight}</span>}
           </div>
         </Tooltip>
@@ -152,7 +153,7 @@ function Sidebar() {
           onClick={handleClick}
         >
           <span className="ni-ico" aria-hidden="true">{connector}</span>
-          <span className="ni-label">{item.label}</span>
+          <Text variant="body-md" className="ni-label">{item.label}</Text>
         </a>
       );
     }
@@ -161,7 +162,7 @@ function Sidebar() {
       const parent = item.items.find((c) => c.kind === 'group-parent');
       const children = item.items.filter((c) => c.kind !== 'group-parent');
       return (
-        <div className="ni-group">
+        <Stack direction="column" className="ni-group">
           {parent && (
             <Tooltip text={parent.tip} placement="right">
               <div
@@ -171,7 +172,7 @@ function Sidebar() {
                 aria-expanded={!isCollapsed}
               >
                 <span className="ni-ico">{parent.icon}</span>
-                <span className="ni-label">{parent.label}</span>
+                <Text variant="body-md" className="ni-label">{parent.label}</Text>
                 <span className="ni-chevron">
                   {isCollapsed ? chevronDown : chevronUp}
                 </span>
@@ -182,7 +183,7 @@ function Sidebar() {
             children.map((child) => (
               <Fragment key={child.id}>{renderItem(child)}</Fragment>
             ))}
-        </div>
+        </Stack>
       );
     }
     return null;
@@ -194,7 +195,6 @@ function Sidebar() {
   // / .admin-root-nav / .ni / .sb-customize classes.
   if (isEditCanvas) {
     const isCollapsed = sidebarCollapsed && !menuExpanded;
-    const sectionDivider = '1px solid #2a2a2a';
     return (
       <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
         {/* Section 1 — 64px-tall row that aligns with .canvas-toolbar.
@@ -202,14 +202,7 @@ function Sidebar() {
             Expanded: a .ni-styled "Hide menu" action that mirrors the
             other root-nav items (icon + label) and collapses the menu. */}
         {menuExpanded ? (
-          <nav
-            className="admin-root-nav"
-            style={{
-              flex: '0 0 64px',
-              justifyContent: 'center',
-              borderBottom: sectionDivider,
-            }}
-          >
+          <nav className="admin-root-nav editor-sidebar-section editor-sidebar-toggle-row">
             <Tooltip text="Hide menu" placement="right">
               <div
                 className="ni"
@@ -224,26 +217,16 @@ function Sidebar() {
                 }}
               >
                 <span className="ni-ico">{chevronLeft}</span>
-                <span className="ni-label">Hide menu</span>
+                <Text variant="body-md" className="ni-label">Hide menu</Text>
               </div>
             </Tooltip>
           </nav>
         ) : (
-          <div
-            className="sidebar-bottom"
-            style={{
-              display: 'flex',
-              height: 64,
-              flex: '0 0 64px',
-              marginTop: 0,
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: 48,
-              alignSelf: 'flex-start',
-              borderTop: 'none',
-              borderBottom: sectionDivider,
-              padding: 0,
-            }}
+          <Stack
+            direction="row"
+            align="center"
+            justify="center"
+            className="sidebar-bottom editor-sidebar-section editor-sidebar-hamburger"
           >
             <Tooltip text="Expand menu" placement="right">
               <button
@@ -256,14 +239,11 @@ function Sidebar() {
                 {menu}
               </button>
             </Tooltip>
-          </div>
+          </Stack>
         )}
 
         {/* Section 2 — root nav icons. */}
-        <nav
-          className="admin-root-nav"
-          style={{ flex: '0 0 auto', borderBottom: sectionDivider }}
-        >
+        <nav className="admin-root-nav editor-sidebar-section editor-sidebar-root-nav">
           {ADMIN_NAV_ITEMS.map((item) => (
             <Tooltip key={item.id} text={item.tip} placement="right">
               <div
@@ -271,7 +251,7 @@ function Sidebar() {
                 onClick={() => navigateSmooth(item.path)}
               >
                 <span className="ni-ico">{item.icon}</span>
-                <span className="ni-label">{item.label}</span>
+                <Text variant="body-md" className="ni-label">{item.label}</Text>
               </div>
             </Tooltip>
           ))}
@@ -281,17 +261,14 @@ function Sidebar() {
             doesn't wrap awkwardly inside the 48px strip. Reuses the same
             uppercase MenuGroup heading style as the Exit popover. */}
         {!isCollapsed && (
-          <div
-            className="components-menu-group__label"
-            style={{ padding: '12px 12px 4px' }}
+          <Text
+            variant="body-sm"
+            className="components-menu-group__label editor-sidebar-recent-heading"
           >
             Recent documents
-          </div>
+          </Text>
         )}
-        <nav
-          className="admin-root-nav"
-          style={{ flex: '1 0 0', overflowY: 'auto' }}
-        >
+        <nav className="admin-root-nav editor-sidebar-recent-list">
           {recentPages.map((p) => (
             <Tooltip key={p.id} text={p.name} placement="right">
               <div
@@ -302,7 +279,7 @@ function Sidebar() {
                 }}
               >
                 <span className="ni-ico">{pageIcon}</span>
-                <span className="ni-label">{p.name}</span>
+                <Text variant="body-md" className="ni-label">{p.name}</Text>
               </div>
             </Tooltip>
           ))}
@@ -331,11 +308,19 @@ function Sidebar() {
       </div>
 
       {/* Dashboard link + sidebar customization. Hidden in the design section. */}
-      <div className="sidebar-bottom">
+      <Stack
+        direction="row"
+        align="center"
+        justify="space-between"
+        gap="sm"
+        className="sidebar-bottom"
+      >
         <Tooltip text="Return to WordPress dashboard" placement="top">
           <button type="button" className="sb-dashboard">
-            <span className="sb-dashboard-ico" aria-hidden="true">{wordpress}</span>
-            <span className="sb-dashboard-label">Dashboard</span>
+            <Stack direction="row" align="center" gap="sm">
+              <span className="sb-dashboard-ico" aria-hidden="true">{wordpress}</span>
+              <Text variant="body-md" className="sb-dashboard-label">Dashboard</Text>
+            </Stack>
           </button>
         </Tooltip>
         <Tooltip text="Customize navigation" placement="top">
@@ -347,7 +332,7 @@ function Sidebar() {
             {settings}
           </button>
         </Tooltip>
-      </div>
+      </Stack>
     </div>
   );
 }

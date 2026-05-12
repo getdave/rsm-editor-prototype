@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import { DataForm } from '@wordpress/dataviews';
 import { close } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
@@ -213,15 +214,20 @@ function SettingsModalContent() {
         aria-label="Settings"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="settings-modal-hd">
-          <h2 className="settings-modal-title">Settings</h2>
+        <Stack
+          direction="row"
+          align="center"
+          justify="space-between"
+          className="settings-modal-hd"
+        >
+          <Text variant="heading-md" className="settings-modal-title">Settings</Text>
           <Button
             icon={close}
             label="Close"
             onClick={closeSettingsModal}
             className="settings-modal-close"
           />
-        </div>
+        </Stack>
         <div className="settings-modal-body">
           <nav className="settings-tabs" aria-label="Settings sections">
             {TABS.map((tab) => (
@@ -245,18 +251,24 @@ function SettingsModalContent() {
                   form={generalForm}
                   onChange={handleFormChange}
                 />
-                <div className="settings-form-actions">
+                <Stack
+                  direction="row"
+                  align="center"
+                  justify="flex-end"
+                  gap="sm"
+                  className="settings-form-actions"
+                >
                   <Button variant="tertiary" onClick={closeSettingsModal}>
                     Cancel
                   </Button>
                   <Button variant="primary" onClick={handleSave}>
                     Save changes
                   </Button>
-                </div>
+                </Stack>
               </div>
             ) : (
               <div className="settings-pane-placeholder">
-                <p>{TABS.find((t) => t.id === activeTab)?.label} settings coming soon.</p>
+                <Text variant="body-md">{TABS.find((t) => t.id === activeTab)?.label} settings coming soon.</Text>
               </div>
             )}
           </div>

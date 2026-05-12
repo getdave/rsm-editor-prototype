@@ -8,7 +8,7 @@ import {
   ToggleControl,
   Tooltip,
 } from "@wordpress/components";
-import { VisuallyHidden } from "@wordpress/ui";
+import { Stack, Text, VisuallyHidden } from "@wordpress/ui";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
 import { createInterpolateElement } from "@wordpress/element";
 import {
@@ -235,10 +235,15 @@ function ConfigureHomepageReadingModal({
       className="modal-box ch-reading-modal"
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="modal-hd">
-        <span id="configure-homepage-modal-title" className="modal-title">
+      <Stack
+        direction="row"
+        align="center"
+        justify="space-between"
+        className="modal-hd"
+      >
+        <Text id="configure-homepage-modal-title" variant="heading-md" className="modal-title">
           Configure site homepage
-        </span>
+        </Text>
         <button
           type="button"
           className="modal-close"
@@ -247,11 +252,11 @@ function ConfigureHomepageReadingModal({
         >
           ×
         </button>
-      </div>
+      </Stack>
       <div className="modal-body ch-reading-body">
-        <p className="ch-reading-intro">
+        <Text variant="body-sm" className="ch-reading-intro">
           Controls what visitors see at your site&apos;s main address (https://example.com).
-        </p>
+        </Text>
 
         <RadioControl
           className="ch-reading-radio"
@@ -291,9 +296,9 @@ function ConfigureHomepageReadingModal({
                 onChange={handleHomepageSelect}
               />
               {homepageWarning ? (
-                <p className="ch-reading-field-warning" role="note">
+                <Text variant="body-sm" className="ch-reading-field-warning" role="note">
                   {homepageWarning}
-                </p>
+                </Text>
               ) : null}
             </div>
             <div className="ch-reading-field">
@@ -327,22 +332,28 @@ function ConfigureHomepageReadingModal({
                 onChange={(v) => setPostsPageIdDraft(v || "")}
               />
               {postsPageWarning ? (
-                <p className="ch-reading-field-warning" role="note">
+                <Text variant="body-sm" className="ch-reading-field-warning" role="note">
                   {postsPageWarning}
-                </p>
+                </Text>
               ) : null}
             </div>
           </div>
         )}
       </div>
-      <div className="modal-footer ch-reading-footer">
+      <Stack
+        direction="row"
+        align="center"
+        justify="flex-end"
+        gap="sm"
+        className="modal-footer ch-reading-footer"
+      >
         <Button variant="tertiary" onClick={onClose}>
           Cancel
         </Button>
         <Button variant="primary" onClick={handleDone}>
           Done
         </Button>
-      </div>
+      </Stack>
     </div>
   );
 }
@@ -354,7 +365,7 @@ function AddNewCard() {
         <span className="pp-card-icon pp-card-icon-add">{plus}</span>
       </div>
       <div className="pp-card-body">
-        <div className="pp-card-name">Add new</div>
+        <Text variant="body-md" className="pp-card-name">Add new</Text>
       </div>
     </div>
   );
@@ -520,7 +531,7 @@ function PagesView() {
               >
                 {docIcon}
               </span>
-              <span className="pp-title-cell-name">{item.name}</span>
+              <Text variant="body-md" className="pp-title-cell-name">{item.name}</Text>
               <span
                 className={`url-dot${isLive ? "" : " url-draft-dot"}`}
                 role="status"
