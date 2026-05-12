@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { Button } from '@wordpress/components';
@@ -29,6 +29,8 @@ import {
   HEADER_META,
   TEMPLATE_ROOT_META,
 } from '../../utils/editCanvasBlockMeta';
+import { PreviewSiteNavCluster } from '../shared/PreviewSiteChrome';
+import { pages } from '../../data/mockData';
 
 /** Below this block height (px), both inserters show on hover — avoids flicker on short sections. */
 const INSERTER_SPLIT_MIN_HEIGHT_PX = 88;
@@ -156,6 +158,11 @@ function EditingView() {
 
   // Get page-specific content for editing
   const content = getEditModeContent(currentPage);
+
+  const editNavEntries = useMemo(
+    () => pages.filter((p) => p.inMenu).map((p) => ({ key: p.id, label: p.name, page: p })),
+    [],
+  );
 
   useEffect(() => {
     setSelectedBlockId(content.isTemplate ? 'template' : 'section-0');
@@ -592,30 +599,11 @@ function EditingView() {
               onClick={() => setSelectedBlockId('header')}
             >
               {selectedBlockId === 'header' && renderBlockToolbar(HEADER_META)}
-              <span className="p-sitename">{siteTitle}</span>
-              <div className="p-nav">
-                <a
-                  href="#"
-                  style={{
-                    color: 'rgba(255,255,255,.6)',
-                    fontSize: '11px',
-                    textDecoration: 'none',
-                  }}
-                >
-                  Home
-                </a>
-                <a
-                  href="#"
-                  style={{
-                    color: 'rgba(255,255,255,.6)',
-                    fontSize: '11px',
-                    textDecoration: 'none',
-                    marginLeft: '14px',
-                  }}
-                >
-                  About
-                </a>
-              </div>
+              <PreviewSiteNavCluster
+                siteTitle={siteTitle}
+                navEntries={editNavEntries}
+                onNavClick={() => {}}
+              />
               <div className="g-badge">⟳ Global — Header</div>
             </div>
 
