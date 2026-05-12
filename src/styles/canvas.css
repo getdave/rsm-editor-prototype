@@ -199,11 +199,8 @@
 .doc-actions-name.is-editing { cursor: text; }
 .doc-actions-name-text { outline: none; }
 
-.preview-canvas-area {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+.preview-canvas-area,
+.edit-canvas-area {
   padding: 0;
   display: flex;
   justify-content: stretch;
@@ -220,11 +217,27 @@
     inset -1px 0 0 rgba(0, 0, 0, 0.04);
 }
 
+.preview-canvas-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.edit-canvas-area {
+  flex: 1 1 auto;
+  width: 100%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
 /* Front-of-site fills the viewport width; shallow lift separates from staging fill */
-.preview-canvas-area .site-card {
+.preview-canvas-area .site-card,
+.edit-canvas-area .edit-card {
   flex: 1 1 auto;
   width: 100%;
   min-height: 100%;
+  border-radius: 8px;
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.07),
     0 8px 28px rgba(0, 0, 0, 0.1);
@@ -467,21 +480,21 @@
 .edit-scroll {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   overflow-y: auto;
-  /* Extra top padding so floating block toolbars above the first block aren’t clipped */
-  padding: 48px 16px 16px 16px;
+  padding: 0 0 16px;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
 }
 
 .edit-card {
   width: 100%;
   max-width: 100%;
   background: #fff;
-  border-radius: 3px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
+  /* border-radius / box-shadow: match `.preview-canvas-area .site-card` via grouped rule */
+  overflow: visible;
   box-sizing: border-box;
   transition: max-width 0.2s ease;
 }
@@ -558,6 +571,7 @@
   bottom: 100%;
   left: 0;
   margin-bottom: 10px;
+  top: auto;
   display: none;
   align-items: stretch;
   flex-wrap: wrap;
@@ -569,6 +583,14 @@
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   z-index: 30;
+}
+
+/* When floating above would clip the canvas top, open below the block */
+.sec-bar.block-toolbar.block-toolbar--flip-below {
+  top: 100%;
+  bottom: auto;
+  margin-top: 10px;
+  margin-bottom: 0;
 }
 
 .sec-bar.block-toolbar > .bt-pill,
