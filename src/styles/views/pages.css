@@ -24,6 +24,9 @@
 
 /* Raised list frames — match areas.svg */
 .pages-panel .split-view-stage {
+  flex: 0 0 380px;
+  width: 380px;
+  min-width: 380px;
   border-right: none;
   background: var(--wp-page-area-surface, #fff);
   border-radius: var(--wp-page-area-radius, 8px);

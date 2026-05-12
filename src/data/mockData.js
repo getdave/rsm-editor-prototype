@@ -681,7 +681,6 @@ export const navigationMenus = [
   {
     id: "main-menu",
     name: "Main menu",
-    isPrimary: true,
     items: [
       {
         id: "nav-1",
@@ -721,6 +720,6 @@ export const navigationMenus = [
         children: [],
       },
     ],
-    usedIn: ["header-main", "header-promo"],
+    usedIn: ["header-main"],
   },
 ];

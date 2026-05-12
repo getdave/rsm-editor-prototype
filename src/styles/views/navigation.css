@@ -22,6 +22,9 @@
 }
 
 .nav-panel .split-view-stage {
+  flex: 0 0 380px;
+  width: 380px;
+  min-width: 380px;
   border-right: none;
   background: var(--wp-page-area-surface, #fff);
   border-radius: var(--wp-page-area-radius, 8px);
@@ -243,18 +246,6 @@
 }
 
 /* DataViews cells */
-.nav-menu-badge {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 8px;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 600;
-  background: rgba(56, 88, 233, 0.12);
-  color: #3858e9;
-}
-
 .nav-dv-locations {
   color: #505050;
   font-size: 13px;
