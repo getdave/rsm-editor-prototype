@@ -20,7 +20,6 @@ import { useAppState } from '../../hooks/useAppState';
 import RenameMenuItemModal from './RenameMenuItemModal';
 import DeleteMenuItemConfirmModal from '../modals/DeleteMenuItemConfirmModal';
 import AddLinkPopover from './AddLinkPopover';
-import AddBlockPopover from './AddBlockPopover';
 import CreatePagePopover from './CreatePagePopover';
 
 function slugify(text) {
@@ -332,12 +331,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
                   >
                     Add Link
                   </MenuItem>
-                  <MenuItem
-                    icon={plus}
-                    onClick={() => setInserterView('add-block')}
-                  >
-                    Add Block
-                  </MenuItem>
                 </MenuGroup>
                 <MenuGroup>
                   <MenuItem
@@ -362,12 +355,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
                   showSnackbar(`Added "${linkLabel}" to the menu`);
                   closeInserter();
                 }}
-              />
-            ) : null}
-            {inserterView === 'add-block' ? (
-              <AddBlockPopover
-                onBack={() => setInserterView('menu')}
-                onClose={closeInserter}
               />
             ) : null}
             {inserterView === 'create-page' ? (
