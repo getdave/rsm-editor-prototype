@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { Button } from '@wordpress/components';
+import { Tooltip, Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
 import { Page } from '@wordpress/admin-ui';
 import { navigationMenus as initialMenus, pages } from '../../data/mockData';
+import { useAppState } from '../../hooks/useAppState';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import MenuEditor from '../navigation/MenuEditor';
 import AddMenuModal from '../navigation/AddMenuModal';
@@ -20,6 +21,8 @@ function NavigationView() {
   const [previewPage, setPreviewPage] = useState(
     () => pages.find((p) => p.isFrontPage) || pages[0],
   );
+  const { sidebarCollapsed, toggleSidebar } = useAppState();
+
   const [view, setView] = useState({
     type: 'list',
     search: '',
@@ -45,6 +48,17 @@ function NavigationView() {
       ? menus.find((menu) => menu.id === resolvedMenuId)
       : null;
 
+  // Auto-collapse sidebar when drilling into a menu; restore when back at list.
+  // Depends only on resolvedMenuId so toggling the sidebar manually on those routes does not fight this effect.
+  useEffect(() => {
+    if (resolvedMenuId && !sidebarCollapsed) {
+      toggleSidebar();
+    } else if (!resolvedMenuId && sidebarCollapsed) {
+      toggleSidebar();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional resolvedMenuId-only coupling (see above)
+  }, [resolvedMenuId]);
+
   const updateMenu = (menuId, updates) => {
     setMenus(prev => prev.map(menu =>
       menu.id === menuId ? { ...menu, ...updates } : menu
@@ -55,6 +69,7 @@ function NavigationView() {
     const newMenu = {
       id: `menu-${Date.now()}`,
       name: menuName,
+      isPrimary: false,
       items: [],
       usedIn: [],
     };
@@ -77,7 +92,16 @@ function NavigationView() {
         id: 'name',
         header: 'Menu name',
         getValue: ({ item }) => item.name,
-        render: ({ item }) => <span>{item.name}</span>,
+        render: ({ item }) => (
+          <span>
+            {item.name}
+            {item.isPrimary && (
+              <Tooltip text="The menu that is currently assigned to the Header template part">
+                <span className="nav-menu-badge">Primary</span>
+              </Tooltip>
+            )}
+          </span>
+        ),
         enableSorting: true,
         enableGlobalSearch: false,
       },
@@ -131,14 +155,15 @@ function NavigationView() {
   /** Top-level menu rows only — matches editor order and labels; drives preview header nav. */
   const previewHeaderNavItems = useMemo(() => {
     const menuForPreview =
-      selectedMenu ?? menus[0];
+      selectedMenu ?? menus.find((m) => m.isPrimary) ?? menus[0];
     if (!menuForPreview?.items?.length) {
       return [];
     }
     return menuForPreview.items.map((item) => ({
       id: item.id,
       label: item.label,
-      pageId: item.pageId,
+      ...(item.pageId != null ? { pageId: item.pageId } : {}),
+      ...(item.url != null ? { url: item.url } : {}),
     }));
   }, [selectedMenu, menus]);
 

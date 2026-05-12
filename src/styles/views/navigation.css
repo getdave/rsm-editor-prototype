@@ -22,9 +22,6 @@
 }
 
 .nav-panel .split-view-stage {
-  flex: 0 0 380px;
-  width: 380px;
-  min-width: 380px;
   border-right: none;
   background: var(--wp-page-area-surface, #fff);
   border-radius: var(--wp-page-area-radius, 8px);
@@ -246,6 +243,18 @@
 }
 
 /* DataViews cells */
+.nav-menu-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(56, 88, 233, 0.12);
+  color: #3858e9;
+}
+
 .nav-dv-locations {
   color: #505050;
   font-size: 13px;
@@ -411,31 +420,239 @@
   color: #949494;
 }
 
-/* Floating add (+) below menu items */
-.nav-add-page-btn {
+/* Quick inserter (DropdownMenu) below menu items — WordPress block inserter style.
+ * Wrapper must shrink-wrap the toggle: Dropdown anchors Popover to this outer div;
+ * full-width flex was stretching the anchor past the + button. */
+.nav-add-item-dropdown {
+  display: inline-flex;
+  align-self: flex-start;
+  justify-content: flex-start;
+  margin: 12px 0 0 12px;
+  width: fit-content;
+}
+
+.nav-add-item-dropdown .components-button.nav-add-page-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  margin: 12px auto 0;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  margin: 0;
   padding: 0;
-  border: 1px dashed #c0c0c0;
-  border-radius: 50%;
-  background: #fafafa;
-  color: #3858e9;
+  border: none;
+  border-radius: 2px;
+  background: #1e1e1e;
+  color: #ffffff;
   cursor: pointer;
-  transition: border-color 0.12s, background 0.12s;
+  transition: background 0.12s;
 }
 
-.nav-add-page-btn:hover {
-  border-color: #3858e9;
-  background: #f0f4ff;
+.nav-add-item-dropdown .components-button.nav-add-page-btn:hover {
+  background: #000000;
 }
 
-.nav-add-page-btn svg {
+.nav-add-item-dropdown .components-button.nav-add-page-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.nav-add-item-dropdown .components-button.nav-add-page-btn:focus:not(:disabled) {
+  box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) var(--wp-admin-theme-color, #3858e9);
+}
+
+/* Quick inserter: multi-step popover (menu → add link / create page) */
+.nav-inserter-popover-shell {
+  min-width: 320px;
+  max-width: 360px;
+  box-sizing: border-box;
+}
+
+/* Override WordPress Popover default padding */
+.nav-inserter-popover-shell .components-popover__content {
+  padding: 0;
+}
+
+/* Menu selection screen */
+.nav-inserter-menu {
+  padding: 0 8px;
+}
+
+.nav-inserter-menu-header {
+  padding: 12px 8px 8px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #757575;
+}
+
+.nav-inserter-menu .components-menu-group {
+  margin: 0;
+  padding: 8px 0;
+}
+
+.nav-inserter-menu .components-menu-group + .components-menu-group {
+  border-top: 1px solid #ddd;
+}
+
+.nav-inserter-menu .components-menu-item__button {
+  width: 100%;
+  padding: 8px;
+  border-radius: 2px;
+}
+
+/* Form screens (add link / create page) */
+.nav-popover-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.nav-popover-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--wp-admin-theme-color, #3858e9);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-popover-back:hover {
+  color: #2145e6;
+  text-decoration: underline;
+}
+
+.nav-popover-back__icon {
+  display: inline-flex;
   width: 18px;
   height: 18px;
+}
+
+.nav-popover-back__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.nav-inserter-popover .nav-popover-body {
+  padding: 16px;
+}
+
+.nav-popover-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #ddd;
+  background: #fff;
+}
+
+/* URL field type icon (used as prefix in TextControl) */
+.nav-add-link-type-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  color: #757575;
+}
+
+.nav-add-link-type-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* URL field invalid — WordPress isURL + normalize failures */
+.nav-add-link-url-field--error .components-text-control__input {
+  border-color: #cc1818;
+  background-color: #fcf0f0;
+}
+
+.nav-add-link-url-field--error .components-text-control__input:focus {
+  border-color: #cc1818;
+  box-shadow: 0 0 0 1px #cc1818;
+}
+
+/* Suspicious URL warning notice */
+.nav-add-link-warning.components-notice {
+  margin: 0;
+}
+
+.nav-add-link-warning .components-notice__content {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.nav-create-page-help {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #757575;
+}
+
+/* Add Block popover — mock inserter (block grid like core inserter) */
+.nav-block-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.nav-block-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 96px;
+  padding: 16px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 400;
+  text-align: center;
+  line-height: 1.3;
+  color: #1e1e1e;
+  cursor: pointer;
+  transition:
+    background 0.1s ease,
+    border-color 0.1s ease;
+}
+
+.nav-block-item:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.nav-block-item:focus-visible {
+  outline: 2px solid var(--wp-admin-theme-color, #3858e9);
+  outline-offset: 2px;
+}
+
+.nav-block-item__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  color: #1e1e1e;
+}
+
+.nav-block-item__icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.nav-block-item__title {
+  font-weight: 400;
+  color: #1e1e1e;
 }
 
 /* Page picker overlay */

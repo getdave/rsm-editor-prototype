@@ -1,5 +1,4 @@
 import { Button, Tooltip } from '@wordpress/components';
-import { Stack, Text } from '@wordpress/ui';
 import {
   desktop,
   tablet,
@@ -10,7 +9,6 @@ import {
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { getPageContent } from '../../services/pageContentService';
-import { pages } from '../../data/mockData';
 
 function docTypeIcon(p) {
   if (p?.isFrontPage) return home;
@@ -19,7 +17,7 @@ function docTypeIcon(p) {
 }
 
 /**
- * @typedef {{ id: string, label: string, pageId: string }} HeaderNavItem
+ * @typedef {{ id: string, label: string, pageId?: string, url?: string }} HeaderNavItem
  */
 
 /**
@@ -38,27 +36,48 @@ function docTypeIcon(p) {
  * @param {object} page - The page/item to preview
  * @param {function} onEdit - Callback when Edit button is clicked
  * @param {function} onPageChange - Callback when a nav link is clicked; parent decides what switching page means
- * @param {HeaderNavItem[]|null|undefined} headerNavItems - Optional top-level nav links (label + pageId order). When omitted, uses pages with `inMenu`.
+ * @param {HeaderNavItem[]|null|undefined} headerNavItems - Optional top-level nav links (pageId or custom url order). When omitted, uses pages with `inMenu`.
  */
 function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }) {
-  const { selectedDevice, setSelectedDevice, siteTitle } = useAppState();
-  
+  const { selectedDevice, setSelectedDevice, siteTitle, pages } = useAppState();
+
   // Get WordPress-appropriate content for this page
   const content = getPageContent(page);
-  
+
   const fallbackMenuPages = pages.filter((p) => p.inMenu);
 
   const navEntries =
     headerNavItems !== undefined
       ? headerNavItems
           .map((item) => {
-            const targetPage = pages.find((p) => p.id === item.pageId);
-            return targetPage
-              ? { key: item.id, label: item.label, page: targetPage }
-              : null;
+            if (item.pageId) {
+              const targetPage = pages.find((p) => p.id === item.pageId);
+              return targetPage
+                ? {
+                    kind: 'page',
+                    key: item.id,
+                    label: item.label,
+                    page: targetPage,
+                  }
+                : null;
+            }
+            if (item.url) {
+              return {
+                kind: 'url',
+                key: item.id,
+                label: item.label,
+                href: item.url,
+              };
+            }
+            return null;
           })
           .filter(Boolean)
-      : fallbackMenuPages.map((p) => ({ key: p.id, label: p.name, page: p }));
+      : fallbackMenuPages.map((p) => ({
+          kind: 'page',
+          key: p.id,
+          label: p.name,
+          page: p,
+        }));
   
   const handleNavClick = (clickedPage) => {
     onPageChange(clickedPage);
@@ -76,9 +95,12 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
             <a
               key={entry.key}
               href="#"
+              title={entry.kind === 'url' ? entry.href : undefined}
               onClick={(e) => {
                 e.preventDefault();
-                handleNavClick(entry.page);
+                if (entry.kind === 'page') {
+                  handleNavClick(entry.page);
+                }
               }}
             >
               {entry.label}
@@ -294,13 +316,8 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
   };
 
   return (
-    <div className="canvas preview-canvas-root">
-      <Stack
-        direction="row"
-        align="center"
-        gap="xs"
-        className="preview-bar"
-      >
+    <div className="canvas" style={{ flexDirection: 'column', padding: 0, width: '100%' }}>
+      <div className="preview-bar">
         <Button
           variant="primary"
           className="ct-edit"
@@ -310,31 +327,42 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
         </Button>
 
         <div className="ct-space"></div>
-
-        <Stack direction="row" align="center" gap="xs" className="preview-bar-doc">
-          <span className="preview-bar-doc-icon" aria-hidden="true">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span
+            aria-hidden="true"
+            style={{ display: 'inline-flex', width: 24, height: 24, color: '#1e1e1e' }}
+          >
             {docTypeIcon(page)}
           </span>
-          <Text variant="body-md" className="ct-btn preview-bar-doc-name">
-            {page.name}
-          </Text>
+          <span className="ct-btn" style={{ cursor: 'default' }}>{page.name}</span>
           <Tooltip
             text={page.isLive ? 'Page is live' : 'Page is a draft'}
             placement="bottom"
           >
-            <span className="preview-bar-doc-status">
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 16,
+                height: 16,
+                borderRadius: 2,
+                background: '#fff',
+                flexShrink: 0,
+              }}
+            >
               <span
                 className={`url-dot${page.isLive ? '' : ' url-draft-dot'}`}
+                style={{ margin: 0 }}
                 role="status"
                 aria-label={page.isLive ? 'Page is live' : 'Page is a draft'}
               />
             </span>
           </Tooltip>
-        </Stack>
-
+        </div>
         <div className="ct-space"></div>
 
-        <Stack direction="row" align="center" className="ct-view-modes">
+        <div className="ct-view-modes">
           <Button
             className={`ct-view-btn ${selectedDevice === 'desktop' ? 'active' : ''}`}
             onClick={() => setSelectedDevice('desktop')}
@@ -356,8 +384,8 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
             icon={mobile}
             iconSize={20}
           />
-        </Stack>
-      </Stack>
+        </div>
+      </div>
       <div className="preview-canvas-area">
         <div className="site-card">
           {renderContent()}
