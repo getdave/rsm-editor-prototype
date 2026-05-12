@@ -41,8 +41,18 @@ export const SECTION_TYPE_META = {
   form: { icon: page, label: 'Contact Form' },
 };
 
-export const HEADER_META = { icon: headerIcon, label: 'Header', isPatternSection: false };
-export const FOOTER_META = { icon: footerIcon, label: 'Footer', isPatternSection: false };
+export const HEADER_META = {
+  icon: headerIcon,
+  label: 'Header',
+  isPatternSection: false,
+  isTemplatePart: true,
+};
+export const FOOTER_META = {
+  icon: footerIcon,
+  label: 'Footer',
+  isPatternSection: false,
+  isTemplatePart: true,
+};
 export const TEMPLATE_ROOT_META = { icon: group, label: 'Content', isPatternSection: false };
 
 /**

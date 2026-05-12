@@ -29,6 +29,7 @@ export default function BlockToolbar({
 
   const Icon = meta.icon;
   const isPatternSection = Boolean(meta.isPatternSection);
+  const isTemplatePart = Boolean(meta.isTemplatePart);
 
   const clampToCanvas = useCallback(() => {
     const el = ref.current;
@@ -103,7 +104,7 @@ export default function BlockToolbar({
   return (
     <div
       ref={ref}
-      className={`sec-bar block-toolbar${isPatternSection ? ' block-toolbar--pattern-section' : ''}${flipBelow ? ' block-toolbar--flip-below' : ''}`}
+      className={`sec-bar block-toolbar${isPatternSection ? ' block-toolbar--pattern-section' : ''}${isTemplatePart ? ' block-toolbar--template-part' : ''}${flipBelow ? ' block-toolbar--flip-below' : ''}`}
       role="toolbar"
       style={translateX ? { transform: `translateX(${translateX}px)` } : undefined}
       onClick={(e) => e.stopPropagation()}

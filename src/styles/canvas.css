@@ -25,6 +25,11 @@
   overflow: visible;
 }
 
+/* Global (template part) accent — List View global rows + Header/Footer canvas selection */
+:root {
+  --edit-global-accent: #7527e7;
+}
+
 /* Shared canvas wrapper */
 .canvas {
   width: 100%;
@@ -553,7 +558,7 @@
   border-color: #007cba;
 }
 
-/* Selection wash only on page content blocks — not header/footer (template parts keep .p-header / .p-footer surfaces) */
+/* Selection wash on page/template root blocks; Header/Footer template parts (.tp-part) use purple accents below */
 .e-sec.sel,
 .template-edit-root.sel {
   border-color: #007cba;
@@ -614,7 +619,15 @@
   opacity: 1;
 }
 
-/* Floating block toolbar — WordPress block editor style */
+.g-el.e-block.tp-part:hover {
+  border-color: var(--edit-global-accent);
+}
+
+.g-el.e-block.tp-part.sel {
+  border-color: var(--edit-global-accent);
+  background: rgba(117, 39, 231, 0.04);
+  opacity: 1;
+}
 .sec-bar.block-toolbar {
   position: absolute;
   bottom: 100%;
@@ -651,6 +664,28 @@
 .sec-bar.block-toolbar.block-toolbar--pattern-section {
   border-left: 3px solid #007cba;
   padding-left: 8px;
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part {
+  border: 1px solid var(--edit-global-accent);
+  border-left-width: 3px;
+  padding-left: 8px;
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-sep {
+  background: var(--edit-global-accent);
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-pill-label {
+  color: var(--edit-global-accent);
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .components-button.bt-pill-icon {
+  color: var(--edit-global-accent);
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .components-button.bt-pill-icon svg {
+  fill: currentColor;
 }
 
 .e-sec.sel .sec-bar.block-toolbar,
@@ -982,7 +1017,7 @@
 /* Global template parts (header/footer) get a distinct hint color when
    the row isn't selected — matches WordPress's purple "global" treatment. */
 .lv-row-global:not(.sel) .lv-icon {
-  color: #7527e7;
+  color: var(--edit-global-accent);
 }
 
 .lv-label {

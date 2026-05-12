@@ -557,7 +557,7 @@ function EditingView() {
               <div className={`edit-card preview-device-${selectedDevice}`}>
             {/* Header (template part — no section inserters) */}
             <div
-              className={`g-el p-header e-block ${selectedBlockId === 'header' ? 'sel' : ''}`}
+              className={`g-el p-header e-block tp-part ${selectedBlockId === 'header' ? 'sel' : ''}`}
               onClick={() => setSelectedBlockId('header')}
             >
               {selectedBlockId === 'header' && (
@@ -588,7 +588,7 @@ function EditingView() {
 
             {/* Footer (template part — no section inserters) */}
             <div
-              className={`g-el p-footer e-block ${selectedBlockId === 'footer' ? 'sel' : ''}`}
+              className={`g-el p-footer e-block tp-part ${selectedBlockId === 'footer' ? 'sel' : ''}`}
               style={{ position: 'relative' }}
               onClick={() => setSelectedBlockId('footer')}
             >
