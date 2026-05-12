@@ -4,6 +4,11 @@
   padding: 0;
 }
 
+:root {
+  /* Serif font for website content to distinguish from editor UI */
+  --wp-content-font: Georgia, 'Times New Roman', serif;
+}
+
 body {
   font-family: var(--wp-font-family);
   background: var(--wp-chrome-bg, #1e1e1e);
