@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@wordpress/components';
+import { Card, Stack, Text } from '@wordpress/ui';
 import { plus } from '@wordpress/icons';
 import { installedThemes } from '../../data/mockData';
 
@@ -12,30 +13,35 @@ function ThemesInstalledView() {
     <div className="preview-body">
       <div className="preview-body-canvas themes-view">
         {active && (
-          <div className="theme-wrap wp-clearfix themes-active-wrap">
+          <Stack
+            direction="row"
+            wrap
+            gap="md"
+            className="theme-wrap wp-clearfix themes-active-wrap"
+          >
             <div
               className="themes-active-screenshot"
               style={{ backgroundImage: active.screenshot }}
               role="img"
               aria-label={`${active.name} screenshot`}
             />
-            <div className="themes-active-details">
-              <h2 className="themes-active-name">
+            <Stack direction="column" gap="sm" className="themes-active-details">
+              <Text variant="heading-md" className="themes-active-name">
                 {active.name}
-                <span className="themes-active-version"> Version: {active.version}</span>
-              </h2>
-              <p className="themes-active-author">
+                <Text variant="body-sm" className="themes-active-version"> Version: {active.version}</Text>
+              </Text>
+              <Text variant="body-md" className="themes-active-author">
                 By <a href={active.authorUrl}>{active.author}</a>
-              </p>
-              <p className="themes-active-description">{active.description}</p>
+              </Text>
+              <Text variant="body-md" className="themes-active-description">{active.description}</Text>
               {/* Per spec: NO Customize button. */}
-              <div className="themes-active-actions">
+              <Stack direction="row" gap="sm" className="themes-active-actions">
                 <Button variant="secondary">Live Preview</Button>
                 <Button variant="tertiary">Theme Details</Button>
                 <Button variant="tertiary" isDestructive>Delete</Button>
-              </div>
-            </div>
-          </div>
+              </Stack>
+            </Stack>
+          </Stack>
         )}
 
         <div className="themes-add-row">
@@ -50,21 +56,23 @@ function ThemesInstalledView() {
 
         <div className="themes-grid">
           {others.map((t) => (
-            <div key={t.id} className="pp-card theme-card">
+            <Card.Root key={t.id} className="pp-card theme-card">
               <div
                 className="theme-card-thumb"
                 style={{ backgroundImage: t.screenshot }}
                 role="img"
                 aria-label={`${t.name} screenshot`}
               />
-              <div className="pp-card-body">
-                <div className="pp-card-name">{t.name}</div>
-                <div className="theme-card-actions">
-                  <Button variant="primary">Activate</Button>
-                  <Button variant="secondary">Live Preview</Button>
-                </div>
-              </div>
-            </div>
+              <Card.Content className="pp-card-body">
+                <Stack direction="column" gap="xs">
+                  <Text variant="body-md" className="pp-card-name">{t.name}</Text>
+                  <Stack direction="row" wrap gap="sm" className="theme-card-actions">
+                    <Button variant="primary">Activate</Button>
+                    <Button variant="secondary">Live Preview</Button>
+                  </Stack>
+                </Stack>
+              </Card.Content>
+            </Card.Root>
           ))}
         </div>
       </div>

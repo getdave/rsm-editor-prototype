@@ -665,6 +665,13 @@
   cursor: not-allowed;
 }
 
+/* Recent documents list inside the Exit dropdown — keeps the popover from
+   growing past 6 rows so it doesn't crowd the canvas. */
+.split-button-recent-list {
+  max-height: 192px;
+  overflow-y: auto;
+}
+
 /* Ensure WordPress button components inherit proper sizing in split button */
 .split-button .components-button {
   height: 36px;

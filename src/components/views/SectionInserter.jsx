@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import * as wpIcons from '@wordpress/icons';
 
 const { Icon: WPIcon } = wpIcons;
@@ -35,22 +36,22 @@ function PatternPreview({ kind }) {
   }
   if (kind === 'twoCol') {
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', height: '100%' }}>
-        <div className="ln img" style={{ flex: 1 }}></div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+      <div className="pattern-preview-two-col">
+        <div className="ln img"></div>
+        <Stack direction="column" gap="xs">
           <div className="ln s"></div>
           <div className="ln f"></div>
           <div className="ln m"></div>
-        </div>
+        </Stack>
       </div>
     );
   }
   if (kind === 'gallery') {
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '3px', height: '100%' }}>
-        <div style={{ background: '#d0d0d0', borderRadius: '2px' }}></div>
-        <div style={{ background: '#d0d0d0', borderRadius: '2px' }}></div>
-        <div style={{ background: '#d0d0d0', borderRadius: '2px' }}></div>
+      <div className="pattern-preview-gallery">
+        <div className="pattern-preview-gallery-cell"></div>
+        <div className="pattern-preview-gallery-cell"></div>
+        <div className="pattern-preview-gallery-cell"></div>
       </div>
     );
   }
@@ -84,13 +85,10 @@ function BlockCard({ block, onInsert }) {
   const icon = getIcon(block.iconKey);
   return (
     <div className="s-opt" onClick={onInsert}>
-      <div
-        className="s-prev"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-      >
+      <Stack direction="row" align="center" justify="center" className="s-prev">
         <WPIcon icon={icon} size={28} />
-      </div>
-      <div className="s-lbl">{block.name}</div>
+      </Stack>
+      <Text variant="body-sm" className="s-lbl">{block.name}</Text>
     </div>
   );
 }
@@ -101,7 +99,7 @@ function PatternCard({ pattern, onInsert }) {
       <div className="s-prev">
         <PatternPreview kind={pattern.previewKind} />
       </div>
-      <div className="s-lbl">{pattern.name}</div>
+      <Text variant="body-sm" className="s-lbl">{pattern.name}</Text>
     </div>
   );
 }
@@ -128,13 +126,6 @@ export function SectionInserterContent() {
 
   const handleInsert = () => {};
 
-  const groupHeadingStyle = {
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    color: '#757575',
-    padding: '12px 4px 8px',
-  };
-
   const trimmedSearch = searchTerm.trim().toLowerCase();
   const isSearching = trimmedSearch.length > 0;
   const nameMatches = (name) => name.toLowerCase().includes(trimmedSearch);
@@ -154,7 +145,7 @@ export function SectionInserterContent() {
         if (blocksInCat.length === 0) return null;
         return (
           <div key={cat.id}>
-            <div className="s-lbl" style={groupHeadingStyle}>{cat.label}</div>
+            <Text variant="body-sm" className="s-lbl ins-group-heading">{cat.label}</Text>
             <div className="ins-grid">
               {blocksInCat.map((b) => (
                 <BlockCard key={b.id} block={b} onInsert={handleInsert} />
@@ -167,29 +158,29 @@ export function SectionInserterContent() {
   );
 
   const renderPatternsTab = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '12px' }}>
+    <Stack direction="column" gap="sm" className="ins-pattern-list">
       {inserterPatterns.map((p) => (
         <PatternCard key={p.id} pattern={p} onInsert={handleInsert} />
       ))}
-    </div>
+    </Stack>
   );
 
   const renderMediaTab = () => (
-    <div className="s-lbl" style={{ padding: '16px 4px', color: '#757575' }}>
+    <Text variant="body-sm" className="s-lbl ins-empty-note">
       Pending
-    </div>
+    </Text>
   );
 
   const renderSearchResults = () => (
     <>
       {!hasAnyMatch && (
-        <div className="s-lbl" style={{ padding: '16px 4px', color: '#757575' }}>
+        <Text variant="body-sm" className="s-lbl ins-empty-note">
           No results for &ldquo;{searchTerm.trim()}&rdquo;
-        </div>
+        </Text>
       )}
       {blockMatches.length > 0 && (
         <div>
-          <div className="s-lbl" style={groupHeadingStyle}>Blocks</div>
+          <Text variant="body-sm" className="s-lbl ins-group-heading">Blocks</Text>
           <div className="ins-grid">
             {blockMatches.map((b) => (
               <BlockCard key={b.id} block={b} onInsert={handleInsert} />
@@ -199,12 +190,12 @@ export function SectionInserterContent() {
       )}
       {patternMatches.length > 0 && (
         <div>
-          <div className="s-lbl" style={groupHeadingStyle}>Patterns</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <Text variant="body-sm" className="s-lbl ins-group-heading">Patterns</Text>
+          <Stack direction="column" gap="sm" className="ins-pattern-list">
             {patternMatches.map((p) => (
               <PatternCard key={p.id} pattern={p} onInsert={handleInsert} />
             ))}
-          </div>
+          </Stack>
         </div>
       )}
     </>
@@ -212,7 +203,7 @@ export function SectionInserterContent() {
 
   return (
     <div className="list-view-inner" role="region" aria-label="Inserter">
-      <div className="ins-search-row">
+      <Stack direction="row" align="center" className="ins-search-row">
         <input
           className="ins-search"
           type="search"
@@ -227,13 +218,13 @@ export function SectionInserterContent() {
           icon={wpIcons.closeSmall}
           onClick={closeInserter}
         />
-      </div>
+      </Stack>
 
       {isSearching ? (
         <div className="ins-list">{renderSearchResults()}</div>
       ) : (
         <>
-          <div className="lv-tabs">
+          <Stack direction="row" align="center" className="lv-tabs">
             {TABS.map((t) => (
               <button
                 key={t.id}
@@ -244,7 +235,7 @@ export function SectionInserterContent() {
                 {t.label}
               </button>
             ))}
-          </div>
+          </Stack>
 
           <div className="ins-list">
             {tab === 'blocks' && renderBlocksTab()}

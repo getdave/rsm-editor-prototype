@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import { chevronRight, closeSmall } from '@wordpress/icons';
 import {
   FOOTER_META,
@@ -44,7 +45,7 @@ export default function ListViewPanel({
           <span className="lv-icon" aria-hidden>
             {meta.icon}
           </span>
-          <span className="lv-label">{meta.label}</span>
+          <Text variant="body-md" className="lv-label">{meta.label}</Text>
           {meta.isPatternSection ? (
             <span className="lv-row-badge">section</span>
           ) : null}
@@ -55,7 +56,7 @@ export default function ListViewPanel({
 
   return (
     <div className="list-view-inner" role="region" aria-label="List View">
-      <div className="lv-tabs">
+      <Stack direction="row" align="center" className="lv-tabs">
         <button
           type="button"
           className={`lv-tab ${tab === 'list' ? 'active' : ''}`}
@@ -76,7 +77,7 @@ export default function ListViewPanel({
           icon={closeSmall}
           onClick={onClose}
         />
-      </div>
+      </Stack>
 
       <div className="lv-body">
         {tab === 'list' && (
@@ -107,13 +108,13 @@ export default function ListViewPanel({
                       <span className="lv-icon" aria-hidden>
                         {TEMPLATE_ROOT_META.icon}
                       </span>
-                      <span className="lv-label">{TEMPLATE_ROOT_META.label}</span>
+                      <Text variant="body-md" className="lv-label">{TEMPLATE_ROOT_META.label}</Text>
                     </span>
                   </button>
                 </div>
                 {templateExpanded && (
                   <div className="lv-nested">
-                    <div className="lv-placeholder-note">Template structure</div>
+                    <Text variant="body-sm" className="lv-placeholder-note">Template structure</Text>
                   </div>
                 )}
               </div>
@@ -127,12 +128,12 @@ export default function ListViewPanel({
         )}
 
         {tab === 'outline' && (
-          <div className="lv-outline">
-            <div className="lv-outline-h1">{pageTitle || 'Untitled'}</div>
-            <p className="lv-outline-muted">
+          <Stack direction="column" gap="sm" className="lv-outline">
+            <Text variant="heading-md" className="lv-outline-h1">{pageTitle || 'Untitled'}</Text>
+            <Text variant="body-sm" className="lv-outline-muted">
               Heading structure appears here as you add headings in the canvas.
-            </p>
-          </div>
+            </Text>
+          </Stack>
         )}
       </div>
     </div>

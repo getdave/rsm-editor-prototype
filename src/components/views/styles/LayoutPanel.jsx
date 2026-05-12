@@ -1,4 +1,5 @@
-import { Button } from '@wordpress/components';
+import { Button, __experimentalUnitControl as UnitControl } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import {
   moreVertical,
   link as linkIcon,
@@ -20,17 +21,28 @@ import { layoutDefaults } from '../../../data/mockData';
  * this is a wireframe-level prototype, not a working settings form.
  */
 
-function UnitInput({ icon, value, unit }) {
+const PX_UNITS = [{ value: 'px', label: 'px', default: 0 }];
+const SPACING_UNITS = [
+  { value: 'px', label: 'px', default: 0 },
+  { value: 'rem', label: 'rem', default: 0 },
+];
+
+function ReadOnlyUnitInput({ icon, value, units = PX_UNITS, unit = 'px' }) {
   return (
-    <div className="styles-input-row">
-      {icon && (
-        <span className="styles-input-row-icon" aria-hidden="true">
-          {icon}
-        </span>
-      )}
-      <span className="styles-input-row-value">{value}</span>
-      <span className="styles-input-row-unit">{unit}</span>
-    </div>
+    <UnitControl
+      value={`${value}${unit}`}
+      units={units}
+      isUnitSelectTabbable={false}
+      disabled
+      prefix={
+        icon ? (
+          <span className="styles-input-row-icon" aria-hidden="true">
+            {icon}
+          </span>
+        ) : undefined
+      }
+      __next40pxDefaultSize
+    />
   );
 }
 
@@ -45,46 +57,64 @@ function LayoutPanel() {
       <StylesPanelHeader title="Layout" />
 
       <div className="styles-panel-section">
-        <div className="styles-panel-heading-row">
-          <h3 className="styles-panel-heading">Dimensions</h3>
+        <Stack
+          direction="row"
+          align="center"
+          justify="space-between"
+          className="styles-panel-heading-row"
+        >
+          <Text variant="heading-sm" className="styles-panel-heading">
+            Dimensions
+          </Text>
           <Button
             icon={moreVertical}
             label="Dimensions options"
             iconSize={20}
             className="styles-panel-heading-action"
           />
-        </div>
-        <p className="styles-panel-description">
+        </Stack>
+        <Text variant="body-sm" className="styles-panel-description">
           Set the width of the main content area.
-        </p>
+        </Text>
       </div>
 
       <div className="styles-panel-section">
-        <div className="styles-panel-section-label">Content width</div>
-        <UnitInput icon={stretchFullWidth} value={contentWidth} unit="px" />
+        <Text variant="body-sm" className="styles-panel-section-label">
+          Content width
+        </Text>
+        <ReadOnlyUnitInput icon={stretchFullWidth} value={contentWidth} />
       </div>
 
       <div className="styles-panel-section">
-        <div className="styles-panel-section-label">Wide width</div>
-        <UnitInput icon={stretchWide} value={wideWidth} unit="px" />
+        <Text variant="body-sm" className="styles-panel-section-label">
+          Wide width
+        </Text>
+        <ReadOnlyUnitInput icon={stretchWide} value={wideWidth} />
       </div>
 
       <div className="styles-panel-section">
-        <div className="styles-panel-section-label">
-          <span>Padding</span>
+        <Stack
+          direction="row"
+          align="center"
+          justify="space-between"
+          className="styles-panel-section-label"
+        >
+          <Text variant="body-sm">Padding</Text>
           <Button
             icon={linkIcon}
             label="Link sides"
             iconSize={18}
             className="styles-panel-section-label-action"
           />
-        </div>
-        <UnitInput value="0" unit="px" />
+        </Stack>
+        <ReadOnlyUnitInput value={0} />
       </div>
 
       <div className="styles-panel-section">
-        <div className="styles-panel-section-label">Block spacing</div>
-        <UnitInput value="1.2" unit="rem" />
+        <Text variant="body-sm" className="styles-panel-section-label">
+          Block spacing
+        </Text>
+        <ReadOnlyUnitInput value={1.2} units={SPACING_UNITS} unit="rem" />
       </div>
     </div>
   );

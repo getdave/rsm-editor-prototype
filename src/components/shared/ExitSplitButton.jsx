@@ -91,7 +91,7 @@ function ExitSplitButton() {
               {recentPages.length === 0 ? (
                 <MenuItem disabled>No recent documents</MenuItem>
               ) : (
-                <div style={{ maxHeight: 192, overflowY: 'auto' }}>
+                <div className="split-button-recent-list">
                   {recentPages.slice(0, 6).map((p) => (
                     <MenuItem
                       key={p.id}

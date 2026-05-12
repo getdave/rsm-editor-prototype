@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Dropdown, MenuGroup, MenuItem, Tooltip } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import {
   chevronDown,
   home,
@@ -49,28 +50,22 @@ function DocumentActions() {
   const statusLabel = isLive ? 'Page is live' : 'Page is a draft';
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+    <Stack direction="row" align="center" gap="xs" className="doc-actions">
       <Tooltip text="Rename page" placement="bottom">
         <span
-          className="ct-btn"
+          className={`ct-btn doc-actions-name${editing ? ' is-editing' : ''}`}
           onClick={() => !editing && setEditing(true)}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            cursor: editing ? 'text' : 'pointer',
-            padding: '0 8px',
-          }}
         >
           <span
+            className="preview-bar-doc-icon"
             aria-hidden="true"
             contentEditable={false}
-            style={{ display: 'inline-flex', width: 24, height: 24, color: '#1e1e1e' }}
           >
             {docTypeIcon(currentPage)}
           </span>
           <span
             ref={ref}
+            className="doc-actions-name-text"
             contentEditable={editing}
             suppressContentEditableWarning
             role="textbox"
@@ -86,7 +81,6 @@ function DocumentActions() {
                 cancel();
               }
             }}
-            style={{ outline: 'none' }}
           >
             {currentPage.name}
           </span>
@@ -94,21 +88,9 @@ function DocumentActions() {
       </Tooltip>
 
       <Tooltip text={statusLabel} placement="bottom">
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 16,
-            height: 16,
-            borderRadius: 2,
-            background: '#fff',
-            flexShrink: 0,
-          }}
-        >
+        <span className="preview-bar-doc-status">
           <span
             className={`url-dot${isLive ? '' : ' url-draft-dot'}`}
-            style={{ margin: 0 }}
             role="status"
             aria-label={statusLabel}
           />
@@ -132,7 +114,7 @@ function DocumentActions() {
           </MenuGroup>
         )}
       />
-    </div>
+    </Stack>
   );
 }
 

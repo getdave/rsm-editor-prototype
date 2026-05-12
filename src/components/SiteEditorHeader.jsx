@@ -1,4 +1,5 @@
 import { Tooltip } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import { search, pencil } from '@wordpress/icons';
 import { useAppState } from '../hooks/useAppState';
 
@@ -19,7 +20,7 @@ function SiteEditorHeader() {
     <header className="site-editor-header">
       {/* Site identity — single edit affordance matching trunk's
           sidebar site-anchor: logo + title + pencil-on-hover. */}
-      <div className="seh-anchor">
+      <Stack direction="row" align="center" className="seh-anchor">
         <Tooltip text="Edit site identity" placement="bottom">
           <button
             type="button"
@@ -27,12 +28,14 @@ function SiteEditorHeader() {
             onClick={openSiteIdentityModal}
             aria-label="Edit site identity"
           >
-            <span className="seh-logo" aria-hidden="true" />
-            <span className="seh-title">{siteTitle}</span>
-            <span className="seh-pencil" aria-hidden="true">{pencil}</span>
+            <Stack direction="row" align="center" gap="sm">
+              <span className="seh-logo" aria-hidden="true" />
+              <Text variant="body-md" className="seh-title">{siteTitle}</Text>
+              <span className="seh-pencil" aria-hidden="true">{pencil}</span>
+            </Stack>
           </button>
         </Tooltip>
-      </div>
+      </Stack>
 
       <Tooltip text="Search (⌘K)" placement="bottom">
         <button
@@ -41,12 +44,14 @@ function SiteEditorHeader() {
           onClick={openCommandPalette}
           aria-label="Open command palette"
         >
-          <span className="seh-search-icon" aria-hidden="true">{search}</span>
-          <span className="seh-search-label">Search anything…</span>
+          <Stack direction="row" align="center" gap="xs">
+            <span className="seh-search-icon" aria-hidden="true">{search}</span>
+            <Text variant="body-md" className="seh-search-label">Search anything…</Text>
+          </Stack>
         </button>
       </Tooltip>
 
-      <div className="seh-actions">
+      <Stack direction="row" align="center" gap="sm" className="seh-actions">
         <Tooltip
           text={hasUnsavedChanges ? 'Save changes' : 'No changes to save'}
           placement="bottom"
@@ -69,7 +74,7 @@ function SiteEditorHeader() {
             <span className="seh-status-dot" aria-hidden="true" />
           </span>
         </Tooltip>
-      </div>
+      </Stack>
     </header>
   );
 }

@@ -493,3 +493,42 @@
   opacity: 0;
   pointer-events: none;
 }
+
+/* ── EDITOR CANVAS SIDEBAR ── */
+/* The three stacked sections shown inside /pages/:id/edit. Each section is
+   delimited by a 1px divider matching .sidebar-bottom's border treatment;
+   these classes replace inline-style blocks in Sidebar.jsx (edit-canvas
+   branch). The .admin-root-nav base styles still own padding, gap, etc. */
+.editor-sidebar-section { border-bottom: 1px solid #2a2a2a; }
+
+/* Section 1 (expanded menu): the "Hide menu" row that aligns with the
+   canvas toolbar. Fixed 64px height, content centered. */
+.editor-sidebar-toggle-row {
+  flex: 0 0 64px;
+  justify-content: center;
+}
+
+/* Section 1 (collapsed): the 48px hamburger column. Pinned to the top of
+   the sidebar so it lines up with the canvas toolbar; no top margin so
+   it sits flush against the chrome above. */
+.editor-sidebar-hamburger {
+  height: 64px;
+  flex: 0 0 64px;
+  width: 48px;
+  align-self: flex-start;
+  margin-top: 0;
+  border-top: none;
+  padding: 0;
+}
+
+/* Section 2 (root nav icons): collapses to its content height so Section 3
+   (recent documents) can take the remaining space. */
+.editor-sidebar-root-nav { flex: 0 0 auto; }
+
+/* Section 3 heading + list: the heading reuses the MenuGroup label color,
+   and the list grows to fill the remaining sidebar height with scroll. */
+.editor-sidebar-recent-heading { padding: 12px 12px 4px; }
+.editor-sidebar-recent-list {
+  flex: 1 0 0;
+  overflow-y: auto;
+}

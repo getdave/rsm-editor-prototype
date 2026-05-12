@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { Button } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 import {
   chevronDown,
   chevronUp,
@@ -207,7 +208,7 @@ function EditingView() {
               handleToggleListView();
             }}
           />
-          <span className="bt-pill-label">{meta.label}</span>
+          <Text variant="body-sm" className="bt-pill-label">{meta.label}</Text>
         </div>
         <span className="bt-sep" aria-hidden />
         <Button className="bt-tb-btn" label="Drag" icon={dragHandle} iconSize={24} />
