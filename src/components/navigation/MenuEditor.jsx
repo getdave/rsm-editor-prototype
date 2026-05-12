@@ -4,11 +4,14 @@ import { Page } from '@wordpress/admin-ui';
 import { chevronDown, chevronRight, dragHandle, moreVertical, page as pageIcon, plus } from '@wordpress/icons';
 import { pages as allPages } from '../../data/mockData';
 import RenameMenuItemModal from './RenameMenuItemModal';
+import DeleteMenuItemConfirmModal from '../modals/DeleteMenuItemConfirmModal';
 
 function MenuEditor({ menu, onUpdateMenu, onBack }) {
   const [expandedItems, setExpandedItems] = useState(new Set());
   /** When set, rename modal is open for this menu tree item (by reference shape). */
   const [renameTarget, setRenameTarget] = useState(null);
+  /** When set, delete confirmation is open for this menu tree item. */
+  const [itemPendingDelete, setItemPendingDelete] = useState(null);
 
   const toggleExpanded = (itemId) => {
     setExpandedItems((prev) => {
@@ -167,7 +170,12 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
                   <MenuItem
                     isDestructive
                     onClick={() => {
-                      removeItem(item.id);
+                      setItemPendingDelete({
+                        id: item.id,
+                        label: item.label,
+                        pageId: item.pageId,
+                        children: item.children,
+                      });
                       onClose();
                     }}
                   >
@@ -277,6 +285,16 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           onSave={(newLabel) => {
             renameItemLabel(renameTarget.id, newLabel);
             setRenameTarget(null);
+          }}
+        />
+      ) : null}
+      {itemPendingDelete ? (
+        <DeleteMenuItemConfirmModal
+          item={itemPendingDelete}
+          onClose={() => setItemPendingDelete(null)}
+          onConfirm={() => {
+            removeItem(itemPendingDelete.id);
+            setItemPendingDelete(null);
           }}
         />
       ) : null}

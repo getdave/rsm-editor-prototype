@@ -2,12 +2,14 @@ import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Tooltip, Button } from '@wordpress/components';
+import { trash } from '@wordpress/icons';
 import { Page } from '@wordpress/admin-ui';
 import { navigationMenus as initialMenus, pages } from '../../data/mockData';
 import { useAppState } from '../../hooks/useAppState';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import MenuEditor from '../navigation/MenuEditor';
 import AddMenuModal from '../navigation/AddMenuModal';
+import DeleteMenuConfirmModal from '../modals/DeleteMenuConfirmModal';
 
 function NavigationView() {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ function NavigationView() {
   const [selectedMenuId, setSelectedMenuId] = useState(null);
   const [forceShowList, setForceShowList] = useState(false);
   const [showAddMenuModal, setShowAddMenuModal] = useState(false);
+  const [menuPendingDelete, setMenuPendingDelete] = useState(null);
   const [previewPage, setPreviewPage] = useState(
     () => pages.find((p) => p.isFrontPage) || pages[0],
   );
@@ -75,6 +78,14 @@ function NavigationView() {
     setForceShowList(false);
   };
 
+  const deleteMenu = (menuId) => {
+    setMenus((prev) => prev.filter((m) => m.id !== menuId));
+    if (selectedMenuId === menuId) {
+      setSelectedMenuId(null);
+      setForceShowList(true);
+    }
+  };
+
   const fields = useMemo(
     () => [
       {
@@ -122,6 +133,14 @@ function NavigationView() {
         callback: (items) => {
           setSelectedMenuId(items[0].id);
           setForceShowList(false);
+        },
+      },
+      {
+        id: 'delete-menu',
+        label: 'Delete',
+        icon: trash,
+        callback: (items) => {
+          setMenuPendingDelete(items[0]);
         },
       },
     ],
@@ -230,6 +249,16 @@ function NavigationView() {
           onAddMenu={addMenu}
         />
       )}
+      {menuPendingDelete ? (
+        <DeleteMenuConfirmModal
+          menu={menuPendingDelete}
+          onClose={() => setMenuPendingDelete(null)}
+          onConfirm={() => {
+            deleteMenu(menuPendingDelete.id);
+            setMenuPendingDelete(null);
+          }}
+        />
+      ) : null}
     </>
   );
 }
