@@ -1,3 +1,9 @@
+/*
+ * Legacy `--wp-*` variables retained for existing chrome/views CSS.
+ * New CSS should reference `--wpds-*` tokens from
+ * `@wordpress/theme/design-tokens.css` (imported in src/main.jsx).
+ * See src/design-system/AGENTS.md.
+ */
 :root {
   /* WordPress colors */
   --wp-blue: #3858e9;
