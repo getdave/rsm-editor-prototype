@@ -205,6 +205,34 @@
 .doc-actions-name.is-editing { cursor: text; }
 .doc-actions-name-text { outline: none; }
 
+.doc-actions.doc-actions--global .preview-bar-doc-icon {
+  color: var(--edit-global-accent);
+}
+
+.doc-actions.doc-actions--global .preview-bar-doc-icon svg {
+  fill: currentColor;
+}
+
+.doc-actions.doc-actions--global .doc-actions-name-text {
+  color: var(--edit-global-accent);
+}
+
+.doc-actions.doc-actions--global .doc-actions-name:hover {
+  background: rgba(117, 39, 231, 0.09);
+}
+
+.doc-actions.doc-actions--global .ct-icon-btn.components-button {
+  color: var(--edit-global-accent);
+}
+
+.doc-actions.doc-actions--global .ct-icon-btn.components-button:hover {
+  background: rgba(117, 39, 231, 0.1);
+}
+
+.doc-actions.doc-actions--global .ct-icon-btn.components-button svg {
+  fill: currentColor;
+}
+
 .preview-canvas-area,
 .edit-canvas-area {
   padding: 0;
@@ -520,15 +548,17 @@
 /* Dim peer regions when editing a block that opts in via isolatePeersOnSelect meta */
 .edit-card.edit-card--spotlight {
   --edit-spotlight-peer-opacity: 0.35;
+  --edit-spotlight-transition-duration: 0.55s;
 }
 
 .edit-card.edit-card--spotlight > [data-edit-block-id]:not(.edit-spotlight-focus) {
   opacity: var(--edit-spotlight-peer-opacity);
-  transition: opacity 0.2s ease;
+  transition: opacity var(--edit-spotlight-transition-duration, 0.55s) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .edit-card.edit-card--spotlight > [data-edit-block-id].edit-spotlight-focus {
   opacity: 1;
+  transition: opacity var(--edit-spotlight-transition-duration, 0.55s) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .g-el {
@@ -710,6 +740,30 @@
   fill: currentColor;
 }
 
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Save: compact filled control; same dimensions/label style as .bt-tb-edit (see bt-tb-edit rule below) */
+
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-tb-edit.bt-tb-edit-global-save.components-button {
+  background: var(--edit-global-accent);
+  border-color: transparent;
+  color: #fff;
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-tb-edit.bt-tb-edit-global-save.components-button:hover:not(:disabled) {
+  background: #6120c1;
+  color: #fff;
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-tb-edit.bt-tb-edit-global-save.components-button:focus:not(:disabled) {
+  outline: none;
+}
+
 .e-sec.sel .sec-bar.block-toolbar,
 .template-edit-root.sel .sec-bar.block-toolbar,
 .g-el.e-block.sel .sec-bar.block-toolbar {
@@ -764,10 +818,13 @@
   height: 32px;
   min-height: 32px;
   padding: 0 10px;
+  font-family: var(--wp-font-family, inherit);
   font-size: 12px;
   font-weight: 500;
+  line-height: 1.2;
   color: #1e1e1e;
   box-shadow: none;
+  text-decoration: none;
 }
 
 .bt-tb-edit.components-button:hover {

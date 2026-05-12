@@ -162,7 +162,6 @@ function EditingView() {
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     currentPage,
-    hasUnsavedChanges,
     listViewOpen,
     openUnsavedChangesModal,
     selectedDevice,
@@ -170,6 +169,7 @@ function EditingView() {
     setListViewOpen,
     setSelectedDevice,
     setSettingsSidebarOpen,
+    showSnackbar,
     siteTitle,
     toggleListView,
     toggleSettingsSidebar,
@@ -242,15 +242,24 @@ function EditingView() {
     setSettingsSidebarOpen,
   };
 
+  const beginGlobalTemplatePartIsolation = useCallback(
+    (id) => {
+      if (id !== 'header' && id !== 'footer') return;
+      if (selectedBlockId !== id) return;
+      if (hasAcknowledgedGlobalTemplatePartEdit()) {
+        setConfirmedGlobalSpotlightBlockId(id);
+      } else {
+        setGlobalEditWarnForId(id);
+      }
+    },
+    [selectedBlockId],
+  );
+
   const selectCanvasBlock = useCallback(
     (id) => {
       if (id === 'header' || id === 'footer') {
         if (selectedBlockId === id) {
-          if (hasAcknowledgedGlobalTemplatePartEdit()) {
-            setConfirmedGlobalSpotlightBlockId(id);
-          } else {
-            setGlobalEditWarnForId(id);
-          }
+          beginGlobalTemplatePartIsolation(id);
           return;
         }
         setSelectedBlockId(id);
@@ -258,8 +267,24 @@ function EditingView() {
       }
       setSelectedBlockId(id);
     },
-    [selectedBlockId],
+    [selectedBlockId, beginGlobalTemplatePartIsolation],
   );
+
+  const handleGlobalPartToolbarCancel = useCallback(() => {
+    setConfirmedGlobalSpotlightBlockId(null);
+  }, []);
+
+  const handleGlobalPartToolbarSave = useCallback(() => {
+    save();
+    setConfirmedGlobalSpotlightBlockId(null);
+    const partPhrase =
+      selectedBlockId === 'header'
+        ? `${HEADER_META.label} template part`
+        : selectedBlockId === 'footer'
+          ? `${FOOTER_META.label} template part`
+          : 'template part';
+    showSnackbar(`Saved ${partPhrase}`);
+  }, [save, showSnackbar, selectedBlockId]);
 
   const handleGlobalEditWarningContinue = useCallback(() => {
     const id = globalEditWarnForId;
@@ -653,7 +678,18 @@ function EditingView() {
               onClick={() => selectCanvasBlock('header')}
             >
               {selectedBlockId === 'header' && (
-                <BlockToolbar toolbarKey="header" meta={HEADER_META} {...blockToolbarBindings} />
+                <BlockToolbar
+                  toolbarKey="header"
+                  meta={HEADER_META}
+                  {...blockToolbarBindings}
+                  globalPartEditActive={
+                    selectedBlockId === 'header' &&
+                    confirmedGlobalSpotlightBlockId === 'header'
+                  }
+                  onGlobalPartEdit={() => beginGlobalTemplatePartIsolation('header')}
+                  onGlobalPartEditCancel={handleGlobalPartToolbarCancel}
+                  onGlobalPartEditSave={handleGlobalPartToolbarSave}
+                />
               )}
               <PreviewSiteNavCluster
                 siteTitle={siteTitle}
@@ -691,7 +727,18 @@ function EditingView() {
               onClick={() => selectCanvasBlock('footer')}
             >
               {selectedBlockId === 'footer' && (
-                <BlockToolbar toolbarKey="footer" meta={FOOTER_META} {...blockToolbarBindings} />
+                <BlockToolbar
+                  toolbarKey="footer"
+                  meta={FOOTER_META}
+                  {...blockToolbarBindings}
+                  globalPartEditActive={
+                    selectedBlockId === 'footer' &&
+                    confirmedGlobalSpotlightBlockId === 'footer'
+                  }
+                  onGlobalPartEdit={() => beginGlobalTemplatePartIsolation('footer')}
+                  onGlobalPartEditCancel={handleGlobalPartToolbarCancel}
+                  onGlobalPartEditSave={handleGlobalPartToolbarSave}
+                />
               )}
               <span className="p-ft">© 2026 {siteTitle}</span>
               <span className="p-ft">Privacy Policy</span>

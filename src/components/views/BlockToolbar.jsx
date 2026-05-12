@@ -21,6 +21,10 @@ export default function BlockToolbar({
   setInspectorFlashSignal,
   setInspectorBlockTabSignal,
   setSettingsSidebarOpen,
+  globalPartEditActive = false,
+  onGlobalPartEdit,
+  onGlobalPartEditCancel,
+  onGlobalPartEditSave,
 }) {
   const ref = useRef(null);
   const rafIdRef = useRef(0);
@@ -99,7 +103,7 @@ export default function BlockToolbar({
       cancelAnimationFrame(rafIdRef.current);
       if (ro) ro.disconnect();
     };
-  }, [toolbarKey, clampToCanvas]);
+  }, [toolbarKey, globalPartEditActive, clampToCanvas]);
 
   return (
     <div
@@ -150,6 +154,46 @@ export default function BlockToolbar({
               setSettingsSidebarOpen(true);
             }}
           />
+          <span className="bt-sep" aria-hidden />
+        </>
+      ) : null}
+      {isTemplatePart && onGlobalPartEdit ? (
+        <>
+          {globalPartEditActive ? (
+            <div className="bt-global-part-actions" role="group" aria-label="Editing global template part">
+              <Button
+                variant="tertiary"
+                className="bt-tb-edit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onGlobalPartEditCancel();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="tertiary"
+                className="bt-tb-edit bt-tb-edit-global-save"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onGlobalPartEditSave();
+                }}
+              >
+                Save
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="tertiary"
+              className="bt-tb-edit"
+              onClick={(e) => {
+                e.stopPropagation();
+                onGlobalPartEdit();
+              }}
+            >
+              Edit
+            </Button>
+          )}
           <span className="bt-sep" aria-hidden />
         </>
       ) : null}

@@ -3,14 +3,12 @@ import { Button, Dropdown, MenuGroup, MenuItem, Tooltip } from '@wordpress/compo
 import { Stack } from '@wordpress/ui';
 import {
   chevronDown,
-  home,
   page as pageIcon,
   postList,
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 
 function docTypeIcon(page) {
-  if (page?.isFrontPage) return home;
   if (page?.isPostsPage) return postList;
   return pageIcon;
 }
@@ -61,7 +59,12 @@ export default function DocumentActions({ documentLabelOverride = null }) {
   const nameTooltipText = isGlobalOverride ? 'Global template part' : 'Rename page';
 
   return (
-    <Stack direction="row" align="center" gap="xs" className="doc-actions">
+    <Stack
+      direction="row"
+      align="center"
+      gap="xs"
+      className={`doc-actions${isGlobalOverride ? ' doc-actions--global' : ''}`}
+    >
       <Tooltip text={nameTooltipText} placement="bottom">
         <span
           className={`ct-btn doc-actions-name${editing ? ' is-editing' : ''}${isGlobalOverride ? ' doc-actions-name--readonly' : ''}`}
