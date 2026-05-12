@@ -201,6 +201,7 @@
    only handles the cursor flip between view (pointer) and edit (text)
    modes and the no-outline editable region. */
 .doc-actions-name { cursor: pointer; }
+.doc-actions-name.doc-actions-name--readonly { cursor: default; }
 .doc-actions-name.is-editing { cursor: text; }
 .doc-actions-name-text { outline: none; }
 
@@ -516,6 +517,20 @@
   margin-right: auto;
 }
 
+/* Dim peer regions when editing a block that opts in via isolatePeersOnSelect meta */
+.edit-card.edit-card--spotlight {
+  --edit-spotlight-peer-opacity: 0.35;
+}
+
+.edit-card.edit-card--spotlight > [data-edit-block-id]:not(.edit-spotlight-focus) {
+  opacity: var(--edit-spotlight-peer-opacity);
+  transition: opacity 0.2s ease;
+}
+
+.edit-card.edit-card--spotlight > [data-edit-block-id].edit-spotlight-focus {
+  opacity: 1;
+}
+
 .g-el {
   position: relative;
   opacity: 0.55;
@@ -525,6 +540,12 @@
 
 .g-el:hover {
   opacity: 0.75;
+}
+
+/* Header/Footer template parts share .g-el; keep full opacity so site chrome matches preview
+   (.g-el otherwise dims globals and reads as an overlay). Spotlight still overrides via .edit-card--spotlight. */
+.g-el.e-block.tp-part {
+  opacity: 1;
 }
 
 .g-badge {
@@ -625,7 +646,8 @@
 
 .g-el.e-block.tp-part.sel {
   border-color: var(--edit-global-accent);
-  background: rgba(117, 39, 231, 0.04);
+  /* No selection fill: .p-header / .p-footer set their own surface colors; a translucent
+     wash would replace them and reveal the white .edit-card behind (header looked white). */
   opacity: 1;
 }
 .sec-bar.block-toolbar {

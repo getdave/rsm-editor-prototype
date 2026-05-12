@@ -15,13 +15,21 @@ function docTypeIcon(page) {
   return pageIcon;
 }
 
-function DocumentActions() {
+/**
+ * Optional label shown instead of the current page title (e.g. when a global template
+ * part is selected with peer spotlight). When set, inline rename is disabled.
+ */
+export default function DocumentActions({ documentLabelOverride = null }) {
   const { currentPage, setCurrentPageName } = useAppState();
   const [editing, setEditing] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
-    if (editing && ref.current) {
+    if (documentLabelOverride != null) setEditing(false);
+  }, [documentLabelOverride]);
+
+  useEffect(() => {
+    if (editing && ref.current && documentLabelOverride == null) {
       ref.current.focus();
       const sel = window.getSelection();
       const range = document.createRange();
@@ -29,7 +37,7 @@ function DocumentActions() {
       sel.removeAllRanges();
       sel.addRange(range);
     }
-  }, [editing]);
+  }, [editing, documentLabelOverride]);
 
   const commit = () => {
     const next = ref.current?.innerText.trim();
@@ -49,12 +57,15 @@ function DocumentActions() {
   const isLive = currentPage.isLive;
   const statusLabel = isLive ? 'Page is live' : 'Page is a draft';
 
+  const isGlobalOverride = documentLabelOverride != null;
+  const nameTooltipText = isGlobalOverride ? 'Global template part' : 'Rename page';
+
   return (
     <Stack direction="row" align="center" gap="xs" className="doc-actions">
-      <Tooltip text="Rename page" placement="bottom">
+      <Tooltip text={nameTooltipText} placement="bottom">
         <span
-          className={`ct-btn doc-actions-name${editing ? ' is-editing' : ''}`}
-          onClick={() => !editing && setEditing(true)}
+          className={`ct-btn doc-actions-name${editing ? ' is-editing' : ''}${isGlobalOverride ? ' doc-actions-name--readonly' : ''}`}
+          onClick={() => !isGlobalOverride && !editing && setEditing(true)}
         >
           <span
             className="preview-bar-doc-icon"
@@ -63,27 +74,33 @@ function DocumentActions() {
           >
             {docTypeIcon(currentPage)}
           </span>
-          <span
-            ref={ref}
-            className="doc-actions-name-text"
-            contentEditable={editing}
-            suppressContentEditableWarning
-            role="textbox"
-            tabIndex={0}
-            onBlur={editing ? commit : undefined}
-            onKeyDown={(e) => {
-              if (!editing) return;
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                commit();
-              } else if (e.key === 'Escape') {
-                e.preventDefault();
-                cancel();
-              }
-            }}
-          >
-            {currentPage.name}
-          </span>
+          {isGlobalOverride ? (
+            <span className="doc-actions-name-text" aria-live="polite">
+              {documentLabelOverride}
+            </span>
+          ) : (
+            <span
+              ref={ref}
+              className="doc-actions-name-text"
+              contentEditable={editing}
+              suppressContentEditableWarning
+              role="textbox"
+              tabIndex={0}
+              onBlur={editing ? commit : undefined}
+              onKeyDown={(e) => {
+                if (!editing) return;
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  commit();
+                } else if (e.key === 'Escape') {
+                  e.preventDefault();
+                  cancel();
+                }
+              }}
+            >
+              {currentPage.name}
+            </span>
+          )}
         </span>
       </Tooltip>
 
@@ -117,5 +134,3 @@ function DocumentActions() {
     </Stack>
   );
 }
-
-export default DocumentActions;

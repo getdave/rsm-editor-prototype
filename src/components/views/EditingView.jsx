@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { Button } from '@wordpress/components';
@@ -27,10 +27,31 @@ import {
   FOOTER_META,
   getSectionMeta,
   HEADER_META,
+  shouldIsolateEditPeers,
   TEMPLATE_ROOT_META,
 } from '../../utils/editCanvasBlockMeta';
 import { PreviewSiteNavCluster } from '../shared/PreviewSiteChrome';
 import { pages } from '../../data/mockData';
+import GlobalTemplatePartEditWarningModal from '../modals/GlobalTemplatePartEditWarningModal';
+
+const LS_GLOBAL_TEMPLATE_PART_EDIT_ACK = 'rsm-prototype-global-template-part-edit-ack';
+
+function hasAcknowledgedGlobalTemplatePartEdit() {
+  if (typeof window === 'undefined') return true;
+  try {
+    return window.localStorage.getItem(LS_GLOBAL_TEMPLATE_PART_EDIT_ACK) === '1';
+  } catch {
+    return true;
+  }
+}
+
+function acknowledgeGlobalTemplatePartEdit() {
+  try {
+    window.localStorage.setItem(LS_GLOBAL_TEMPLATE_PART_EDIT_ACK, '1');
+  } catch {
+    /* ignore quota / privacy mode */
+  }
+}
 
 /** Below this block height (px), both inserters show on hover — avoids flicker on short sections. */
 const INSERTER_SPLIT_MIN_HEIGHT_PX = 88;
@@ -99,11 +120,12 @@ function EditableSectionGroup({
   section,
   index,
   selectedBlockId,
-  setSelectedBlockId,
+  selectCanvasBlock,
   openInserter,
   blockToolbarBindings,
   renderSectionContent,
   sectionStyleClass,
+  spotlightOn,
 }) {
   const blockId = `section-${index}`;
   const meta = getSectionMeta(section);
@@ -113,7 +135,8 @@ function EditableSectionGroup({
 
   return (
     <div
-      className="sec-group"
+      className={`sec-group${spotlightOn && selected ? ' edit-spotlight-focus' : ''}`}
+      data-edit-block-id={blockId}
       data-inserter={placement}
       onMouseEnter={onGroupMouseEnter}
       onMouseMove={onGroupMouseMove}
@@ -123,7 +146,7 @@ function EditableSectionGroup({
       <div
         ref={measureRef}
         className={`e-sec ${sectionStyleClass} ${selected ? 'sel' : ''}`}
-        onClick={() => setSelectedBlockId(blockId)}
+        onClick={() => selectCanvasBlock(blockId)}
       >
         {selected && (
           <BlockToolbar toolbarKey={blockId} meta={meta} {...blockToolbarBindings} />
@@ -153,6 +176,10 @@ function EditingView() {
     menuExpanded,
   } = useAppState();
   const [selectedBlockId, setSelectedBlockId] = useState('section-0');
+  /** Second acknowledgment for Header/Footer before peer spotlight + global doc-actions label apply. */
+  const [confirmedGlobalSpotlightBlockId, setConfirmedGlobalSpotlightBlockId] = useState(null);
+  /** Shown once per browser (until acknowledged) before confirming global spotlight. */
+  const [globalEditWarnForId, setGlobalEditWarnForId] = useState(null);
   /** Incremented when opening the inspector to the Block tab (e.g. section toolbar Design). */
   const [inspectorBlockTabSignal, setInspectorBlockTabSignal] = useState(0);
   /** Incremented to run the attention flash only when the inspector is already open (Design control). */
@@ -175,6 +202,11 @@ function EditingView() {
   const handleSectionStyleChange = (sectionIndex, styleId) => {
     setSectionStylesByIndex((prev) => ({ ...prev, [sectionIndex]: styleId }));
   };
+
+  useEffect(() => {
+    setConfirmedGlobalSpotlightBlockId(null);
+    setGlobalEditWarnForId(null);
+  }, [selectedBlockId]);
 
   const isInserterOpen = searchParams.get('inserter') != null;
   
@@ -209,6 +241,59 @@ function EditingView() {
     setInspectorBlockTabSignal,
     setSettingsSidebarOpen,
   };
+
+  const selectCanvasBlock = useCallback(
+    (id) => {
+      if (id === 'header' || id === 'footer') {
+        if (selectedBlockId === id) {
+          if (hasAcknowledgedGlobalTemplatePartEdit()) {
+            setConfirmedGlobalSpotlightBlockId(id);
+          } else {
+            setGlobalEditWarnForId(id);
+          }
+          return;
+        }
+        setSelectedBlockId(id);
+        return;
+      }
+      setSelectedBlockId(id);
+    },
+    [selectedBlockId],
+  );
+
+  const handleGlobalEditWarningContinue = useCallback(() => {
+    const id = globalEditWarnForId;
+    if (id == null) return;
+    acknowledgeGlobalTemplatePartEdit();
+    setConfirmedGlobalSpotlightBlockId(id);
+    setGlobalEditWarnForId(null);
+  }, [globalEditWarnForId]);
+
+  const handleGlobalEditWarningDismiss = useCallback(() => {
+    setGlobalEditWarnForId(null);
+  }, []);
+
+  const isolatePeersForSelection = useMemo(
+    () =>
+      shouldIsolateEditPeers(selectedBlockId, {
+        isTemplate: Boolean(content.isTemplate),
+        sections: content.sections,
+      }),
+    [selectedBlockId, content.isTemplate, content.sections],
+  );
+
+  const spotlightOn = useMemo(() => {
+    if (!isolatePeersForSelection) return false;
+    if (selectedBlockId !== 'header' && selectedBlockId !== 'footer') return true;
+    return confirmedGlobalSpotlightBlockId === selectedBlockId;
+  }, [isolatePeersForSelection, selectedBlockId, confirmedGlobalSpotlightBlockId]);
+
+  const spotlightGlobalDocLabel = useMemo(() => {
+    if (!spotlightOn) return null;
+    if (selectedBlockId === 'header') return `${HEADER_META.label} (Global)`;
+    if (selectedBlockId === 'footer') return `${FOOTER_META.label} (Global)`;
+    return null;
+  }, [spotlightOn, selectedBlockId]);
 
   // Render section content based on type
   const renderSectionContent = (section) => {
@@ -267,13 +352,14 @@ function EditingView() {
       section={section}
       index={index}
       selectedBlockId={selectedBlockId}
-      setSelectedBlockId={setSelectedBlockId}
+      selectCanvasBlock={selectCanvasBlock}
       openInserter={openInserter}
       blockToolbarBindings={blockToolbarBindings}
       renderSectionContent={renderSectionContent}
       sectionStyleClass={sectionStyleSurfaceClass(
         sectionStylesByIndex[index] ?? DEFAULT_SECTION_STYLE_ID
       )}
+      spotlightOn={spotlightOn}
     />
   );
 
@@ -485,7 +571,7 @@ function EditingView() {
 
           <div className="ct-space"></div>
           {/* Center zone */}
-          <DocumentActions />
+          <DocumentActions documentLabelOverride={spotlightGlobalDocLabel} />
           <div className="ct-space"></div>
 
           {/* Right zone */}
@@ -546,7 +632,7 @@ function EditingView() {
               sections: content.sections,
               isTemplate: Boolean(content.isTemplate),
               selectedBlockId,
-              onSelectBlock: setSelectedBlockId,
+              onSelectBlock: selectCanvasBlock,
               pageTitle: pageInspectorTitle,
             }}
           />
@@ -554,11 +640,17 @@ function EditingView() {
           {/* Edit scroll area */}
           <div className="edit-scroll">
             <div className="edit-canvas-area">
-              <div className={`edit-card preview-device-${selectedDevice}`}>
+              <div
+                className={`edit-card preview-device-${selectedDevice}${spotlightOn ? ' edit-card--spotlight' : ''}`}
+                {...(spotlightOn ? { 'data-spotlight-focus': selectedBlockId } : {})}
+              >
             {/* Header (template part — no section inserters) */}
             <div
-              className={`g-el p-header e-block tp-part ${selectedBlockId === 'header' ? 'sel' : ''}`}
-              onClick={() => setSelectedBlockId('header')}
+              className={`g-el p-header e-block tp-part ${selectedBlockId === 'header' ? 'sel' : ''}${
+                spotlightOn && selectedBlockId === 'header' ? ' edit-spotlight-focus' : ''
+              }`}
+              data-edit-block-id="header"
+              onClick={() => selectCanvasBlock('header')}
             >
               {selectedBlockId === 'header' && (
                 <BlockToolbar toolbarKey="header" meta={HEADER_META} {...blockToolbarBindings} />
@@ -574,8 +666,11 @@ function EditingView() {
             {/* Dynamic sections based on current page */}
             {content.isTemplate ? (
               <div
-                className={`template-edit-root e-block ${selectedBlockId === 'template' ? 'sel' : ''}`}
-                onClick={() => setSelectedBlockId('template')}
+                className={`template-edit-root e-block ${selectedBlockId === 'template' ? 'sel' : ''}${
+                  spotlightOn && selectedBlockId === 'template' ? ' edit-spotlight-focus' : ''
+                }`}
+                data-edit-block-id="template"
+                onClick={() => selectCanvasBlock('template')}
               >
                 {selectedBlockId === 'template' && (
                   <BlockToolbar toolbarKey="template" meta={TEMPLATE_ROOT_META} {...blockToolbarBindings} />
@@ -588,9 +683,12 @@ function EditingView() {
 
             {/* Footer (template part — no section inserters) */}
             <div
-              className={`g-el p-footer e-block tp-part ${selectedBlockId === 'footer' ? 'sel' : ''}`}
+              className={`g-el p-footer e-block tp-part ${selectedBlockId === 'footer' ? 'sel' : ''}${
+                spotlightOn && selectedBlockId === 'footer' ? ' edit-spotlight-focus' : ''
+              }`}
+              data-edit-block-id="footer"
               style={{ position: 'relative' }}
-              onClick={() => setSelectedBlockId('footer')}
+              onClick={() => selectCanvasBlock('footer')}
             >
               {selectedBlockId === 'footer' && (
                 <BlockToolbar toolbarKey="footer" meta={FOOTER_META} {...blockToolbarBindings} />
@@ -616,6 +714,15 @@ function EditingView() {
           />
         </div>
       </div>
+      {globalEditWarnForId != null ? (
+        <GlobalTemplatePartEditWarningModal
+          partLabel={
+            globalEditWarnForId === 'header' ? HEADER_META.label : FOOTER_META.label
+          }
+          onDismiss={handleGlobalEditWarningDismiss}
+          onContinue={handleGlobalEditWarningContinue}
+        />
+      ) : null}
     </div>
   );
 }
