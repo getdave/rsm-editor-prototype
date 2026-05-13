@@ -1112,9 +1112,42 @@
   gap: var(--wpds-dimension-gap-xs);
 }
 
-.ss-layout-button {
+/* Outline + neutral tone: match the @wordpress/ui Button
+   variant="outline" tone="neutral" treatment using the legacy
+   @wordpress/components Button (kept for lint-allowlist consistency
+   with the rest of the prototype). Shared by both Layout and Style
+   pickers so the two grids stay visually identical. */
+.ss-layout-button,
+.ss-style-button {
   justify-content: center;
   width: 100%;
+}
+
+.ss-layout-button.is-secondary:not(.is-pressed),
+.ss-style-button.is-secondary:not(.is-pressed) {
+  color: var(--wpds-color-fg-interactive-neutral);
+  box-shadow: inset 0 0 0 1px var(--wpds-color-stroke-surface-neutral);
+  background: transparent;
+}
+
+.ss-layout-button.is-secondary:not(.is-pressed):hover,
+.ss-style-button.is-secondary:not(.is-pressed):hover {
+  color: var(--wpds-color-fg-interactive-neutral-active);
+  background: var(--wpds-color-bg-interactive-neutral-weak-active);
+  box-shadow: inset 0 0 0 1px var(--wpds-color-stroke-interactive-neutral);
+}
+
+.ss-layout-button.is-pressed,
+.ss-style-button.is-pressed {
+  color: var(--wpds-color-fg-interactive-neutral-strong);
+  background: var(--wpds-color-bg-interactive-neutral-strong);
+  box-shadow: inset 0 0 0 1px var(--wpds-color-bg-interactive-neutral-strong);
+}
+
+.ss-layout-button.is-pressed:hover,
+.ss-style-button.is-pressed:hover {
+  background: var(--wpds-color-bg-interactive-neutral-strong-active);
+  box-shadow: inset 0 0 0 1px var(--wpds-color-bg-interactive-neutral-strong-active);
 }
 
 /* Popover preview shown when hovering an inactive layout button */
@@ -1153,16 +1186,12 @@
 }
 
 /* Section style variants (settings sidebar) — same interaction as Layout,
-   but each variant paints the preview card with its own palette. */
+   but each variant paints the preview card with its own palette.
+   .ss-style-button itself is styled by the shared rule above. */
 .ss-style-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--wpds-dimension-gap-xs);
-}
-
-.ss-style-button {
-  justify-content: center;
-  width: 100%;
 }
 
 /* Rich popover preview rendered to the left of the hovered button. */

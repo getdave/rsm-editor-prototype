@@ -125,19 +125,20 @@ function SectionLayoutAlternatives() {
     <>
       <div className="ss-layout-buttons">
         {SECTION_LAYOUT_PRESETS.map(({ id, title }) => (
-          <Button
-            key={id}
-            variant="secondary"
-            isPressed={id === activeId}
-            className="ss-layout-button"
-            onClick={() => setActiveId(id)}
-            onMouseEnter={(event) => handleEnter(event, id)}
-            onMouseLeave={() => handleLeave(id)}
-            onFocus={(event) => handleEnter(event, id)}
-            onBlur={() => handleLeave(id)}
-          >
-            {title}
-          </Button>
+          <Tooltip key={id} text={title} placement="top">
+            <Button
+              variant="secondary"
+              isPressed={id === activeId}
+              className="ss-layout-button"
+              onClick={() => setActiveId(id)}
+              onMouseEnter={(event) => handleEnter(event, id)}
+              onMouseLeave={() => handleLeave(id)}
+              onFocus={(event) => handleEnter(event, id)}
+              onBlur={() => handleLeave(id)}
+            >
+              {title}
+            </Button>
+          </Tooltip>
         ))}
       </div>
       {previewPreset && preview.anchor ? (
