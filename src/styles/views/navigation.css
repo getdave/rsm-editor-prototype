@@ -275,6 +275,31 @@
   position: relative;
 }
 
+/* Newly added rows — slow attention flash (peak highlight held ~3s so it’s easy to spot) */
+.nav-menu-editor-item.flash-highlight {
+  animation: nav-menu-item-attn 4s ease-in-out;
+}
+
+@keyframes nav-menu-item-attn {
+  0%,
+  4% {
+    background: transparent;
+    box-shadow: none;
+  }
+  9% {
+    background: rgb(255, 245, 200);
+    box-shadow: inset 3px 0 0 0 rgba(217, 119, 6, 0.45);
+  }
+  84% {
+    background: rgb(255, 245, 200);
+    box-shadow: inset 3px 0 0 0 rgba(217, 119, 6, 0.45);
+  }
+  100% {
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
 .nav-item-toggle {
   width: 28px;
   height: 28px;
@@ -703,4 +728,94 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 16px;
+}
+
+/* Add pages — DataViewsPicker in WordPress Modal (Storybook With modal pattern) */
+.components-modal__frame:has(.nav-add-pages-picker-root) .components-modal__content {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.components-modal__frame:has(.nav-add-pages-picker-root) {
+  z-index: 1000001;
+}
+
+.nav-add-pages-picker-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 420px;
+  min-width: min(100%, 560px);
+  background: var(--wp-dataviews-color-background, #fff);
+}
+
+.nav-add-pages-picker-root .dataviews-picker-wrapper {
+  flex: 1;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-add-pages-picker-thumb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 56px;
+  background: #f6f7f7;
+  border-radius: 4px;
+}
+
+.nav-add-pages-picker-thumb-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #757575;
+}
+
+.nav-add-pages-picker-thumb-overlay {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: 3px;
+  line-height: 1.2;
+}
+
+.nav-add-pages-picker-thumb-overlay--home {
+  background: rgba(56, 88, 233, 0.14);
+  color: #3858e9;
+}
+
+.nav-add-pages-picker-thumb-overlay--posts {
+  background: rgba(33, 117, 155, 0.14);
+  color: #21759b;
+}
+
+.nav-add-pages-picker-title {
+  font-size: 13px;
+  color: #1e1e1e;
+}
+
+.nav-add-pages-picker-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.nav-add-pages-picker-badge--in {
+  background: rgba(56, 88, 233, 0.12);
+  color: #3858e9;
+}
+
+.nav-add-pages-picker-badge--out {
+  background: #f0f0f0;
+  color: #505050;
 }

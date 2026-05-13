@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Button,
   DropdownMenu,
@@ -21,6 +21,7 @@ import RenameMenuItemModal from './RenameMenuItemModal';
 import DeleteMenuItemConfirmModal from '../modals/DeleteMenuItemConfirmModal';
 import AddLinkPopover from './AddLinkPopover';
 import CreatePagePopover from './CreatePagePopover';
+import AddPagesToMenuModal from './AddPagesToMenuModal';
 
 function slugify(text) {
   return text
@@ -51,8 +52,17 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
   /** null | 'menu' | 'add-link' | 'create-page' */
   const [inserterView, setInserterView] = useState(null);
   const inserterAnchorRef = useRef(null);
+  const [showAddPagesModal, setShowAddPagesModal] = useState(false);
+  const [addPagesModalKey, setAddPagesModalKey] = useState(0);
+  /** Nav item row ids that should play the attention flash (newly added links). */
+  const [flashNavItemIds, setFlashNavItemIds] = useState([]);
 
   const closeInserter = () => setInserterView(null);
+
+  const openAddPagesModal = useCallback(() => {
+    setAddPagesModalKey((k) => k + 1);
+    setShowAddPagesModal(true);
+  }, []);
 
   const toggleInserterFromButton = () => {
     setInserterView((prev) => (prev ? null : 'menu'));
@@ -64,7 +74,48 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
       ...newItem,
     };
     onUpdateMenu({ items: [...menu.items, item] });
+    setFlashNavItemIds([item.id]);
   };
+
+  const addPageLinksFromPicker = useCallback(
+    (selectedRows) => {
+      if (!selectedRows?.length) {
+        showSnackbar('Nothing was added to the menu.');
+        setShowAddPagesModal(false);
+        return;
+      }
+      const ts = Date.now();
+      const newItems = selectedRows.map((row, index) => ({
+        id: `nav-page-${row.id}-${ts}-${index}`,
+        label: row.name,
+        pageId: row.id,
+        children: [],
+      }));
+      onUpdateMenu({ items: [...menu.items, ...newItems] });
+      setFlashNavItemIds(newItems.map((i) => i.id));
+      showSnackbar(
+        `Added ${newItems.length} link${newItems.length === 1 ? '' : 's'} to the menu`,
+      );
+      setShowAddPagesModal(false);
+    },
+    [menu.items, onUpdateMenu, showSnackbar],
+  );
+
+  useEffect(() => {
+    if (flashNavItemIds.length === 0) {
+      return undefined;
+    }
+    // Clear flash class after animation (~4s cycle)
+    const t = window.setTimeout(() => {
+      setFlashNavItemIds([]);
+    }, 4200);
+    return () => window.clearTimeout(t);
+  }, [flashNavItemIds]);
+
+  const flashNavItemIdSet = useMemo(
+    () => new Set(flashNavItemIds),
+    [flashNavItemIds],
+  );
 
   const toggleExpanded = (itemId) => {
     setExpandedItems((prev) => {
@@ -145,7 +196,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     return (
       <div key={item.id} className="nav-menu-item-wrapper">
         <div
-          className="nav-menu-editor-item"
+          className={`nav-menu-editor-item${flashNavItemIdSet.has(item.id) ? ' flash-highlight' : ''}`}
           style={{ paddingLeft: `${level * 24 + 12}px` }}
         >
           {hasChildren && (
@@ -281,12 +332,10 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
   const pageActions = (
     <Button
       variant="secondary"
-      onClick={() => {
-        // Placeholder: "Add pages" flow not yet implemented
-      }}
+      onClick={openAddPagesModal}
       className="nav-header-add-btn"
     >
-      Add Pages
+      Add pages
     </Button>
   );
 
@@ -319,11 +368,11 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
                   <MenuItem
                     icon={pageIcon}
                     onClick={() => {
-                      // Placeholder: Add existing page flow — close popover only
                       closeInserter();
+                      openAddPagesModal();
                     }}
                   >
-                    Add Page
+                    Add pages
                   </MenuItem>
                   <MenuItem
                     icon={linkIconGlyph}
@@ -407,7 +456,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
               <div className="nav-empty-state">
                 <p>No items in this menu yet</p>
                 <p className="nav-empty-hint">
-                  Use &quot;Add Pages&quot; above or the + button below to add links.
+                  Use &quot;Add pages&quot; above or the + button below to add links.
                 </p>
               </div>
               {quickInserter}
@@ -448,6 +497,15 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
             removeItem(itemPendingDelete.id);
             setItemPendingDelete(null);
           }}
+        />
+      ) : null}
+      {showAddPagesModal ? (
+        <AddPagesToMenuModal
+          key={addPagesModalKey}
+          onClose={() => setShowAddPagesModal(false)}
+          pages={allPages}
+          menuItems={menu.items}
+          onConfirm={addPageLinksFromPicker}
         />
       ) : null}
     </Page>
