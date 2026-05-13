@@ -14,17 +14,19 @@ import { createInterpolateElement } from "@wordpress/element";
 import {
   pencil,
   external,
+  seen,
   plus,
   copy,
   home,
   page as pageIcon,
   postList,
-  seen,
   chevronDown,
   chevronUp,
   moreVertical,
   help,
   trash,
+  navigation,
+  closeSmall,
 } from "@wordpress/icons";
 import { Page } from "@wordpress/admin-ui";
 import {
@@ -404,6 +406,7 @@ function PagesView() {
     pagesViewMode,
     setPagesViewMode,
     pages,
+    openAddPageModal,
     deletePage,
     homepageDisplayMode,
     setHomepageDisplayMode,
@@ -413,6 +416,8 @@ function PagesView() {
     setPostsPageId,
     setPageStatus,
     showSnackbar,
+    addPageToMainMenu,
+    removePageFromMainMenu,
   } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -683,6 +688,38 @@ function PagesView() {
         },
       },
       {
+        id: "add-to-menu",
+        label: "Add to menu",
+        icon: navigation,
+        isEligible: (item) =>
+          item.category === "content" &&
+          !item.isSystem &&
+          item.id !== BLOG_HOMEPAGE_ROOT_TEMPLATE_ID &&
+          !item.inMenu,
+        callback: (items, { onActionPerformed } = {}) => {
+          const page = items[0];
+          addPageToMainMenu(page);
+          showSnackbar(`“${page.name}” added to the main menu.`);
+          onActionPerformed?.(items);
+        },
+      },
+      {
+        id: "remove-from-menu",
+        label: "Remove from menu",
+        icon: closeSmall,
+        isEligible: (item) =>
+          item.category === "content" &&
+          !item.isSystem &&
+          item.id !== BLOG_HOMEPAGE_ROOT_TEMPLATE_ID &&
+          item.inMenu,
+        callback: (items, { onActionPerformed } = {}) => {
+          const page = items[0];
+          removePageFromMainMenu(page.id);
+          showSnackbar(`“${page.name}” removed from the main menu.`);
+          onActionPerformed?.(items);
+        },
+      },
+      {
         id: "set-as-homepage",
         label: "Set as Homepage",
         isEligible: (item) =>
@@ -779,6 +816,8 @@ function PagesView() {
       setHomepageDisplayMode,
       setFrontPageId,
       setPostsPageId,
+      addPageToMainMenu,
+      removePageFromMainMenu,
     ],
   );
 

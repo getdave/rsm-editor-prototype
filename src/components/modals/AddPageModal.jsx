@@ -18,6 +18,7 @@ function AddPageModalContent() {
   const {
     closeAddPageModal,
     addPage,
+    addPageToMainMenu,
     showSnackbar,
   } = useAppState();
   const navigate = useNavigate();
@@ -126,6 +127,9 @@ function AddPageModalContent() {
     if (!pageTitle.trim()) return;
     const newPage = createPageObject();
     addPage(newPage);
+    if (newPage.inMenu) {
+      addPageToMainMenu(newPage);
+    }
     showSnackbar(`Page "${newPage.name}" created`);
     closeAddPageModal();
     const editPath = `/pages/${newPage.id}/edit`;
@@ -138,6 +142,9 @@ function AddPageModalContent() {
     if (!pageTitle.trim()) return;
     const newPage = createPageObject();
     addPage(newPage);
+    if (newPage.inMenu) {
+      addPageToMainMenu(newPage);
+    }
     showSnackbar(`Page "${newPage.name}" created successfully`);
     closeAddPageModal();
   };
