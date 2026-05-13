@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Modal } from '@wordpress/components';
+import { Button, Modal } from '@wordpress/components';
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import { home, page as pageIcon, postList } from '@wordpress/icons';
 import { collectPageIdsInMenu } from './navigationUtils';
@@ -161,6 +161,15 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
     <Modal
       className="nav-add-pages-modal"
       title="Add pages to menu"
+      headerActions={
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => {}}
+        >
+          Create new page
+        </Button>
+      }
       onRequestClose={onClose}
       isFullScreen={false}
       size="fill"
