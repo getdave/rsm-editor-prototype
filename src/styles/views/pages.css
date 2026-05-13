@@ -158,14 +158,13 @@
   background: transparent;
 }
 
-/* Controls row: sits below tabs */
+/* Optional row below tabs (reading tip / view options). No bottom border — tab row already separates header from list. */
 .pp-toolbar-controls {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 8px;
-  padding: 8px 16px 8px 20px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 0 16px 0 20px;
   background: #fff;
   flex-shrink: 0;
 }
@@ -173,6 +172,10 @@
 /* Single-tab mode: no top border — @wordpress/admin-ui Page header already has border-block-end */
 .pp-toolbar-controls--solo-category {
   border-top: none;
+}
+
+.pp-toolbar-controls:has(.pp-latest-posts-home-tip, .pp-toolbar-row-options) {
+  padding-top: 8px;
 }
 
 .pp-latest-posts-home-tip {

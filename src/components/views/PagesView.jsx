@@ -72,12 +72,7 @@ const SYSTEM_FILTER_HIDE = Object.freeze([
 ]);
 
 const DATAVIEW_FIELDS_DEFAULT = ["status", "inMenu", "authorDisplay"];
-const DATAVIEW_FIELDS_LIST = [
-  "status",
-  "pageRole",
-  "inMenu",
-  "authorDisplay",
-];
+const DATAVIEW_FIELDS_LIST = ["status", "pageRole", "inMenu", "authorDisplay"];
 
 const DEFAULT_VIEW = {
   type: "list",
@@ -236,7 +231,11 @@ function ConfigureHomepageReadingModal({
         justify="space-between"
         className="modal-hd"
       >
-        <Text id="configure-homepage-modal-title" variant="heading-md" className="modal-title">
+        <Text
+          id="configure-homepage-modal-title"
+          variant="heading-md"
+          className="modal-title"
+        >
           Configure site homepage
         </Text>
         <button
@@ -250,7 +249,8 @@ function ConfigureHomepageReadingModal({
       </Stack>
       <div className="modal-body ch-reading-body">
         <Text variant="body-sm" className="ch-reading-intro">
-          Controls what visitors see at your site&apos;s main address (https://example.com).
+          Controls what visitors see at your site&apos;s main address
+          (https://example.com).
         </Text>
 
         <RadioControl
@@ -291,7 +291,11 @@ function ConfigureHomepageReadingModal({
                 onChange={handleHomepageSelect}
               />
               {homepageWarning ? (
-                <Text variant="body-sm" className="ch-reading-field-warning" role="note">
+                <Text
+                  variant="body-sm"
+                  className="ch-reading-field-warning"
+                  role="note"
+                >
                   {homepageWarning}
                 </Text>
               ) : null}
@@ -327,7 +331,11 @@ function ConfigureHomepageReadingModal({
                 onChange={(v) => setPostsPageIdDraft(v || "")}
               />
               {postsPageWarning ? (
-                <Text variant="body-sm" className="ch-reading-field-warning" role="note">
+                <Text
+                  variant="body-sm"
+                  className="ch-reading-field-warning"
+                  role="note"
+                >
                   {postsPageWarning}
                 </Text>
               ) : null}
@@ -360,7 +368,9 @@ function AddNewCard() {
         <span className="pp-card-icon pp-card-icon-add">{plus}</span>
       </div>
       <div className="pp-card-body">
-        <Text variant="body-md" className="pp-card-name">Add new</Text>
+        <Text variant="body-md" className="pp-card-name">
+          Add new
+        </Text>
       </div>
     </div>
   );
@@ -476,13 +486,13 @@ function PagesView() {
               className="pp-media-thumb-icon"
               style={{ color: "#999", display: "flex" }}
             >
-            {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
-          </span>
+              {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
+            </span>
             {item.isFrontPage ? (
               <span className="pp-front-page-overlay">Homepage</span>
             ) : item.isPostsPage ? (
-            <span className="pp-posts-page-overlay">Posts page</span>
-          ) : null}
+              <span className="pp-posts-page-overlay">Posts page</span>
+            ) : null}
           </span>
         ),
         enableSorting: false,
@@ -519,7 +529,9 @@ function PagesView() {
               >
                 {docIcon}
               </span>
-              <Text variant="body-md" className="pp-title-cell-name">{item.name}</Text>
+              <Text variant="body-md" className="pp-title-cell-name">
+                {item.name}
+              </Text>
               <span
                 className={`url-dot${isLive ? "" : " url-draft-dot"}`}
                 role="status"
@@ -846,9 +858,7 @@ function PagesView() {
       page: 1,
       search: "",
       filters:
-        value === "all" && showDynamicPagesTab
-          ? [...SYSTEM_FILTER_HIDE]
-          : [],
+        value === "all" && showDynamicPagesTab ? [...SYSTEM_FILTER_HIDE] : [],
     }));
   };
 
@@ -979,18 +989,15 @@ function PagesView() {
         </Button>
       )}
       {activeCategory === "all" && showDynamicPagesTab && (
-        <Button
-          variant="secondary"
-          onClick={() => navigate("/templates")}
-        >
+        <Button variant="secondary" onClick={() => navigate("/templates")}>
           All Templates
         </Button>
       )}
       <span className="pp-hd-more-wrap">
         {readingConfigureMenuNeedsAttention ? (
           <VisuallyHidden>
-            Homepage or posts page configuration needs attention.
-            Configure it in this menu.
+            Homepage or posts page configuration needs attention. Configure it
+            in this menu.
           </VisuallyHidden>
         ) : null}
         <DropdownMenu
