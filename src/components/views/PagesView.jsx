@@ -51,9 +51,10 @@ const BADGE_STYLES = {
 
 const TABS = [
   {
-    value: "all",
-    label: "All Pages",
-    description: "Published pages on your site.",
+    value: "published",
+    label: "Published",
+    description:
+      "Pages that are published and visible on your site.",
   },
   {
     value: "drafts",
@@ -411,7 +412,7 @@ function PagesView() {
     showSnackbar,
   } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState("published");
   const [view, setView] = useState(() =>
     createPagesDataViewState(pagesViewMode),
   );
@@ -419,9 +420,9 @@ function PagesView() {
   const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
   const [publishConfirmPage, setPublishConfirmPage] = useState(null);
 
-  /** When All Pages includes dynamic rows, match former Dynamic tab default filters. */
+  /** When Published includes template-backed rows, match former Dynamic tab default filters. */
   useEffect(() => {
-    if (activeCategory !== "all") {
+    if (activeCategory !== "published") {
       return;
     }
     setView((prev) => ({
@@ -774,10 +775,10 @@ function PagesView() {
       filtered = filtered.filter(
         (p) => p.category === "content" && p.status === "draft",
       );
-    } else {
+    } else if (activeCategory === "published") {
       filtered = filtered.filter((p) => {
         if (p.category === "content") {
-          return p.status !== "draft";
+          return p.status === "live";
         }
         if (p.category === "dynamic") {
           return showDynamicPagesTab;
@@ -792,6 +793,8 @@ function PagesView() {
       ) {
         filtered = [blogHomepageRootTemplateRow, ...filtered];
       }
+    } else {
+      filtered = [];
     }
 
     return filtered;
@@ -858,7 +861,9 @@ function PagesView() {
       page: 1,
       search: "",
       filters:
-        value === "all" && showDynamicPagesTab ? [...SYSTEM_FILTER_HIDE] : [],
+        value === "published" && showDynamicPagesTab
+          ? [...SYSTEM_FILTER_HIDE]
+          : [],
     }));
   };
 
@@ -926,7 +931,7 @@ function PagesView() {
           className={`pp-toolbar-controls${TABS.length <= 1 ? " pp-toolbar-controls--solo-category" : ""}`}
         >
           {homepageDisplayMode === READING_DISPLAY_LATEST &&
-            activeCategory === "all" && (
+            activeCategory === "published" && (
               <div className="pp-latest-posts-home-tip" role="status">
                 {showDynamicPagesTab ? (
                   <>
@@ -978,7 +983,7 @@ function PagesView() {
   /** Layout: Foundations → Sidebar (RootLayout) + Content Frame + Preview Frame (list). */
   const pageActions = (
     <>
-      {(activeCategory === "all" || activeCategory === "drafts") && (
+      {(activeCategory === "published" || activeCategory === "drafts") && (
         <Button
           variant="primary"
           icon={plus}
@@ -988,7 +993,7 @@ function PagesView() {
           Add page
         </Button>
       )}
-      {activeCategory === "all" && showDynamicPagesTab && (
+      {activeCategory === "published" && showDynamicPagesTab && (
         <Button variant="secondary" onClick={() => navigate("/templates")}>
           All Templates
         </Button>
