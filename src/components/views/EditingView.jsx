@@ -20,6 +20,10 @@ import SettingsSidebar from './SettingsSidebar';
 import BlockToolbar from './BlockToolbar';
 import { getEditModeContent } from '../../services/pageContentService';
 import {
+  DEFAULT_SECTION_STYLE_ID,
+  sectionStyleSurfaceClass,
+} from '../../constants/sectionInspectorStyles';
+import {
   FOOTER_META,
   getSectionMeta,
   HEADER_META,
@@ -99,6 +103,7 @@ function EditableSectionGroup({
   openInserter,
   blockToolbarBindings,
   renderSectionContent,
+  sectionStyleClass,
 }) {
   const blockId = `section-${index}`;
   const meta = getSectionMeta(section);
@@ -117,7 +122,7 @@ function EditableSectionGroup({
       <AddSectionInserterButton variant="top" onAdd={openInserter} />
       <div
         ref={measureRef}
-        className={`e-sec ${selected ? 'sel' : ''}`}
+        className={`e-sec ${sectionStyleClass} ${selected ? 'sel' : ''}`}
         onClick={() => setSelectedBlockId(blockId)}
       >
         {selected && (
@@ -152,7 +157,7 @@ function EditingView() {
   const [inspectorBlockTabSignal, setInspectorBlockTabSignal] = useState(0);
   /** Incremented to run the attention flash only when the inspector is already open (Design control). */
   const [inspectorFlashSignal, setInspectorFlashSignal] = useState(0);
-
+  const [sectionStylesByIndex, setSectionStylesByIndex] = useState({});
 
   // Get page-specific content for editing
   const content = getEditModeContent(currentPage);
@@ -164,7 +169,12 @@ function EditingView() {
 
   useEffect(() => {
     setSelectedBlockId(content.isTemplate ? 'template' : 'section-0');
+    setSectionStylesByIndex({});
   }, [currentPage?.id, content.isTemplate]);
+
+  const handleSectionStyleChange = (sectionIndex, styleId) => {
+    setSectionStylesByIndex((prev) => ({ ...prev, [sectionIndex]: styleId }));
+  };
 
   const isInserterOpen = searchParams.get('inserter') != null;
   
@@ -261,6 +271,9 @@ function EditingView() {
       openInserter={openInserter}
       blockToolbarBindings={blockToolbarBindings}
       renderSectionContent={renderSectionContent}
+      sectionStyleClass={sectionStyleSurfaceClass(
+        sectionStylesByIndex[index] ?? DEFAULT_SECTION_STYLE_ID
+      )}
     />
   );
 
@@ -598,6 +611,8 @@ function EditingView() {
             sections={content.sections}
             focusBlockTabSignal={inspectorBlockTabSignal}
             flashSignal={inspectorFlashSignal}
+            sectionStyles={sectionStylesByIndex}
+            onSectionStyleChange={handleSectionStyleChange}
           />
         </div>
       </div>
