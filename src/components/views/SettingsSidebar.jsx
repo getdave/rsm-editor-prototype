@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, PanelBody, TabPanel, TextControl } from '@wordpress/components';
+import { Button, PanelBody, Popover, TabPanel, TextControl } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { closeSmall } from '@wordpress/icons';
 import {
@@ -103,17 +103,60 @@ const SECTION_LAYOUT_PRESETS = [
 ];
 
 function SectionLayoutAlternatives() {
+  const [activeId, setActiveId] = useState(SECTION_LAYOUT_PRESETS[0].id);
+  // `preview` holds both the hovered/focused preset id and its anchor element
+  // in one object so the Popover can render without reading a ref during render.
+  const [preview, setPreview] = useState(null);
+
+  const showPreview = preview && preview.id !== activeId;
+  const previewPreset = showPreview
+    ? SECTION_LAYOUT_PRESETS.find((p) => p.id === preview.id)
+    : null;
+  const PreviewWireframe = previewPreset?.Wireframe;
+
+  const handleEnter = (event, id) => {
+    setPreview({ id, anchor: event.currentTarget });
+  };
+  const handleLeave = (id) => {
+    setPreview((current) => (current && current.id === id ? null : current));
+  };
+
   return (
-    <div className="ss-layout-grid">
-      {SECTION_LAYOUT_PRESETS.map(({ id, title, Wireframe }) => (
-        <button key={id} type="button" className="ss-layout-card">
+    <>
+      <div className="ss-layout-buttons">
+        {SECTION_LAYOUT_PRESETS.map(({ id, title }) => (
+          <Button
+            key={id}
+            variant="secondary"
+            isPressed={id === activeId}
+            className="ss-layout-button"
+            onClick={() => setActiveId(id)}
+            onMouseEnter={(event) => handleEnter(event, id)}
+            onMouseLeave={() => handleLeave(id)}
+            onFocus={(event) => handleEnter(event, id)}
+            onBlur={() => handleLeave(id)}
+          >
+            {title}
+          </Button>
+        ))}
+      </div>
+      {previewPreset && preview.anchor ? (
+        <Popover
+          anchor={preview.anchor}
+          placement="left-start"
+          offset={12}
+          focusOnMount={false}
+          className="ss-layout-preview"
+        >
           <div className="ss-layout-thumb" aria-hidden>
-            <Wireframe />
+            <PreviewWireframe />
           </div>
-          <Text variant="body-sm" className="ss-layout-title">{title}</Text>
-        </button>
-      ))}
-    </div>
+          <Text variant="body-sm" className="ss-layout-title">
+            {previewPreset.title}
+          </Text>
+        </Popover>
+      ) : null}
+    </>
   );
 }
 
