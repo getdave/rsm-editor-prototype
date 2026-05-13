@@ -77,6 +77,61 @@
   text-overflow: ellipsis;
 }
 
+/* Advanced — expandable second tier (Posts, Templates, Patterns) */
+.admin-root-nav .sb-advanced-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+/* Pinned above Dashboard — overrides .admin-root-nav flex growth */
+.sidebar-advanced-dock.admin-root-nav,
+.editor-sidebar-advanced-dock.admin-root-nav {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  overflow: visible;
+  border-top: 1px solid #2a2a2a;
+}
+
+.editor-sidebar-advanced-dock.editor-sidebar-section {
+  border-bottom: none;
+}
+
+/* Advanced submenu — icons + indent (match .ni chrome; anchors ignore WP link colour) */
+.admin-root-nav a.sb-advanced-sub.ni.ni-child,
+.admin-root-nav a.sb-advanced-sub.ni.ni-child:visited {
+  padding-left: 36px;
+  text-decoration: none;
+  color: #bbb;
+}
+
+.admin-root-nav a.sb-advanced-sub.ni.ni-child:hover {
+  color: #fff;
+}
+
+.admin-root-nav a.sb-advanced-sub.ni.ni-child.on {
+  color: #fff;
+}
+
+.admin-root-nav a.sb-advanced-sub.ni.ni-child .ni-label {
+  color: #bbb;
+}
+
+.admin-root-nav a.sb-advanced-sub.ni.ni-child:visited .ni-label {
+  color: #bbb;
+}
+
+.admin-root-nav a.sb-advanced-sub.ni.ni-child:hover .ni-label,
+.admin-root-nav a.sb-advanced-sub.ni.ni-child.on .ni-label {
+  color: #fff;
+}
+
+.sidebar.collapsed .admin-root-nav .sb-advanced-sub.ni.ni-child {
+  padding-left: 0;
+  justify-content: center;
+}
+
 .ni-with-chevron .ni-chevron {
   margin-left: auto;
   width: 24px;

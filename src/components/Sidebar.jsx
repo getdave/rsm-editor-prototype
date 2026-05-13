@@ -1,6 +1,6 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAppState } from '../hooks/useAppState';
+import { useAppState, READING_DISPLAY_LATEST } from '../hooks/useAppState';
 import { Tooltip } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import {
@@ -21,15 +21,67 @@ import {
   background,
   shadow,
   layout,
+  tool,
+  addTemplate,
+  symbolFilled,
 } from '@wordpress/icons';
 
-const ADMIN_NAV_ITEMS = [
+/** Root admin nav — Posts inserted after Pages only when homepage shows latest posts */
+const ADMIN_NAV_ITEM_POSTS = Object.freeze({
+  kind: 'item',
+  id: 'posts',
+  icon: postList,
+  label: 'Posts',
+  path: '/posts',
+  tip: 'Manage Posts on your site',
+});
+
+const ADMIN_NAV_ITEMS_BASE = [
   { kind: 'item', id: 'home', icon: home, label: 'Home', path: '/', tip: "View your site's home page" },
-  { kind: 'item', id: 'posts', icon: postList, label: 'Posts', path: '/posts', tip: 'Manage Posts on your site' },
   { kind: 'item', id: 'pages', icon: pageIcon, label: 'Pages', path: '/pages', tip: "View your site's Pages" },
   { kind: 'item', id: 'navigation', icon: navigation, label: 'Navigation', path: '/navigation', tip: 'Assign pages to your Main Menu and manage other menus' },
   { kind: 'item', id: 'design', icon: styles, label: 'Design', path: '/design', tip: 'Modify your site design and styling', chevron: true },
 ];
+
+function buildVisibleAdminNavItems(homepageDisplayMode) {
+  if (homepageDisplayMode === READING_DISPLAY_LATEST) {
+    return [
+      ADMIN_NAV_ITEMS_BASE[0],
+      ADMIN_NAV_ITEMS_BASE[1],
+      ADMIN_NAV_ITEM_POSTS,
+      ADMIN_NAV_ITEMS_BASE[2],
+      ADMIN_NAV_ITEMS_BASE[3],
+    ];
+  }
+  return [...ADMIN_NAV_ITEMS_BASE];
+}
+
+/** Sub-links under Advanced — icons + indent (no tree-line connectors) */
+const ADVANCED_SUB_NAV_ITEMS = Object.freeze([
+  {
+    id: 'advanced-posts',
+    label: 'Posts',
+    path: '/posts',
+    tip: 'Manage posts on your site',
+    icon: postList,
+  },
+  {
+    id: 'advanced-templates',
+    label: 'Templates',
+    path: '/templates',
+    tip: 'Edit templates that control how your site renders',
+    icon: addTemplate,
+  },
+  {
+    id: 'advanced-patterns',
+    label: 'Patterns',
+    path: '/patterns',
+    tip: 'Reusable sets of blocks for layouts and sections',
+    icon: symbolFilled,
+  },
+]);
+
+const ADVANCED_ROUTE_PREFIXES = ['/posts', '/templates', '/patterns'];
 
 const DESIGN_NAV_ITEMS = [
   { kind: 'back', id: 'back', icon: chevronLeft, label: 'Back', path: '/', tip: 'Back to admin' },
@@ -65,10 +117,26 @@ function Sidebar() {
     menuExpanded,
     toggleMenuExpanded,
     selectPage,
+    homepageDisplayMode,
   } = useAppState();
+  const visibleAdminNavItems = useMemo(
+    () => buildVisibleAdminNavItems(homepageDisplayMode),
+    [homepageDisplayMode],
+  );
   const isDesignSection = location.pathname.startsWith('/design');
   const isEditCanvas = EDIT_ROUTE_PATTERN.test(location.pathname);
   const [collapsedGroups, setCollapsedGroups] = useState({});
+  const [advancedExpanded, setAdvancedExpanded] = useState(false);
+
+  const sidebarNestedNavHidden = isEditCanvas
+    ? sidebarCollapsed && !menuExpanded
+    : sidebarCollapsed;
+
+  useEffect(() => {
+    if (sidebarNestedNavHidden) {
+      setAdvancedExpanded(false);
+    }
+  }, [sidebarNestedNavHidden]);
 
   const toggleGroup = (groupId) => {
     setCollapsedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
@@ -89,6 +157,11 @@ function Sidebar() {
     }
     return location.pathname === itemPath;
   };
+
+  const isAdvancedChildRouteActive = ADVANCED_ROUTE_PREFIXES.some(
+    (prefix) =>
+      location.pathname === prefix || location.pathname.startsWith(`${prefix}/`),
+  );
 
   const renderItem = (item) => {
     if (item.kind === 'back') {
@@ -189,6 +262,56 @@ function Sidebar() {
     return null;
   };
 
+  const renderAdvancedSection = () => {
+    const showChildren = advancedExpanded && !sidebarNestedNavHidden;
+    return (
+      <Stack direction="column" gap="xs" className="sb-advanced-block">
+        <Tooltip text="Templates, patterns, and posts" placement="right">
+          <div
+            className={`ni ni-with-chevron ni-group-parent sb-advanced-parent ${
+              isAdvancedChildRouteActive ? 'on' : ''
+            }`}
+            role="button"
+            tabIndex={0}
+            aria-expanded={showChildren}
+            onClick={() => setAdvancedExpanded((prev) => !prev)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setAdvancedExpanded((prev) => !prev);
+              }
+            }}
+          >
+            <span className="ni-ico">{tool}</span>
+            <Text variant="body-md" className="ni-label">Advanced</Text>
+            <span className="ni-chevron">
+              {advancedExpanded ? chevronDown : chevronUp}
+            </span>
+          </div>
+        </Tooltip>
+        {showChildren &&
+          ADVANCED_SUB_NAV_ITEMS.map((row) => {
+            const isOn = isItemActive(row.path);
+            return (
+              <Tooltip key={row.id} text={row.tip} placement="right">
+                <a
+                  href={row.path}
+                  className={`ni ni-child sb-advanced-sub ${isOn ? 'on' : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(row.path);
+                  }}
+                >
+                  <span className="ni-ico">{row.icon}</span>
+                  <Text variant="body-md" className="ni-label">{row.label}</Text>
+                </a>
+              </Tooltip>
+            );
+          })}
+      </Stack>
+    );
+  };
+
   // Inside the editor the sidebar shows three sections: a menu-toggle
   // button (top, 64px), the root nav (middle), and recent documents
   // (bottom, flex-grow). Reuses the same .sidebar / .sidebar.collapsed
@@ -244,7 +367,7 @@ function Sidebar() {
 
         {/* Section 2 — root nav icons. */}
         <nav className="admin-root-nav editor-sidebar-section editor-sidebar-root-nav">
-          {ADMIN_NAV_ITEMS.map((item) => (
+          {visibleAdminNavItems.map((item) => (
             <Tooltip key={item.id} text={item.tip} placement="right">
               <div
                 className="ni"
@@ -268,7 +391,7 @@ function Sidebar() {
             Recent documents
           </Text>
         )}
-        <nav className="admin-root-nav editor-sidebar-recent-list">
+        <nav className="admin-root-nav editor-sidebar-section editor-sidebar-recent-list">
           {recentPages.map((p) => (
             <Tooltip key={p.id} text={p.name} placement="right">
               <div
@@ -284,6 +407,13 @@ function Sidebar() {
             </Tooltip>
           ))}
         </nav>
+
+        <nav
+          className="admin-root-nav editor-sidebar-section editor-sidebar-advanced-dock"
+          aria-label="Advanced"
+        >
+          {renderAdvancedSection()}
+        </nav>
       </div>
     );
   }
@@ -296,7 +426,7 @@ function Sidebar() {
     >
       <div className={`sidebar-nav-slider ${isDesignSection ? 'is-design' : ''}`}>
         <nav className="admin-root-nav sidebar-nav-pane sidebar-nav-pane-admin">
-          {ADMIN_NAV_ITEMS.map((item) => (
+          {visibleAdminNavItems.map((item) => (
             <Fragment key={item.id}>{renderItem(item)}</Fragment>
           ))}
         </nav>
@@ -306,6 +436,12 @@ function Sidebar() {
           ))}
         </nav>
       </div>
+
+      {!isDesignSection && (
+        <nav className="admin-root-nav sidebar-advanced-dock" aria-label="Advanced">
+          {renderAdvancedSection()}
+        </nav>
+      )}
 
       {/* Dashboard link + sidebar customization. Hidden in the design section. */}
       <Stack

@@ -14,6 +14,8 @@ import ThemesInstalledView from '../components/views/ThemesInstalledView';
 import ThemesBrowseView from '../components/views/ThemesBrowseView';
 import NavigationView from '../components/views/NavigationView';
 
+import PostsRouteGate from './PostsRouteGate';
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -23,7 +25,7 @@ export const router = createBrowserRouter([
       { path: 'pages', element: <PagesView /> },
       { path: 'pages/:pageId/edit', element: <EditingView /> },
       { path: 'templates', element: <div style={{ padding: '20px' }}>Templates view coming soon</div> },
-      { path: 'posts', element: <div style={{ padding: '20px' }}>Posts view coming soon</div> },
+      { path: 'posts', element: <PostsRouteGate /> },
       { path: 'navigation', element: <NavigationView /> },
       { path: 'patterns', element: <div style={{ padding: '20px' }}>Patterns view coming soon</div> },
       { path: 'media', element: <div style={{ padding: '20px' }}>Media view coming soon</div> },

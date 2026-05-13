@@ -1,6 +1,10 @@
 import { createContext, useContext, useState } from 'react';
 import { pages as pagesData } from '../data/mockData';
 
+/** Mirrors WP Reading settings — homepage displays latest posts vs static page */
+export const READING_DISPLAY_LATEST = 'latest';
+export const READING_DISPLAY_STATIC = 'static';
+
 const AppStateContext = createContext(null);
 
 export function AppStateProvider({ children }) {
@@ -65,6 +69,17 @@ export function AppStateProvider({ children }) {
   
   // Pages view mode (list/grid)
   const [pagesViewMode, setPagesViewMode] = useState('grid');
+
+  // Reading / homepage (Configure homepage in Pages — drives Posts nav visibility)
+  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
+    READING_DISPLAY_STATIC,
+  );
+  const [frontPageId, setFrontPageId] = useState(
+    () => pagesData.find((p) => p.isFrontPage)?.id ?? 'home',
+  );
+  const [postsPageId, setPostsPageId] = useState(
+    () => pagesData.find((p) => p.isPostsPage)?.id ?? 'blog',
+  );
 
   // Edit canvas: List View panel and block inspector sidebar (WordPress-style)
   const [listViewOpen, setListViewOpen] = useState(false);
@@ -229,6 +244,14 @@ export function AppStateProvider({ children }) {
     // Pages view mode
     pagesViewMode,
     setPagesViewMode,
+
+    // Reading / homepage
+    homepageDisplayMode,
+    setHomepageDisplayMode,
+    frontPageId,
+    setFrontPageId,
+    postsPageId,
+    setPostsPageId,
 
     // Edit canvas panels
     listViewOpen,
