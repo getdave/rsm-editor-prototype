@@ -488,7 +488,15 @@ function Sidebar() {
         className="sidebar-bottom"
       >
         <Tooltip text="Return to the WordPress dashboard" placement="top">
-          <button type="button" className="sb-dashboard">
+          <button
+            type="button"
+            className="sb-dashboard"
+            onClick={() =>
+              alert(
+                'This would take you back to WP Admin, but this is a prototype.',
+              )
+            }
+          >
             <Stack direction="row" align="center" gap="sm" className="sb-dashboard-inner">
               <span className="sb-dashboard-ico-wrap" aria-hidden="true">
                 <span className="sb-dashboard-ico-layer sb-dashboard-ico-layer--wp">{wordpress}</span>
