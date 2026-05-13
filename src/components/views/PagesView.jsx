@@ -31,6 +31,7 @@ import {
   READING_DISPLAY_LATEST,
   READING_DISPLAY_STATIC,
 } from "../../hooks/useAppState";
+import PageLayoutWireframeThumb from "../shared/PageLayoutWireframeThumb";
 import PreviewCanvas from "../shared/PreviewCanvas";
 import DefinedTerm from "../shared/DefinedTerm";
 
@@ -483,12 +484,16 @@ function PagesView() {
                 : "pp-media-thumb"
             }
           >
-            <span
-              className="pp-media-thumb-icon"
-              style={{ color: "#999", display: "flex" }}
-            >
-              {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
-            </span>
+            {isGridLayout ? (
+              <PageLayoutWireframeThumb page={item} />
+            ) : (
+              <span
+                className="pp-media-thumb-icon"
+                style={{ color: "#999", display: "flex" }}
+              >
+                {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
+              </span>
+            )}
             {item.isFrontPage ? (
               <span className="pp-front-page-overlay">Homepage</span>
             ) : item.isPostsPage ? (
