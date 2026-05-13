@@ -150,6 +150,20 @@ export function AppStateProvider({ children }) {
     setPages(prev => [...prev, newPage]);
   };
 
+  const deletePage = (pageId) => {
+    setPages((prev) => {
+      const next = prev.filter((p) => p.id !== pageId);
+      setCurrentPage((cur) => {
+        if (!cur || cur.id !== pageId) return cur;
+        const fallback =
+          next.find((p) => p.category === 'content') ?? next[0] ?? null;
+        return fallback;
+      });
+      return next;
+    });
+    setRecentPages((prev) => prev.filter((p) => p.id !== pageId));
+  };
+
   const markDirty = () => {
     setHasUnsavedChanges(true);
   };
@@ -202,6 +216,7 @@ export function AppStateProvider({ children }) {
     pages,
     addPage,
     setPageStatus,
+    deletePage,
 
     // Current page
     currentPage,

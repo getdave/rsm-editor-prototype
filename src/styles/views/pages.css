@@ -319,6 +319,45 @@
   position: relative;
 }
 
+/* DataViews row/action menu — destructive Delete (color only; weight matches other items) */
+.pp-dataviews-action-delete {
+  color: #d63638;
+}
+
+/* Remove page — ConfirmDialog (compact); children must be span-safe (WP wraps in Text) */
+.pp-delete-page-confirm__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  max-width: 28em;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.pp-delete-page-confirm__question {
+  display: block;
+}
+
+.pp-delete-page-confirm__warn {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #50575e;
+  background: #f6e9b9;
+  border: 1px solid #dba617;
+  border-left-width: 4px;
+  border-radius: 2px;
+}
+
+.pp-delete-page-confirm__warn strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #1e1e1e;
+}
+
 /* Wireframe “preview” for page layout types (grid media cell only) */
 .pp-media-thumb--grid .pp-wf-root {
   position: absolute;

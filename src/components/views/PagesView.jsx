@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Button,
@@ -24,6 +24,7 @@ import {
   chevronUp,
   moreVertical,
   help,
+  trash,
 } from "@wordpress/icons";
 import { Page } from "@wordpress/admin-ui";
 import {
@@ -34,6 +35,7 @@ import {
 import PageLayoutWireframeThumb from "../shared/PageLayoutWireframeThumb";
 import PreviewCanvas from "../shared/PreviewCanvas";
 import DefinedTerm from "../shared/DefinedTerm";
+import DeletePageConfirmModal from "../modals/DeletePageConfirmModal";
 
 /** Tooltip primer (concept from WP template hierarchy) */
 const WP_TEMPLATE_TERM_DEFINITION =
@@ -402,7 +404,7 @@ function PagesView() {
     pagesViewMode,
     setPagesViewMode,
     pages,
-    openAddPageModal,
+    deletePage,
     homepageDisplayMode,
     setHomepageDisplayMode,
     frontPageId,
@@ -413,6 +415,7 @@ function PagesView() {
     showSnackbar,
   } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [activeCategory, setActiveCategory] = useState("published");
   const [view, setView] = useState(() =>
     createPagesDataViewState(pagesViewMode),
@@ -746,6 +749,24 @@ function PagesView() {
         disabled: true,
         callback: () => {},
       },
+      {
+        id: "delete",
+        label: () => (
+          <span className="pp-dataviews-action-delete">Delete</span>
+        ),
+        icon: trash,
+        isEligible: (item) =>
+          item.category === "content" &&
+          !item.isSystem &&
+          item.id !== BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
+        callback: (items, { onActionPerformed } = {}) => {
+          setDeleteConfirm({
+            page: items[0],
+            onActionPerformed,
+            actionItems: items,
+          });
+        },
+      },
     ],
     [
       navigate,
@@ -811,6 +832,33 @@ function PagesView() {
     postsPageId,
     homepageDisplayMode,
   ]);
+
+  const executeDeletePage = useCallback(
+    (page, { onActionPerformed, actionItems } = {}) => {
+      const nextPreview =
+        categoryPages.find((p) => p.id !== page.id) ?? null;
+      deletePage(page.id);
+      if (page.id === frontPageId) {
+        setFrontPageId("");
+      }
+      if (page.id === postsPageId) {
+        setPostsPageId("");
+      }
+      setPreviewPage((p) => (p?.id === page.id ? nextPreview : p));
+      showSnackbar(`“${page.name}” removed from this site.`);
+      onActionPerformed?.(actionItems ?? [page]);
+    },
+    [
+      categoryPages,
+      deletePage,
+      frontPageId,
+      postsPageId,
+      setFrontPageId,
+      setPostsPageId,
+      setPreviewPage,
+      showSnackbar,
+    ],
+  );
 
   const handleReadingModalApply = (draft) => {
     if (draft.homepageDisplayMode === READING_DISPLAY_LATEST) {
@@ -980,7 +1028,10 @@ function PagesView() {
   const canvasContent = (
     <PreviewCanvas
       page={previewPage}
-      onEdit={() => navigate(`/pages/${previewPage.id}/edit?inserter=patterns`)}
+      onEdit={() =>
+        previewPage &&
+        navigate(`/pages/${previewPage.id}/edit?inserter=patterns`)
+      }
       onPageChange={setPreviewPage}
     />
   );
@@ -1103,6 +1154,19 @@ function PagesView() {
         >
           {`Publish “${publishConfirmPage.name}”? It will go live on your site.`}
         </ConfirmDialog>
+      ) : null}
+      {deleteConfirm ? (
+        <DeletePageConfirmModal
+          page={deleteConfirm.page}
+          onClose={() => setDeleteConfirm(null)}
+          onConfirm={() => {
+            executeDeletePage(deleteConfirm.page, {
+              onActionPerformed: deleteConfirm.onActionPerformed,
+              actionItems: deleteConfirm.actionItems,
+            });
+            setDeleteConfirm(null);
+          }}
+        />
       ) : null}
     </>
   );
