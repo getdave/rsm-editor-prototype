@@ -105,10 +105,10 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     if (flashNavItemIds.length === 0) {
       return undefined;
     }
-    // Clear flash class after animation (~4s cycle)
+    // Clear flash class after animation (4s + small buffer)
     const t = window.setTimeout(() => {
       setFlashNavItemIds([]);
-    }, 4200);
+    }, 4100);
     return () => window.clearTimeout(t);
   }, [flashNavItemIds]);
 

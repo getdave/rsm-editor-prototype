@@ -275,22 +275,13 @@
   position: relative;
 }
 
-/* Newly added rows — slow attention flash (peak highlight held ~3s so it’s easy to spot) */
+/* Newly added rows — 4s ease-out from peak highlight to none (no long “hold” at full tint) */
 .nav-menu-editor-item.flash-highlight {
-  animation: nav-menu-item-attn 4s ease-in-out;
+  animation: nav-menu-item-attn 4s ease-out forwards;
 }
 
 @keyframes nav-menu-item-attn {
-  0%,
-  4% {
-    background: transparent;
-    box-shadow: none;
-  }
-  9% {
-    background: rgb(255, 245, 200);
-    box-shadow: inset 3px 0 0 0 rgba(217, 119, 6, 0.45);
-  }
-  84% {
+  0% {
     background: rgb(255, 245, 200);
     box-shadow: inset 3px 0 0 0 rgba(217, 119, 6, 0.45);
   }
@@ -779,7 +770,8 @@
 .nav-add-pages-picker-thumb-overlay {
   position: absolute;
   top: 4px;
-  left: 4px;
+  right: 4px;
+  left: auto;
   font-size: 9px;
   font-weight: 600;
   padding: 2px 5px;

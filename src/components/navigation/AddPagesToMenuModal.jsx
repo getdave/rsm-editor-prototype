@@ -28,6 +28,11 @@ const DEFAULT_PICKER_LAYOUTS = {
   pickerTable: {},
 };
 
+/** Site pages only — excludes dynamic/template routes (`category: dynamic` in mock data). */
+function filterPickerContentPages(pagesList) {
+  return pagesList.filter((p) => p.category === 'content');
+}
+
 /**
  * Mount only when open; parent passes a changing `key` so internal picker state resets per open.
  */
@@ -38,6 +43,11 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
   const pageIdSet = useMemo(
     () => collectPageIdsInMenu(menuItems),
     [menuItems],
+  );
+
+  const contentPagesOnly = useMemo(
+    () => filterPickerContentPages(pages),
+    [pages],
   );
 
   const fields = useMemo(
@@ -105,11 +115,11 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
 
   const dataWithFlags = useMemo(
     () =>
-      pages.map((p) => ({
+      contentPagesOnly.map((p) => ({
         ...p,
         inThisMenu: pageIdSet.has(p.id),
       })),
-    [pages, pageIdSet],
+    [contentPagesOnly, pageIdSet],
   );
 
   const { data: processedData, paginationInfo } = useMemo(
