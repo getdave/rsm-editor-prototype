@@ -22,9 +22,6 @@
 }
 
 .nav-panel .split-view-stage {
-  flex: 0 0 380px;
-  width: 380px;
-  min-width: 380px;
   border-right: none;
   background: var(--wp-page-area-surface, #fff);
   border-radius: var(--wp-page-area-radius, 8px);
@@ -246,6 +243,18 @@
 }
 
 /* DataViews cells */
+.nav-menu-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(56, 88, 233, 0.12);
+  color: #3858e9;
+}
+
 .nav-dv-locations {
   color: #505050;
   font-size: 13px;
@@ -264,6 +273,22 @@
   min-height: 44px;
   padding: 8px 8px 8px 0;
   position: relative;
+}
+
+/* Newly added rows — 4s ease-out from peak highlight to none (no long “hold” at full tint) */
+.nav-menu-editor-item.flash-highlight {
+  animation: nav-menu-item-attn 4s ease-out forwards;
+}
+
+@keyframes nav-menu-item-attn {
+  0% {
+    background: rgb(255, 245, 200);
+    box-shadow: inset 3px 0 0 0 rgba(217, 119, 6, 0.45);
+  }
+  100% {
+    background: transparent;
+    box-shadow: none;
+  }
 }
 
 .nav-item-toggle {
@@ -411,31 +436,179 @@
   color: #949494;
 }
 
-/* Floating add (+) below menu items */
-.nav-add-page-btn {
+/* Quick inserter (DropdownMenu) below menu items — WordPress block inserter style.
+ * Wrapper must shrink-wrap the toggle: Dropdown anchors Popover to this outer div;
+ * full-width flex was stretching the anchor past the + button. */
+.nav-add-item-dropdown {
+  display: inline-flex;
+  align-self: flex-start;
+  justify-content: flex-start;
+  margin: 12px 0 0 12px;
+  width: fit-content;
+}
+
+.nav-add-item-dropdown .components-button.nav-add-page-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  margin: 12px auto 0;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  margin: 0;
   padding: 0;
-  border: 1px dashed #c0c0c0;
-  border-radius: 50%;
-  background: #fafafa;
-  color: #3858e9;
+  border: none;
+  border-radius: 2px;
+  background: #1e1e1e;
+  color: #ffffff;
   cursor: pointer;
-  transition: border-color 0.12s, background 0.12s;
+  transition: background 0.12s;
 }
 
-.nav-add-page-btn:hover {
-  border-color: #3858e9;
-  background: #f0f4ff;
+.nav-add-item-dropdown .components-button.nav-add-page-btn:hover {
+  background: #000000;
 }
 
-.nav-add-page-btn svg {
+.nav-add-item-dropdown .components-button.nav-add-page-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.nav-add-item-dropdown .components-button.nav-add-page-btn:focus:not(:disabled) {
+  box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) var(--wp-admin-theme-color, #3858e9);
+}
+
+/* Quick inserter: multi-step popover (menu → add link / create page) */
+.nav-inserter-popover-shell {
+  min-width: 320px;
+  max-width: 360px;
+  box-sizing: border-box;
+}
+
+/* Override WordPress Popover default padding */
+.nav-inserter-popover-shell .components-popover__content {
+  padding: 0;
+}
+
+/* Menu selection screen */
+.nav-inserter-menu {
+  padding: 0 8px;
+}
+
+.nav-inserter-menu-header {
+  padding: 12px 8px 8px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #757575;
+}
+
+.nav-inserter-menu .components-menu-group {
+  margin: 0;
+  padding: 8px 0;
+}
+
+.nav-inserter-menu .components-menu-group + .components-menu-group {
+  border-top: 1px solid #ddd;
+}
+
+.nav-inserter-menu .components-menu-item__button {
+  width: 100%;
+  padding: 8px;
+  border-radius: 2px;
+}
+
+/* Form screens (add link / create page) */
+.nav-popover-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.nav-popover-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--wp-admin-theme-color, #3858e9);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-popover-back:hover {
+  color: #2145e6;
+  text-decoration: underline;
+}
+
+.nav-popover-back__icon {
+  display: inline-flex;
   width: 18px;
   height: 18px;
+}
+
+.nav-popover-back__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.nav-inserter-popover .nav-popover-body {
+  padding: 16px;
+}
+
+.nav-popover-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #ddd;
+  background: #fff;
+}
+
+/* URL field type icon (used as prefix in TextControl) */
+.nav-add-link-type-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  color: #757575;
+}
+
+.nav-add-link-type-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* URL field invalid — WordPress isURL + normalize failures */
+.nav-add-link-url-field--error .components-text-control__input {
+  border-color: #cc1818;
+  background-color: #fcf0f0;
+}
+
+.nav-add-link-url-field--error .components-text-control__input:focus {
+  border-color: #cc1818;
+  box-shadow: 0 0 0 1px #cc1818;
+}
+
+/* Suspicious URL warning notice */
+.nav-add-link-warning.components-notice {
+  margin: 0;
+}
+
+.nav-add-link-warning .components-notice__content {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.nav-create-page-help {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #757575;
 }
 
 /* Page picker overlay */
@@ -546,4 +719,95 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 16px;
+}
+
+/* Add pages — DataViewsPicker in WordPress Modal (Storybook With modal pattern) */
+.components-modal__frame:has(.nav-add-pages-picker-root) .components-modal__content {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.components-modal__frame:has(.nav-add-pages-picker-root) {
+  z-index: 1000001;
+}
+
+.nav-add-pages-picker-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 420px;
+  min-width: min(100%, 560px);
+  background: var(--wp-dataviews-color-background, #fff);
+}
+
+.nav-add-pages-picker-root .dataviews-picker-wrapper {
+  flex: 1;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-add-pages-picker-thumb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 56px;
+  background: #f6f7f7;
+  border-radius: 4px;
+}
+
+.nav-add-pages-picker-thumb-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #757575;
+}
+
+.nav-add-pages-picker-thumb-overlay {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  left: auto;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: 3px;
+  line-height: 1.2;
+}
+
+.nav-add-pages-picker-thumb-overlay--home {
+  background: rgba(56, 88, 233, 0.14);
+  color: #3858e9;
+}
+
+.nav-add-pages-picker-thumb-overlay--posts {
+  background: rgba(33, 117, 155, 0.14);
+  color: #21759b;
+}
+
+.nav-add-pages-picker-title {
+  font-size: 13px;
+  color: #1e1e1e;
+}
+
+.nav-add-pages-picker-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.nav-add-pages-picker-badge--in {
+  background: rgba(56, 88, 233, 0.12);
+  color: #3858e9;
+}
+
+.nav-add-pages-picker-badge--out {
+  background: #f0f0f0;
+  color: #505050;
 }
