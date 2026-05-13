@@ -5,8 +5,8 @@ import {
   DropdownMenu,
   RadioControl,
   SelectControl,
-  ToggleControl,
   Tooltip,
+  __experimentalConfirmDialog as ConfirmDialog,
 } from "@wordpress/components";
 import { Stack, Text, VisuallyHidden } from "@wordpress/ui";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
@@ -51,20 +51,14 @@ const BADGE_STYLES = {
 
 const TABS = [
   {
-    value: "content",
-    label: "Content",
-    description:
-      "These pages are created by an author or automatically created by a Plugin or WordPress.",
+    value: "all",
+    label: "All Pages",
+    description: "Published pages on your site.",
   },
   {
-    value: "dynamic",
-    label: "Dynamic",
-    description: createInterpolateElement(
-      "Dynamic pages use <term>Templates</term> that automatically generate pages from your content.",
-      {
-        term: <DefinedTerm definition={WP_TEMPLATE_TERM_DEFINITION} />,
-      },
-    ),
+    value: "drafts",
+    label: "Drafts",
+    description: "Pages not yet published.",
   },
 ];
 
@@ -403,30 +397,26 @@ function PagesView() {
     setFrontPageId,
     postsPageId,
     setPostsPageId,
+    setPageStatus,
+    showSnackbar,
   } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
-  const [activeCategory, setActiveCategory] = useState("content");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [view, setView] = useState(() =>
     createPagesDataViewState(pagesViewMode),
   );
-  const [showDrafts, setShowDrafts] = useState(false);
   const [viewOptionsOpen, setViewOptionsOpen] = useState(false);
   const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
+  const [publishConfirmPage, setPublishConfirmPage] = useState(null);
 
-  const visibleTabs = useMemo(
-    () => TABS.filter((tab) => tab.value !== "dynamic" || showDynamicPagesTab),
-    [showDynamicPagesTab],
-  );
-
+  /** When All Pages includes dynamic rows, match former Dynamic tab default filters. */
   useEffect(() => {
-    if (showDynamicPagesTab || activeCategory !== "dynamic") {
+    if (activeCategory !== "all") {
       return;
     }
-    setActiveCategory("content");
     setView((prev) => ({
       ...prev,
-      page: 1,
-      filters: [],
+      filters: showDynamicPagesTab ? [...SYSTEM_FILTER_HIDE] : [],
     }));
   }, [showDynamicPagesTab, activeCategory]);
 
@@ -663,6 +653,15 @@ function PagesView() {
         callback: (items) => console.log("Duplicate:", items[0].slug),
       },
       {
+        id: "publish",
+        label: "Publish",
+        isEligible: (item) =>
+          item.category === "content" && item.status === "draft",
+        callback: (items) => {
+          setPublishConfirmPage(items[0]);
+        },
+      },
+      {
         id: "set-as-homepage",
         label: "Set as Homepage",
         isEligible: (item) =>
@@ -734,6 +733,8 @@ function PagesView() {
       navigate,
       selectPage,
       setPreviewPage,
+      setPageStatus,
+      showSnackbar,
       frontPageId,
       postsPageId,
       setHomepageDisplayMode,
@@ -743,39 +744,49 @@ function PagesView() {
   );
 
   const categoryPages = useMemo(() => {
-    let filtered = pages
-      .map((p) => ({
-        ...p,
-        isFrontPage:
-          homepageDisplayMode === READING_DISPLAY_STATIC &&
-          Boolean(frontPageId) &&
-          p.category === "content" &&
-          p.id === frontPageId,
-        isPostsPage:
-          homepageDisplayMode === READING_DISPLAY_STATIC &&
-          Boolean(postsPageId) &&
-          p.category === "content" &&
-          p.id === postsPageId,
-      }))
-      .filter((p) => p.category === activeCategory);
+    let filtered = pages.map((p) => ({
+      ...p,
+      isFrontPage:
+        homepageDisplayMode === READING_DISPLAY_STATIC &&
+        Boolean(frontPageId) &&
+        p.category === "content" &&
+        p.id === frontPageId,
+      isPostsPage:
+        homepageDisplayMode === READING_DISPLAY_STATIC &&
+        Boolean(postsPageId) &&
+        p.category === "content" &&
+        p.id === postsPageId,
+    }));
 
-    if (activeCategory === "content" && !showDrafts) {
-      filtered = filtered.filter((p) => p.status !== "draft");
-    }
+    if (activeCategory === "drafts") {
+      filtered = filtered.filter(
+        (p) => p.category === "content" && p.status === "draft",
+      );
+    } else {
+      filtered = filtered.filter((p) => {
+        if (p.category === "content") {
+          return p.status !== "draft";
+        }
+        if (p.category === "dynamic") {
+          return showDynamicPagesTab;
+        }
+        return false;
+      });
 
-    if (
-      activeCategory === "dynamic" &&
-      homepageDisplayMode === READING_DISPLAY_LATEST &&
-      !filtered.some((p) => p.id === BLOG_HOMEPAGE_ROOT_TEMPLATE_ID)
-    ) {
-      filtered = [blogHomepageRootTemplateRow, ...filtered];
+      if (
+        showDynamicPagesTab &&
+        homepageDisplayMode === READING_DISPLAY_LATEST &&
+        !filtered.some((p) => p.id === BLOG_HOMEPAGE_ROOT_TEMPLATE_ID)
+      ) {
+        filtered = [blogHomepageRootTemplateRow, ...filtered];
+      }
     }
 
     return filtered;
   }, [
     activeCategory,
     pages,
-    showDrafts,
+    showDynamicPagesTab,
     frontPageId,
     postsPageId,
     homepageDisplayMode,
@@ -834,7 +845,10 @@ function PagesView() {
       ...prev,
       page: 1,
       search: "",
-      filters: value === "dynamic" ? [...SYSTEM_FILTER_HIDE] : [],
+      filters:
+        value === "all" && showDynamicPagesTab
+          ? [...SYSTEM_FILTER_HIDE]
+          : [],
     }));
   };
 
@@ -868,78 +882,62 @@ function PagesView() {
         getItemId={(item) => item.id}
         getItemLevel={(item) => item.level ?? 0}
       >
-        {visibleTabs.length > 1 ? (
-          <div className="pp-tabs">
-            {visibleTabs.map((tab) => (
-              <button
-                key={tab.value}
-                className={`pp-tab${activeCategory === tab.value ? " on" : ""}`}
-                onClick={() => handleTabClick(tab.value)}
-              >
-                {tab.label}
-              </button>
-            ))}
+        <div className="pp-tabs-row">
+          <div className="pp-tabs-row__tabs">
+            {TABS.length > 1 ? (
+              <div className="pp-tabs">
+                {TABS.map((tab) => (
+                  <button
+                    key={tab.value}
+                    className={`pp-tab${activeCategory === tab.value ? " on" : ""}`}
+                    onClick={() => handleTabClick(tab.value)}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
-        ) : null}
+          <div className="pp-tabs-row__actions">
+            <Button
+              variant="tertiary"
+              className="pp-view-options-toggle"
+              onClick={() => setViewOptionsOpen((o) => !o)}
+              aria-expanded={viewOptionsOpen}
+            >
+              View options
+              <span className="pp-view-options-chevron">
+                {viewOptionsOpen ? chevronUp : chevronDown}
+              </span>
+            </Button>
+          </div>
+        </div>
         <div
-          className={`pp-toolbar-controls${visibleTabs.length <= 1 ? " pp-toolbar-controls--solo-category" : ""}`}
+          className={`pp-toolbar-controls${TABS.length <= 1 ? " pp-toolbar-controls--solo-category" : ""}`}
         >
-          <div className="pp-notice-toolbar-row">
-            <div className="pp-notice-toolbar-col pp-notice-toolbar-col--notice">
-              {homepageDisplayMode === READING_DISPLAY_LATEST &&
-                activeCategory === "content" && (
-                  <div className="pp-latest-posts-home-tip" role="status">
-                    {showDynamicPagesTab ? (
-                      <>
-                        Looking for your Homepage? It&apos;s under{" "}
-                        <button
-                          type="button"
-                          className="pp-desc-link"
-                          onClick={() => handleTabClick("dynamic")}
-                        >
-                          Dynamic
-                        </button>
-                        .
-                      </>
-                    ) : (
-                      <>
-                        Looking for your blog homepage? It&apos;s a
-                        template-backed page — open{" "}
-                        <button
-                          type="button"
-                          className="pp-desc-link"
-                          onClick={() => navigate("/templates")}
-                        >
-                          Templates
-                        </button>
-                        .
-                      </>
-                    )}
-                  </div>
+          {homepageDisplayMode === READING_DISPLAY_LATEST &&
+            activeCategory === "all" && (
+              <div className="pp-latest-posts-home-tip" role="status">
+                {showDynamicPagesTab ? (
+                  <>
+                    Latest posts on the homepage? Look for{" "}
+                    <strong>Posts page</strong> in this list.
+                  </>
+                ) : (
+                  <>
+                    Latest posts on the homepage? Edit that layout in{" "}
+                    <button
+                      type="button"
+                      className="pp-desc-link"
+                      onClick={() => navigate("/templates")}
+                    >
+                      Templates
+                    </button>
+                    .
+                  </>
                 )}
-            </div>
-            <div className="pp-notice-toolbar-col pp-notice-toolbar-col--actions">
-              <Button
-                variant="tertiary"
-                className="pp-view-options-toggle"
-                onClick={() => setViewOptionsOpen((o) => !o)}
-                aria-expanded={viewOptionsOpen}
-              >
-                View options
-                <span className="pp-view-options-chevron">
-                  {viewOptionsOpen ? chevronUp : chevronDown}
-                </span>
-              </Button>
-              {activeCategory === "content" && (
-                <ToggleControl
-                  label="Show drafts"
-                  checked={showDrafts}
-                  onChange={setShowDrafts}
-                  className="pp-system-toggle"
-                />
-              )}
-            </div>
-          </div>
+              </div>
+            )}
           {viewOptionsOpen && (
             <div className="pp-toolbar-row-options">
               <DataViews.Search />
@@ -970,7 +968,7 @@ function PagesView() {
   /** Layout: Foundations → Sidebar (RootLayout) + Content Frame + Preview Frame (list). */
   const pageActions = (
     <>
-      {activeCategory === "content" && (
+      {(activeCategory === "all" || activeCategory === "drafts") && (
         <Button
           variant="primary"
           icon={plus}
@@ -980,7 +978,7 @@ function PagesView() {
           Add page
         </Button>
       )}
-      {activeCategory === "dynamic" && (
+      {activeCategory === "all" && showDynamicPagesTab && (
         <Button
           variant="secondary"
           onClick={() => navigate("/templates")}
@@ -1069,6 +1067,26 @@ function PagesView() {
           />
         </div>
       )}
+      {publishConfirmPage ? (
+        <ConfirmDialog
+          isOpen
+          onCancel={() => setPublishConfirmPage(null)}
+          onConfirm={() => {
+            setPageStatus(publishConfirmPage.id, "live");
+            showSnackbar(`“${publishConfirmPage.name}” is published.`);
+            setPreviewPage((prev) =>
+              prev?.id === publishConfirmPage.id
+                ? { ...prev, status: "live" }
+                : prev,
+            );
+            setPublishConfirmPage(null);
+          }}
+          confirmButtonText="Publish"
+          cancelButtonText="Cancel"
+        >
+          {`Publish “${publishConfirmPage.name}”? It will go live on your site.`}
+        </ConfirmDialog>
+      ) : null}
     </>
   );
 }

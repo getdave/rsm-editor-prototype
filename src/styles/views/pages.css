@@ -120,15 +120,42 @@
   color: #1e1e1e;
 }
 
-/* Category tabs row */
+/* Tabs + View options (right): one row */
+.pp-tabs-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 0 16px 0 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.pp-tabs-row__tabs {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.pp-tabs-row__actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Inner tab strip — border on parent .pp-tabs-row */
 .pp-tabs {
   display: flex;
   flex-direction: row;
   align-items: center;
   flex-shrink: 0;
-  padding: 0 8px 0 20px;
-  border-bottom: 1px solid #e0e0e0;
-  background: #fff;
+  padding: 0 8px 0 0;
+  border-bottom: none;
+  background: transparent;
 }
 
 /* Controls row: sits below tabs */
@@ -146,30 +173,6 @@
 /* Single-tab mode: no top border — @wordpress/admin-ui Page header already has border-block-end */
 .pp-toolbar-controls--solo-category {
   border-top: none;
-}
-
-/* Notice + view options + drafts: one row, two columns */
-.pp-notice-toolbar-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  min-width: 0;
-}
-
-.pp-notice-toolbar-col--notice {
-  flex: 1;
-  min-width: 0;
-}
-
-.pp-notice-toolbar-col--actions {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
 }
 
 .pp-latest-posts-home-tip {
