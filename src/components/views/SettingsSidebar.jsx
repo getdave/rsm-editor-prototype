@@ -316,14 +316,17 @@ export default function SettingsSidebar({
   focusBlockTabSignal = 0,
   flashSignal = 0,
 }) {
-  const [tab, setTab] = useState('page');
   const [flashHighlight, setFlashHighlight] = useState(false);
 
-  useEffect(() => {
-    if (focusBlockTabSignal > 0) {
-      setTab('block');
-    }
-  }, [focusBlockTabSignal]);
+  // Each time the parent increments `focusBlockTabSignal` (e.g. clicking
+  // the section toolbar's "Change Design" button), we want the inspector
+  // to open on the Block/Section tab. TabPanel is uncontrolled — it only
+  // reads `initialTabName` at mount — so we derive the initial directly
+  // from the signal and pair it with `key={ss-tabs-${signal}}` to force a
+  // fresh mount every time the signal changes. Storing the user's manual
+  // tab choice in local state and updating it from a useEffect on signal
+  // change loses the race against the remount.
+  const initialTabName = focusBlockTabSignal > 0 ? 'block' : 'page';
 
   useEffect(() => {
     if (flashSignal <= 0 || !isOpen) {
@@ -382,8 +385,7 @@ export default function SettingsSidebar({
         key={`ss-tabs-${focusBlockTabSignal}`}
         className="ss-tabs"
         tabs={tabsConfig}
-        initialTabName={tab}
-        onSelect={setTab}
+        initialTabName={initialTabName}
       >
         {(activeTab) =>
           activeTab.name === 'page' ? (
