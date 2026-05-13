@@ -104,26 +104,26 @@ const SECTION_LAYOUT_PRESETS = [
 
 function SectionLayoutAlternatives() {
   const [activeId, setActiveId] = useState(SECTION_LAYOUT_PRESETS[0].id);
-  // `preview` holds both the hovered/focused preset id and its anchor element
-  // in one object so the Popover can render without reading a ref during render.
-  const [preview, setPreview] = useState(null);
+  const [hoveredId, setHoveredId] = useState(null);
+  // Mirrors Gutenberg's block-styles preview: the Popover anchors to the
+  // wrapper element holding the button grid, not to the individual hovered
+  // button — so the popover stays put as the user moves across buttons and
+  // only its content swaps.
+  const [groupAnchor, setGroupAnchor] = useState(null);
 
-  const showPreview = preview && preview.id !== activeId;
+  const showPreview = hoveredId && hoveredId !== activeId;
   const previewPreset = showPreview
-    ? SECTION_LAYOUT_PRESETS.find((p) => p.id === preview.id)
+    ? SECTION_LAYOUT_PRESETS.find((p) => p.id === hoveredId)
     : null;
   const PreviewWireframe = previewPreset?.Wireframe;
 
-  const handleEnter = (event, id) => {
-    setPreview({ id, anchor: event.currentTarget });
-  };
   const handleLeave = (id) => {
-    setPreview((current) => (current && current.id === id ? null : current));
+    setHoveredId((current) => (current === id ? null : current));
   };
 
   return (
     <>
-      <div className="ss-layout-buttons">
+      <div className="ss-layout-buttons" ref={setGroupAnchor}>
         {SECTION_LAYOUT_PRESETS.map(({ id, title }) => (
           <Tooltip key={id} text={title} placement="top">
             <Button
@@ -131,9 +131,9 @@ function SectionLayoutAlternatives() {
               isPressed={id === activeId}
               className="ss-layout-button"
               onClick={() => setActiveId(id)}
-              onMouseEnter={(event) => handleEnter(event, id)}
+              onMouseEnter={() => setHoveredId(id)}
               onMouseLeave={() => handleLeave(id)}
-              onFocus={(event) => handleEnter(event, id)}
+              onFocus={() => setHoveredId(id)}
               onBlur={() => handleLeave(id)}
             >
               {title}
@@ -141,9 +141,9 @@ function SectionLayoutAlternatives() {
           </Tooltip>
         ))}
       </div>
-      {previewPreset && preview.anchor ? (
+      {previewPreset && groupAnchor ? (
         <Popover
-          anchor={preview.anchor}
+          anchor={groupAnchor}
           placement="left-start"
           offset={12}
           focusOnMount={false}
@@ -199,23 +199,23 @@ function StylePreviewCard({ variant }) {
 
 function SectionStyleVariants() {
   const [activeId, setActiveId] = useState(SECTION_STYLE_VARIANTS[0].id);
-  const [preview, setPreview] = useState(null);
+  const [hoveredId, setHoveredId] = useState(null);
+  // Anchor the Popover to the buttons wrapper so the preview stays put as
+  // the user moves across buttons — only the content swaps.
+  const [groupAnchor, setGroupAnchor] = useState(null);
 
-  const showPreview = preview && preview.id !== activeId;
+  const showPreview = hoveredId && hoveredId !== activeId;
   const previewVariant = showPreview
-    ? SECTION_STYLE_VARIANTS.find((v) => v.id === preview.id)
+    ? SECTION_STYLE_VARIANTS.find((v) => v.id === hoveredId)
     : null;
 
-  const handleEnter = (event, id) => {
-    setPreview({ id, anchor: event.currentTarget });
-  };
   const handleLeave = (id) => {
-    setPreview((current) => (current && current.id === id ? null : current));
+    setHoveredId((current) => (current === id ? null : current));
   };
 
   return (
     <>
-      <div className="ss-style-buttons">
+      <div className="ss-style-buttons" ref={setGroupAnchor}>
         {SECTION_STYLE_VARIANTS.map(({ id, title }) => (
           <Tooltip key={id} text={title} placement="top">
             <Button
@@ -223,9 +223,9 @@ function SectionStyleVariants() {
               isPressed={id === activeId}
               className="ss-style-button"
               onClick={() => setActiveId(id)}
-              onMouseEnter={(event) => handleEnter(event, id)}
+              onMouseEnter={() => setHoveredId(id)}
               onMouseLeave={() => handleLeave(id)}
-              onFocus={(event) => handleEnter(event, id)}
+              onFocus={() => setHoveredId(id)}
               onBlur={() => handleLeave(id)}
             >
               {title}
@@ -233,9 +233,9 @@ function SectionStyleVariants() {
           </Tooltip>
         ))}
       </div>
-      {previewVariant && preview.anchor ? (
+      {previewVariant && groupAnchor ? (
         <Popover
-          anchor={preview.anchor}
+          anchor={groupAnchor}
           placement="left-start"
           offset={12}
           focusOnMount={false}
