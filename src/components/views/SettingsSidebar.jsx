@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@wordpress/components';
+import { Button, PanelBody, TabPanel, TextControl } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { closeSmall } from '@wordpress/icons';
 import {
@@ -9,30 +9,11 @@ import {
   TEMPLATE_ROOT_META,
 } from '../../utils/editCanvasBlockMeta';
 
-function Accordion({ title, children, defaultOpen = false }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className={`ss-acc ${open ? 'open' : ''}`}>
-      <button
-        type="button"
-        className="ss-acc-hd"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-      >
-        <Text variant="body-md" className="ss-acc-title">{title}</Text>
-        <span className="ss-acc-toggle" aria-hidden>
-          {open ? '−' : '+'}
-        </span>
-      </button>
-      {open && <div className="ss-acc-body">{children}</div>}
-    </div>
-  );
-}
-
 function PageTab({ pageTitle }) {
+  const slug = pageTitle?.toLowerCase().replace(/\s+/g, '-') ?? '';
   return (
     <>
-      <Accordion title="Status & visibility" defaultOpen>
+      <PanelBody title="Status & visibility" initialOpen>
         <Stack direction="row" align="center" justify="space-between" className="ss-field-row">
           <Text variant="body-sm" className="ss-label">Visibility</Text>
           <Text variant="body-sm" className="ss-value">Public</Text>
@@ -41,22 +22,26 @@ function PageTab({ pageTitle }) {
           <Text variant="body-sm" className="ss-label">Publish</Text>
           <Text variant="body-sm" className="ss-value">Immediately</Text>
         </Stack>
-      </Accordion>
-      <Accordion title="Permalink">
-        <div className="ss-placeholder-field">
-          <Text variant="body-sm" className="ss-muted">URL slug</Text>
-          <div className="ss-fake-input">{pageTitle?.toLowerCase().replace(/\s+/g, '-')}</div>
-        </div>
-      </Accordion>
-      <Accordion title="Template">
+      </PanelBody>
+      <PanelBody title="Permalink" initialOpen={false}>
+        <TextControl
+          __nextHasNoMarginBottom
+          __next40pxDefaultSize
+          label="URL slug"
+          value={slug}
+          readOnly
+          onChange={() => {}}
+        />
+      </PanelBody>
+      <PanelBody title="Template" initialOpen={false}>
         <Text variant="body-sm" className="ss-muted">Template assignment appears here in the Site Editor.</Text>
-      </Accordion>
-      <Accordion title="Discussion">
+      </PanelBody>
+      <PanelBody title="Discussion" initialOpen={false}>
         <Stack direction="row" align="center" justify="space-between" className="ss-field-row">
           <Text variant="body-sm" className="ss-label">Allow comments</Text>
           <Text variant="body-sm" className="ss-value">Closed</Text>
         </Stack>
-      </Accordion>
+      </PanelBody>
     </>
   );
 }
@@ -145,22 +130,22 @@ function BlockTab({ icon: Icon, label, description, showLayoutAlternatives }) {
         </Stack>
       </Stack>
       {showLayoutAlternatives ? (
-        <Accordion title="Layout" defaultOpen>
+        <PanelBody title="Layout" initialOpen>
           <SectionLayoutAlternatives />
-        </Accordion>
+        </PanelBody>
       ) : null}
-      <Accordion title="Color">
+      <PanelBody title="Color" initialOpen={false}>
         <Text variant="body-sm" className="ss-muted">Color controls would appear here.</Text>
-      </Accordion>
-      <Accordion title="Typography">
+      </PanelBody>
+      <PanelBody title="Typography" initialOpen={false}>
         <Text variant="body-sm" className="ss-muted">Typography options would appear here.</Text>
-      </Accordion>
-      <Accordion title="Dimensions">
+      </PanelBody>
+      <PanelBody title="Dimensions" initialOpen={false}>
         <Text variant="body-sm" className="ss-muted">Spacing and size controls would appear here.</Text>
-      </Accordion>
-      <Accordion title="Advanced">
+      </PanelBody>
+      <PanelBody title="Advanced" initialOpen={false}>
         <Text variant="body-sm" className="ss-muted">Additional settings would appear here.</Text>
-      </Accordion>
+      </PanelBody>
     </>
   );
 }
@@ -239,6 +224,10 @@ export default function SettingsSidebar({
     : descriptionForLabel(blockMeta.label);
 
   const inspectorTabLabel = blockMeta.isPatternSection ? 'Section' : 'Block';
+  const tabsConfig = [
+    { name: 'page', title: 'Page' },
+    { name: 'block', title: inspectorTabLabel },
+  ];
 
   return (
     <div
@@ -247,36 +236,32 @@ export default function SettingsSidebar({
       aria-label="Settings"
       aria-hidden={!isOpen}
     >
-      <Stack direction="row" align="center" className="ss-head">
-        <Stack direction="row" align="center" className="ss-tabs-strip">
-          <button
-            type="button"
-            className={`ss-tab-strip ${tab === 'page' ? 'active' : ''}`}
-            onClick={() => setTab('page')}
-          >
-            Page
-          </button>
-          <button
-            type="button"
-            className={`ss-tab-strip ${tab === 'block' ? 'active' : ''}`}
-            onClick={() => setTab('block')}
-          >
-            {inspectorTabLabel}
-          </button>
-        </Stack>
-        <Button className="ss-close" label="Close settings" icon={closeSmall} onClick={onClose} />
-      </Stack>
-      <div className="ss-body">
-        {tab === 'page' && <PageTab pageTitle={pageTitle || 'Untitled'} />}
-        {tab === 'block' && (
-          <BlockTab
-            icon={blockMeta.icon}
-            label={blockMeta.label}
-            description={blockDescription}
-            showLayoutAlternatives={blockMeta.isPatternSection}
-          />
-        )}
-      </div>
+      <Button
+        className="ss-close"
+        label="Close settings"
+        icon={closeSmall}
+        onClick={onClose}
+      />
+      <TabPanel
+        key={`ss-tabs-${focusBlockTabSignal}`}
+        className="ss-tabs"
+        tabs={tabsConfig}
+        initialTabName={tab}
+        onSelect={setTab}
+      >
+        {(activeTab) =>
+          activeTab.name === 'page' ? (
+            <PageTab pageTitle={pageTitle || 'Untitled'} />
+          ) : (
+            <BlockTab
+              icon={blockMeta.icon}
+              label={blockMeta.label}
+              description={blockDescription}
+              showLayoutAlternatives={blockMeta.isPatternSection}
+            />
+          )
+        }
+      </TabPanel>
     </div>
   );
 }
