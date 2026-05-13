@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Text } from '@wordpress/ui';
-import { useAppState, READING_DISPLAY_LATEST } from '../hooks/useAppState';
+import { useAppState } from '../hooks/useAppState';
 
 function CommandPalette() {
   const {
@@ -34,7 +34,6 @@ function CommandPaletteContent() {
     closeCommandPalette,
     openSiteIdentityModal,
     openSettingsModal,
-    homepageDisplayMode,
   } = useAppState();
 
   const [query, setQuery] = useState('');
@@ -46,15 +45,13 @@ function CommandPaletteContent() {
     const navigateCommands = [
       { id: 'home', label: 'Go to Home', group: 'Navigate', perform: () => navigate('/') },
       { id: 'pages', label: 'Go to Pages', group: 'Navigate', perform: () => navigate('/pages') },
-    ];
-    if (homepageDisplayMode === READING_DISPLAY_LATEST) {
-      navigateCommands.push({
+      {
         id: 'posts',
         label: 'Go to Posts',
         group: 'Navigate',
         perform: () => navigate('/posts'),
-      });
-    }
+      },
+    ];
     navigateCommands.push(
       { id: 'navigation', label: 'Go to Navigation', group: 'Navigate', perform: () => navigate('/navigation') },
       { id: 'design', label: 'Go to Design', group: 'Navigate', perform: () => navigate('/design') },
@@ -64,7 +61,7 @@ function CommandPaletteContent() {
       { id: 'identity', label: 'Edit site identity', group: 'Action', perform: openSiteIdentityModal },
       { id: 'settings', label: 'Open settings', group: 'Action', perform: openSettingsModal },
     ];
-  }, [navigate, openSiteIdentityModal, openSettingsModal, homepageDisplayMode]);
+  }, [navigate, openSiteIdentityModal, openSettingsModal]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

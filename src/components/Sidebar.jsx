@@ -16,6 +16,7 @@ import {
   chevronUp,
   chevronDown,
   wordpress,
+  arrowLeft,
   color,
   typography,
   background,
@@ -81,6 +82,14 @@ const ADVANCED_SUB_NAV_ITEMS = Object.freeze([
   },
 ]);
 
+/** Advanced submenu — omit Posts when it already appears in the root nav */
+function buildVisibleAdvancedSubNavItems(homepageDisplayMode) {
+  if (homepageDisplayMode === READING_DISPLAY_LATEST) {
+    return ADVANCED_SUB_NAV_ITEMS.filter((row) => row.id !== 'advanced-posts');
+  }
+  return [...ADVANCED_SUB_NAV_ITEMS];
+}
+
 const ADVANCED_ROUTE_PREFIXES = ['/posts', '/templates', '/patterns'];
 
 const DESIGN_NAV_ITEMS = [
@@ -113,14 +122,20 @@ function Sidebar() {
   const location = useLocation();
   const {
     sidebarCollapsed,
+    setSidebarCollapsed,
     recentPages,
     menuExpanded,
+    setMenuExpanded,
     toggleMenuExpanded,
     selectPage,
     homepageDisplayMode,
   } = useAppState();
   const visibleAdminNavItems = useMemo(
     () => buildVisibleAdminNavItems(homepageDisplayMode),
+    [homepageDisplayMode],
+  );
+  const visibleAdvancedSubNavItems = useMemo(
+    () => buildVisibleAdvancedSubNavItems(homepageDisplayMode),
     [homepageDisplayMode],
   );
   const isDesignSection = location.pathname.startsWith('/design');
@@ -137,6 +152,20 @@ function Sidebar() {
       setAdvancedExpanded(false);
     }
   }, [sidebarNestedNavHidden]);
+
+  /** Collapsed chrome: first interaction expands the sidebar/menu and opens Advanced */
+  const handleAdvancedParentActivate = () => {
+    if (sidebarNestedNavHidden) {
+      if (isEditCanvas) {
+        setMenuExpanded(true);
+      } else {
+        setSidebarCollapsed(false);
+      }
+      setAdvancedExpanded(true);
+      return;
+    }
+    setAdvancedExpanded((prev) => !prev);
+  };
 
   const toggleGroup = (groupId) => {
     setCollapsedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
@@ -158,7 +187,14 @@ function Sidebar() {
     return location.pathname === itemPath;
   };
 
-  const isAdvancedChildRouteActive = ADVANCED_ROUTE_PREFIXES.some(
+  const advancedRoutePrefixesForHighlight = useMemo(() => {
+    if (homepageDisplayMode === READING_DISPLAY_LATEST) {
+      return ADVANCED_ROUTE_PREFIXES.filter((p) => p !== '/posts');
+    }
+    return ADVANCED_ROUTE_PREFIXES;
+  }, [homepageDisplayMode]);
+
+  const isAdvancedChildRouteActive = advancedRoutePrefixesForHighlight.some(
     (prefix) =>
       location.pathname === prefix || location.pathname.startsWith(`${prefix}/`),
   );
@@ -266,7 +302,7 @@ function Sidebar() {
     const showChildren = advancedExpanded && !sidebarNestedNavHidden;
     return (
       <Stack direction="column" gap="xs" className="sb-advanced-block">
-        <Tooltip text="Templates, patterns, and posts" placement="right">
+        <Tooltip text="Less common tools beyond everyday editing." placement="right">
           <div
             className={`ni ni-with-chevron ni-group-parent sb-advanced-parent ${
               isAdvancedChildRouteActive ? 'on' : ''
@@ -274,11 +310,11 @@ function Sidebar() {
             role="button"
             tabIndex={0}
             aria-expanded={showChildren}
-            onClick={() => setAdvancedExpanded((prev) => !prev)}
+            onClick={handleAdvancedParentActivate}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                setAdvancedExpanded((prev) => !prev);
+                handleAdvancedParentActivate();
               }
             }}
           >
@@ -290,7 +326,7 @@ function Sidebar() {
           </div>
         </Tooltip>
         {showChildren &&
-          ADVANCED_SUB_NAV_ITEMS.map((row) => {
+          visibleAdvancedSubNavItems.map((row) => {
             const isOn = isItemActive(row.path);
             return (
               <Tooltip key={row.id} text={row.tip} placement="right">
@@ -443,7 +479,7 @@ function Sidebar() {
         </nav>
       )}
 
-      {/* Dashboard link + sidebar customization. Hidden in the design section. */}
+      {/* WP Admin link + sidebar customization. Hidden in the design section. */}
       <Stack
         direction="row"
         align="center"
@@ -451,11 +487,14 @@ function Sidebar() {
         gap="sm"
         className="sidebar-bottom"
       >
-        <Tooltip text="Return to WordPress dashboard" placement="top">
+        <Tooltip text="Return to the WordPress dashboard" placement="top">
           <button type="button" className="sb-dashboard">
-            <Stack direction="row" align="center" gap="sm">
-              <span className="sb-dashboard-ico" aria-hidden="true">{wordpress}</span>
-              <Text variant="body-md" className="sb-dashboard-label">Dashboard</Text>
+            <Stack direction="row" align="center" gap="sm" className="sb-dashboard-inner">
+              <span className="sb-dashboard-ico-wrap" aria-hidden="true">
+                <span className="sb-dashboard-ico-layer sb-dashboard-ico-layer--wp">{wordpress}</span>
+                <span className="sb-dashboard-ico-layer sb-dashboard-ico-layer--arrow">{arrowLeft}</span>
+              </span>
+              <Text variant="body-md" className="sb-dashboard-label">WP Admin</Text>
             </Stack>
           </button>
         </Tooltip>

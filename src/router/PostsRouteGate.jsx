@@ -1,14 +1,8 @@
-import { Navigate } from 'react-router-dom';
-import { useAppState, READING_DISPLAY_LATEST } from '../hooks/useAppState';
+import PlaceholderAdminView from '../components/views/PlaceholderAdminView';
 
+/** `/posts` — placeholder until implemented; always reachable (e.g. Advanced submenu). */
 export default function PostsRouteGate() {
-  const { homepageDisplayMode } = useAppState();
-
-  if (homepageDisplayMode !== READING_DISPLAY_LATEST) {
-    return <Navigate to="/pages" replace />;
-  }
-
   return (
-    <div style={{ padding: '20px' }}>Posts view coming soon</div>
+    <PlaceholderAdminView title="Posts" description="Posts view coming soon." />
   );
 }

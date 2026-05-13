@@ -85,7 +85,7 @@
   width: 100%;
 }
 
-/* Pinned above Dashboard — overrides .admin-root-nav flex growth */
+/* Pinned above WP Admin row — overrides .admin-root-nav flex growth */
 .sidebar-advanced-dock.admin-root-nav,
 .editor-sidebar-advanced-dock.admin-root-nav {
   flex: 0 0 auto;
@@ -162,7 +162,7 @@
   display: none;
 }
 
-/* Dashboard link */
+/* WP Admin shortcut */
 .dash-link {
   display: flex;
   align-items: center;
@@ -395,7 +395,7 @@
   font-weight: 500;
 }
 
-/* Sidebar bottom — Dashboard link + customization icon */
+/* Sidebar bottom — WP Admin link + customization icon */
 .sidebar-bottom {
   display: flex;
   flex-direction: row;
@@ -434,6 +434,30 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+.sb-dashboard-inner {
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sb-dashboard:hover .sb-dashboard-inner,
+.sb-dashboard:focus-visible .sb-dashboard-inner {
+  transform: translateX(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sb-dashboard-inner {
+    transition: none;
+  }
+
+  .sb-dashboard:hover .sb-dashboard-inner,
+  .sb-dashboard:focus-visible .sb-dashboard-inner {
+    transform: none;
+  }
+
+  .sb-dashboard-ico-layer {
+    transition: none;
+  }
+}
+
 .sb-dashboard:hover,
 .sb-dashboard:focus-visible {
   background: #2a2a2a;
@@ -441,19 +465,40 @@
   outline: none;
 }
 
-.sb-dashboard-ico {
-  display: inline-flex;
+.sb-dashboard-ico-wrap {
+  position: relative;
   width: 24px;
   height: 24px;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
 }
 
-.sb-dashboard-ico svg {
+.sb-dashboard-ico-layer {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.18s ease;
+}
+
+.sb-dashboard-ico-layer svg {
   width: 24px;
   height: 24px;
   fill: currentColor;
+}
+
+.sb-dashboard .sb-dashboard-ico-layer--arrow {
+  opacity: 0;
+}
+
+.sb-dashboard:hover .sb-dashboard-ico-layer--wp,
+.sb-dashboard:focus-visible .sb-dashboard-ico-layer--wp {
+  opacity: 0;
+}
+
+.sb-dashboard:hover .sb-dashboard-ico-layer--arrow,
+.sb-dashboard:focus-visible .sb-dashboard-ico-layer--arrow {
+  opacity: 1;
 }
 
 .sb-dashboard-label {

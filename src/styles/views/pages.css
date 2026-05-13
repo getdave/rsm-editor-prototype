@@ -60,6 +60,12 @@
   background: var(--wp-page-area-surface, #fff);
 }
 
+/* Stub routes — padding inside admin-ui Page body */
+.placeholder-admin-view-body {
+  padding: 24px 24px 32px;
+  box-sizing: border-box;
+}
+
 .pp-inner {
   width: 100%;
   display: flex;
