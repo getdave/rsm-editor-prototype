@@ -1152,6 +1152,55 @@
   text-align: center;
 }
 
+/* Section style variants (settings sidebar) — same interaction as Layout,
+   but each variant paints the preview card with its own palette. */
+.ss-style-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--wpds-dimension-gap-xs);
+}
+
+.ss-style-button {
+  justify-content: center;
+  width: 100%;
+}
+
+/* Rich popover preview rendered to the left of the hovered button. */
+.ss-style-preview .components-popover__content {
+  width: 360px;
+  padding: var(--wpds-dimension-padding-md);
+}
+
+.ss-style-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--wpds-dimension-gap-md);
+  padding: var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-lg);
+  border-radius: var(--wpds-border-radius-md);
+  text-align: center;
+}
+
+.ss-style-preview-title {
+  font-weight: 600;
+}
+
+.ss-style-preview-body {
+  line-height: 1.5;
+  max-width: 28ch;
+}
+
+.ss-style-preview-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-lg);
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: var(--wpds-dimension-gap-xs);
+}
+
 .ss-wf {
   display: flex;
   width: 100%;

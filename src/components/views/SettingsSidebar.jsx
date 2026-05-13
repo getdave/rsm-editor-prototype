@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, PanelBody, Popover, TabPanel, TextControl } from '@wordpress/components';
+import { Button, PanelBody, Popover, TabPanel, TextControl, Tooltip } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { closeSmall } from '@wordpress/icons';
 import {
@@ -160,6 +160,93 @@ function SectionLayoutAlternatives() {
   );
 }
 
+/**
+ * Six visual style variants applied to the same preview card content. Each
+ * variant defines the background, text, and accent (button) colors used to
+ * paint the preview shown in the hover popover.
+ */
+const SECTION_STYLE_VARIANTS = [
+  { id: 'style-01', title: 'Style 01', bg: '#ffffff', text: '#1e1e1e', accent: '#1e1e1e', accentText: '#ffffff' },
+  { id: 'style-02', title: 'Style 02', bg: '#fdd9e9', text: '#1e1e1e', accent: '#1e1e1e', accentText: '#ffffff' },
+  { id: 'style-03', title: 'Style 03', bg: '#1e1e1e', text: '#ffffff', accent: '#facc15', accentText: '#1e1e1e' },
+  { id: 'style-04', title: 'Style 04', bg: '#4338ca', text: '#ffffff', accent: '#f9a8d4', accentText: '#4338ca' },
+  { id: 'style-05', title: 'Style 05', bg: '#fde047', text: '#1e1e1e', accent: '#1e1e1e', accentText: '#fde047' },
+  { id: 'style-06', title: 'Style 06', bg: '#dcfce7', text: '#14532d', accent: '#14532d', accentText: '#dcfce7' },
+];
+
+function StylePreviewCard({ variant }) {
+  return (
+    <div
+      className="ss-style-preview-card"
+      style={{ background: variant.bg, color: variant.text }}
+    >
+      <Text variant="heading-md" className="ss-style-preview-title">La Mancha</Text>
+      <Text variant="body-sm" className="ss-style-preview-body">
+        In a village of La Mancha, the name of which I have no desire to call to mind,
+        there lived not long since one of those gentlemen that keep a lance in the
+        lance-rack, an old buckler, a lean hack, and a greyhound for coursing.
+      </Text>
+      <span
+        className="ss-style-preview-button"
+        style={{ background: variant.accent, color: variant.accentText }}
+      >
+        Read more
+      </span>
+    </div>
+  );
+}
+
+function SectionStyleVariants() {
+  const [activeId, setActiveId] = useState(SECTION_STYLE_VARIANTS[0].id);
+  const [preview, setPreview] = useState(null);
+
+  const showPreview = preview && preview.id !== activeId;
+  const previewVariant = showPreview
+    ? SECTION_STYLE_VARIANTS.find((v) => v.id === preview.id)
+    : null;
+
+  const handleEnter = (event, id) => {
+    setPreview({ id, anchor: event.currentTarget });
+  };
+  const handleLeave = (id) => {
+    setPreview((current) => (current && current.id === id ? null : current));
+  };
+
+  return (
+    <>
+      <div className="ss-style-buttons">
+        {SECTION_STYLE_VARIANTS.map(({ id, title }) => (
+          <Tooltip key={id} text={title} placement="top">
+            <Button
+              variant="secondary"
+              isPressed={id === activeId}
+              className="ss-style-button"
+              onClick={() => setActiveId(id)}
+              onMouseEnter={(event) => handleEnter(event, id)}
+              onMouseLeave={() => handleLeave(id)}
+              onFocus={(event) => handleEnter(event, id)}
+              onBlur={() => handleLeave(id)}
+            >
+              {title}
+            </Button>
+          </Tooltip>
+        ))}
+      </div>
+      {previewVariant && preview.anchor ? (
+        <Popover
+          anchor={preview.anchor}
+          placement="left-start"
+          offset={12}
+          focusOnMount={false}
+          className="ss-style-preview"
+        >
+          <StylePreviewCard variant={previewVariant} />
+        </Popover>
+      ) : null}
+    </>
+  );
+}
+
 function BlockTab({ icon: Icon, label, description, showLayoutAlternatives }) {
   return (
     <>
@@ -175,6 +262,11 @@ function BlockTab({ icon: Icon, label, description, showLayoutAlternatives }) {
       {showLayoutAlternatives ? (
         <PanelBody title="Layout" initialOpen>
           <SectionLayoutAlternatives />
+        </PanelBody>
+      ) : null}
+      {showLayoutAlternatives ? (
+        <PanelBody title="Style" initialOpen>
+          <SectionStyleVariants />
         </PanelBody>
       ) : null}
       <PanelBody title="Color" initialOpen={false}>
