@@ -191,6 +191,12 @@ function Sidebar() {
     if (itemPath === '/pages') {
       return activePathname.startsWith('/pages');
     }
+    if (itemPath === '/content') {
+      return (
+        activePathname.startsWith('/content') ||
+        activePathname.startsWith('/page-designs')
+      );
+    }
     return activePathname === itemPath;
   };
 
