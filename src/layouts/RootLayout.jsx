@@ -12,7 +12,7 @@ import PagesFloatingPanel from '../components/modals/PagesFloatingPanel';
 import UnsavedChangesModal from '../components/modals/UnsavedChangesModal';
 import DevBranchIndicator from '../components/shared/DevBranchIndicator';
 
-const EDIT_ROUTE_PATTERN = /\/pages\/[^/]+\/edit$/;
+const EDIT_ROUTE_PATTERN = /\/pages\/[^/]+\/edit$|^\/template-editing$/;
 
 function RootLayout() {
   const location = useLocation();
