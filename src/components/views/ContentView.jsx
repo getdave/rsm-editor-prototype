@@ -368,8 +368,11 @@ function getRecordTableFields(contentTypeId) {
   return RECORD_TABLE_FIELDS[contentTypeId] || ['title', 'status'];
 }
 
-function getLayoutScopeLabel(contentType) {
-  return `${contentType.singularName.toLowerCase()} layouts`;
+function getTemplateScopeLabel(contentType, { capitalize = false } = {}) {
+  const contentTypeLabel = capitalize
+    ? contentType.singularName
+    : contentType.singularName.toLowerCase();
+  return `${contentTypeLabel} templates`;
 }
 
 function getTemplateState(design) {
@@ -606,10 +609,6 @@ function ContentRecordsDataView({ contentType }) {
   const defaultLayouts = useMemo(
     () => ({
       table: { fields: [...defaultTableFields] },
-      list: {
-        fields: ['status'],
-        layout: { density: 'compact' },
-      },
     }),
     [defaultTableFields],
   );
@@ -631,7 +630,12 @@ function ContentRecordsDataView({ contentType }) {
       data={processedRecords}
       fields={recordFields}
       view={recordsView}
-      onChangeView={setRecordsView}
+      onChangeView={(nextView) =>
+        setRecordsView({
+          ...nextView,
+          type: 'table',
+        })
+      }
       defaultLayouts={defaultLayouts}
       paginationInfo={paginationInfo}
       getItemId={(item) => item.id}
@@ -639,7 +643,6 @@ function ContentRecordsDataView({ contentType }) {
       <div className="content-records-toolbar">
         <DataViews.Search />
         <DataViews.FiltersToggle />
-        <DataViews.LayoutSwitcher />
       </div>
       <div className="content-records-filters">
         <DataViews.FiltersToggled />
@@ -793,7 +796,7 @@ function ContentView() {
             <span className="content-tab-icon" aria-hidden>
               {grid}
             </span>
-            Page Layouts
+            {getTemplateScopeLabel(selectedContentType, { capitalize: true })}
           </button>
         </div>
 
@@ -819,7 +822,7 @@ function ContentView() {
             </div>
             <p className="content-template-gateway">
               For more advanced control over{' '}
-              {getLayoutScopeLabel(selectedContentType)},{' '}
+              {getTemplateScopeLabel(selectedContentType)},{' '}
               <Link
                 to={`/templates?contentType=${selectedContentType.id}`}
                 className="content-template-gateway-link"
