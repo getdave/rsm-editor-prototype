@@ -129,6 +129,7 @@ function Sidebar() {
     toggleMenuExpanded,
     selectPage,
     homepageDisplayMode,
+    editorReferrer,
   } = useAppState();
   const visibleAdminNavItems = useMemo(
     () => buildVisibleAdminNavItems(homepageDisplayMode),
@@ -140,6 +141,8 @@ function Sidebar() {
   );
   const isDesignSection = location.pathname.startsWith('/design');
   const isEditCanvas = EDIT_ROUTE_PATTERN.test(location.pathname);
+  const activePathname =
+    isEditCanvas && editorReferrer ? editorReferrer : location.pathname;
   const [collapsedGroups, setCollapsedGroups] = useState({});
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
 
@@ -179,12 +182,21 @@ function Sidebar() {
   const isItemActive = (itemPath) => {
     if (!itemPath) return false;
     if (itemPath === '/') {
-      return !isDesignSection && (location.pathname === '/' || location.pathname.includes('/edit'));
+      return !isDesignSection && activePathname === '/';
     }
     if (itemPath === '/design') {
-      return location.pathname.startsWith('/design');
+      return activePathname.startsWith('/design');
     }
-    return location.pathname === itemPath;
+    if (itemPath === '/pages') {
+      return activePathname.startsWith('/pages');
+    }
+    if (itemPath === '/content') {
+      return (
+        activePathname.startsWith('/content') ||
+        activePathname.startsWith('/page-designs')
+      );
+    }
+    return activePathname === itemPath;
   };
 
   const advancedRoutePrefixesForHighlight = useMemo(() => {
@@ -406,7 +418,7 @@ function Sidebar() {
           {visibleAdminNavItems.map((item) => (
             <Tooltip key={item.id} text={item.tip} placement="right">
               <div
-                className="ni"
+                className={`ni ${isItemActive(item.path) ? 'on' : ''}`}
                 onClick={() => navigateSmooth(item.path)}
               >
                 <span className="ni-ico">{item.icon}</span>
