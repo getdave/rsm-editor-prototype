@@ -120,25 +120,51 @@
   color: #1e1e1e;
 }
 
-/* Category tabs row */
+/* Tabs + View options (right): one row */
+.pp-tabs-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 0 16px 0 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.pp-tabs-row__tabs {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.pp-tabs-row__actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Inner tab strip — border on parent .pp-tabs-row */
 .pp-tabs {
   display: flex;
   flex-direction: row;
   align-items: center;
   flex-shrink: 0;
-  padding: 0 8px 0 20px;
-  border-bottom: 1px solid #e0e0e0;
-  background: #fff;
+  padding: 0 8px 0 0;
+  border-bottom: none;
+  background: transparent;
 }
 
-/* Controls row: sits below tabs */
+/* Optional row below tabs (reading tip / view options). No bottom border — tab row already separates header from list. */
 .pp-toolbar-controls {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 8px;
-  padding: 8px 16px 8px 20px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 0 16px 0 20px;
   background: #fff;
   flex-shrink: 0;
 }
@@ -148,28 +174,8 @@
   border-top: none;
 }
 
-/* Notice + view options + drafts: one row, two columns */
-.pp-notice-toolbar-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  min-width: 0;
-}
-
-.pp-notice-toolbar-col--notice {
-  flex: 1;
-  min-width: 0;
-}
-
-.pp-notice-toolbar-col--actions {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
+.pp-toolbar-controls:has(.pp-latest-posts-home-tip, .pp-toolbar-row-options) {
+  padding-top: 8px;
 }
 
 .pp-latest-posts-home-tip {

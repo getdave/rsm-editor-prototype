@@ -155,6 +155,15 @@ export function AppStateProvider({ children }) {
     setPages((list) => list.map((p) => (p.id === currentPage.id ? { ...p, name } : p)));
   };
 
+  const setPageStatus = (pageId, status) => {
+    setPages((prev) =>
+      prev.map((p) => (p.id === pageId ? { ...p, status } : p)),
+    );
+    setCurrentPage((cur) =>
+      cur && cur.id === pageId ? { ...cur, status } : cur,
+    );
+  };
+
   // Wrap setCurrentPage so picking a page also lands it in the recents
   // list. Stable insertion order with FIFO eviction:
   //   - First time a page is opened, it joins at position 1 (top).
@@ -183,6 +192,7 @@ export function AppStateProvider({ children }) {
     // Pages state
     pages,
     addPage,
+    setPageStatus,
 
     // Current page
     currentPage,
