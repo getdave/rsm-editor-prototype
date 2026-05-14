@@ -1,12 +1,14 @@
 /*
- * Template editing context — purple "skin" applied to the canvas editor
- * when editing a content type of `template`. Modeled on WordPress's
- * admin-theme-color layer: a scoped class on the editor root swaps the
- * blue accent tones for the synced-block purple defined in
- * `wordpress-vars.css` (`--wp-block-synced-color`).
+ * Template editing context — "sync color" skin applied to the canvas
+ * editor when editing a content type of `template`. Modeled on
+ * WordPress's admin-theme-color layer: a scoped class on the editor
+ * root re-binds the WP admin / components theme variables to the sync
+ * color (`--wp-block-synced-color`, defined in `wordpress-vars.css`),
+ * so every `@wordpress/components` button, focus ring, and selection
+ * state inside the skin automatically picks it up.
  *
- * The badge below is rendered globally (DocumentActions toggles it) so
- * the canvas header can convey "you are editing a template" even
+ * The badge below is rendered globally (DocumentActions toggles it)
+ * so the canvas header can convey "you are editing a template" even
  * outside the skin's selection scope.
  */
 
@@ -26,7 +28,23 @@
   user-select: none;
 }
 
-/* ── Canvas toolbar — primary actions ── */
+/* ── Theme-layer rebind ─────────────────────────────────────────
+ * Re-point WP's admin / components accent tokens at the sync color.
+ * This is the same mechanism WordPress uses for admin color schemes
+ * and covers @wordpress/components hover, focus, active, and pressed
+ * states in one shot — including the Exit button's focus ring and
+ * every icon-button hover in the canvas toolbar.
+ */
+.is-template-context {
+  --wp-admin-theme-color: var(--wp-block-synced-color);
+  --wp-admin-theme-color-darker-10: var(--wp-block-synced-color-hover);
+  --wp-admin-theme-color-darker-20: var(--wp-block-synced-color-hover);
+  --wp-components-color-accent: var(--wp-block-synced-color);
+  --wp-components-color-accent-darker-10: var(--wp-block-synced-color-hover);
+  --wp-components-color-accent-darker-20: var(--wp-block-synced-color-hover);
+}
+
+/* ── Canvas toolbar — primary actions (hardcoded literals in canvas.css) ── */
 .is-template-context .ct-btn.primary {
   background: var(--wp-block-synced-color);
 }
