@@ -989,23 +989,24 @@
 }
 
 .settings-sidebar {
-  --ss-panel-surface: #ffffff;
+  --ss-panel-surface: var(--wpds-color-bg-surface-neutral-strong);
   --ss-panel-edge: transparent;
   width: 0;
   overflow: hidden;
   flex-shrink: 0;
-  transition: width 0.2s ease, border-color 0.2s ease;
+  transition: border-color 0.2s ease;
   background: var(--ss-panel-surface);
   border-left: 1px solid transparent;
   box-shadow: inset 4px 0 0 0 var(--ss-panel-edge);
   display: flex;
   flex-direction: column;
   min-height: 0;
+  position: relative;
 }
 
 .settings-sidebar.open {
   width: 280px;
-  border-left-color: #ddd;
+  border-left-color: var(--wpds-color-stroke-surface-neutral);
 }
 
 .settings-sidebar.open.flash-highlight {
@@ -1015,7 +1016,7 @@
 @keyframes settings-sidebar-attn {
   0%,
   100% {
-    --ss-panel-surface: #ffffff;
+    --ss-panel-surface: var(--wpds-color-bg-surface-neutral-strong);
     --ss-panel-edge: transparent;
   }
   30% {
@@ -1024,132 +1025,57 @@
   }
 }
 
-.ss-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 8px 0 12px;
-  border-bottom: 1px solid #ddd;
-  flex-shrink: 0;
-}
-
-.ss-tabs-strip {
-  display: flex;
-  gap: 4px;
-  flex: 1;
-}
-
-.ss-tab-strip {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font: 500 13px 'DM Sans', sans-serif;
-  color: #1e1e1e;
-  padding: 10px 8px;
-  cursor: pointer;
-  position: relative;
-}
-
-.ss-tab-strip.active {
-  font-weight: 600;
-}
-
-.ss-tab-strip.active::after {
-  content: '';
-  position: absolute;
-  left: 4px;
-  right: 4px;
-  bottom: 0;
-  height: 2px;
-  background: #007cba;
-  border-radius: 2px 2px 0 0;
-}
-
 .ss-close {
-  flex-shrink: 0;
+  position: absolute;
+  top: var(--wpds-dimension-padding-xs);
+  right: var(--wpds-dimension-padding-xs);
+  z-index: 1;
 }
 
-.ss-body {
+.ss-tabs {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.ss-tabs .components-tab-panel__tab-content {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
-  padding: 12px 0 24px;
+  padding: var(--wpds-dimension-padding-md) 0 var(--wpds-dimension-padding-2xl);
 }
 
-.ss-acc {
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.ss-acc-hd {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 12px 16px;
-  border: none;
-  background: var(--ss-panel-surface);
-  cursor: pointer;
-  font: 500 13px 'DM Sans', sans-serif;
-  color: #1e1e1e;
-  text-align: left;
-}
-
-.ss-acc-toggle {
-  color: #757575;
-  font-size: 16px;
-  line-height: 1;
-}
-
-.ss-acc-body {
-  padding: 0 16px 14px;
+.ss-tabs .components-tab-panel__tabs {
+  padding-right: 40px;
+  border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .ss-field-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  font: 12px 'DM Sans', sans-serif;
-  padding: 6px 0;
+  gap: var(--wpds-dimension-gap-md);
+  padding: var(--wpds-dimension-padding-xs) 0;
 }
 
 .ss-label {
-  color: #757575;
+  color: var(--wpds-color-fg-content-neutral-weak);
 }
 
 .ss-value {
-  color: #1e1e1e;
+  color: var(--wpds-color-fg-content-neutral);
   font-weight: 500;
 }
 
 .ss-muted {
-  font: 12px 'DM Sans', sans-serif;
-  color: #757575;
+  color: var(--wpds-color-fg-content-neutral-weak);
   margin: 0;
   line-height: 1.5;
 }
 
-.ss-placeholder-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.ss-fake-input {
-  border: 1px solid #949494;
-  border-radius: 2px;
-  padding: 8px 10px;
-  font: 13px 'DM Sans', sans-serif;
-  color: #1e1e1e;
-  background: var(--ss-panel-surface);
-}
-
 .ss-block-intro {
-  display: flex;
-  gap: 12px;
-  padding: 12px 16px 16px;
-  border-bottom: 1px solid #e0e0e0;
+  gap: var(--wpds-dimension-gap-md);
+  padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-lg)
+    var(--wpds-dimension-padding-lg);
+  border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 .ss-block-icon {
@@ -1159,7 +1085,7 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  color: #1e1e1e;
+  color: var(--wpds-color-fg-content-neutral);
 }
 
 .ss-block-icon svg {
@@ -1168,52 +1094,73 @@
 }
 
 .ss-block-title {
-  font: 600 14px 'DM Sans', sans-serif;
-  color: #1e1e1e;
-  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--wpds-color-fg-content-neutral);
+  margin-bottom: var(--wpds-dimension-gap-xs);
 }
 
 .ss-block-desc {
-  font: 12px 'DM Sans', sans-serif;
-  color: #757575;
+  color: var(--wpds-color-fg-content-neutral-weak);
   margin: 0;
   line-height: 1.45;
 }
 
-/* Section layout wireframe thumbnails (settings sidebar) */
-.ss-layout-grid {
+/* Section layout buttons (settings sidebar) — Gutenberg block-styles pattern */
+.ss-layout-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  align-items: stretch;
+  gap: var(--wpds-dimension-gap-xs);
 }
 
-.ss-layout-card {
+/* Outline + neutral tone: match the @wordpress/ui Button
+   variant="outline" tone="neutral" treatment using the legacy
+   @wordpress/components Button (kept for lint-allowlist consistency
+   with the rest of the prototype). Shared by both Layout and Style
+   pickers so the two grids stay visually identical. */
+.ss-layout-button,
+.ss-style-button {
+  justify-content: center;
+  width: 100%;
+}
+
+.ss-layout-button.is-secondary:not(.is-pressed),
+.ss-style-button.is-secondary:not(.is-pressed) {
+  color: var(--wpds-color-fg-interactive-neutral);
+  box-shadow: inset 0 0 0 1px var(--wpds-color-stroke-surface-neutral);
+  background: transparent;
+}
+
+.ss-layout-button.is-secondary:not(.is-pressed):hover,
+.ss-style-button.is-secondary:not(.is-pressed):hover {
+  color: var(--wpds-color-fg-interactive-neutral-active);
+  background: var(--wpds-color-bg-interactive-neutral-weak-active);
+  box-shadow: inset 0 0 0 1px var(--wpds-color-stroke-interactive-neutral);
+}
+
+.ss-layout-button.is-pressed,
+.ss-style-button.is-pressed {
+  color: var(--wpds-color-fg-interactive-neutral-strong);
+  background: var(--wpds-color-bg-interactive-neutral-strong);
+  box-shadow: inset 0 0 0 1px var(--wpds-color-bg-interactive-neutral-strong);
+}
+
+.ss-layout-button.is-pressed:hover,
+.ss-style-button.is-pressed:hover {
+  background: var(--wpds-color-bg-interactive-neutral-strong-active);
+  box-shadow: inset 0 0 0 1px var(--wpds-color-bg-interactive-neutral-strong-active);
+}
+
+/* Popover preview shown when hovering an inactive layout button */
+.ss-layout-preview {
+  --wpds-popover-padding: var(--wpds-dimension-padding-md);
+}
+
+.ss-layout-preview .components-popover__content {
+  width: 200px;
+  padding: var(--wpds-dimension-padding-md);
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  height: 100%;
-  min-height: 136px;
-  margin: 0;
-  padding: 8px;
-  width: 100%;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: var(--ss-panel-surface);
-  font: inherit;
-  cursor: pointer;
-  text-align: center;
-  color: inherit;
-  gap: 8px;
-}
-
-.ss-layout-card:hover {
-  border-color: #3858e9;
-}
-
-.ss-layout-card:focus-visible {
-  outline: 2px solid #3858e9;
-  outline-offset: 1px;
+  gap: var(--wpds-dimension-gap-sm);
 }
 
 .ss-layout-thumb {
@@ -1221,20 +1168,66 @@
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  min-height: 88px;
+  min-height: 120px;
   width: 100%;
   padding: 6px;
-  border-radius: 3px;
-  background: #f0f0f1;
+  border-radius: var(--wpds-border-radius-sm);
+  background: var(--wpds-color-bg-surface-neutral-weak);
   box-sizing: border-box;
 }
 
 .ss-layout-title {
   display: block;
   flex-shrink: 0;
-  font: 600 11px 'DM Sans', sans-serif;
-  color: #1e1e1e;
+  font-weight: 600;
+  color: var(--wpds-color-fg-content-neutral);
   line-height: 1.25;
+  text-align: center;
+}
+
+/* Section style variants (settings sidebar) — same interaction as Layout,
+   but each variant paints the preview card with its own palette.
+   .ss-style-button itself is styled by the shared rule above. */
+.ss-style-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--wpds-dimension-gap-xs);
+}
+
+/* Rich popover preview rendered to the left of the hovered button. */
+.ss-style-preview .components-popover__content {
+  width: 360px;
+  padding: var(--wpds-dimension-padding-md);
+}
+
+.ss-style-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--wpds-dimension-gap-md);
+  padding: var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-lg);
+  border-radius: var(--wpds-border-radius-md);
+  text-align: center;
+}
+
+.ss-style-preview-title {
+  font-weight: 600;
+}
+
+.ss-style-preview-body {
+  line-height: 1.5;
+  max-width: 28ch;
+}
+
+.ss-style-preview-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-lg);
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: var(--wpds-dimension-gap-xs);
 }
 
 .ss-wf {
@@ -1254,8 +1247,8 @@
 .ss-wf-hero-band {
   flex-shrink: 0;
   height: 38%;
-  border-radius: 2px;
-  background: #c3c4c7;
+  border-radius: var(--wpds-border-radius-sm);
+  background: var(--wpds-color-stroke-surface-neutral);
 }
 
 .ss-wf-stack {
@@ -1271,8 +1264,8 @@
   flex-shrink: 0;
   width: 100%;
   height: 3px;
-  border-radius: 1px;
-  background: #dcdcde;
+  border-radius: var(--wpds-border-radius-xs);
+  background: var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 .ss-wf-line--lg {
@@ -1297,8 +1290,8 @@
 .ss-wf-split-media {
   flex-shrink: 0;
   width: 42%;
-  border-radius: 2px;
-  background: #c3c4c7;
+  border-radius: var(--wpds-border-radius-sm);
+  background: var(--wpds-color-stroke-surface-neutral);
 }
 
 .ss-wf-split-copy {
@@ -1325,8 +1318,8 @@
 }
 
 .ss-wf-gallery-cell {
-  border-radius: 2px;
-  background: #c3c4c7;
+  border-radius: var(--wpds-border-radius-sm);
+  background: var(--wpds-color-stroke-surface-neutral);
   aspect-ratio: 1;
 }
 

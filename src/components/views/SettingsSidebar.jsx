@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@wordpress/components';
+import { Button, PanelBody, Popover, TabPanel, TextControl, Tooltip } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { closeSmall } from '@wordpress/icons';
 import {
@@ -9,30 +9,11 @@ import {
   TEMPLATE_ROOT_META,
 } from '../../utils/editCanvasBlockMeta';
 
-function Accordion({ title, children, defaultOpen = false }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className={`ss-acc ${open ? 'open' : ''}`}>
-      <button
-        type="button"
-        className="ss-acc-hd"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-      >
-        <Text variant="body-md" className="ss-acc-title">{title}</Text>
-        <span className="ss-acc-toggle" aria-hidden>
-          {open ? '−' : '+'}
-        </span>
-      </button>
-      {open && <div className="ss-acc-body">{children}</div>}
-    </div>
-  );
-}
-
 function PageTab({ pageTitle }) {
+  const slug = pageTitle?.toLowerCase().replace(/\s+/g, '-') ?? '';
   return (
     <>
-      <Accordion title="Status & visibility" defaultOpen>
+      <PanelBody title="Status & visibility" initialOpen>
         <Stack direction="row" align="center" justify="space-between" className="ss-field-row">
           <Text variant="body-sm" className="ss-label">Visibility</Text>
           <Text variant="body-sm" className="ss-value">Public</Text>
@@ -41,22 +22,26 @@ function PageTab({ pageTitle }) {
           <Text variant="body-sm" className="ss-label">Publish</Text>
           <Text variant="body-sm" className="ss-value">Immediately</Text>
         </Stack>
-      </Accordion>
-      <Accordion title="Permalink">
-        <div className="ss-placeholder-field">
-          <Text variant="body-sm" className="ss-muted">URL slug</Text>
-          <div className="ss-fake-input">{pageTitle?.toLowerCase().replace(/\s+/g, '-')}</div>
-        </div>
-      </Accordion>
-      <Accordion title="Template">
+      </PanelBody>
+      <PanelBody title="Permalink" initialOpen={false}>
+        <TextControl
+          __nextHasNoMarginBottom
+          __next40pxDefaultSize
+          label="URL slug"
+          value={slug}
+          readOnly
+          onChange={() => {}}
+        />
+      </PanelBody>
+      <PanelBody title="Template" initialOpen={false}>
         <Text variant="body-sm" className="ss-muted">Template assignment appears here in the Site Editor.</Text>
-      </Accordion>
-      <Accordion title="Discussion">
+      </PanelBody>
+      <PanelBody title="Discussion" initialOpen={false}>
         <Stack direction="row" align="center" justify="space-between" className="ss-field-row">
           <Text variant="body-sm" className="ss-label">Allow comments</Text>
           <Text variant="body-sm" className="ss-value">Closed</Text>
         </Stack>
-      </Accordion>
+      </PanelBody>
     </>
   );
 }
@@ -118,17 +103,148 @@ const SECTION_LAYOUT_PRESETS = [
 ];
 
 function SectionLayoutAlternatives() {
+  const [activeId, setActiveId] = useState(SECTION_LAYOUT_PRESETS[0].id);
+  const [hoveredId, setHoveredId] = useState(null);
+  // Mirrors Gutenberg's block-styles preview: the Popover anchors to the
+  // wrapper element holding the button grid, not to the individual hovered
+  // button — so the popover stays put as the user moves across buttons and
+  // only its content swaps.
+  const [groupAnchor, setGroupAnchor] = useState(null);
+
+  const showPreview = hoveredId && hoveredId !== activeId;
+  const previewPreset = showPreview
+    ? SECTION_LAYOUT_PRESETS.find((p) => p.id === hoveredId)
+    : null;
+  const PreviewWireframe = previewPreset?.Wireframe;
+
+  const handleLeave = (id) => {
+    setHoveredId((current) => (current === id ? null : current));
+  };
+
   return (
-    <div className="ss-layout-grid">
-      {SECTION_LAYOUT_PRESETS.map(({ id, title, Wireframe }) => (
-        <button key={id} type="button" className="ss-layout-card">
+    <>
+      <div className="ss-layout-buttons" ref={setGroupAnchor}>
+        {SECTION_LAYOUT_PRESETS.map(({ id, title }) => (
+          <Tooltip key={id} text={title} placement="top">
+            <Button
+              variant="secondary"
+              isPressed={id === activeId}
+              className="ss-layout-button"
+              onClick={() => setActiveId(id)}
+              onMouseEnter={() => setHoveredId(id)}
+              onMouseLeave={() => handleLeave(id)}
+              onFocus={() => setHoveredId(id)}
+              onBlur={() => handleLeave(id)}
+            >
+              {title}
+            </Button>
+          </Tooltip>
+        ))}
+      </div>
+      {previewPreset && groupAnchor ? (
+        <Popover
+          anchor={groupAnchor}
+          placement="left-start"
+          offset={12}
+          focusOnMount={false}
+          className="ss-layout-preview"
+        >
           <div className="ss-layout-thumb" aria-hidden>
-            <Wireframe />
+            <PreviewWireframe />
           </div>
-          <Text variant="body-sm" className="ss-layout-title">{title}</Text>
-        </button>
-      ))}
+          <Text variant="body-sm" className="ss-layout-title">
+            {previewPreset.title}
+          </Text>
+        </Popover>
+      ) : null}
+    </>
+  );
+}
+
+/**
+ * Six visual style variants applied to the same preview card content. Each
+ * variant defines the background, text, and accent (button) colors used to
+ * paint the preview shown in the hover popover.
+ */
+const SECTION_STYLE_VARIANTS = [
+  { id: 'style-01', title: 'Style 01', bg: '#ffffff', text: '#1e1e1e', accent: '#1e1e1e', accentText: '#ffffff' },
+  { id: 'style-02', title: 'Style 02', bg: '#fdd9e9', text: '#1e1e1e', accent: '#1e1e1e', accentText: '#ffffff' },
+  { id: 'style-03', title: 'Style 03', bg: '#1e1e1e', text: '#ffffff', accent: '#facc15', accentText: '#1e1e1e' },
+  { id: 'style-04', title: 'Style 04', bg: '#4338ca', text: '#ffffff', accent: '#f9a8d4', accentText: '#4338ca' },
+  { id: 'style-05', title: 'Style 05', bg: '#fde047', text: '#1e1e1e', accent: '#1e1e1e', accentText: '#fde047' },
+  { id: 'style-06', title: 'Style 06', bg: '#dcfce7', text: '#14532d', accent: '#14532d', accentText: '#dcfce7' },
+];
+
+function StylePreviewCard({ variant }) {
+  return (
+    <div
+      className="ss-style-preview-card"
+      style={{ background: variant.bg, color: variant.text }}
+    >
+      <Text variant="heading-md" className="ss-style-preview-title">La Mancha</Text>
+      <Text variant="body-sm" className="ss-style-preview-body">
+        In a village of La Mancha, the name of which I have no desire to call to mind,
+        there lived not long since one of those gentlemen that keep a lance in the
+        lance-rack, an old buckler, a lean hack, and a greyhound for coursing.
+      </Text>
+      <span
+        className="ss-style-preview-button"
+        style={{ background: variant.accent, color: variant.accentText }}
+      >
+        Read more
+      </span>
     </div>
+  );
+}
+
+function SectionStyleVariants() {
+  const [activeId, setActiveId] = useState(SECTION_STYLE_VARIANTS[0].id);
+  const [hoveredId, setHoveredId] = useState(null);
+  // Anchor the Popover to the buttons wrapper so the preview stays put as
+  // the user moves across buttons — only the content swaps.
+  const [groupAnchor, setGroupAnchor] = useState(null);
+
+  const showPreview = hoveredId && hoveredId !== activeId;
+  const previewVariant = showPreview
+    ? SECTION_STYLE_VARIANTS.find((v) => v.id === hoveredId)
+    : null;
+
+  const handleLeave = (id) => {
+    setHoveredId((current) => (current === id ? null : current));
+  };
+
+  return (
+    <>
+      <div className="ss-style-buttons" ref={setGroupAnchor}>
+        {SECTION_STYLE_VARIANTS.map(({ id, title }) => (
+          <Tooltip key={id} text={title} placement="top">
+            <Button
+              variant="secondary"
+              isPressed={id === activeId}
+              className="ss-style-button"
+              onClick={() => setActiveId(id)}
+              onMouseEnter={() => setHoveredId(id)}
+              onMouseLeave={() => handleLeave(id)}
+              onFocus={() => setHoveredId(id)}
+              onBlur={() => handleLeave(id)}
+            >
+              {title}
+            </Button>
+          </Tooltip>
+        ))}
+      </div>
+      {previewVariant && groupAnchor ? (
+        <Popover
+          anchor={groupAnchor}
+          placement="left-start"
+          offset={12}
+          focusOnMount={false}
+          className="ss-style-preview"
+        >
+          <StylePreviewCard variant={previewVariant} />
+        </Popover>
+      ) : null}
+    </>
   );
 }
 
@@ -145,22 +261,27 @@ function BlockTab({ icon: Icon, label, description, showLayoutAlternatives }) {
         </Stack>
       </Stack>
       {showLayoutAlternatives ? (
-        <Accordion title="Layout" defaultOpen>
+        <PanelBody title="Layout" initialOpen>
           <SectionLayoutAlternatives />
-        </Accordion>
+        </PanelBody>
       ) : null}
-      <Accordion title="Color">
+      {showLayoutAlternatives ? (
+        <PanelBody title="Style" initialOpen>
+          <SectionStyleVariants />
+        </PanelBody>
+      ) : null}
+      <PanelBody title="Color" initialOpen={false}>
         <Text variant="body-sm" className="ss-muted">Color controls would appear here.</Text>
-      </Accordion>
-      <Accordion title="Typography">
+      </PanelBody>
+      <PanelBody title="Typography" initialOpen={false}>
         <Text variant="body-sm" className="ss-muted">Typography options would appear here.</Text>
-      </Accordion>
-      <Accordion title="Dimensions">
+      </PanelBody>
+      <PanelBody title="Dimensions" initialOpen={false}>
         <Text variant="body-sm" className="ss-muted">Spacing and size controls would appear here.</Text>
-      </Accordion>
-      <Accordion title="Advanced">
+      </PanelBody>
+      <PanelBody title="Advanced" initialOpen={false}>
         <Text variant="body-sm" className="ss-muted">Additional settings would appear here.</Text>
-      </Accordion>
+      </PanelBody>
     </>
   );
 }
@@ -195,14 +316,17 @@ export default function SettingsSidebar({
   focusBlockTabSignal = 0,
   flashSignal = 0,
 }) {
-  const [tab, setTab] = useState('page');
   const [flashHighlight, setFlashHighlight] = useState(false);
 
-  useEffect(() => {
-    if (focusBlockTabSignal > 0) {
-      setTab('block');
-    }
-  }, [focusBlockTabSignal]);
+  // Each time the parent increments `focusBlockTabSignal` (e.g. clicking
+  // the section toolbar's "Change Design" button), we want the inspector
+  // to open on the Block/Section tab. TabPanel is uncontrolled — it only
+  // reads `initialTabName` at mount — so we derive the initial directly
+  // from the signal and pair it with `key={ss-tabs-${signal}}` to force a
+  // fresh mount every time the signal changes. Storing the user's manual
+  // tab choice in local state and updating it from a useEffect on signal
+  // change loses the race against the remount.
+  const initialTabName = focusBlockTabSignal > 0 ? 'block' : 'page';
 
   useEffect(() => {
     if (flashSignal <= 0 || !isOpen) {
@@ -239,6 +363,10 @@ export default function SettingsSidebar({
     : descriptionForLabel(blockMeta.label);
 
   const inspectorTabLabel = blockMeta.isPatternSection ? 'Section' : 'Block';
+  const tabsConfig = [
+    { name: 'page', title: 'Page' },
+    { name: 'block', title: inspectorTabLabel },
+  ];
 
   return (
     <div
@@ -247,36 +375,31 @@ export default function SettingsSidebar({
       aria-label="Settings"
       aria-hidden={!isOpen}
     >
-      <Stack direction="row" align="center" className="ss-head">
-        <Stack direction="row" align="center" className="ss-tabs-strip">
-          <button
-            type="button"
-            className={`ss-tab-strip ${tab === 'page' ? 'active' : ''}`}
-            onClick={() => setTab('page')}
-          >
-            Page
-          </button>
-          <button
-            type="button"
-            className={`ss-tab-strip ${tab === 'block' ? 'active' : ''}`}
-            onClick={() => setTab('block')}
-          >
-            {inspectorTabLabel}
-          </button>
-        </Stack>
-        <Button className="ss-close" label="Close settings" icon={closeSmall} onClick={onClose} />
-      </Stack>
-      <div className="ss-body">
-        {tab === 'page' && <PageTab pageTitle={pageTitle || 'Untitled'} />}
-        {tab === 'block' && (
-          <BlockTab
-            icon={blockMeta.icon}
-            label={blockMeta.label}
-            description={blockDescription}
-            showLayoutAlternatives={blockMeta.isPatternSection}
-          />
-        )}
-      </div>
+      <Button
+        className="ss-close"
+        label="Close settings"
+        icon={closeSmall}
+        onClick={onClose}
+      />
+      <TabPanel
+        key={`ss-tabs-${focusBlockTabSignal}`}
+        className="ss-tabs"
+        tabs={tabsConfig}
+        initialTabName={initialTabName}
+      >
+        {(activeTab) =>
+          activeTab.name === 'page' ? (
+            <PageTab pageTitle={pageTitle || 'Untitled'} />
+          ) : (
+            <BlockTab
+              icon={blockMeta.icon}
+              label={blockMeta.label}
+              description={blockDescription}
+              showLayoutAlternatives={blockMeta.isPatternSection}
+            />
+          )
+        }
+      </TabPanel>
     </div>
   );
 }
