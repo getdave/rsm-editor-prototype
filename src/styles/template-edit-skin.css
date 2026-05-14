@@ -7,26 +7,11 @@
  * so every `@wordpress/components` button, focus ring, and selection
  * state inside the skin automatically picks it up.
  *
- * The badge below is rendered globally (DocumentActions toggles it)
- * so the canvas header can convey "you are editing a template" even
- * outside the skin's selection scope.
+ * The editable canvas area (`.edit-scroll`) explicitly resets these
+ * variables back to the default blue so block selection / hover and
+ * any in-canvas controls stay consistent with the default editing
+ * experience across all content types.
  */
-
-/* Template type badge (rendered before the doc name field) */
-.doc-actions-type-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 8px;
-  background: rgba(122, 0, 223, 0.12);
-  color: var(--wp-block-synced-color);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: none;
-  flex-shrink: 0;
-  user-select: none;
-}
 
 /* ── Theme-layer rebind ─────────────────────────────────────────
  * Re-point WP's admin / components accent tokens at the sync color.
@@ -42,6 +27,17 @@
   --wp-components-color-accent: var(--wp-block-synced-color);
   --wp-components-color-accent-darker-10: var(--wp-block-synced-color-hover);
   --wp-components-color-accent-darker-20: var(--wp-block-synced-color-hover);
+}
+
+/* Restore the default blue inside the editable canvas so block
+ * selection, hover, and toolbars match the rest of the editor. */
+.is-template-context .edit-scroll {
+  --wp-admin-theme-color: #3858e9;
+  --wp-admin-theme-color-darker-10: #2145e6;
+  --wp-admin-theme-color-darker-20: #183ad6;
+  --wp-components-color-accent: #3858e9;
+  --wp-components-color-accent-darker-10: #2145e6;
+  --wp-components-color-accent-darker-20: #183ad6;
 }
 
 /* ── Canvas toolbar — primary actions (hardcoded literals in canvas.css) ── */
@@ -68,28 +64,8 @@
   color: var(--wp-block-synced-color);
 }
 
-/* ── Canvas content — block hover / selection outlines ── */
-.is-template-context .e-sec:hover,
-.is-template-context .template-edit-root:hover,
-.is-template-context .g-el.e-block:hover {
-  border-color: var(--wp-block-synced-color);
-}
-
-.is-template-context .e-sec.sel,
-.is-template-context .template-edit-root.sel {
-  border-color: var(--wp-block-synced-color);
-  background: rgba(122, 0, 223, 0.05);
-}
-
-.is-template-context .g-el.e-block.sel {
-  border-color: var(--wp-block-synced-color);
-}
-
-.is-template-context .sec-bar.block-toolbar.block-toolbar--pattern-section {
-  border-left-color: var(--wp-block-synced-color);
-}
-
-/* Settings sidebar / inserter focus + hover accents inside the editor */
+/* Settings sidebar / inserter focus + hover accents (side panels —
+ * outside the editable canvas, so they stay on the sync color). */
 .is-template-context .ss-layout-card:hover {
   border-color: var(--wp-block-synced-color);
 }
