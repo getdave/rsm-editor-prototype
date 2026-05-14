@@ -10,6 +10,13 @@
   --wp-blue-hover: #2a47d4;
   --wp-block-synced-color: #7a00df;
   --wp-block-synced-color-hover: #5e00ac;
+  /* Sync-tinted analogues of the WP Badge's default gray shades.
+     Mirrors the @wordpress/components `Badge` color-mix formulas
+     (90% white for the background, 50% black for the text) so the
+     template badge keeps the same tonal balance as `.is-default`
+     while picking up the sync color. */
+  --wp-block-synced-color-tint-bg: color-mix(in srgb, #fff 90%, var(--wp-block-synced-color));
+  --wp-block-synced-color-tint-fg: color-mix(in srgb, #000 50%, var(--wp-block-synced-color));
   --wp-green: #00a32a;
   --wp-red: #f87171;
   --wp-yellow: #f0b849;
