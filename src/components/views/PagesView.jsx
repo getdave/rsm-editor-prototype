@@ -38,6 +38,7 @@ import PageLayoutWireframeThumb from "../shared/PageLayoutWireframeThumb";
 import PreviewCanvas from "../shared/PreviewCanvas";
 import DefinedTerm from "../shared/DefinedTerm";
 import DeleteHomepagePageModal from "../modals/DeleteHomepagePageModal";
+import DeletePostsPageModal from "../modals/DeletePostsPageModal";
 import DeletePageConfirmModal from "../modals/DeletePageConfirmModal";
 
 /** Tooltip primer (concept from WP template hierarchy) */
@@ -495,7 +496,7 @@ function PagesView() {
   ]);
 
   useEffect(() => {
-    if (!deleteConfirm?.page?.isFrontPage) {
+    if (!deleteConfirm?.page?.isFrontPage && !deleteConfirm?.page?.isPostsPage) {
       return;
     }
     const onKeyDown = (e) => {
@@ -907,13 +908,18 @@ function PagesView() {
         onActionPerformed,
         actionItems,
         replacementFrontPageId,
+        replacementPostsPageId,
       } = {},
     ) => {
-      const replacementRow =
+      const replacementFrontRow =
         replacementFrontPageId &&
         categoryPages.find((p) => p.id === replacementFrontPageId);
+      const replacementPostsRow =
+        replacementPostsPageId &&
+        categoryPages.find((p) => p.id === replacementPostsPageId);
       const nextPreview =
-        replacementRow ??
+        replacementFrontRow ??
+        replacementPostsRow ??
         categoryPages.find((p) => p.id !== page.id) ??
         null;
 
@@ -925,12 +931,20 @@ function PagesView() {
         }
       }
 
+      if (replacementPostsPageId) {
+        setHomepageDisplayMode(READING_DISPLAY_STATIC);
+        setPostsPageId(replacementPostsPageId);
+        if (replacementPostsPageId === frontPageId) {
+          setFrontPageId("");
+        }
+      }
+
       deletePage(page.id);
 
       if (page.isFrontPage && !replacementFrontPageId) {
         setFrontPageId("");
       }
-      if (page.id === postsPageId) {
+      if (page.isPostsPage && !replacementPostsPageId) {
         setPostsPageId("");
       }
 
@@ -1260,6 +1274,27 @@ function PagesView() {
             onDelete={({ replacementFrontPageId }) => {
               executeDeletePage(deleteConfirm.page, {
                 replacementFrontPageId,
+                onActionPerformed: deleteConfirm.onActionPerformed,
+                actionItems: deleteConfirm.actionItems,
+              });
+              setDeleteConfirm(null);
+            }}
+          />
+        </div>
+      ) : deleteConfirm?.page?.isPostsPage ? (
+        <div
+          className="modal-overlay"
+          role="presentation"
+          onClick={() => setDeleteConfirm(null)}
+        >
+          <DeletePostsPageModal
+            page={deleteConfirm.page}
+            frontPageId={frontPageId}
+            readingSelectPages={readingSelectPages}
+            onClose={() => setDeleteConfirm(null)}
+            onDelete={({ replacementPostsPageId }) => {
+              executeDeletePage(deleteConfirm.page, {
+                replacementPostsPageId,
                 onActionPerformed: deleteConfirm.onActionPerformed,
                 actionItems: deleteConfirm.actionItems,
               });

@@ -358,7 +358,8 @@
   color: #1e1e1e;
 }
 
-/* Remove homepage — full modal (optional replacement Homepage select) */
+/* Remove homepage / Posts page — full modal (optional replacement selects).
+   DeletePostsPageModal also uses .pp-delete-homepage-modal_* utilities + .pp-delete-posts-page-modal on the box. */
 .pp-delete-homepage-modal.modal-box {
   width: min(420px, calc(100vw - 32px));
   max-width: 420px;
