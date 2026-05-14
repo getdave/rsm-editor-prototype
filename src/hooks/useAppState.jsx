@@ -70,30 +70,7 @@ export function AppStateProvider({ children }) {
   // Pages view mode (list/grid)
   const [pagesViewMode, setPagesViewMode] = useState('grid');
 
-  // Reading / homepage (Configure homepage in Pages — drives Posts nav visibility)
-  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
-    READING_DISPLAY_STATIC,
-  );
-  const [frontPageId, setFrontPageId] = useState(
-    () => pagesData.find((p) => p.isFrontPage)?.id ?? 'home',
-  );
-  const [postsPageId, setPostsPageId] = useState(
-    () => pagesData.find((p) => p.isPostsPage)?.id ?? 'blog',
-  );
-
-  // Edit canvas: List View panel and block inspector sidebar (WordPress-style)
-  const [listViewOpen, setListViewOpen] = useState(false);
-  const [settingsSidebarOpen, setSettingsSidebarOpen] = useState(false);
-
-  const toggleListView = () => {
-    setListViewOpen((prev) => !prev);
-  };
-
-  const toggleSettingsSidebar = () => {
-    setSettingsSidebarOpen((prev) => !prev);
-  };
-
-  // Reading / homepage settings (persists across routes; mirrors WP Settings → Reading)
+  // Reading / homepage (mirrors WP Settings → Reading; drives Posts nav & Pages home row)
   const [homepageDisplayMode, setHomepageDisplayMode] = useState(
     READING_DISPLAY_STATIC,
   );
@@ -116,6 +93,18 @@ export function AppStateProvider({ children }) {
 
   const dismissLatestPostsReadingNotice = () => {
     setLatestPostsReadingNoticeDismissed(true);
+  };
+
+  // Edit canvas: List View panel and block inspector sidebar (WordPress-style)
+  const [listViewOpen, setListViewOpen] = useState(false);
+  const [settingsSidebarOpen, setSettingsSidebarOpen] = useState(false);
+
+  const toggleListView = () => {
+    setListViewOpen((prev) => !prev);
+  };
+
+  const toggleSettingsSidebar = () => {
+    setSettingsSidebarOpen((prev) => !prev);
   };
 
   const toggleSidebar = () => {
