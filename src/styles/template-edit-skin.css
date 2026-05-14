@@ -64,6 +64,19 @@
   color: var(--wp-block-synced-color);
 }
 
+/* Tint the gray surfaces in the toolbar with the sync color: hover
+ * backgrounds on the secondary actions next to the primary `+`
+ * (Undo, Redo, List View) and the static pill behind the device
+ * view toggle group. Reuses the badge background token so the
+ * tinted gray is consistent across the skin. */
+.is-template-context .ct-btn:not(.primary):hover {
+  background: var(--wp-block-synced-color-tint-bg);
+}
+
+.is-template-context .ct-view-modes {
+  background: var(--wp-block-synced-color-tint-bg);
+}
+
 /* Doc-actions layout icon (next to "Template title") picks up the
  * sync color. The WP icon SVGs ship without a `fill` attribute, so
  * we force `fill: currentColor` to make the wrapper `color` apply. */
