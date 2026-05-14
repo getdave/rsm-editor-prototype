@@ -1391,7 +1391,7 @@
   display: flex;
   align-items: center;
   gap: var(--wpds-dimension-gap-sm);
-  padding: var(--wpds-dimension-padding-lg);
+  padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-lg) 0;
   flex-shrink: 0;
 }
 
