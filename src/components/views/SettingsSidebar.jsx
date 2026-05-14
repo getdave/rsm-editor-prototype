@@ -187,8 +187,8 @@ function PageTab({ pageTitle }) {
           onChange={() => {}}
         />
       </PanelBody>
-      <PanelBody title="Template" initialOpen={false}>
-        <Text variant="body-sm" className="ss-muted">Template assignment appears here in the Site Editor.</Text>
+      <PanelBody title="Page design" initialOpen={false}>
+        <Text variant="body-sm" className="ss-muted">Page design assignment appears here in the Site Editor.</Text>
       </PanelBody>
       <PanelBody title="Discussion" initialOpen={false}>
         <Stack direction="row" align="center" justify="space-between" className="ss-field-row">
@@ -372,7 +372,7 @@ const BLOCK_DESCRIPTIONS = {
   Paragraph: 'Start with the basic building block of all narrative.',
   Gallery: 'Display multiple images in a rich gallery.',
   'Contact Form': 'Collect information from visitors with a form.',
-  Content: 'Content for this template.',
+  Content: 'Content for this design.',
   Block: 'Block settings for the selected canvas region.',
 };
 
@@ -442,12 +442,12 @@ export default function SettingsSidebar({
   }
 
   const blockDescription = blockMeta.isPatternSection
-    ? 'Built from a section pattern—a ready-made group of blocks you can customise on the canvas.'
+    ? 'Built from a ready-made section you can customise on the canvas.'
     : descriptionForLabel(blockMeta.label);
 
   const inspectorTabLabel = blockMeta.isPatternSection ? 'Section' : 'Block';
   const tabsConfig = [
-    { name: 'page', title: 'Page' },
+    { name: 'page', title: isTemplate ? 'Design' : 'Page' },
     { name: 'block', title: inspectorTabLabel },
   ];
 

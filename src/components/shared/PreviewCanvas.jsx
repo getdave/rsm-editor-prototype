@@ -6,12 +6,14 @@ import {
   home,
   page as pageIcon,
   postList,
+  styles,
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { getPageContent } from '../../services/pageContentService';
 import { PreviewTemplateFrame } from './PreviewSiteChrome';
 
 function docTypeIcon(p) {
+  if (p?.isPageDesign) return styles;
   if (p?.isFrontPage) return home;
   if (p?.isPostsPage) return postList;
   return pageIcon;
@@ -25,8 +27,8 @@ function docTypeIcon(p) {
  * Reusable Preview Canvas Component
  *
  * Displays a site preview with device switcher and edit button.
- * Dynamically renders content based on WordPress content model (pages, templates, template hierarchy).
- *
+ * Dynamically renders content for the selected page or page-design target
+ * using the WordPress content model (pages, templates, template hierarchy).
  * WordPress Template Mapping:
  * - Content Pages → page.html template
  * - System Pages → 404.html, page.html templates
@@ -39,13 +41,24 @@ function docTypeIcon(p) {
  * @param {function} onPageChange - Callback when a nav link is clicked; parent decides what switching page means
  * @param {HeaderNavItem[]|null|undefined} headerNavItems - Optional top-level nav links (pageId or custom url order). When omitted, uses pages with `inMenu`.
  */
-function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }) {
+function PreviewCanvas({
+  page,
+  onEdit,
+  onPageChange = () => {},
+  headerNavItems,
+  editLabel = 'Edit',
+  documentLabel,
+  scopeNotice,
+}) {
   const { selectedDevice, setSelectedDevice, siteTitle, pages } = useAppState();
 
   // Get WordPress-appropriate content for this page
   const content = getPageContent(page);
 
   const fallbackMenuPages = pages.filter((p) => p.inMenu);
+  const statusLabel = page.isPageDesign
+    ? 'Design is active'
+    : page.isLive ? 'Page is live' : 'Page is a draft';
 
   const resolveHeaderNavItem = (item) => {
     const children = (item.children || [])
@@ -318,7 +331,7 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
           className="ct-edit"
           onClick={onEdit}
         >
-          Edit
+          {editLabel}
         </Button>
 
         <div className="ct-space"></div>
@@ -329,9 +342,9 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
           >
             {docTypeIcon(page)}
           </span>
-          <span className="ct-btn" style={{ cursor: 'default' }}>{page.name}</span>
+          <span className="ct-btn" style={{ cursor: 'default' }}>{documentLabel || page.name}</span>
           <Tooltip
-            text={page.isLive ? 'Page is live' : 'Page is a draft'}
+            text={statusLabel}
             placement="bottom"
           >
             <span
@@ -350,7 +363,7 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
                 className={`url-dot${page.isLive ? '' : ' url-draft-dot'}`}
                 style={{ margin: 0 }}
                 role="status"
-                aria-label={page.isLive ? 'Page is live' : 'Page is a draft'}
+                aria-label={statusLabel}
               />
             </span>
           </Tooltip>
@@ -382,8 +395,16 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
         </div>
       </div>
       <div className="preview-canvas-area">
-        <div className="site-card">
-          {renderContent()}
+        <div className="preview-canvas-stack">
+          {scopeNotice ? (
+            <div className="preview-scope-notice" role="note">
+              <strong>{documentLabel || page.name}</strong>
+              <span>{scopeNotice}</span>
+            </div>
+          ) : null}
+          <div className="site-card">
+            {renderContent()}
+          </div>
         </div>
       </div>
     </div>

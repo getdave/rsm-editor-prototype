@@ -30,6 +30,30 @@
   --edit-global-accent: #7527e7;
 }
 
+.edit-scope-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 16px auto 0;
+  width: min(100% - 32px, 1120px);
+  padding: 10px 12px;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  background: #f6f7f7;
+  color: #1e1e1e;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.edit-scope-banner strong {
+  font-weight: 600;
+}
+
+.edit-scope-banner span {
+  color: #646970;
+}
+
 /* Shared canvas wrapper */
 .canvas {
   width: 100%;
@@ -275,6 +299,35 @@
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.07),
     0 8px 28px rgba(0, 0, 0, 0.1);
+}
+
+.preview-canvas-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.preview-scope-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  background: #f6f7f7;
+  color: #1e1e1e;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.preview-scope-notice strong {
+  font-weight: 600;
+}
+
+.preview-scope-notice span {
+  color: #646970;
 }
 
 /* Edit button in preview bar */

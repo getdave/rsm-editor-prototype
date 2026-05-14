@@ -1,5 +1,10 @@
 import { createContext, useCallback, useContext, useState } from 'react';
-import { pages as pagesData, navigationMenus as navigationMenusInitial } from '../data/mockData';
+import {
+  initialReadingSettings,
+  navigationMenus as navigationMenusInitial,
+  pageDesigns as pageDesignsData,
+  pages as pagesData,
+} from '../data/mockData';
 import { MAIN_MENU_ID } from '../constants/navigation';
 import {
   appendTopLevelPageIfMissing,
@@ -22,8 +27,23 @@ export function AppStateProvider({ children }) {
 
   const [navigationMenus, setNavigationMenus] = useState(navigationMenusInitial);
 
+  // Contextual page-design targets (template-backed surfaces surfaced by intent).
+  const [pageDesigns] = useState(pageDesignsData);
+
   // Current page
   const [currentPage, setCurrentPage] = useState(pages[0]); // Home page
+
+  // Homepage configuration. Kept global so Home, Pages, and Content all resolve
+  // the same front-page/posts-page state.
+  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
+    initialReadingSettings.homepageDisplayMode,
+  );
+  const [frontPageId, setFrontPageId] = useState(
+    initialReadingSettings.frontPageId,
+  );
+  const [postsPageId, setPostsPageId] = useState(
+    initialReadingSettings.postsPageId,
+  );
 
   // Where the user came from when entering the edit canvas — drives the
   // split-Exit button label/destination. null when not inside the editor.
@@ -78,17 +98,6 @@ export function AppStateProvider({ children }) {
   
   // Pages view mode (list/grid)
   const [pagesViewMode, setPagesViewMode] = useState('grid');
-
-  // Reading / homepage (Configure homepage in Pages — drives Posts nav visibility)
-  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
-    READING_DISPLAY_STATIC,
-  );
-  const [frontPageId, setFrontPageId] = useState(
-    () => pagesData.find((p) => p.isFrontPage)?.id ?? 'home',
-  );
-  const [postsPageId, setPostsPageId] = useState(
-    () => pagesData.find((p) => p.isPostsPage)?.id ?? 'blog',
-  );
 
   // Edit canvas: List View panel and block inspector sidebar (WordPress-style)
   const [listViewOpen, setListViewOpen] = useState(false);
@@ -310,6 +319,17 @@ export function AppStateProvider({ children }) {
     // Navigation menus (shared with Navigation screen + main-menu actions from Pages)
     navigationMenus,
     setNavigationMenus,
+
+    // Contextual page-design targets
+    pageDesigns,
+
+    // Homepage configuration
+    homepageDisplayMode,
+    setHomepageDisplayMode,
+    frontPageId,
+    setFrontPageId,
+    postsPageId,
+    setPostsPageId,
 
     // Current page
     currentPage,

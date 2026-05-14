@@ -7,10 +7,10 @@
 @import './modals/add-page.css';
 @import './views/home.css';
 @import './views/pages.css';
+@import './views/content.css';
 @import './views/navigation.css';
 @import './views/design.css';
 @import './views/templates.css';
-@import './views/posts.css';
 @import './views/media.css';
 @import './views/plugins.css';
 @import './templates-preview.css';
