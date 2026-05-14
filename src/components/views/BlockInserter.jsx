@@ -129,7 +129,7 @@ function BlocksTab({ onInsert }) {
 
 function PatternsTab({ onInsert }) {
   return (
-    <Stack direction="column" gap="sm" className="ins-pattern-list">
+    <Stack direction="column" gap="lg" className="ins-pattern-list">
       {inserterPatterns.map((p) => (
         <PatternCard key={p.id} pattern={p} onInsert={onInsert} />
       ))}
@@ -167,7 +167,7 @@ function SearchResults({ searchTerm, blockMatches, patternMatches, onInsert }) {
       {patternMatches.length > 0 && (
         <section className="bi-category">
           <Text as="h3" variant="heading-sm" className="bi-category-heading">Patterns</Text>
-          <Stack direction="column" gap="sm" className="ins-pattern-list">
+          <Stack direction="column" gap="lg" className="ins-pattern-list">
             {patternMatches.map((p) => (
               <PatternCard key={p.id} pattern={p} onInsert={onInsert} />
             ))}

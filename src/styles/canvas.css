@@ -1488,46 +1488,68 @@
   color: inherit;
 }
 
-/* Pattern card — keeps the wireframe preview because patterns inherently
-   benefit from a visual hint; uses the same token discipline as bi-block. */
+/* Pattern card — mirrors Gutenberg's .block-editor-block-patterns-list__item
+   from packages/block-editor/src/components/block-patterns-list/style.scss.
+   No visible chrome on the button itself; the preview container draws its
+   own outline via ::after using rgba(0,0,0,0.1) so the boundary stays soft.
+   Hover deepens the outline; focus switches to the brand stroke. The title
+   sits beneath the preview with no shared chrome. */
 .bi-pattern {
+  position: relative;
   display: block;
   width: 100%;
   padding: 0;
-  border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
-  border-radius: var(--wpds-border-radius-md);
-  background: var(--wpds-color-bg-surface-neutral-strong);
-  overflow: hidden;
+  border: none;
+  background: transparent;
   text-align: left;
   font: inherit;
   color: inherit;
   cursor: pointer;
-  transition: all 0.15s;
 }
 
-.bi-pattern:hover {
-  border-color: var(--wpds-color-bg-interactive-brand-strong);
-  box-shadow: 0 0 0 2px var(--wpds-color-bg-interactive-brand-weak-active);
-}
-
-.bi-pattern:focus-visible {
-  outline: 2px solid var(--wpds-color-stroke-focus-brand);
-  outline-offset: 1px;
+.bi-pattern:focus {
+  outline: none;
 }
 
 .bi-pattern-preview {
-  height: 60px;
+  position: relative;
+  height: 80px;
   padding: var(--wpds-dimension-padding-md);
   background: var(--wpds-color-bg-surface-neutral-weak);
   display: flex;
   flex-direction: column;
   gap: 3px;
+  border-radius: var(--wpds-border-radius-md);
+  overflow: hidden;
+}
+
+.bi-pattern-preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--wpds-border-radius-md);
+  outline: 1px solid rgba(0, 0, 0, 0.1);
+  outline-offset: -1px;
+  pointer-events: none;
+  transition: outline-color 0.1s linear, outline-width 0.1s linear;
+}
+
+.bi-pattern:hover .bi-pattern-preview::after {
+  outline-color: rgba(0, 0, 0, 0.3);
+}
+
+.bi-pattern:focus-visible .bi-pattern-preview::after {
+  outline-color: var(--wpds-color-stroke-focus-brand);
+  outline-width: 2px;
+  outline-offset: -2px;
 }
 
 .bi-pattern-label {
-  padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
-  font-weight: 500;
+  padding-top: var(--wpds-dimension-padding-sm);
+  font-size: 12px;
+  line-height: 1.4;
   color: var(--wpds-color-fg-content-neutral);
+  text-align: left;
 }
 
 /* Empty / placeholder line shown by the Media tab + search no-results. */
