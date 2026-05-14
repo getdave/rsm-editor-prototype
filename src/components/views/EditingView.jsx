@@ -213,6 +213,7 @@ function EditingView() {
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset selection when switching edited documents.
     setSelectedBlockId(content.isTemplate ? 'template' : 'section-0');
     setSectionStylesByIndex({});
   }, [editTarget?.id, content.isTemplate]);
@@ -679,12 +680,6 @@ function EditingView() {
           {/* Edit scroll area */}
           <div className="edit-scroll">
             <div className="edit-canvas-area">
-              {isPageDesignEdit ? (
-                <div className="edit-scope-banner" role="note">
-                  <strong>{pageDesignTarget.name}</strong>
-                  <span>{pageDesignTarget.scopeNotice}</span>
-                </div>
-              ) : null}
               <div
                 className={`edit-card preview-device-${selectedDevice}${spotlightOn ? ' edit-card--spotlight' : ''}`}
                 {...(spotlightOn ? { 'data-spotlight-focus': selectedBlockId } : {})}

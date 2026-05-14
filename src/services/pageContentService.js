@@ -54,6 +54,8 @@ export const getPageContent = (page) => {
     // Archive Templates (Template Hierarchy)
     'product-list': getProductListContent(),
     'product-catalog-template': getProductCatalogTemplateContent(page),
+    /** Posts index at `/` when homepage displays latest posts (home.php hierarchy) */
+    'blog-home-root': getBlogListContent(),
     'blog-list': getBlogListContent(),
     'posts-index-template': getPostsIndexTemplateContent(page),
     
@@ -375,7 +377,7 @@ function getProductCatalogTemplateContent(page = null) {
 function getBlogListContent() {
   return {
     layout: 'archive',
-    title: 'Blog',
+    title: 'Latest posts',
     subtitle: 'Photography tips, stories, and updates',
     wordpressContext: {
       type: 'template',
@@ -384,7 +386,7 @@ function getBlogListContent() {
     sections: [
       {
         type: 'archive-header',
-        title: 'Blog',
+        title: 'Latest posts',
         subtitle: 'Photography tips, stories, and updates'
       },
       {
@@ -691,12 +693,14 @@ function getPlaceholderTitle(pageOrId, layout) {
   if (pageId === 'shop') return 'Store page title';
   if (pageId === 'product-catalog-template') return 'Product listing title';
   if (pageId === 'blog') return 'Blog page title';
-  if (pageId === 'blog-list') return 'Blog Archive Title';
+  if (pageId === 'blog-home-root') return 'Latest Posts Homepage';
+  if (pageId === 'blog-list') return 'Posts Page Title';
   if (pageId === 'posts-index-template') {
     return pageName === 'Latest posts'
       ? 'Latest posts title'
       : 'Posts listing title';
   }
+  if (pageId === 'template-archive') return 'Archive Title';
   if (pageId === 'product-single') return 'Product Title';
   if (pageId === 'blog-single') return 'Post Title';
   if (pageId === 'event-list') return 'Event listing title';
@@ -791,7 +795,7 @@ function replaceWithPlaceholders(sections) {
           title: 'Post Title',
           date: 'Post Date',
           author: 'Author Name',
-          content: 'Post content goes here. This is where the full blog post text would be displayed with multiple paragraphs and formatting.'
+          content: 'Post content goes here. This is where the full post text would be displayed with multiple paragraphs and formatting.'
         };
       
       default:

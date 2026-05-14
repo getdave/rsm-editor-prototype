@@ -28,7 +28,8 @@ export function AppStateProvider({ children }) {
   const [navigationMenus, setNavigationMenus] = useState(navigationMenusInitial);
 
   // Contextual page-design targets (template-backed surfaces surfaced by intent).
-  const [pageDesigns] = useState(pageDesignsData);
+  // These are static mock records, so read them directly to avoid stale HMR state.
+  const pageDesigns = pageDesignsData;
 
   // Current page
   const [currentPage, setCurrentPage] = useState(pages[0]); // Home page
@@ -419,6 +420,7 @@ export function AppStateProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- app state hook intentionally lives beside its provider in this prototype.
 export function useAppState() {
   const context = useContext(AppStateContext);
   if (!context) {

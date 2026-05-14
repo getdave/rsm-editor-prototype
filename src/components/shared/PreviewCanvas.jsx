@@ -62,6 +62,16 @@ function PreviewCanvas({
     : page.isPageDesign
       ? 'Design is active'
       : page.isLive ? 'Page is live' : 'Page is a draft';
+  const documentName = documentLabel || page.name;
+  const documentStatusLabel = scopeNotice || statusLabel;
+  const documentNameElement = (
+    <span
+      className={`ct-btn preview-bar-doc-name${scopeNotice ? ' preview-bar-doc-name--has-scope' : ''}`}
+      style={{ cursor: 'default' }}
+    >
+      {documentName}
+    </span>
+  );
 
   const resolveHeaderNavItem = (item) => {
     const children = (item.children || [])
@@ -345,9 +355,15 @@ function PreviewCanvas({
           >
             {docTypeIcon(page)}
           </span>
-          <span className="ct-btn" style={{ cursor: 'default' }}>{documentLabel || page.name}</span>
+          {scopeNotice ? (
+            <Tooltip text={scopeNotice} placement="bottom">
+              {documentNameElement}
+            </Tooltip>
+          ) : (
+            documentNameElement
+          )}
           <Tooltip
-            text={statusLabel}
+            text={documentStatusLabel}
             placement="bottom"
           >
             <span
@@ -366,7 +382,7 @@ function PreviewCanvas({
                 className={`url-dot${page.isLive && !isInactiveTemplate ? '' : ' url-draft-dot'}`}
                 style={{ margin: 0 }}
                 role="status"
-                aria-label={statusLabel}
+                aria-label={documentStatusLabel}
               />
             </span>
           </Tooltip>
@@ -399,12 +415,6 @@ function PreviewCanvas({
       </div>
       <div className="preview-canvas-area">
         <div className="preview-canvas-stack">
-          {scopeNotice ? (
-            <div className="preview-scope-notice" role="note">
-              <strong>{documentLabel || page.name}</strong>
-              <span>{scopeNotice}</span>
-            </div>
-          ) : null}
           <div className="site-card">
             {renderContent()}
           </div>
