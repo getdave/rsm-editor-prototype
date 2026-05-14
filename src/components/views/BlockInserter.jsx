@@ -84,44 +84,46 @@ function PatternPreview({ kind }) {
 function BlockCard({ block, onInsert }) {
   const icon = getIcon(block.iconKey);
   return (
-    <button type="button" className="s-opt" onClick={onInsert}>
-      <Stack direction="row" align="center" justify="center" className="s-prev">
-        <WPIcon icon={icon} size={28} />
-      </Stack>
-      <Text variant="body-sm" className="s-lbl">{block.name}</Text>
+    <button type="button" className="bi-block" onClick={onInsert}>
+      <span className="bi-block-icon" aria-hidden>
+        <WPIcon icon={icon} size={24} />
+      </span>
+      <Text variant="body-sm" className="bi-block-label">{block.name}</Text>
     </button>
   );
 }
 
 function PatternCard({ pattern, onInsert }) {
   return (
-    <button type="button" className="s-opt" onClick={onInsert}>
-      <div className="s-prev">
+    <button type="button" className="bi-pattern" onClick={onInsert}>
+      <div className="bi-pattern-preview">
         <PatternPreview kind={pattern.previewKind} />
       </div>
-      <Text variant="body-sm" className="s-lbl">{pattern.name}</Text>
+      <Text variant="body-sm" className="bi-pattern-label">{pattern.name}</Text>
     </button>
   );
 }
 
 function BlocksTab({ onInsert }) {
   return (
-    <>
+    <Stack direction="column" gap="lg" className="bi-blocks">
       {inserterBlockCategories.map((cat) => {
         const blocksInCat = inserterBlocks.filter((b) => b.category === cat.id);
         if (blocksInCat.length === 0) return null;
         return (
-          <div key={cat.id}>
-            <Text variant="body-sm" className="s-lbl ins-group-heading">{cat.label}</Text>
-            <div className="ins-grid">
+          <section key={cat.id} className="bi-category">
+            <Text as="h3" variant="heading-sm" className="bi-category-heading">
+              {cat.label}
+            </Text>
+            <div className="bi-grid">
               {blocksInCat.map((b) => (
                 <BlockCard key={b.id} block={b} onInsert={onInsert} />
               ))}
             </div>
-          </div>
+          </section>
         );
       })}
-    </>
+    </Stack>
   );
 }
 
@@ -137,7 +139,7 @@ function PatternsTab({ onInsert }) {
 
 function MediaTab() {
   return (
-    <Text variant="body-sm" className="s-lbl ins-empty-note">
+    <Text variant="body-sm" className="bi-empty-note">
       Pending
     </Text>
   );
@@ -146,38 +148,38 @@ function MediaTab() {
 function SearchResults({ searchTerm, blockMatches, patternMatches, onInsert }) {
   const hasAnyMatch = blockMatches.length + patternMatches.length > 0;
   return (
-    <>
+    <Stack direction="column" gap="lg" className="bi-blocks">
       {!hasAnyMatch && (
-        <Text variant="body-sm" className="s-lbl ins-empty-note">
+        <Text variant="body-sm" className="bi-empty-note">
           No results for &ldquo;{searchTerm.trim()}&rdquo;
         </Text>
       )}
       {blockMatches.length > 0 && (
-        <div>
-          <Text variant="body-sm" className="s-lbl ins-group-heading">Blocks</Text>
-          <div className="ins-grid">
+        <section className="bi-category">
+          <Text as="h3" variant="heading-sm" className="bi-category-heading">Blocks</Text>
+          <div className="bi-grid">
             {blockMatches.map((b) => (
               <BlockCard key={b.id} block={b} onInsert={onInsert} />
             ))}
           </div>
-        </div>
+        </section>
       )}
       {patternMatches.length > 0 && (
-        <div>
-          <Text variant="body-sm" className="s-lbl ins-group-heading">Patterns</Text>
+        <section className="bi-category">
+          <Text as="h3" variant="heading-sm" className="bi-category-heading">Patterns</Text>
           <Stack direction="column" gap="sm" className="ins-pattern-list">
             {patternMatches.map((p) => (
               <PatternCard key={p.id} pattern={p} onInsert={onInsert} />
             ))}
           </Stack>
-        </div>
+        </section>
       )}
-    </>
+    </Stack>
   );
 }
 
 /**
- * Tabbed inserter sidebar (Blocks / Patterns / Media), built on
+ * Block inserter sidebar (Blocks / Patterns / Media), built on
  * WordPress design-system primitives: SearchControl, TabPanel, Button,
  * Stack / Text. Mirrors Gutenberg's inserter chrome.
  *
@@ -185,7 +187,7 @@ function SearchResults({ searchTerm, blockMatches, patternMatches, onInsert }) {
  * param when it names a valid tab, so callers can deep-link to a tab
  * (e.g. `?inserter=patterns` from the Pages "Edit" action).
  */
-export function SectionInserterContent() {
+export function BlockInserterContent() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = VALID_TAB_NAMES.includes(searchParams.get('inserter'))
     ? searchParams.get('inserter')
@@ -210,11 +212,11 @@ export function SectionInserterContent() {
     : [];
 
   return (
-    <div className="list-view-inner" role="region" aria-label="Inserter">
-      <Stack direction="row" align="center" className="ins-search-row">
+    <div className="list-view-inner bi-root" role="region" aria-label="Block inserter">
+      <Stack direction="row" align="center" gap="sm" className="bi-search-row">
         <SearchControl
           __nextHasNoMarginBottom
-          className="ins-search"
+          className="bi-search"
           value={searchTerm}
           onChange={setSearchTerm}
           placeholder="Search"
@@ -222,15 +224,15 @@ export function SectionInserterContent() {
           hideLabelFromVision
         />
         <Button
-          className="lv-close"
-          label="Close inserter"
+          className="bi-close"
+          label="Close block inserter"
           icon={wpIcons.closeSmall}
           onClick={closeInserter}
         />
       </Stack>
 
       {isSearching ? (
-        <div className="ins-list">
+        <div className="bi-list">
           <SearchResults
             searchTerm={searchTerm}
             blockMatches={blockMatches}
@@ -240,20 +242,20 @@ export function SectionInserterContent() {
         </div>
       ) : (
         <TabPanel
-          className="ins-tabs"
+          className="bi-tabs"
           tabs={TABS}
           initialTabName={initialTab}
         >
           {(activeTab) => (
             <>
-              <div className="ins-list">
+              <div className="bi-list">
                 {activeTab.name === 'blocks' && <BlocksTab onInsert={handleInsert} />}
                 {activeTab.name === 'patterns' && <PatternsTab onInsert={handleInsert} />}
                 {activeTab.name === 'media' && <MediaTab />}
               </div>
               {(activeTab.name === 'patterns' || activeTab.name === 'media') && (
-                <div className="ins-footer">
-                  <Button variant="secondary" className="ins-explore-btn">
+                <div className="bi-footer">
+                  <Button variant="secondary" className="bi-explore-btn">
                     Explore all {activeTab.name}
                   </Button>
                 </div>
@@ -266,4 +268,4 @@ export function SectionInserterContent() {
   );
 }
 
-export default SectionInserterContent;
+export default BlockInserterContent;

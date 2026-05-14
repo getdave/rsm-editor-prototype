@@ -783,23 +783,29 @@
 }
 
 /* TabPanel host inside the left panel. Mirrors the .ss-tabs structure
-   used by the right inspector so both sides feel consistent. */
+   used by the right inspector so both sides feel consistent. The
+   `.bi-tabs` host (Block inserter) skips the reserved close-button gutter
+   because its close button sits next to the SearchControl, not over the
+   tab strip. */
 .lv-tabs-panel,
-.ins-tabs {
+.bi-tabs {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
 }
 
-.lv-tabs-panel .components-tab-panel__tabs,
-.ins-tabs .components-tab-panel__tabs {
+.lv-tabs-panel .components-tab-panel__tabs {
   padding-right: 40px;
   border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral);
 }
 
+.bi-tabs .components-tab-panel__tabs {
+  border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral);
+}
+
 .lv-tabs-panel .components-tab-panel__tab-content,
-.ins-tabs .components-tab-panel__tab-content {
+.bi-tabs .components-tab-panel__tab-content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -1371,88 +1377,186 @@
 }
 
 .edit-left-panel.show {
-  width: 300px;
+  width: 350px;
   border-right-color: var(--wpds-color-stroke-surface-neutral);
 }
 
-/* Search row at the top of the Inserter — sits above the TabPanel so it
-   stays visible while the user switches between Blocks / Patterns / Media. */
-.ins-search-row {
+/* ── Block inserter (bi-*) ──
+   Modeled on the Figma reference (jhpyWGZm6ZpXOtoxdaeFkz @ 211:14332).
+   Search row sits flush against the TabPanel below (no divider); the
+   close button is a sibling of the SearchControl rather than absolutely
+   positioned (the List View shares the shell but keeps its own .lv-close
+   placement). All spacing comes from --wpds-dimension-* tokens. */
+.bi-search-row {
   display: flex;
   align-items: center;
-  gap: var(--wpds-dimension-gap-xs);
-  padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-xs)
-    var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-md);
+  gap: var(--wpds-dimension-gap-sm);
+  padding: var(--wpds-dimension-padding-lg);
   flex-shrink: 0;
-  border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
-.ins-search.components-search-control {
+.bi-search.components-search-control {
   flex: 1;
   min-width: 0;
 }
 
-.ins-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-lg);
+.bi-close.components-button {
+  flex-shrink: 0;
 }
 
-.ins-footer {
+.bi-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--wpds-dimension-padding-lg);
+}
+
+.bi-blocks {
+  width: 100%;
+}
+
+.bi-category {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wpds-dimension-gap-md);
+}
+
+/* Category heading — matches Figma Heading S (11px / Medium / uppercase /
+   gray-900). No separator below; vertical rhythm comes from the parent
+   Stack's gap. */
+.bi-category-heading {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--wpds-color-fg-content-neutral);
+}
+
+/* Three-column block grid — icon + label, transparent background; the
+   only chrome is a hover wash on the cell itself. */
+.bi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--wpds-dimension-gap-xs);
+}
+
+.bi-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--wpds-dimension-gap-md);
+  padding: var(--wpds-dimension-padding-md);
+  border: none;
+  background: transparent;
+  border-radius: var(--wpds-border-radius-md);
+  cursor: pointer;
+  text-align: center;
+  color: var(--wpds-color-fg-content-neutral);
+  transition: background 0.12s, color 0.12s;
+}
+
+.bi-block:hover {
+  background: var(--wpds-color-bg-interactive-neutral-weak-active);
+  color: var(--wpds-color-fg-interactive-neutral-active);
+}
+
+.bi-block:focus-visible {
+  outline: 2px solid var(--wpds-color-stroke-focus-brand);
+  outline-offset: -2px;
+}
+
+.bi-block-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.bi-block-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.bi-block-label {
+  line-height: 1.2;
+  overflow-wrap: break-word;
+  color: inherit;
+}
+
+/* Pattern card — keeps the wireframe preview because patterns inherently
+   benefit from a visual hint; uses the same token discipline as bi-block. */
+.bi-pattern {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+  border-radius: var(--wpds-border-radius-md);
+  background: var(--wpds-color-bg-surface-neutral-strong);
+  overflow: hidden;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.bi-pattern:hover {
+  border-color: var(--wpds-color-bg-interactive-brand-strong);
+  box-shadow: 0 0 0 2px var(--wpds-color-bg-interactive-brand-weak-active);
+}
+
+.bi-pattern:focus-visible {
+  outline: 2px solid var(--wpds-color-stroke-focus-brand);
+  outline-offset: 1px;
+}
+
+.bi-pattern-preview {
+  height: 60px;
+  padding: var(--wpds-dimension-padding-md);
+  background: var(--wpds-color-bg-surface-neutral-weak);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bi-pattern-label {
+  padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
+  font-weight: 500;
+  color: var(--wpds-color-fg-content-neutral);
+}
+
+/* Empty / placeholder line shown by the Media tab + search no-results. */
+.bi-empty-note {
+  padding: var(--wpds-dimension-padding-lg) 0;
+  color: var(--wpds-color-fg-content-neutral-weak);
+  text-align: center;
+}
+
+/* Footer holding "Explore all …" CTA. Border-top kept as the panel's
+   only horizontal divider so it doesn't compete with the tab strip. */
+.bi-footer {
   flex-shrink: 0;
   padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-lg);
   border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
   background: var(--wpds-color-bg-surface-neutral-strong);
 }
 
-.ins-explore-btn.components-button {
+.bi-explore-btn.components-button {
   width: 100%;
   justify-content: center;
 }
 
-.ins-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--wpds-dimension-gap-md);
+/* Vertical patterns list (single column with breathing room between cards). */
+.ins-pattern-list {
+  padding-top: var(--wpds-dimension-padding-md);
 }
 
-/* Inserter card — clickable preview tile for a block or pattern. Kept
-   bespoke because @wordpress/ui doesn't expose a tile primitive yet,
-   but every colour / radius / spacing now comes from --wpds-* tokens. */
-.s-opt {
-  display: block;
-  width: 100%;
-  border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
-  border-radius: var(--wpds-border-radius-md);
-  background: var(--wpds-color-bg-surface-neutral-strong);
-  overflow: hidden;
-  cursor: pointer;
-  padding: 0;
-  text-align: left;
-  font: inherit;
-  color: inherit;
-  transition: all 0.15s;
-}
-
-.s-opt:hover {
-  border-color: var(--wpds-color-bg-interactive-brand-strong);
-  box-shadow: 0 0 0 2px var(--wpds-color-bg-interactive-brand-weak-active);
-}
-
-.s-opt:focus-visible {
-  outline: 2px solid var(--wpds-color-stroke-focus-brand);
-  outline-offset: 1px;
-}
-
-.s-prev {
-  height: 60px;
-  background: var(--wpds-color-bg-surface-neutral-weak);
-  padding: var(--wpds-dimension-padding-md);
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
+/* Decorative content-placeholder bars used inside pattern previews. */
 .ln {
   height: 5px;
   background: var(--wpds-color-stroke-surface-neutral-weak);
@@ -1475,34 +1579,6 @@
   height: 24px;
   background: var(--wpds-color-stroke-surface-neutral);
   border-radius: var(--wpds-border-radius-sm);
-}
-
-.s-lbl {
-  padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
-  font-weight: 500;
-  color: var(--wpds-color-fg-content-neutral);
-}
-
-/* Section heading inside the inserter — uppercase pill above each group of
-   blocks/patterns. Reuses .s-lbl typography for color/weight; only adds
-   the uppercase treatment and the slightly different padding. */
-.s-lbl.ins-group-heading {
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--wpds-color-fg-content-neutral-weak);
-  padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-xs)
-    var(--wpds-dimension-padding-md);
-}
-
-/* "Pending" / "No results for…" placeholder rows. */
-.s-lbl.ins-empty-note {
-  padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-xs);
-  color: var(--wpds-color-fg-content-neutral-weak);
-}
-
-/* Vertical patterns list (single column with breathing room between cards). */
-.ins-pattern-list {
-  padding-top: var(--wpds-dimension-padding-md);
 }
 
 /* Pattern preview wireframes that previously used inline grid styles. */

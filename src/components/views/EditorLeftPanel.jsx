@@ -1,8 +1,8 @@
-import SectionInserterContent from './SectionInserter';
+import BlockInserterContent from './BlockInserter';
 import ListViewPanel from './ListViewPanel';
 
 /**
- * Single sliding left panel for the edit canvas: section inserter or List View.
+ * Single sliding left panel for the edit canvas: block inserter or List View.
  * Same width animation as the former inserter sidebar; sits beside the editor column (pushes canvas).
  *
  * @param {object} props
@@ -17,7 +17,7 @@ export default function EditorLeftPanel({ mode, listViewProps }) {
       className={`edit-left-panel ${show ? 'show' : ''}`}
       aria-hidden={!show}
     >
-      {mode === 'inserter' && <SectionInserterContent />}
+      {mode === 'inserter' && <BlockInserterContent />}
       {mode === 'list' && <ListViewPanel {...listViewProps} />}
     </div>
   );
