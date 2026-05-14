@@ -21,12 +21,19 @@
  * every icon-button hover in the canvas toolbar.
  */
 .is-template-context {
+  /* @wordpress/components admin-theme tokens */
   --wp-admin-theme-color: var(--wp-block-synced-color);
   --wp-admin-theme-color-darker-10: var(--wp-block-synced-color-hover);
   --wp-admin-theme-color-darker-20: var(--wp-block-synced-color-hover);
   --wp-components-color-accent: var(--wp-block-synced-color);
   --wp-components-color-accent-darker-10: var(--wp-block-synced-color-hover);
   --wp-components-color-accent-darker-20: var(--wp-block-synced-color-hover);
+  /* WPDS brand tokens (used by the refactored side panels for focus
+     rings, selected list-view rows, and weak-brand hover surfaces). */
+  --wpds-color-bg-interactive-brand-strong: var(--wp-block-synced-color);
+  --wpds-color-bg-interactive-brand-strong-active: var(--wp-block-synced-color-hover);
+  --wpds-color-bg-interactive-brand-weak-active: var(--wp-block-synced-color-tint-bg);
+  --wpds-color-stroke-focus-brand: var(--wp-block-synced-color);
 }
 
 /* Restore the default blue inside the editable canvas so block
@@ -38,6 +45,10 @@
   --wp-components-color-accent: #3858e9;
   --wp-components-color-accent-darker-10: #2145e6;
   --wp-components-color-accent-darker-20: #183ad6;
+  --wpds-color-bg-interactive-brand-strong: #3858e9;
+  --wpds-color-bg-interactive-brand-strong-active: #2e49d9;
+  --wpds-color-bg-interactive-brand-weak-active: #e6eaf4;
+  --wpds-color-stroke-focus-brand: #3858e9;
 }
 
 /* ── Canvas toolbar — primary actions (hardcoded literals in canvas.css) ── */
@@ -95,21 +106,8 @@
   color: var(--wp-block-synced-color-tint-fg);
 }
 
-/* Settings sidebar / inserter focus + hover accents (side panels —
- * outside the editable canvas, so they stay on the sync color). */
-.is-template-context .ss-layout-card:hover {
-  border-color: var(--wp-block-synced-color);
-}
-
-.is-template-context .ss-layout-card:focus-visible {
-  outline-color: var(--wp-block-synced-color);
-}
-
-.is-template-context .ins-search:focus {
-  border-color: var(--wp-block-synced-color);
-}
-
-.is-template-context .s-opt:hover {
-  border-color: var(--wp-block-synced-color);
-  box-shadow: 0 0 0 2px rgba(122, 0, 223, 0.12);
-}
+/* Side panels (inserter, list view, settings sidebar) inherit the
+ * sync color through the WPDS brand token rebind above. No
+ * component-specific overrides needed — the refactored panels are
+ * already wired through `--wpds-color-stroke-focus-brand` and
+ * `--wpds-color-bg-interactive-brand-strong`. */
