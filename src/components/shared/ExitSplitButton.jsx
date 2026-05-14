@@ -39,10 +39,10 @@ function ExitSplitButton() {
   } = useAppState();
   const referrer = metaForReferrer(editorReferrer);
 
-  const goToDashboard = () => {
+  const goToWpAdmin = () => {
     // Silly placeholder — wp-admin doesn't exist in this prototype.
     // eslint-disable-next-line no-alert
-    alert("🎉 Pretend you're back in wp-admin! (This is a prototype.)");
+    alert("🎉 Pretend you're back in WP Admin! (This is a prototype.)");
   };
 
   // Navigate straight to the target. The chrome auto-resets via
@@ -80,11 +80,11 @@ function ExitSplitButton() {
                 icon={wordpress}
                 iconPosition="left"
                 onClick={() => {
-                  goToDashboard();
+                  goToWpAdmin();
                   onClose();
                 }}
               >
-                Dashboard
+                WP Admin
               </MenuItem>
             </MenuGroup>
             <MenuGroup label="Recent documents">

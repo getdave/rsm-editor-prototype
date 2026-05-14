@@ -26,7 +26,11 @@ import {
   help,
 } from "@wordpress/icons";
 import { Page } from "@wordpress/admin-ui";
-import { useAppState } from "../../hooks/useAppState";
+import {
+  useAppState,
+  READING_DISPLAY_LATEST,
+  READING_DISPLAY_STATIC,
+} from "../../hooks/useAppState";
 import PreviewCanvas from "../shared/PreviewCanvas";
 import DefinedTerm from "../shared/DefinedTerm";
 
@@ -118,9 +122,6 @@ const DEFAULT_LAYOUTS = {
   grid: { badgeFields: ["authorDisplay"], layout: { previewSize: 60 } },
   table: {},
 };
-
-const READING_DISPLAY_LATEST = "latest";
-const READING_DISPLAY_STATIC = "static";
 
 /** Synthetic dynamic row — blog index at `/` when Reading uses “your latest posts” */
 const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = "blog-home-root";
@@ -396,23 +397,20 @@ function PagesView() {
     setPagesViewMode,
     pages,
     openAddPageModal,
+    homepageDisplayMode,
+    setHomepageDisplayMode,
+    frontPageId,
+    setFrontPageId,
+    postsPageId,
+    setPostsPageId,
   } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
-  const [frontPageId, setFrontPageId] = useState(
-    () => pages.find((p) => p.isFrontPage)?.id ?? "home",
-  );
-  const [postsPageId, setPostsPageId] = useState(
-    () => pages.find((p) => p.isPostsPage)?.id ?? "blog",
-  );
   const [activeCategory, setActiveCategory] = useState("content");
   const [view, setView] = useState(() =>
     createPagesDataViewState(pagesViewMode),
   );
   const [showDrafts, setShowDrafts] = useState(false);
   const [viewOptionsOpen, setViewOptionsOpen] = useState(false);
-  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
-    READING_DISPLAY_STATIC,
-  );
   const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
 
   const visibleTabs = useMemo(
@@ -434,7 +432,7 @@ function PagesView() {
 
   const readingSelectPages = useMemo(
     () => pages.filter((p) => p.category === "content" && p.status === "live"),
-    [],
+    [pages],
   );
 
   const readingConfigureMenuNeedsAttention = useMemo(() => {
@@ -739,6 +737,8 @@ function PagesView() {
       frontPageId,
       postsPageId,
       setHomepageDisplayMode,
+      setFrontPageId,
+      setPostsPageId,
     ],
   );
 

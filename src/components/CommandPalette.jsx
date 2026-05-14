@@ -41,15 +41,27 @@ function CommandPaletteContent() {
   const inputRef = useRef(null);
   const listRef = useRef(null);
 
-  const commands = useMemo(() => [
-    { id: 'home', label: 'Go to Home', group: 'Navigate', perform: () => navigate('/') },
-    { id: 'pages', label: 'Go to Pages', group: 'Navigate', perform: () => navigate('/pages') },
-    { id: 'posts', label: 'Go to Posts', group: 'Navigate', perform: () => navigate('/posts') },
-    { id: 'navigation', label: 'Go to Navigation', group: 'Navigate', perform: () => navigate('/navigation') },
-    { id: 'design', label: 'Go to Design', group: 'Navigate', perform: () => navigate('/design') },
-    { id: 'identity', label: 'Edit site identity', group: 'Action', perform: openSiteIdentityModal },
-    { id: 'settings', label: 'Open settings', group: 'Action', perform: openSettingsModal },
-  ], [navigate, openSiteIdentityModal, openSettingsModal]);
+  const commands = useMemo(() => {
+    const navigateCommands = [
+      { id: 'home', label: 'Go to Home', group: 'Navigate', perform: () => navigate('/') },
+      { id: 'pages', label: 'Go to Pages', group: 'Navigate', perform: () => navigate('/pages') },
+      {
+        id: 'posts',
+        label: 'Go to Posts',
+        group: 'Navigate',
+        perform: () => navigate('/posts'),
+      },
+    ];
+    navigateCommands.push(
+      { id: 'navigation', label: 'Go to Navigation', group: 'Navigate', perform: () => navigate('/navigation') },
+      { id: 'design', label: 'Go to Design', group: 'Navigate', perform: () => navigate('/design') },
+    );
+    return [
+      ...navigateCommands,
+      { id: 'identity', label: 'Edit site identity', group: 'Action', perform: openSiteIdentityModal },
+      { id: 'settings', label: 'Open settings', group: 'Action', perform: openSettingsModal },
+    ];
+  }, [navigate, openSiteIdentityModal, openSettingsModal]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

@@ -13,6 +13,9 @@ import LayoutPanel from '../components/views/styles/LayoutPanel';
 import ThemesInstalledView from '../components/views/ThemesInstalledView';
 import ThemesBrowseView from '../components/views/ThemesBrowseView';
 import NavigationView from '../components/views/NavigationView';
+import PlaceholderAdminView from '../components/views/PlaceholderAdminView';
+
+import PostsRouteGate from './PostsRouteGate';
 
 export const router = createBrowserRouter([
   {
@@ -22,11 +25,35 @@ export const router = createBrowserRouter([
       { index: true, element: <PreviewView /> },
       { path: 'pages', element: <PagesView /> },
       { path: 'pages/:pageId/edit', element: <EditingView /> },
-      { path: 'templates', element: <div style={{ padding: '20px' }}>Templates view coming soon</div> },
-      { path: 'posts', element: <div style={{ padding: '20px' }}>Posts view coming soon</div> },
+      {
+        path: 'templates',
+        element: (
+          <PlaceholderAdminView
+            title="Templates"
+            description="Templates view coming soon."
+          />
+        ),
+      },
+      { path: 'posts', element: <PostsRouteGate /> },
       { path: 'navigation', element: <NavigationView /> },
-      { path: 'patterns', element: <div style={{ padding: '20px' }}>Patterns view coming soon</div> },
-      { path: 'media', element: <div style={{ padding: '20px' }}>Media view coming soon</div> },
+      {
+        path: 'patterns',
+        element: (
+          <PlaceholderAdminView
+            title="Patterns"
+            description="Patterns view coming soon."
+          />
+        ),
+      },
+      {
+        path: 'media',
+        element: (
+          <PlaceholderAdminView
+            title="Media"
+            description="Media view coming soon."
+          />
+        ),
+      },
       {
         path: 'design',
         children: [
@@ -53,7 +80,15 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      { path: 'plugins', element: <div style={{ padding: '20px' }}>Plugins view coming soon</div> },
+      {
+        path: 'plugins',
+        element: (
+          <PlaceholderAdminView
+            title="Plugins"
+            description="Plugins view coming soon."
+          />
+        ),
+      },
     ],
   },
 ]);

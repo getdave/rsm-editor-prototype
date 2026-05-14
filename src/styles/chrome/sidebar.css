@@ -77,6 +77,61 @@
   text-overflow: ellipsis;
 }
 
+/* Advanced — expandable second tier (Posts, Templates, Patterns) */
+.admin-root-nav .sb-advanced-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+/* Pinned above WP Admin row — overrides .admin-root-nav flex growth */
+.sidebar-advanced-dock.admin-root-nav,
+.editor-sidebar-advanced-dock.admin-root-nav {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  overflow: visible;
+  border-top: 1px solid #2a2a2a;
+}
+
+.editor-sidebar-advanced-dock.editor-sidebar-section {
+  border-bottom: none;
+}
+
+/* Advanced submenu — icons + indent (match .ni chrome; anchors ignore WP link colour) */
+.admin-root-nav a.sb-advanced-sub.ni.ni-child,
+.admin-root-nav a.sb-advanced-sub.ni.ni-child:visited {
+  padding-left: 36px;
+  text-decoration: none;
+  color: #bbb;
+}
+
+.admin-root-nav a.sb-advanced-sub.ni.ni-child:hover {
+  color: #fff;
+}
+
+.admin-root-nav a.sb-advanced-sub.ni.ni-child.on {
+  color: #fff;
+}
+
+.admin-root-nav a.sb-advanced-sub.ni.ni-child .ni-label {
+  color: #bbb;
+}
+
+.admin-root-nav a.sb-advanced-sub.ni.ni-child:visited .ni-label {
+  color: #bbb;
+}
+
+.admin-root-nav a.sb-advanced-sub.ni.ni-child:hover .ni-label,
+.admin-root-nav a.sb-advanced-sub.ni.ni-child.on .ni-label {
+  color: #fff;
+}
+
+.sidebar.collapsed .admin-root-nav .sb-advanced-sub.ni.ni-child {
+  padding-left: 0;
+  justify-content: center;
+}
+
 .ni-with-chevron .ni-chevron {
   margin-left: auto;
   width: 24px;
@@ -107,7 +162,7 @@
   display: none;
 }
 
-/* Dashboard link */
+/* WP Admin shortcut */
 .dash-link {
   display: flex;
   align-items: center;
@@ -340,7 +395,7 @@
   font-weight: 500;
 }
 
-/* Sidebar bottom — Dashboard link + customization icon */
+/* Sidebar bottom — WP Admin link + customization icon */
 .sidebar-bottom {
   display: flex;
   flex-direction: row;
@@ -379,6 +434,30 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+.sb-dashboard-inner {
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sb-dashboard:hover .sb-dashboard-inner,
+.sb-dashboard:focus-visible .sb-dashboard-inner {
+  transform: translateX(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sb-dashboard-inner {
+    transition: none;
+  }
+
+  .sb-dashboard:hover .sb-dashboard-inner,
+  .sb-dashboard:focus-visible .sb-dashboard-inner {
+    transform: none;
+  }
+
+  .sb-dashboard-ico-layer {
+    transition: none;
+  }
+}
+
 .sb-dashboard:hover,
 .sb-dashboard:focus-visible {
   background: #2a2a2a;
@@ -386,19 +465,40 @@
   outline: none;
 }
 
-.sb-dashboard-ico {
-  display: inline-flex;
+.sb-dashboard-ico-wrap {
+  position: relative;
   width: 24px;
   height: 24px;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
 }
 
-.sb-dashboard-ico svg {
+.sb-dashboard-ico-layer {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.18s ease;
+}
+
+.sb-dashboard-ico-layer svg {
   width: 24px;
   height: 24px;
   fill: currentColor;
+}
+
+.sb-dashboard .sb-dashboard-ico-layer--arrow {
+  opacity: 0;
+}
+
+.sb-dashboard:hover .sb-dashboard-ico-layer--wp,
+.sb-dashboard:focus-visible .sb-dashboard-ico-layer--wp {
+  opacity: 0;
+}
+
+.sb-dashboard:hover .sb-dashboard-ico-layer--arrow,
+.sb-dashboard:focus-visible .sb-dashboard-ico-layer--arrow {
+  opacity: 1;
 }
 
 .sb-dashboard-label {
