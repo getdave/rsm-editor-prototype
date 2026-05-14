@@ -761,7 +761,10 @@
   color: #1e1e1e;
 }
 
-/* ── List View (inside shared edit-left-panel) ── */
+/* ── List View + Inserter shared shell (inside .edit-left-panel) ──
+   Both panels render a TabPanel from @wordpress/components, with the
+   Close button absolutely positioned over the tab strip — matching the
+   right inspector pattern introduced in PR #31. */
 .list-view-inner {
   display: flex;
   flex-direction: column;
@@ -769,45 +772,45 @@
   min-height: 0;
   min-width: 0;
   overflow: hidden;
-}
-
-.lv-tabs {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #ddd;
-  flex-shrink: 0;
-  padding: 0 4px 0 8px;
-  gap: 0;
-}
-
-.lv-tab {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font: 500 13px 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #1e1e1e;
-  padding: 12px 8px 10px;
-  cursor: pointer;
   position: relative;
 }
 
-.lv-tab.active {
-  font-weight: 600;
-}
-
-.lv-tab.active::after {
-  content: '';
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: 0;
-  height: 2px;
-  background: #007cba;
-  border-radius: 2px 2px 0 0;
-}
-
 .lv-close {
-  flex-shrink: 0;
+  position: absolute;
+  top: var(--wpds-dimension-padding-xs);
+  right: var(--wpds-dimension-padding-xs);
+  z-index: 1;
+}
+
+/* TabPanel host inside the left panel. Mirrors the .ss-tabs structure
+   used by the right inspector so both sides feel consistent. The
+   `.bi-tabs` host (Block inserter) skips the reserved close-button gutter
+   because its close button sits next to the SearchControl, not over the
+   tab strip. */
+.lv-tabs-panel,
+.bi-tabs {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.lv-tabs-panel .components-tab-panel__tabs {
+  padding-right: 40px;
+  border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.bi-tabs .components-tab-panel__tabs {
+  border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.lv-tabs-panel .components-tab-panel__tab-content,
+.bi-tabs .components-tab-panel__tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .lv-body {
@@ -817,7 +820,7 @@
 }
 
 .lv-list {
-  padding: 8px 0 16px;
+  padding: var(--wpds-dimension-padding-md) 0 var(--wpds-dimension-padding-lg);
 }
 
 .lv-row {
@@ -827,25 +830,24 @@
   background: transparent;
   cursor: pointer;
   text-align: left;
-  font: 13px 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #1e1e1e;
-  padding: 6px 12px;
+  color: var(--wpds-color-fg-content-neutral);
+  padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
   transition: background 0.1s;
 }
 
 .lv-row:hover {
-  background: #f0f0f0;
+  background: var(--wpds-color-bg-interactive-neutral-weak-active);
 }
 
 .lv-row.sel {
-  background: #2271b1;
-  color: #fff;
+  background: var(--wpds-color-bg-interactive-brand-strong);
+  color: var(--wpds-color-fg-on-bg-interactive-brand-strong, #fff);
 }
 
 .lv-row-inner {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--wpds-dimension-gap-md);
   width: 100%;
 }
 
@@ -856,7 +858,7 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  color: #1e1e1e;
+  color: var(--wpds-color-fg-content-neutral);
 }
 
 .lv-icon svg {
@@ -865,10 +867,13 @@
   fill: currentColor;
 }
 
-.lv-row.sel .lv-icon {
-  color: #fff;
+.lv-row.sel .lv-icon,
+.lv-row.sel .lv-label {
+  color: var(--wpds-color-fg-on-bg-interactive-brand-strong, #fff);
 }
 
+/* Global template parts (header/footer) get a distinct hint color when
+   the row isn't selected — matches WordPress's purple "global" treatment. */
 .lv-row-global:not(.sel) .lv-icon {
   color: #7527e7;
 }
@@ -888,9 +893,9 @@
   font-weight: 600;
   line-height: 1.2;
   padding: 2px 7px;
-  border-radius: 3px;
-  background: #f0f0f0;
-  color: #50575e;
+  border-radius: var(--wpds-border-radius-sm);
+  background: var(--wpds-color-bg-surface-neutral-weak);
+  color: var(--wpds-color-fg-content-neutral-weak);
   letter-spacing: 0.02em;
 }
 
@@ -900,43 +905,35 @@
 }
 
 .lv-row:not(.sel):hover .lv-row-badge {
-  background: #e8e8e8;
+  background: var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 .lv-template-branch {
-  padding-left: 4px;
+  padding-left: var(--wpds-dimension-padding-xs);
 }
 
 .lv-template-row-wrap {
   display: flex;
-  align-items: stretch;
-}
-
-.lv-expand {
-  width: 28px;
-  flex-shrink: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
   align-items: center;
-  justify-content: center;
+}
+
+/* Tree-style expand toggle for the Template branch. The Button is sized
+   tight to mirror Gutenberg's list-view chevron column. */
+.lv-expand.components-button {
+  width: 28px;
+  min-width: 28px;
+  height: 32px;
   padding: 0;
-  color: #1e1e1e;
+  flex-shrink: 0;
+  color: var(--wpds-color-fg-content-neutral);
 }
 
-.lv-chevron {
-  display: inline-flex;
-  transition: transform 0.15s ease;
-}
-
-.lv-chevron.open {
+.lv-expand[aria-expanded='true'] svg {
   transform: rotate(90deg);
 }
 
-.lv-chevron svg {
-  width: 20px;
-  height: 20px;
+.lv-expand svg {
+  transition: transform 0.15s ease;
 }
 
 .lv-row.lv-row-parent {
@@ -947,30 +944,28 @@
 }
 
 .lv-nested {
-  padding-left: 28px;
-  border-left: 1px solid #e0e0e0;
-  margin: 4px 0 4px 14px;
+  padding-left: var(--wpds-dimension-padding-3xl);
+  border-left: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+  margin: var(--wpds-dimension-gap-xs) 0 var(--wpds-dimension-gap-xs) 14px;
 }
 
 .lv-placeholder-note {
-  font: 12px 'DM Sans', sans-serif;
-  color: #757575;
-  padding: 8px 0 8px 8px;
+  color: var(--wpds-color-fg-content-neutral-weak);
+  padding: var(--wpds-dimension-padding-md) 0 var(--wpds-dimension-padding-md)
+    var(--wpds-dimension-padding-md);
 }
 
 .lv-outline {
-  padding: 16px;
+  padding: var(--wpds-dimension-padding-lg);
 }
 
 .lv-outline-h1 {
-  font: 600 18px 'DM Sans', sans-serif;
-  color: #1e1e1e;
-  margin-bottom: 8px;
+  color: var(--wpds-color-fg-content-neutral);
+  margin-bottom: var(--wpds-dimension-gap-md);
 }
 
 .lv-outline-muted {
-  font: 12px 'DM Sans', sans-serif;
-  color: #757575;
+  color: var(--wpds-color-fg-content-neutral-weak);
   line-height: 1.5;
   margin: 0;
 }
@@ -1367,7 +1362,9 @@
   border-color: #1e1e1e;
 }
 
-/* Shared left panel: section inserter + list view (pushes editor column) */
+/* Shared left panel: section inserter + list view (pushes editor column).
+   Width animation is preserved from the original implementation so the
+   panel still slides in/out next to the canvas. */
 .edit-left-panel {
   width: 0;
   overflow: hidden;
@@ -1375,148 +1372,217 @@
   transition: width 0.2s;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: var(--wpds-color-bg-surface-neutral-strong);
+  border-right: 1px solid transparent;
 }
 
 .edit-left-panel.show {
-  width: 300px;
+  width: 350px;
+  border-right-color: var(--wpds-color-stroke-surface-neutral);
 }
 
-.ins-hd {
+/* ── Block inserter (bi-*) ──
+   Modeled on the Figma reference (jhpyWGZm6ZpXOtoxdaeFkz @ 211:14332).
+   Search row sits flush against the TabPanel below (no divider); the
+   close button is a sibling of the SearchControl rather than absolutely
+   positioned (the List View shares the shell but keeps its own .lv-close
+   placement). All spacing comes from --wpds-dimension-* tokens. */
+.bi-search-row {
   display: flex;
   align-items: center;
-  padding: 12px 14px 11px;
-  border-bottom: 1px solid #eee;
+  gap: var(--wpds-dimension-gap-sm);
+  padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-lg) 0;
   flex-shrink: 0;
 }
 
-.ins-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: #1e1e1e;
-  flex: 1;
-}
-
-.ins-close {
-  width: 24px;
-  height: 24px;
-  border: none;
-  background: transparent;
-  color: #aaa;
-  cursor: pointer;
-  border-radius: 3px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-.ins-close:hover {
-  background: #f0f0f0;
-  color: #1e1e1e;
-}
-
-.ins-search-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 4px 8px 12px;
-  flex-shrink: 0;
-  border-bottom: 1px solid #eee;
-}
-
-.ins-search {
+.bi-search.components-search-control {
   flex: 1;
   min-width: 0;
-  padding: 6px 9px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font: 12px var(--wp-font-family);
-  outline: none;
-  background: #fafafa;
 }
 
-.ins-search:focus {
-  border-color: #3858e9;
-  background: #fff;
-}
-
-.ins-cats {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  padding: 10px 14px;
+.bi-close.components-button {
   flex-shrink: 0;
-  border-bottom: 1px solid #eee;
 }
 
-.c-btn {
-  padding: 4px 10px;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 20px;
-  font: 11px var(--wp-font-family);
-  cursor: pointer;
-  color: #888;
-}
-
-.c-btn.on {
-  background: #1e1e1e;
-  border-color: #1e1e1e;
-  color: #fff;
-}
-
-.ins-list {
+.bi-list {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 14px;
+  padding: var(--wpds-dimension-padding-lg);
 }
 
-.ins-footer {
+.bi-blocks {
+  width: 100%;
+}
+
+.bi-category {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wpds-dimension-gap-md);
+}
+
+/* Category heading — matches Figma Heading S (11px / Medium / uppercase /
+   gray-900). No separator below; vertical rhythm comes from the parent
+   Stack's gap. */
+.bi-category-heading {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--wpds-color-fg-content-neutral);
+}
+
+/* Three-column block grid — icon + label, transparent background; the
+   only chrome is a hover wash on the cell itself. */
+.bi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--wpds-dimension-gap-xs);
+}
+
+.bi-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--wpds-dimension-gap-md);
+  padding: var(--wpds-dimension-padding-md);
+  border: none;
+  background: transparent;
+  border-radius: var(--wpds-border-radius-md);
+  cursor: pointer;
+  text-align: center;
+  color: var(--wpds-color-fg-content-neutral);
+  transition: background 0.12s, color 0.12s;
+}
+
+.bi-block:hover {
+  background: var(--wpds-color-bg-interactive-neutral-weak-active);
+  color: var(--wpds-color-fg-interactive-neutral-active);
+}
+
+.bi-block:focus-visible {
+  outline: 2px solid var(--wpds-color-stroke-focus-brand);
+  outline-offset: -2px;
+}
+
+.bi-block-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.bi-block-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.bi-block-label {
+  line-height: 1.2;
+  overflow-wrap: break-word;
+  color: inherit;
+}
+
+/* Pattern card — mirrors Gutenberg's .block-editor-block-patterns-list__item
+   from packages/block-editor/src/components/block-patterns-list/style.scss.
+   No visible chrome on the button itself; the preview container draws its
+   own outline via ::after using rgba(0,0,0,0.1) so the boundary stays soft.
+   Hover deepens the outline; focus switches to the brand stroke. The title
+   sits beneath the preview with no shared chrome. */
+.bi-pattern {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.bi-pattern:focus {
+  outline: none;
+}
+
+.bi-pattern-preview {
+  position: relative;
+  height: 80px;
+  padding: var(--wpds-dimension-padding-md);
+  background: var(--wpds-color-bg-surface-neutral-weak);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-radius: var(--wpds-border-radius-md);
+  overflow: hidden;
+}
+
+.bi-pattern-preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--wpds-border-radius-md);
+  outline: 1px solid rgba(0, 0, 0, 0.1);
+  outline-offset: -1px;
+  pointer-events: none;
+  transition: outline-color 0.1s linear, outline-width 0.1s linear;
+}
+
+.bi-pattern:hover .bi-pattern-preview::after {
+  outline-color: rgba(0, 0, 0, 0.3);
+}
+
+.bi-pattern:focus-visible .bi-pattern-preview::after {
+  outline-color: var(--wpds-color-stroke-focus-brand);
+  outline-width: 2px;
+  outline-offset: -2px;
+}
+
+.bi-pattern-label {
+  padding-top: var(--wpds-dimension-padding-sm);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--wpds-color-fg-content-neutral);
+  text-align: left;
+}
+
+/* Empty / placeholder line shown by the Media tab + search no-results. */
+.bi-empty-note {
+  padding: var(--wpds-dimension-padding-lg) 0;
+  color: var(--wpds-color-fg-content-neutral-weak);
+  text-align: center;
+}
+
+/* Footer holding "Explore all …" CTA. Border-top kept as the panel's
+   only horizontal divider so it doesn't compete with the tab strip. */
+.bi-footer {
   flex-shrink: 0;
-  padding: 12px 14px;
-  border-top: 1px solid #eee;
-  background: #fff;
+  padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-lg);
+  border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+  background: var(--wpds-color-bg-surface-neutral-strong);
 }
 
-.ins-explore-btn.components-button {
+.bi-explore-btn.components-button {
   width: 100%;
   justify-content: center;
 }
 
-.ins-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+/* Vertical patterns list (single column with breathing room between cards). */
+.ins-pattern-list {
+  padding-top: var(--wpds-dimension-padding-md);
 }
 
-.s-opt {
-  border: 1px solid #e0e0e0;
-  border-radius: 5px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.s-opt:hover {
-  border-color: #3858e9;
-  box-shadow: 0 0 0 2px #e8edff;
-}
-
-.s-prev {
-  height: 60px;
-  background: #f5f5f5;
-  padding: 7px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
+/* Decorative content-placeholder bars used inside pattern previews. */
 .ln {
   height: 5px;
-  background: #e0e0e0;
-  border-radius: 2px;
+  background: var(--wpds-color-stroke-surface-neutral-weak);
+  border-radius: var(--wpds-border-radius-sm);
 }
 
 .ln.s {
@@ -1533,41 +1599,15 @@
 
 .ln.img {
   height: 24px;
-  background: #d0d0d0;
-  border-radius: 2px;
+  background: var(--wpds-color-stroke-surface-neutral);
+  border-radius: var(--wpds-border-radius-sm);
 }
-
-.s-lbl {
-  padding: 6px 8px;
-  font-size: 11px;
-  font-weight: 500;
-  color: #1e1e1e;
-}
-
-/* Section heading inside the inserter — uppercase pill above each group of
-   blocks/patterns. Reuses .s-lbl typography for color/weight; only adds
-   the uppercase treatment and the slightly different padding. */
-.s-lbl.ins-group-heading {
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #757575;
-  padding: 12px 4px 8px;
-}
-
-/* "Pending" / "No results for…" placeholder rows. */
-.s-lbl.ins-empty-note {
-  padding: 16px 4px;
-  color: #757575;
-}
-
-/* Vertical patterns list (single column with breathing room between cards). */
-.ins-pattern-list { padding-top: 12px; }
 
 /* Pattern preview wireframes that previously used inline grid styles. */
 .pattern-preview-two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
+  gap: var(--wpds-dimension-gap-xs);
   height: 100%;
 }
 
@@ -1579,8 +1619,8 @@
 }
 
 .pattern-preview-gallery-cell {
-  background: #d0d0d0;
-  border-radius: 2px;
+  background: var(--wpds-color-stroke-surface-neutral);
+  border-radius: var(--wpds-border-radius-sm);
 }
 
 /* Split View Layout - Generic reusable pattern for stage + canvas views */
