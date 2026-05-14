@@ -1,0 +1,90 @@
+/*
+ * Template editing context — purple "skin" applied to the canvas editor
+ * when editing a content type of `template`. Modeled on WordPress's
+ * admin-theme-color layer: a scoped class on the editor root swaps the
+ * blue accent tones for the synced-block purple defined in
+ * `wordpress-vars.css` (`--wp-block-synced-color`).
+ *
+ * The badge below is rendered globally (DocumentActions toggles it) so
+ * the canvas header can convey "you are editing a template" even
+ * outside the skin's selection scope.
+ */
+
+/* Template type badge (rendered before the doc name field) */
+.doc-actions-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(122, 0, 223, 0.12);
+  color: var(--wp-block-synced-color);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* ── Canvas toolbar — primary actions ── */
+.is-template-context .ct-btn.primary {
+  background: var(--wp-block-synced-color);
+}
+
+.is-template-context .ct-btn.primary:hover {
+  background: var(--wp-block-synced-color-hover);
+}
+
+.is-template-context .ct-save {
+  background: var(--wp-block-synced-color);
+  border-color: var(--wp-block-synced-color);
+}
+
+.is-template-context .ct-save:hover {
+  background: var(--wp-block-synced-color-hover);
+  border-color: var(--wp-block-synced-color-hover);
+}
+
+/* Active device-mode toggle */
+.is-template-context .ct-view-btn.active {
+  color: var(--wp-block-synced-color);
+}
+
+/* ── Canvas content — block hover / selection outlines ── */
+.is-template-context .e-sec:hover,
+.is-template-context .template-edit-root:hover,
+.is-template-context .g-el.e-block:hover {
+  border-color: var(--wp-block-synced-color);
+}
+
+.is-template-context .e-sec.sel,
+.is-template-context .template-edit-root.sel {
+  border-color: var(--wp-block-synced-color);
+  background: rgba(122, 0, 223, 0.05);
+}
+
+.is-template-context .g-el.e-block.sel {
+  border-color: var(--wp-block-synced-color);
+}
+
+.is-template-context .sec-bar.block-toolbar.block-toolbar--pattern-section {
+  border-left-color: var(--wp-block-synced-color);
+}
+
+/* Settings sidebar / inserter focus + hover accents inside the editor */
+.is-template-context .ss-layout-card:hover {
+  border-color: var(--wp-block-synced-color);
+}
+
+.is-template-context .ss-layout-card:focus-visible {
+  outline-color: var(--wp-block-synced-color);
+}
+
+.is-template-context .ins-search:focus {
+  border-color: var(--wp-block-synced-color);
+}
+
+.is-template-context .s-opt:hover {
+  border-color: var(--wp-block-synced-color);
+  box-shadow: 0 0 0 2px rgba(122, 0, 223, 0.12);
+}

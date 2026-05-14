@@ -561,7 +561,7 @@ function EditingView() {
         transition: 'width 280ms cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
-      <div className="editor-col">
+      <div className={`editor-col${content.isTemplate ? ' is-template-context' : ''}`}>
         {/* Canvas toolbar — full width; panels sit below this */}
         <div className="canvas-toolbar">
           {/* Left zone */}
@@ -595,7 +595,10 @@ function EditingView() {
 
           <div className="ct-space"></div>
           {/* Center zone */}
-          <DocumentActions documentLabelOverride={spotlightGlobalDocLabel} />
+          <DocumentActions
+            documentLabelOverride={spotlightGlobalDocLabel}
+            isTemplate={content.isTemplate}
+          />
           <div className="ct-space"></div>
 
           {/* Right zone */}
