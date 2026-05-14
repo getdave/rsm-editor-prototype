@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button } from '@wordpress/components';
+import { Button, SearchControl, TabPanel } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import * as wpIcons from '@wordpress/icons';
 
@@ -12,13 +12,13 @@ import {
 } from '../../data/mockData';
 
 const TABS = [
-  { id: 'blocks', label: 'Blocks' },
-  { id: 'patterns', label: 'Patterns' },
-  { id: 'media', label: 'Media' },
+  { name: 'blocks', title: 'Blocks' },
+  { name: 'patterns', title: 'Patterns' },
+  { name: 'media', title: 'Media' },
 ];
 
 const DEFAULT_TAB = 'blocks';
-const VALID_TAB_IDS = TABS.map((t) => t.id);
+const VALID_TAB_NAMES = TABS.map((t) => t.name);
 
 function getIcon(iconKey) {
   return wpIcons[iconKey] ?? wpIcons.blockDefault;
@@ -84,39 +84,112 @@ function PatternPreview({ kind }) {
 function BlockCard({ block, onInsert }) {
   const icon = getIcon(block.iconKey);
   return (
-    <div className="s-opt" onClick={onInsert}>
+    <button type="button" className="s-opt" onClick={onInsert}>
       <Stack direction="row" align="center" justify="center" className="s-prev">
         <WPIcon icon={icon} size={28} />
       </Stack>
       <Text variant="body-sm" className="s-lbl">{block.name}</Text>
-    </div>
+    </button>
   );
 }
 
 function PatternCard({ pattern, onInsert }) {
   return (
-    <div className="s-opt" onClick={onInsert}>
+    <button type="button" className="s-opt" onClick={onInsert}>
       <div className="s-prev">
         <PatternPreview kind={pattern.previewKind} />
       </div>
       <Text variant="body-sm" className="s-lbl">{pattern.name}</Text>
-    </div>
+    </button>
+  );
+}
+
+function BlocksTab({ onInsert }) {
+  return (
+    <>
+      {inserterBlockCategories.map((cat) => {
+        const blocksInCat = inserterBlocks.filter((b) => b.category === cat.id);
+        if (blocksInCat.length === 0) return null;
+        return (
+          <div key={cat.id}>
+            <Text variant="body-sm" className="s-lbl ins-group-heading">{cat.label}</Text>
+            <div className="ins-grid">
+              {blocksInCat.map((b) => (
+                <BlockCard key={b.id} block={b} onInsert={onInsert} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+function PatternsTab({ onInsert }) {
+  return (
+    <Stack direction="column" gap="sm" className="ins-pattern-list">
+      {inserterPatterns.map((p) => (
+        <PatternCard key={p.id} pattern={p} onInsert={onInsert} />
+      ))}
+    </Stack>
+  );
+}
+
+function MediaTab() {
+  return (
+    <Text variant="body-sm" className="s-lbl ins-empty-note">
+      Pending
+    </Text>
+  );
+}
+
+function SearchResults({ searchTerm, blockMatches, patternMatches, onInsert }) {
+  const hasAnyMatch = blockMatches.length + patternMatches.length > 0;
+  return (
+    <>
+      {!hasAnyMatch && (
+        <Text variant="body-sm" className="s-lbl ins-empty-note">
+          No results for &ldquo;{searchTerm.trim()}&rdquo;
+        </Text>
+      )}
+      {blockMatches.length > 0 && (
+        <div>
+          <Text variant="body-sm" className="s-lbl ins-group-heading">Blocks</Text>
+          <div className="ins-grid">
+            {blockMatches.map((b) => (
+              <BlockCard key={b.id} block={b} onInsert={onInsert} />
+            ))}
+          </div>
+        </div>
+      )}
+      {patternMatches.length > 0 && (
+        <div>
+          <Text variant="body-sm" className="s-lbl ins-group-heading">Patterns</Text>
+          <Stack direction="column" gap="sm" className="ins-pattern-list">
+            {patternMatches.map((p) => (
+              <PatternCard key={p.id} pattern={p} onInsert={onInsert} />
+            ))}
+          </Stack>
+        </div>
+      )}
+    </>
   );
 }
 
 /**
- * Tabbed inserter sidebar (Blocks / Patterns / Media).
- * Mirrors the "List View / Outline" tab pattern from ListViewPanel.
+ * Tabbed inserter sidebar (Blocks / Patterns / Media), built on
+ * WordPress design-system primitives: SearchControl, TabPanel, Button,
+ * Stack / Text. Mirrors Gutenberg's inserter chrome.
+ *
  * The active tab on first render comes from the `?inserter=<tab>` URL
  * param when it names a valid tab, so callers can deep-link to a tab
  * (e.g. `?inserter=patterns` from the Pages "Edit" action).
  */
 export function SectionInserterContent() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab = VALID_TAB_IDS.includes(searchParams.get('inserter'))
+  const initialTab = VALID_TAB_NAMES.includes(searchParams.get('inserter'))
     ? searchParams.get('inserter')
     : DEFAULT_TAB;
-  const [tab, setTab] = useState(initialTab);
   const [searchTerm, setSearchTerm] = useState('');
 
   const closeInserter = () => {
@@ -135,82 +208,18 @@ export function SectionInserterContent() {
   const patternMatches = isSearching
     ? inserterPatterns.filter((p) => nameMatches(p.name))
     : [];
-  // Media has no underlying data yet, so it never contributes search hits.
-  const hasAnyMatch = blockMatches.length + patternMatches.length > 0;
-
-  const renderBlocksTab = () => (
-    <>
-      {inserterBlockCategories.map((cat) => {
-        const blocksInCat = inserterBlocks.filter((b) => b.category === cat.id);
-        if (blocksInCat.length === 0) return null;
-        return (
-          <div key={cat.id}>
-            <Text variant="body-sm" className="s-lbl ins-group-heading">{cat.label}</Text>
-            <div className="ins-grid">
-              {blocksInCat.map((b) => (
-                <BlockCard key={b.id} block={b} onInsert={handleInsert} />
-              ))}
-            </div>
-          </div>
-        );
-      })}
-    </>
-  );
-
-  const renderPatternsTab = () => (
-    <Stack direction="column" gap="sm" className="ins-pattern-list">
-      {inserterPatterns.map((p) => (
-        <PatternCard key={p.id} pattern={p} onInsert={handleInsert} />
-      ))}
-    </Stack>
-  );
-
-  const renderMediaTab = () => (
-    <Text variant="body-sm" className="s-lbl ins-empty-note">
-      Pending
-    </Text>
-  );
-
-  const renderSearchResults = () => (
-    <>
-      {!hasAnyMatch && (
-        <Text variant="body-sm" className="s-lbl ins-empty-note">
-          No results for &ldquo;{searchTerm.trim()}&rdquo;
-        </Text>
-      )}
-      {blockMatches.length > 0 && (
-        <div>
-          <Text variant="body-sm" className="s-lbl ins-group-heading">Blocks</Text>
-          <div className="ins-grid">
-            {blockMatches.map((b) => (
-              <BlockCard key={b.id} block={b} onInsert={handleInsert} />
-            ))}
-          </div>
-        </div>
-      )}
-      {patternMatches.length > 0 && (
-        <div>
-          <Text variant="body-sm" className="s-lbl ins-group-heading">Patterns</Text>
-          <Stack direction="column" gap="sm" className="ins-pattern-list">
-            {patternMatches.map((p) => (
-              <PatternCard key={p.id} pattern={p} onInsert={handleInsert} />
-            ))}
-          </Stack>
-        </div>
-      )}
-    </>
-  );
 
   return (
     <div className="list-view-inner" role="region" aria-label="Inserter">
       <Stack direction="row" align="center" className="ins-search-row">
-        <input
+        <SearchControl
+          __nextHasNoMarginBottom
           className="ins-search"
-          type="search"
-          placeholder="Search"
-          aria-label="Search blocks, patterns, and media"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={setSearchTerm}
+          placeholder="Search"
+          label="Search blocks, patterns, and media"
+          hideLabelFromVision
         />
         <Button
           className="lv-close"
@@ -221,36 +230,37 @@ export function SectionInserterContent() {
       </Stack>
 
       {isSearching ? (
-        <div className="ins-list">{renderSearchResults()}</div>
+        <div className="ins-list">
+          <SearchResults
+            searchTerm={searchTerm}
+            blockMatches={blockMatches}
+            patternMatches={patternMatches}
+            onInsert={handleInsert}
+          />
+        </div>
       ) : (
-        <>
-          <Stack direction="row" align="center" className="lv-tabs">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                className={`lv-tab ${tab === t.id ? 'active' : ''}`}
-                onClick={() => setTab(t.id)}
-              >
-                {t.label}
-              </button>
-            ))}
-          </Stack>
-
-          <div className="ins-list">
-            {tab === 'blocks' && renderBlocksTab()}
-            {tab === 'patterns' && renderPatternsTab()}
-            {tab === 'media' && renderMediaTab()}
-          </div>
-
-          {(tab === 'patterns' || tab === 'media') && (
-            <div className="ins-footer">
-              <Button variant="secondary" className="ins-explore-btn">
-                Explore all {tab}
-              </Button>
-            </div>
+        <TabPanel
+          className="ins-tabs"
+          tabs={TABS}
+          initialTabName={initialTab}
+        >
+          {(activeTab) => (
+            <>
+              <div className="ins-list">
+                {activeTab.name === 'blocks' && <BlocksTab onInsert={handleInsert} />}
+                {activeTab.name === 'patterns' && <PatternsTab onInsert={handleInsert} />}
+                {activeTab.name === 'media' && <MediaTab />}
+              </div>
+              {(activeTab.name === 'patterns' || activeTab.name === 'media') && (
+                <div className="ins-footer">
+                  <Button variant="secondary" className="ins-explore-btn">
+                    Explore all {activeTab.name}
+                  </Button>
+                </div>
+              )}
+            </>
           )}
-        </>
+        </TabPanel>
       )}
     </div>
   );

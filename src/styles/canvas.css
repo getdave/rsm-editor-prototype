@@ -761,7 +761,10 @@
   color: #1e1e1e;
 }
 
-/* ── List View (inside shared edit-left-panel) ── */
+/* ── List View + Inserter shared shell (inside .edit-left-panel) ──
+   Both panels render a TabPanel from @wordpress/components, with the
+   Close button absolutely positioned over the tab strip — matching the
+   right inspector pattern introduced in PR #31. */
 .list-view-inner {
   display: flex;
   flex-direction: column;
@@ -769,45 +772,39 @@
   min-height: 0;
   min-width: 0;
   overflow: hidden;
-}
-
-.lv-tabs {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #ddd;
-  flex-shrink: 0;
-  padding: 0 4px 0 8px;
-  gap: 0;
-}
-
-.lv-tab {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font: 500 13px 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #1e1e1e;
-  padding: 12px 8px 10px;
-  cursor: pointer;
   position: relative;
 }
 
-.lv-tab.active {
-  font-weight: 600;
-}
-
-.lv-tab.active::after {
-  content: '';
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: 0;
-  height: 2px;
-  background: #007cba;
-  border-radius: 2px 2px 0 0;
-}
-
 .lv-close {
-  flex-shrink: 0;
+  position: absolute;
+  top: var(--wpds-dimension-padding-xs);
+  right: var(--wpds-dimension-padding-xs);
+  z-index: 1;
+}
+
+/* TabPanel host inside the left panel. Mirrors the .ss-tabs structure
+   used by the right inspector so both sides feel consistent. */
+.lv-tabs-panel,
+.ins-tabs {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.lv-tabs-panel .components-tab-panel__tabs,
+.ins-tabs .components-tab-panel__tabs {
+  padding-right: 40px;
+  border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.lv-tabs-panel .components-tab-panel__tab-content,
+.ins-tabs .components-tab-panel__tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .lv-body {
@@ -817,7 +814,7 @@
 }
 
 .lv-list {
-  padding: 8px 0 16px;
+  padding: var(--wpds-dimension-padding-md) 0 var(--wpds-dimension-padding-lg);
 }
 
 .lv-row {
@@ -827,25 +824,24 @@
   background: transparent;
   cursor: pointer;
   text-align: left;
-  font: 13px 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #1e1e1e;
-  padding: 6px 12px;
+  color: var(--wpds-color-fg-content-neutral);
+  padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
   transition: background 0.1s;
 }
 
 .lv-row:hover {
-  background: #f0f0f0;
+  background: var(--wpds-color-bg-interactive-neutral-weak-active);
 }
 
 .lv-row.sel {
-  background: #2271b1;
-  color: #fff;
+  background: var(--wpds-color-bg-interactive-brand-strong);
+  color: var(--wpds-color-fg-on-bg-interactive-brand-strong, #fff);
 }
 
 .lv-row-inner {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--wpds-dimension-gap-md);
   width: 100%;
 }
 
@@ -856,7 +852,7 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  color: #1e1e1e;
+  color: var(--wpds-color-fg-content-neutral);
 }
 
 .lv-icon svg {
@@ -865,10 +861,13 @@
   fill: currentColor;
 }
 
-.lv-row.sel .lv-icon {
-  color: #fff;
+.lv-row.sel .lv-icon,
+.lv-row.sel .lv-label {
+  color: var(--wpds-color-fg-on-bg-interactive-brand-strong, #fff);
 }
 
+/* Global template parts (header/footer) get a distinct hint color when
+   the row isn't selected — matches WordPress's purple "global" treatment. */
 .lv-row-global:not(.sel) .lv-icon {
   color: #7527e7;
 }
@@ -888,9 +887,9 @@
   font-weight: 600;
   line-height: 1.2;
   padding: 2px 7px;
-  border-radius: 3px;
-  background: #f0f0f0;
-  color: #50575e;
+  border-radius: var(--wpds-border-radius-sm);
+  background: var(--wpds-color-bg-surface-neutral-weak);
+  color: var(--wpds-color-fg-content-neutral-weak);
   letter-spacing: 0.02em;
 }
 
@@ -900,43 +899,35 @@
 }
 
 .lv-row:not(.sel):hover .lv-row-badge {
-  background: #e8e8e8;
+  background: var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 .lv-template-branch {
-  padding-left: 4px;
+  padding-left: var(--wpds-dimension-padding-xs);
 }
 
 .lv-template-row-wrap {
   display: flex;
-  align-items: stretch;
-}
-
-.lv-expand {
-  width: 28px;
-  flex-shrink: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
   align-items: center;
-  justify-content: center;
+}
+
+/* Tree-style expand toggle for the Template branch. The Button is sized
+   tight to mirror Gutenberg's list-view chevron column. */
+.lv-expand.components-button {
+  width: 28px;
+  min-width: 28px;
+  height: 32px;
   padding: 0;
-  color: #1e1e1e;
+  flex-shrink: 0;
+  color: var(--wpds-color-fg-content-neutral);
 }
 
-.lv-chevron {
-  display: inline-flex;
-  transition: transform 0.15s ease;
-}
-
-.lv-chevron.open {
+.lv-expand[aria-expanded='true'] svg {
   transform: rotate(90deg);
 }
 
-.lv-chevron svg {
-  width: 20px;
-  height: 20px;
+.lv-expand svg {
+  transition: transform 0.15s ease;
 }
 
 .lv-row.lv-row-parent {
@@ -947,30 +938,28 @@
 }
 
 .lv-nested {
-  padding-left: 28px;
-  border-left: 1px solid #e0e0e0;
-  margin: 4px 0 4px 14px;
+  padding-left: var(--wpds-dimension-padding-3xl);
+  border-left: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+  margin: var(--wpds-dimension-gap-xs) 0 var(--wpds-dimension-gap-xs) 14px;
 }
 
 .lv-placeholder-note {
-  font: 12px 'DM Sans', sans-serif;
-  color: #757575;
-  padding: 8px 0 8px 8px;
+  color: var(--wpds-color-fg-content-neutral-weak);
+  padding: var(--wpds-dimension-padding-md) 0 var(--wpds-dimension-padding-md)
+    var(--wpds-dimension-padding-md);
 }
 
 .lv-outline {
-  padding: 16px;
+  padding: var(--wpds-dimension-padding-lg);
 }
 
 .lv-outline-h1 {
-  font: 600 18px 'DM Sans', sans-serif;
-  color: #1e1e1e;
-  margin-bottom: 8px;
+  color: var(--wpds-color-fg-content-neutral);
+  margin-bottom: var(--wpds-dimension-gap-md);
 }
 
 .lv-outline-muted {
-  font: 12px 'DM Sans', sans-serif;
-  color: #757575;
+  color: var(--wpds-color-fg-content-neutral-weak);
   line-height: 1.5;
   margin: 0;
 }
@@ -1367,7 +1356,9 @@
   border-color: #1e1e1e;
 }
 
-/* Shared left panel: section inserter + list view (pushes editor column) */
+/* Shared left panel: section inserter + list view (pushes editor column).
+   Width animation is preserved from the original implementation so the
+   panel still slides in/out next to the canvas. */
 .edit-left-panel {
   width: 0;
   overflow: hidden;
@@ -1375,109 +1366,43 @@
   transition: width 0.2s;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: var(--wpds-color-bg-surface-neutral-strong);
+  border-right: 1px solid transparent;
 }
 
 .edit-left-panel.show {
   width: 300px;
+  border-right-color: var(--wpds-color-stroke-surface-neutral);
 }
 
-.ins-hd {
-  display: flex;
-  align-items: center;
-  padding: 12px 14px 11px;
-  border-bottom: 1px solid #eee;
-  flex-shrink: 0;
-}
-
-.ins-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: #1e1e1e;
-  flex: 1;
-}
-
-.ins-close {
-  width: 24px;
-  height: 24px;
-  border: none;
-  background: transparent;
-  color: #aaa;
-  cursor: pointer;
-  border-radius: 3px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-.ins-close:hover {
-  background: #f0f0f0;
-  color: #1e1e1e;
-}
-
+/* Search row at the top of the Inserter — sits above the TabPanel so it
+   stays visible while the user switches between Blocks / Patterns / Media. */
 .ins-search-row {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 8px 4px 8px 12px;
+  gap: var(--wpds-dimension-gap-xs);
+  padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-xs)
+    var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-md);
   flex-shrink: 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
-.ins-search {
+.ins-search.components-search-control {
   flex: 1;
   min-width: 0;
-  padding: 6px 9px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font: 12px var(--wp-font-family);
-  outline: none;
-  background: #fafafa;
-}
-
-.ins-search:focus {
-  border-color: #3858e9;
-  background: #fff;
-}
-
-.ins-cats {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  padding: 10px 14px;
-  flex-shrink: 0;
-  border-bottom: 1px solid #eee;
-}
-
-.c-btn {
-  padding: 4px 10px;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 20px;
-  font: 11px var(--wp-font-family);
-  cursor: pointer;
-  color: #888;
-}
-
-.c-btn.on {
-  background: #1e1e1e;
-  border-color: #1e1e1e;
-  color: #fff;
 }
 
 .ins-list {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 14px;
+  padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-lg);
 }
 
 .ins-footer {
   flex-shrink: 0;
-  padding: 12px 14px;
-  border-top: 1px solid #eee;
-  background: #fff;
+  padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-lg);
+  border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+  background: var(--wpds-color-bg-surface-neutral-strong);
 }
 
 .ins-explore-btn.components-button {
@@ -1488,26 +1413,41 @@
 .ins-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: var(--wpds-dimension-gap-md);
 }
 
+/* Inserter card — clickable preview tile for a block or pattern. Kept
+   bespoke because @wordpress/ui doesn't expose a tile primitive yet,
+   but every colour / radius / spacing now comes from --wpds-* tokens. */
 .s-opt {
-  border: 1px solid #e0e0e0;
-  border-radius: 5px;
+  display: block;
+  width: 100%;
+  border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+  border-radius: var(--wpds-border-radius-md);
+  background: var(--wpds-color-bg-surface-neutral-strong);
   overflow: hidden;
   cursor: pointer;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
   transition: all 0.15s;
 }
 
 .s-opt:hover {
-  border-color: #3858e9;
-  box-shadow: 0 0 0 2px #e8edff;
+  border-color: var(--wpds-color-bg-interactive-brand-strong);
+  box-shadow: 0 0 0 2px var(--wpds-color-bg-interactive-brand-weak-active);
+}
+
+.s-opt:focus-visible {
+  outline: 2px solid var(--wpds-color-stroke-focus-brand);
+  outline-offset: 1px;
 }
 
 .s-prev {
   height: 60px;
-  background: #f5f5f5;
-  padding: 7px;
+  background: var(--wpds-color-bg-surface-neutral-weak);
+  padding: var(--wpds-dimension-padding-md);
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -1515,8 +1455,8 @@
 
 .ln {
   height: 5px;
-  background: #e0e0e0;
-  border-radius: 2px;
+  background: var(--wpds-color-stroke-surface-neutral-weak);
+  border-radius: var(--wpds-border-radius-sm);
 }
 
 .ln.s {
@@ -1533,15 +1473,14 @@
 
 .ln.img {
   height: 24px;
-  background: #d0d0d0;
-  border-radius: 2px;
+  background: var(--wpds-color-stroke-surface-neutral);
+  border-radius: var(--wpds-border-radius-sm);
 }
 
 .s-lbl {
-  padding: 6px 8px;
-  font-size: 11px;
+  padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
   font-weight: 500;
-  color: #1e1e1e;
+  color: var(--wpds-color-fg-content-neutral);
 }
 
 /* Section heading inside the inserter — uppercase pill above each group of
@@ -1550,24 +1489,27 @@
 .s-lbl.ins-group-heading {
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #757575;
-  padding: 12px 4px 8px;
+  color: var(--wpds-color-fg-content-neutral-weak);
+  padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-xs)
+    var(--wpds-dimension-padding-md);
 }
 
 /* "Pending" / "No results for…" placeholder rows. */
 .s-lbl.ins-empty-note {
-  padding: 16px 4px;
-  color: #757575;
+  padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-xs);
+  color: var(--wpds-color-fg-content-neutral-weak);
 }
 
 /* Vertical patterns list (single column with breathing room between cards). */
-.ins-pattern-list { padding-top: 12px; }
+.ins-pattern-list {
+  padding-top: var(--wpds-dimension-padding-md);
+}
 
 /* Pattern preview wireframes that previously used inline grid styles. */
 .pattern-preview-two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
+  gap: var(--wpds-dimension-gap-xs);
   height: 100%;
 }
 
@@ -1579,8 +1521,8 @@
 }
 
 .pattern-preview-gallery-cell {
-  background: #d0d0d0;
-  border-radius: 2px;
+  background: var(--wpds-color-stroke-surface-neutral);
+  border-radius: var(--wpds-border-radius-sm);
 }
 
 /* Split View Layout - Generic reusable pattern for stage + canvas views */
