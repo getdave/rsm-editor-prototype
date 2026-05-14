@@ -136,7 +136,7 @@ function EditingView() {
     currentPage,
     hasUnsavedChanges,
     listViewOpen,
-    save,
+    openUnsavedChangesModal,
     selectedDevice,
     settingsSidebarOpen,
     setListViewOpen,
@@ -563,7 +563,8 @@ function EditingView() {
           <Button
             variant="primary"
             className="ct-save show"
-            onClick={save}
+            onClick={openUnsavedChangesModal}
+            disabled={!hasUnsavedChanges}
           >
             Save
           </Button>
