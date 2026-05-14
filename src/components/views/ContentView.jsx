@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Page } from '@wordpress/admin-ui';
+import { Button, Modal } from '@wordpress/components';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Text } from '@wordpress/ui';
 import {
+  calendar,
   chevronRight,
   grid,
   page as pageIcon,
@@ -24,11 +26,18 @@ import PrototypeNotImplementedButton from '../shared/PrototypeNotImplemented';
 const CONTENT_TYPE_ICONS = {
   posts: postList,
   products: store,
+  events: calendar,
+  calendar,
 };
 
 const PAGE_DESIGN_ICONS = {
   listing: grid,
   single: pageIcon,
+};
+
+const TEMPLATE_STATE_LABELS = {
+  active: 'Active',
+  inactive: 'Inactive',
 };
 
 const RECORD_STATUS_ELEMENTS = [
@@ -86,6 +95,7 @@ const STOCK_STATUS_ELEMENTS = [
 const RECORD_TABLE_FIELDS = {
   posts: ['author', 'categories', 'date', 'status'],
   products: ['sku', 'stockStatus', 'price', 'status'],
+  events: ['eventDate', 'venue', 'organizer', 'status'],
 };
 
 function getElementLabel(elements, value) {
@@ -298,9 +308,58 @@ const PRODUCT_RECORD_FIELDS = [
   },
 ];
 
+const EVENT_RECORD_FIELDS = [
+  {
+    id: 'title',
+    type: 'text',
+    label: 'Title',
+    enableGlobalSearch: true,
+    enableHiding: false,
+    render: renderTitle,
+  },
+  {
+    id: 'eventDate',
+    type: 'text',
+    label: 'Event date',
+    getValue: ({ item }) => item.dateSortable,
+    render: ({ item }) => (
+      <span className="content-record-muted">{item.eventDate}</span>
+    ),
+  },
+  {
+    id: 'venue',
+    type: 'text',
+    label: 'Venue',
+    enableGlobalSearch: true,
+    render: ({ item }) => (
+      <span className="content-record-muted">{item.venue}</span>
+    ),
+  },
+  {
+    id: 'organizer',
+    type: 'text',
+    label: 'Organizer',
+    enableGlobalSearch: true,
+    render: ({ item }) => (
+      <span className="content-record-muted">{item.organizer}</span>
+    ),
+  },
+  {
+    id: 'status',
+    type: 'text',
+    label: 'Status',
+    elements: RECORD_STATUS_ELEMENTS,
+    filterBy: { operators: ['isAny'] },
+    render: renderStatus,
+  },
+];
+
 function getRecordFields(contentTypeId) {
   if (contentTypeId === 'products') {
     return PRODUCT_RECORD_FIELDS;
+  }
+  if (contentTypeId === 'events') {
+    return EVENT_RECORD_FIELDS;
   }
   return POST_RECORD_FIELDS;
 }
@@ -313,8 +372,23 @@ function getLayoutScopeLabel(contentType) {
   return `${contentType.singularName.toLowerCase()} layouts`;
 }
 
+function getTemplateState(design) {
+  return design?.templateState === 'inactive' ? 'inactive' : 'active';
+}
+
+function isInactiveTemplate(design) {
+  return getTemplateState(design) === 'inactive';
+}
+
+function getTemplateStateLabel(design) {
+  return TEMPLATE_STATE_LABELS[getTemplateState(design)];
+}
+
 function ContentTypeRow({ contentType, onSelect }) {
-  const icon = CONTENT_TYPE_ICONS[contentType.id] || postList;
+  const icon =
+    CONTENT_TYPE_ICONS[contentType.iconKey] ||
+    CONTENT_TYPE_ICONS[contentType.id] ||
+    postList;
   return (
     <button
       type="button"
@@ -342,10 +416,20 @@ function ContentTypeRow({ contentType, onSelect }) {
   );
 }
 
-function PageDesignCard({ design, isSelected, onSelect }) {
+function PageDesignCard({
+  design,
+  isSelected,
+  onCustomize,
+  onSelect,
+}) {
   const icon = PAGE_DESIGN_ICONS[design.layoutKind] || styles;
+  const templateState = getTemplateState(design);
+  const templateStateLabel = getTemplateStateLabel(design);
+  const isInactive = templateState === 'inactive';
   return (
-    <div className={`page-design-card${isSelected ? ' is-selected' : ''}`}>
+    <div
+      className={`page-design-card${isSelected ? ' is-selected' : ''}${isInactive ? ' is-inactive' : ''}`}
+    >
       <button
         type="button"
         className="page-design-card-main"
@@ -356,15 +440,144 @@ function PageDesignCard({ design, isSelected, onSelect }) {
           {icon}
         </span>
         <span className="page-design-card-copy">
-          <Text variant="body-md" className="page-design-card-title">
-            {design.shortName}
-          </Text>
+          <span className="page-design-card-header">
+            <Text variant="body-md" className="page-design-card-title">
+              {design.shortName}
+            </Text>
+            <span
+              className="page-design-card-status"
+              aria-label={`Status: ${templateStateLabel}`}
+            >
+              <span className={`page-design-card-status-badge is-${templateState}`}>
+                {templateStateLabel}
+              </span>
+            </span>
+          </span>
           <Text variant="body-sm" className="page-design-card-desc">
             {design.description}
           </Text>
         </span>
       </button>
+      {isInactive ? (
+        <span className="page-design-card-action">
+          <Button variant="secondary" onClick={onCustomize}>
+            Customize
+          </Button>
+        </span>
+      ) : null}
     </div>
+  );
+}
+
+function CustomizeTemplateModal({
+  contentType,
+  design,
+  onClose,
+  onCustomizeTemplate,
+}) {
+  if (!design) {
+    return null;
+  }
+
+  const layoutKind =
+    design.layoutKind === 'listing'
+      ? 'listing layout'
+      : `${contentType.singularName.toLowerCase()} page layout`;
+  const defaultLayoutName =
+    design.layoutKind === 'listing'
+      ? 'default listing layout'
+      : 'default item layout';
+
+  return (
+    <Modal
+      title={`Customize ${design.shortName}`}
+      onRequestClose={onClose}
+      className="content-customize-template-modal"
+    >
+      <div className="content-customize-template-modal-body">
+        <p>
+          Right now, {contentType.name} are using the site&apos;s{' '}
+          {defaultLayoutName}. They do not have a {layoutKind} of their own yet.
+        </p>
+        <div className="content-customize-template-recommendation">
+          <Text variant="body-sm" className="content-customize-template-label">
+            Recommended
+          </Text>
+          <p>
+            The editor will make a {contentType.name}-only layout based on the
+            current one. It will look the same at first, and any changes you
+            make after that will affect only {contentType.name}.
+          </p>
+        </div>
+      </div>
+      <div className="content-customize-template-modal-actions">
+        <Button variant="primary" onClick={onCustomizeTemplate}>
+          Customize {design.shortName}
+        </Button>
+        <Button variant="tertiary" onClick={onClose}>
+          Cancel
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
+function EditDefaultTemplateModal({
+  contentType,
+  design,
+  onClose,
+  onConfirm,
+  onCreateInstead,
+}) {
+  if (!design) {
+    return null;
+  }
+
+  const sharedUsageLabels = design.sharedUsageLabels?.length
+    ? design.sharedUsageLabels
+    : [contentType.name];
+  const isListingTemplate = design.layoutKind === 'listing';
+  const templateKind = isListingTemplate
+    ? 'shared listing template'
+    : 'shared template for individual content items';
+  const missingTemplateKind = isListingTemplate
+    ? 'listing template'
+    : 'content-type-specific item template';
+
+  return (
+    <Modal
+      title="Edit default template?"
+      onRequestClose={onClose}
+      className="content-default-template-modal"
+    >
+      <div className="content-default-template-modal-body">
+        <p>
+          You are about to edit the {templateKind}. The site uses this template
+          whenever it cannot find a more specific {missingTemplateKind}.
+        </p>
+        <div className="content-default-template-impact">
+          <Text variant="body-sm" className="content-default-template-impact-label">
+            Changing this template will also affect:
+          </Text>
+          <ul>
+            {sharedUsageLabels.map((label) => (
+              <li key={label}>{label}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className="content-default-template-modal-actions">
+        <Button variant="tertiary" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button variant="secondary" onClick={onCreateInstead}>
+          Customize {design.shortName} instead
+        </Button>
+        <Button variant="primary" onClick={onConfirm}>
+          Edit default template
+        </Button>
+      </div>
+    </Modal>
   );
 }
 
@@ -454,7 +667,9 @@ function ContentView() {
   );
   const isDrilldown = Boolean(contentTypeId && selectedContentType);
   const selectedContentTypeIcon =
-    CONTENT_TYPE_ICONS[selectedContentType?.id] || postList;
+    CONTENT_TYPE_ICONS[selectedContentType?.iconKey] ||
+    CONTENT_TYPE_ICONS[selectedContentType?.id] ||
+    postList;
   const [activeTab, setActiveTab] = useState('records');
 
   const visibleDesigns = useMemo(
@@ -469,6 +684,8 @@ function ContentView() {
     [isDrilldown, pageDesigns, selectedContentType],
   );
   const [selectedDesignId, setSelectedDesignId] = useState(null);
+  const [customizeTemplateDesign, setCustomizeTemplateDesign] = useState(null);
+  const [defaultTemplateDesign, setDefaultTemplateDesign] = useState(null);
   const selectedDesign =
     visibleDesigns.find((design) => design.id === selectedDesignId) ||
     visibleDesigns[0];
@@ -480,9 +697,43 @@ function ContentView() {
     return pages.find((page) => page.id === frontPageId) || currentPage;
   }, [currentPage, frontPageId, homepageDisplayMode, pageDesigns, pages]);
 
+  const selectDesign = (design) => {
+    setSelectedDesignId(design.id);
+  };
+
+  const openCustomizeTemplateModal = (design) => {
+    selectDesign(design);
+    setCustomizeTemplateDesign(design);
+  };
+
   const editDesign = (design = selectedDesign) => {
     if (!design) return;
+    if (isInactiveTemplate(design)) {
+      selectDesign(design);
+      setCustomizeTemplateDesign(null);
+      setDefaultTemplateDesign(design);
+      return;
+    }
     navigate(`/page-designs/${design.id}/edit?inserter=patterns`);
+  };
+
+  const returnToCustomizeFlow = () => {
+    const design = defaultTemplateDesign;
+    setDefaultTemplateDesign(null);
+    if (design) {
+      setCustomizeTemplateDesign(design);
+    }
+  };
+
+  const confirmDefaultTemplateEdit = () => {
+    if (!defaultTemplateDesign) {
+      return;
+    }
+    const route =
+      defaultTemplateDesign.defaultTemplateRoute ||
+      `/templates?contentType=${selectedContentType.id}`;
+    setDefaultTemplateDesign(null);
+    navigate(route);
   };
 
   const addRecordAction =
@@ -561,7 +812,8 @@ function ContentView() {
                   key={design.id}
                   design={design}
                   isSelected={design.id === selectedDesign?.id}
-                  onSelect={() => setSelectedDesignId(design.id)}
+                  onCustomize={() => openCustomizeTemplateModal(design)}
+                  onSelect={() => selectDesign(design)}
                 />
               ))}
             </div>
@@ -642,6 +894,23 @@ function ContentView() {
           </div>
         ) : null}
       </div>
+      {customizeTemplateDesign ? (
+        <CustomizeTemplateModal
+          contentType={selectedContentType}
+          design={customizeTemplateDesign}
+          onClose={() => setCustomizeTemplateDesign(null)}
+          onCustomizeTemplate={showPrototypeNotImplementedAlert}
+        />
+      ) : null}
+      {defaultTemplateDesign ? (
+        <EditDefaultTemplateModal
+          contentType={selectedContentType}
+          design={defaultTemplateDesign}
+          onClose={() => setDefaultTemplateDesign(null)}
+          onConfirm={confirmDefaultTemplateEdit}
+          onCreateInstead={returnToCustomizeFlow}
+        />
+      ) : null}
     </div>
   );
 }

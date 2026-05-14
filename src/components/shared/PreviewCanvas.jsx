@@ -55,10 +55,13 @@ function PreviewCanvas({
   // Get WordPress-appropriate content for this page
   const content = getPageContent(page);
 
-  const fallbackMenuPages = pages.filter((p) => p.inMenu);
-  const statusLabel = page.isPageDesign
-    ? 'Design is active'
-    : page.isLive ? 'Page is live' : 'Page is a draft';
+  const defaultMenuPages = pages.filter((p) => p.inMenu);
+  const isInactiveTemplate = page.templateState === 'inactive';
+  const statusLabel = isInactiveTemplate
+    ? `Inactive. Using ${page.defaultTemplateLabel}.`
+    : page.isPageDesign
+      ? 'Design is active'
+      : page.isLive ? 'Page is live' : 'Page is a draft';
 
   const resolveHeaderNavItem = (item) => {
     const children = (item.children || [])
@@ -101,7 +104,7 @@ function PreviewCanvas({
   const navEntries =
     headerNavItems !== undefined
       ? headerNavItems.map(resolveHeaderNavItem).filter(Boolean)
-      : fallbackMenuPages.map((p) => ({
+      : defaultMenuPages.map((p) => ({
           kind: 'page',
           key: p.id,
           label: p.name,
@@ -360,7 +363,7 @@ function PreviewCanvas({
               }}
             >
               <span
-                className={`url-dot${page.isLive ? '' : ' url-draft-dot'}`}
+                className={`url-dot${page.isLive && !isInactiveTemplate ? '' : ' url-draft-dot'}`}
                 style={{ margin: 0 }}
                 role="status"
                 aria-label={statusLabel}
