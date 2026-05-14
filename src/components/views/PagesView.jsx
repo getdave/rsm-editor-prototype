@@ -37,6 +37,7 @@ import {
 import PageLayoutWireframeThumb from "../shared/PageLayoutWireframeThumb";
 import PreviewCanvas from "../shared/PreviewCanvas";
 import DefinedTerm from "../shared/DefinedTerm";
+import DeleteHomepagePageModal from "../modals/DeleteHomepagePageModal";
 import DeletePageConfirmModal from "../modals/DeletePageConfirmModal";
 
 /** Tooltip primer (concept from WP template hierarchy) */
@@ -415,6 +416,7 @@ function PagesView() {
     postsPageId,
     setPostsPageId,
     setPageStatus,
+    syncReadingPageMarkers,
     showSnackbar,
     addPageToMainMenu,
     removePageFromMainMenu,
@@ -478,6 +480,32 @@ function PagesView() {
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [configureHomepageOpen]);
+
+  useEffect(() => {
+    const front =
+      homepageDisplayMode === READING_DISPLAY_STATIC ? frontPageId : "";
+    const posts =
+      homepageDisplayMode === READING_DISPLAY_STATIC ? postsPageId : "";
+    syncReadingPageMarkers(front, posts);
+  }, [
+    homepageDisplayMode,
+    frontPageId,
+    postsPageId,
+    syncReadingPageMarkers,
+  ]);
+
+  useEffect(() => {
+    if (!deleteConfirm?.page?.isFrontPage) {
+      return;
+    }
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setDeleteConfirm(null);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [deleteConfirm]);
 
   const fields = useMemo(
     () => [
@@ -873,16 +901,39 @@ function PagesView() {
   ]);
 
   const executeDeletePage = useCallback(
-    (page, { onActionPerformed, actionItems } = {}) => {
+    (
+      page,
+      {
+        onActionPerformed,
+        actionItems,
+        replacementFrontPageId,
+      } = {},
+    ) => {
+      const replacementRow =
+        replacementFrontPageId &&
+        categoryPages.find((p) => p.id === replacementFrontPageId);
       const nextPreview =
-        categoryPages.find((p) => p.id !== page.id) ?? null;
+        replacementRow ??
+        categoryPages.find((p) => p.id !== page.id) ??
+        null;
+
+      if (replacementFrontPageId) {
+        setHomepageDisplayMode(READING_DISPLAY_STATIC);
+        setFrontPageId(replacementFrontPageId);
+        if (replacementFrontPageId === postsPageId) {
+          setPostsPageId("");
+        }
+      }
+
       deletePage(page.id);
-      if (page.id === frontPageId) {
+
+      if (page.isFrontPage && !replacementFrontPageId) {
         setFrontPageId("");
       }
       if (page.id === postsPageId) {
         setPostsPageId("");
       }
+
       setPreviewPage((p) => (p?.id === page.id ? nextPreview : p));
       showSnackbar(`“${page.name}” removed from this site.`);
       onActionPerformed?.(actionItems ?? [page]);
@@ -892,6 +943,7 @@ function PagesView() {
       deletePage,
       frontPageId,
       postsPageId,
+      setHomepageDisplayMode,
       setFrontPageId,
       setPostsPageId,
       setPreviewPage,
@@ -1104,7 +1156,7 @@ function PagesView() {
           icon={moreVertical}
           label={
             readingConfigureMenuNeedsAttention
-              ? "More options. Homepage settings need attention; choose Configure homepage."
+              ? "More options. Homepage settings need attention; choose Configure Homepage."
               : "More page options"
           }
           toggleProps={{
@@ -1115,7 +1167,7 @@ function PagesView() {
           }}
           controls={[
             {
-              title: "Configure homepage",
+              title: "Configure Homepage",
               onClick: () => setConfigureHomepageOpen(true),
             },
           ]}
@@ -1194,7 +1246,28 @@ function PagesView() {
           {`Publish “${publishConfirmPage.name}”? It will go live on your site.`}
         </ConfirmDialog>
       ) : null}
-      {deleteConfirm ? (
+      {deleteConfirm?.page?.isFrontPage ? (
+        <div
+          className="modal-overlay"
+          role="presentation"
+          onClick={() => setDeleteConfirm(null)}
+        >
+          <DeleteHomepagePageModal
+            page={deleteConfirm.page}
+            postsPageId={postsPageId}
+            readingSelectPages={readingSelectPages}
+            onClose={() => setDeleteConfirm(null)}
+            onDelete={({ replacementFrontPageId }) => {
+              executeDeletePage(deleteConfirm.page, {
+                replacementFrontPageId,
+                onActionPerformed: deleteConfirm.onActionPerformed,
+                actionItems: deleteConfirm.actionItems,
+              });
+              setDeleteConfirm(null);
+            }}
+          />
+        </div>
+      ) : deleteConfirm ? (
         <DeletePageConfirmModal
           page={deleteConfirm.page}
           onClose={() => setDeleteConfirm(null)}

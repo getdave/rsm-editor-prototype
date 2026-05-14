@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 import { pages as pagesData, navigationMenus as navigationMenusInitial } from '../data/mockData';
 import { MAIN_MENU_ID } from '../constants/navigation';
 import {
@@ -173,6 +173,21 @@ export function AppStateProvider({ children }) {
     setRecentPages((prev) => prev.filter((p) => p.id !== pageId));
   };
 
+  /** Keeps `pages[].isFrontPage` / `isPostsPage` aligned with Reading-style ids (prototype only). */
+  const syncReadingPageMarkers = useCallback((frontId, postsId) => {
+    setPages((prev) =>
+      prev.map((p) => {
+        if (p.category !== "content") return p;
+        const next = { ...p };
+        if (frontId && p.id === frontId) next.isFrontPage = true;
+        else delete next.isFrontPage;
+        if (postsId && p.id === postsId) next.isPostsPage = true;
+        else delete next.isPostsPage;
+        return next;
+      }),
+    );
+  }, []);
+
   const addPageToMainMenu = (page) => {
     if (!page?.id) return;
     setNavigationMenus((prev) =>
@@ -260,6 +275,7 @@ export function AppStateProvider({ children }) {
     addPage,
     setPageStatus,
     deletePage,
+    syncReadingPageMarkers,
     addPageToMainMenu,
     removePageFromMainMenu,
 

@@ -358,6 +358,52 @@
   color: #1e1e1e;
 }
 
+/* Remove homepage — full modal (optional replacement Homepage select) */
+.pp-delete-homepage-modal.modal-box {
+  width: min(420px, calc(100vw - 32px));
+  max-width: 420px;
+}
+
+.pp-delete-homepage-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pp-delete-homepage-modal__lead {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #50575e;
+}
+
+.pp-delete-homepage-modal__notice {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #50575e;
+  background: #f6e9b9;
+  border: 1px solid #dba617;
+  border-left-width: 4px;
+  border-radius: 2px;
+}
+
+.pp-delete-homepage-modal__notice-title {
+  margin: 0 0 6px;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+
+.pp-delete-homepage-modal__notice-body {
+  margin: 0;
+}
+
+.pp-delete-homepage-modal__field .components-base-control {
+  margin-bottom: 0;
+}
+
 /* Wireframe “preview” for page layout types (grid media cell only) */
 .pp-media-thumb--grid .pp-wf-root {
   position: absolute;
