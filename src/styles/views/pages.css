@@ -141,13 +141,20 @@
 
 .pp-tab-description-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
   padding: 10px 16px 12px 20px;
   border-bottom: 1px solid #e0e0e0;
   background: #fff;
   flex-shrink: 0;
+}
+
+.pp-tab-description-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 
 .pp-tab-description {
@@ -162,6 +169,17 @@
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.pp-static-homepage-notice {
+  padding: 9px 12px;
+  background: #fcf9e8;
+  border-left: 4px solid #dba617;
+  border-radius: 2px;
+  color: #1e1e1e;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .pp-tabs-row__tabs {

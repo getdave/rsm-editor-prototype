@@ -1071,11 +1071,28 @@ function PagesView() {
         </div>
       </div>
       <div className="pp-tab-description-row">
-        {activeTab?.description ? (
-          <Text variant="body-md" className="pp-tab-description">
-            {activeTab.description}
-          </Text>
-        ) : null}
+        <div className="pp-tab-description-stack">
+          {activeTab?.description ? (
+            <Text variant="body-md" className="pp-tab-description">
+              {activeTab.description}
+            </Text>
+          ) : null}
+          {activePageType === "pages" &&
+            homepageDisplayMode === READING_DISPLAY_LATEST && (
+              <div className="pp-static-homepage-notice" role="status">
+                Homepage is currently set to latest posts. Edit that generated
+                page under{" "}
+                <button
+                  type="button"
+                  className="pp-desc-link"
+                  onClick={() => handleTabClick("collections")}
+                >
+                  Collections
+                </button>
+                .
+              </div>
+            )}
+        </div>
         <div className="pp-tab-description-actions">
           {activePageType === "pages" ? (
             <ToggleControl
