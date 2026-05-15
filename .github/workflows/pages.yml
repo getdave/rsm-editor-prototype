@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - trunk
-  pull_request:
-    branches:
-      - trunk
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -40,14 +36,12 @@ jobs:
         run: npm run build -- --base=/rsm-editor-prototype/
 
       - name: Upload Pages artifact
-        if: github.ref == 'refs/heads/trunk' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
     name: Deploy
-    if: github.ref == 'refs/heads/trunk' && github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
 
