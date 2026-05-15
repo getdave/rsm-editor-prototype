@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Button,
   DropdownMenu,
@@ -67,8 +67,16 @@ const PAGE_TYPE_TABS = [
     value: "collections",
     label: "Collections",
     icon: archive,
-    description:
-      "Generated pages for groups of content and special site views.",
+    description: (
+      <>
+        Generated pages for groups of content and special site views. Their
+        layouts are controlled by{" "}
+        <Link className="pp-desc-link" to="/templates">
+          Templates
+        </Link>
+        .
+      </>
+    ),
   },
 ];
 
