@@ -154,8 +154,8 @@
   justify-content: center;
   height: 32px;
   padding: 0 12px;
-  background: #fff;
-  color: #000;
+  background: #3858e9;
+  color: #fff;
   border: none;
   border-radius: 2px;
   font: inherit;
@@ -172,7 +172,7 @@
 }
 
 .seh-save:not(:disabled):hover {
-  background: #e0e0e0;
+  background: #2a47d1;
 }
 
 .seh-status {

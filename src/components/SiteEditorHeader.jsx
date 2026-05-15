@@ -9,7 +9,7 @@ function SiteEditorHeader() {
     openSiteIdentityModal,
     openCommandPalette,
     hasUnsavedChanges,
-    save,
+    openUnsavedChangesModal,
     siteStatus,
   } = useAppState();
 
@@ -59,7 +59,7 @@ function SiteEditorHeader() {
           <button
             type="button"
             className="seh-save"
-            onClick={save}
+            onClick={openUnsavedChangesModal}
             disabled={!hasUnsavedChanges}
           >
             Save

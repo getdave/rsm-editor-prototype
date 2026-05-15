@@ -9,6 +9,7 @@ import SiteIdentityModal from '../components/modals/SiteIdentityModal';
 import SettingsModal from '../components/modals/SettingsModal';
 import AddPageModal from '../components/modals/AddPageModal';
 import PagesFloatingPanel from '../components/modals/PagesFloatingPanel';
+import UnsavedChangesModal from '../components/modals/UnsavedChangesModal';
 import DevBranchIndicator from '../components/shared/DevBranchIndicator';
 
 const EDIT_ROUTE_PATTERN = /\/pages\/[^/]+\/edit$/;
@@ -22,6 +23,7 @@ function RootLayout() {
     setEditorReferrer,
     setMenuExpanded,
     menuExpanded,
+    markDirty,
   } = useAppState();
 
   const isEditCanvas = EDIT_ROUTE_PATTERN.test(location.pathname);
@@ -39,12 +41,15 @@ function RootLayout() {
   }, [location.pathname]);
 
   // Capture the route the user was on before entering the edit canvas so the
-  // split-Exit button knows where to take them back. Cleared on exit.
+  // split-Exit button knows where to take them back. Cleared on exit. Also
+  // marks the prototype dirty on entry — entering the editor implies the
+  // user is about to make changes, which enables both Save buttons.
   useEffect(() => {
     const isEdit = EDIT_ROUTE_PATTERN.test(location.pathname);
     const wasEdit = EDIT_ROUTE_PATTERN.test(prevPathRef.current);
     if (isEdit && !wasEdit) {
       setEditorReferrer(prevPathRef.current);
+      markDirty();
     } else if (!isEdit) {
       setEditorReferrer(null);
     }
@@ -66,6 +71,7 @@ function RootLayout() {
       <SettingsModal />
       <AddPageModal />
       <PagesFloatingPanel />
+      <UnsavedChangesModal />
       <CommandPalette />
       {snackbarMessage && (
         <Snackbar onDismiss={dismissSnackbar}>

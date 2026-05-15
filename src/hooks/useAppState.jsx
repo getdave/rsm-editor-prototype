@@ -37,6 +37,7 @@ export function AppStateProvider({ children }) {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [addPageModalOpen, setAddPageModalOpen] = useState(false);
+  const [unsavedChangesModalOpen, setUnsavedChangesModalOpen] = useState(false);
 
   // Site visibility status — drives the header indicator dot.
   const [siteStatus] = useState('live');
@@ -127,6 +128,14 @@ export function AppStateProvider({ children }) {
 
   const closeAddPageModal = () => {
     setAddPageModalOpen(false);
+  };
+
+  const openUnsavedChangesModal = () => {
+    setUnsavedChangesModalOpen(true);
+  };
+
+  const closeUnsavedChangesModal = () => {
+    setUnsavedChangesModalOpen(false);
   };
 
   const showSnackbar = (message) => {
@@ -229,6 +238,9 @@ export function AppStateProvider({ children }) {
     addPageModalOpen,
     openAddPageModal,
     closeAddPageModal,
+    unsavedChangesModalOpen,
+    openUnsavedChangesModal,
+    closeUnsavedChangesModal,
 
     // Site status
     siteStatus,
