@@ -1,11 +1,10 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Tooltip, Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
 import { Page } from '@wordpress/admin-ui';
 import { navigationMenus as initialMenus, pages } from '../../data/mockData';
-import { useAppState } from '../../hooks/useAppState';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import MenuEditor from '../navigation/MenuEditor';
 import AddMenuModal from '../navigation/AddMenuModal';
@@ -21,8 +20,6 @@ function NavigationView() {
   const [previewPage, setPreviewPage] = useState(
     () => pages.find((p) => p.isFrontPage) || pages[0],
   );
-  const { sidebarCollapsed, toggleSidebar } = useAppState();
-
   const [view, setView] = useState({
     type: 'list',
     search: '',
@@ -47,17 +44,6 @@ function NavigationView() {
     resolvedMenuId != null
       ? menus.find((menu) => menu.id === resolvedMenuId)
       : null;
-
-  // Auto-collapse sidebar when drilling into a menu; restore when back at list.
-  // Depends only on resolvedMenuId so toggling the sidebar manually on those routes does not fight this effect.
-  useEffect(() => {
-    if (resolvedMenuId && !sidebarCollapsed) {
-      toggleSidebar();
-    } else if (!resolvedMenuId && sidebarCollapsed) {
-      toggleSidebar();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional resolvedMenuId-only coupling (see above)
-  }, [resolvedMenuId]);
 
   const updateMenu = (menuId, updates) => {
     setMenus(prev => prev.map(menu =>
