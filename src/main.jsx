@@ -8,7 +8,7 @@ import App from './components/App.jsx'
 import { DEV_BRANCH_LABEL } from './utils/devBranchLabel.js'
 
 if (import.meta.env.DEV && DEV_BRANCH_LABEL) {
-  document.title = `RSM Prototype (${DEV_BRANCH_LABEL})`
+  document.title = `WordPress Site Editor Prototype (${DEV_BRANCH_LABEL})`
 }
 
 createRoot(document.getElementById('root')).render(
