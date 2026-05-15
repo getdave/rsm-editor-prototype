@@ -1,3 +1,5 @@
+import { chevronDown } from '@wordpress/icons';
+
 /**
  * Front-of-site chrome: mirrors a block theme template framing
  * (header template part + main + footer template part).
@@ -63,6 +65,11 @@ export function PreviewSiteNavCluster({ siteTitle, navEntries, onNavClick }) {
               className={`p-nav-item${hasChildren ? ' has-children' : ''}`}
             >
               <NavEntryControl entry={entry} onNavClick={onNavClick} />
+              {hasChildren ? (
+                <span className="p-nav-dropdown-indicator" aria-hidden="true">
+                  {chevronDown}
+                </span>
+              ) : null}
               {hasChildren ? (
                 <div className="p-subnav">
                   {children.map((child) => (

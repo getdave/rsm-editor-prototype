@@ -68,6 +68,28 @@
   color: #fff;
 }
 
+.p-nav-dropdown-indicator {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+}
+
+.p-nav-dropdown-indicator svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.p-nav-item.has-children:hover .p-nav-dropdown-indicator,
+.p-nav-item.has-children:focus-within .p-nav-dropdown-indicator {
+  color: #fff;
+}
+
 .p-nav-item.has-children::after {
   content: "";
   position: absolute;

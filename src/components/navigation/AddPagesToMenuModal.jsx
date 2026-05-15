@@ -140,10 +140,6 @@ function filterPickerContentPages(pagesList) {
   return pagesList.filter((p) => p.category === 'content');
 }
 
-function addableItems(items) {
-  return (items || []).filter((item) => !item.inThisMenu);
-}
-
 function selectedItemsFromIds(items, selectedIds) {
   const selectedIdSet = new Set(selectedIds);
   return items.filter((item) => selectedIdSet.has(item.id));
@@ -468,9 +464,7 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
         isPrimary: true,
         supportsBulk: true,
         callback() {
-          const itemsToAdd = addableItems(
-            selectedItemsFromIds(pageRows, pageSelection),
-          );
+          const itemsToAdd = selectedItemsFromIds(pageRows, pageSelection);
           if (itemsToAdd.length) {
             onConfirm(itemsToAdd);
           }
@@ -496,7 +490,7 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
         isPrimary: true,
         supportsBulk: true,
         callback() {
-          const itemsToAdd = addableItems(selectedAdvancedItems);
+          const itemsToAdd = selectedAdvancedItems;
           if (itemsToAdd.length) {
             onConfirm(itemsToAdd);
           }
@@ -531,26 +525,6 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
     [selectedGroupId],
   );
 
-  const handlePageSelectionChange = useCallback(
-    (selectedIds) => {
-      const blockedIds = new Set(
-        pageRows.filter((row) => row.inThisMenu).map((row) => row.id),
-      );
-      setPageSelection(selectedIds.filter((id) => !blockedIds.has(id)));
-    },
-    [pageRows],
-  );
-
-  const handleAdvancedSelectionChange = useCallback(
-    (selectedIds) => {
-      const blockedIds = new Set(
-        advancedRows.filter((row) => row.inThisMenu).map((row) => row.id),
-      );
-      setAdvancedSelection(selectedIds.filter((id) => !blockedIds.has(id)));
-    },
-    [advancedRows],
-  );
-
   const selectGroup = (groupId) => {
     setSelectedGroupId(groupId);
     setAdvancedSelection([]);
@@ -561,10 +535,6 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
   };
 
   const addCustomUrl = ({ label, url }) => {
-    if (urlSet.has(url)) {
-      return;
-    }
-
     onConfirm([
       {
         id: `custom-url-${Date.now()}`,
@@ -621,7 +591,7 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
                 searchLabel="Search pages"
                 actions={pageActions}
                 selection={pageSelection}
-                onChangeSelection={handlePageSelectionChange}
+                onChangeSelection={setPageSelection}
                 getItemId={(item) => item.id}
                 paginationInfo={pagePaginationInfo}
                 data={processedPageData}
@@ -640,7 +610,7 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
                 searchLabel={`Search ${activeType.title.toLowerCase()}`}
                 actions={advancedActions}
                 selection={advancedSelection}
-                onChangeSelection={handleAdvancedSelectionChange}
+                onChangeSelection={setAdvancedSelection}
                 getItemId={(item) => item.id}
                 paginationInfo={advancedPaginationInfo}
                 data={processedAdvancedData}
