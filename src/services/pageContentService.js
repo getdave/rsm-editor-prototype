@@ -53,9 +53,9 @@ export const getPageContent = (page) => {
     
     // Archive Templates (Template Hierarchy)
     'product-list': getProductListContent(),
-    /** Blog index at `/` when homepage displays latest posts (home.php hierarchy) */
-    'blog-home-root': getBlogListContent(),
+    'product-catalog-template': getProductCatalogTemplateContent(page),
     'blog-list': getBlogListContent(),
+    'posts-index-template': getPostsIndexTemplateContent(page),
     
     // Single Templates (Template Hierarchy)
     'product-single': getProductSingleContent(),
@@ -327,7 +327,7 @@ function getShopCatalogContent(page = null) {
     subtitle: 'Browse photography services and products',
     wordpressContext: {
       type: 'template',
-      templateFile: 'Product Catalog',
+      templateFile: 'archive-product.html',
       plugin: 'WooCommerce',
       usesAssignedUrl: true
     },
@@ -347,6 +347,28 @@ function getShopCatalogContent(page = null) {
         ]
       }
     ]
+  };
+}
+
+function getProductCatalogTemplateContent(page = null) {
+  const title = page?.name ?? 'Product listing';
+  const catalog = getShopCatalogContent({ name: title });
+  return {
+    ...catalog,
+    title,
+    wordpressContext: {
+      ...catalog.wordpressContext,
+      type: 'template',
+      usesAssignedUrl: false
+    },
+    sections: catalog.sections.map((section, i) =>
+      i === 0 && section.type === 'archive-header'
+        ? {
+            ...section,
+            title,
+          }
+        : section
+    ),
   };
 }
 
@@ -404,6 +426,28 @@ function getBlogCollectionContent(page = null) {
         ? {
             ...section,
             title: page?.name ?? section.title,
+          }
+        : section
+    ),
+  };
+}
+
+function getPostsIndexTemplateContent(page = null) {
+  const archive = getBlogListContent();
+  const title = page?.name ?? 'Posts listing';
+  return {
+    ...archive,
+    title,
+    wordpressContext: {
+      type: 'template',
+      templateFile: 'home.html',
+      usesAssignedUrl: false
+    },
+    sections: archive.sections.map((section, i) =>
+      i === 0 && section.type === 'archive-header'
+        ? {
+            ...section,
+            title,
           }
         : section
     ),
@@ -625,7 +669,7 @@ export const getEditModeContent = (page) => {
       isTemplate: true,
       templateName: page.name,
       templateDescription: getTemplateDescription(content.layout),
-      title: getPlaceholderTitle(page.id, content.layout),
+      title: getPlaceholderTitle(page, content.layout),
       subtitle: getPlaceholderSubtitle(),
       sections: replaceWithPlaceholders(content.sections)
     };
@@ -634,13 +678,21 @@ export const getEditModeContent = (page) => {
   return content;
 };
 
-function getPlaceholderTitle(pageId, layout) {
+function getPlaceholderTitle(pageOrId, layout) {
+  const pageId = typeof pageOrId === 'string' ? pageOrId : pageOrId?.id;
+  const pageName = typeof pageOrId === 'string' ? null : pageOrId?.name;
+
   // Specific titles for known page types
   if (pageId === 'product-list') return 'Product Category Title';
   if (pageId === 'shop') return 'Store page title';
-  if (pageId === 'blog-home-root') return 'Blog Homepage';
+  if (pageId === 'product-catalog-template') return 'Product listing title';
   if (pageId === 'blog') return 'Blog page title';
   if (pageId === 'blog-list') return 'Blog Archive Title';
+  if (pageId === 'posts-index-template') {
+    return pageName === 'Latest posts'
+      ? 'Latest posts title'
+      : 'Posts listing title';
+  }
   if (pageId === 'product-single') return 'Product Title';
   if (pageId === 'blog-single') return 'Post Title';
   if (pageId === 'event-list') return 'Event listing title';

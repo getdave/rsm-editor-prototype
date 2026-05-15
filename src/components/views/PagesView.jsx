@@ -154,13 +154,10 @@ function setCollectionGrouping(view, enabled) {
   return next;
 }
 
-/** Synthetic collection row — blog index at `/` when Reading uses “your latest posts” */
-const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = "blog-home-root";
-
-const blogHomepageRootTemplateRow = Object.freeze({
-  id: BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
-  slug: "",
-  name: "Posts page",
+const postsIndexTemplateRow = Object.freeze({
+  id: "posts-index-template",
+  slug: "posts-index",
+  name: "Posts listing",
   type: "Collection Page",
   isLive: true,
   inMenu: false,
@@ -171,16 +168,70 @@ const blogHomepageRootTemplateRow = Object.freeze({
   collectionOverlay: "Posts page",
   pageKind: "collection",
   category: "collection",
-  collectionKind: "posts",
+  collectionKind: "posts-index-template",
   viewKind: "listing",
   status: "live",
   level: 0,
   authorDisplay: "WordPress",
-  templateLabel: "Posts Index",
-  titleTooltip:
-    "Used at your site's main web address while the homepage shows your latest posts. Visitors see your newest posts listed first.",
-  isFrontPage: true,
+  templateLabel: "Posts listing",
+  titleTooltip: "Uses home.html for the posts index.",
 });
+
+const productCatalogTemplateRow = Object.freeze({
+  id: "product-catalog-template",
+  slug: "product-catalog",
+  name: "Product listing",
+  type: "Collection Page",
+  isLive: true,
+  inMenu: false,
+  isSystem: false,
+  isDynamic: true,
+  isCollection: true,
+  collectionBadge: "Shop page",
+  collectionOverlay: "Shop page",
+  pageKind: "collection",
+  category: "collection",
+  collectionKind: "product-catalog-template",
+  viewKind: "listing",
+  status: "live",
+  level: 0,
+  authorDisplay: "WooCommerce",
+  templateLabel: "Product listing",
+  titleTooltip: "Uses archive-product.html.",
+});
+
+const collectionTemplateDisplay = {
+  "blog-single": {
+    name: "Single post",
+    templateLabel: "Single post",
+    titleTooltip: "Uses single.html.",
+  },
+  "product-single": {
+    name: "Single product",
+    templateLabel: "Single product",
+    titleTooltip: "Uses single-product.html.",
+  },
+  "event-list": {
+    name: "Event listing",
+    templateLabel: "Event listing",
+    titleTooltip: "Uses archive-event.html.",
+  },
+  "event-single": {
+    name: "Single event",
+    templateLabel: "Single event",
+    titleTooltip: "Uses single-event.html.",
+  },
+  "search-results": {
+    name: "Search results",
+    templateLabel: "Search results",
+    titleTooltip: "Uses search.html.",
+  },
+  "404": {
+    name: "404 page",
+    templateLabel: "404 page",
+    titleTooltip: "Uses 404.html.",
+  },
+};
 
 function createPostsCollectionRow(postsPage) {
   if (!postsPage) {
@@ -202,9 +253,9 @@ function createPostsCollectionRow(postsPage) {
     viewKind: "listing",
     status: "live",
     authorDisplay: "WordPress",
-    templateLabel: "Posts Index",
+    templateLabel: "Posts listing",
     titleTooltip:
-      "Uses the selected Posts page URL while the posts index template controls the layout visitors see.",
+      "Uses the selected Posts page URL while home.html controls the layout visitors see.",
     isPostsPage: true,
   };
 }
@@ -223,8 +274,10 @@ function asCollectionRow(row, collectionGroup) {
   if (!row) {
     return null;
   }
+  const display = collectionTemplateDisplay[row.id] ?? {};
   return {
     ...row,
+    ...display,
     level: 0,
     isCollection: true,
     category: "collection",
@@ -962,18 +1015,22 @@ function PagesView() {
   const collectionRows = useMemo(() => {
     const rows = [];
     const findPage = (id) => pagesWithRoles.find((p) => p.id === id);
-    if (homepageDisplayMode === READING_DISPLAY_LATEST) {
-      rows.push(asCollectionRow(blogHomepageRootTemplateRow, "Posts"));
-    } else {
-      const postsPage = findPage(postsPageId);
-      const postsCollectionRow = createPostsCollectionRow(postsPage);
-      if (postsCollectionRow) {
-        rows.push(asCollectionRow(postsCollectionRow, "Posts"));
-      }
-    }
+    const postsListingTemplate =
+      homepageDisplayMode === READING_DISPLAY_LATEST
+        ? {
+            ...postsIndexTemplateRow,
+            name: "Latest posts",
+            templateLabel: "Latest posts",
+            collectionBadge: "Homepage",
+            collectionOverlay: "Homepage",
+            isFrontPage: true,
+            titleTooltip: "Uses home.html for the posts index.",
+          }
+        : postsIndexTemplateRow;
     rows.push(
+      asCollectionRow(postsListingTemplate, "Posts"),
       asCollectionRow(findPage("blog-single"), "Posts"),
-      asCollectionRow(findPage("shop"), "Products"),
+      asCollectionRow(productCatalogTemplateRow, "Products"),
       asCollectionRow(findPage("product-single"), "Products"),
       asCollectionRow(findPage("event-list"), "Events"),
       asCollectionRow(findPage("event-single"), "Events"),
@@ -981,11 +1038,27 @@ function PagesView() {
       asCollectionRow(findPage("404"), "System"),
     );
     return rows.filter(Boolean);
+  }, [pagesWithRoles, homepageDisplayMode]);
+
+  const staticHybridRows = useMemo(() => {
+    const rows = [];
+    const findPage = (id) => pagesWithRoles.find((p) => p.id === id);
+
+    if (homepageDisplayMode === READING_DISPLAY_STATIC) {
+      const postsPage = findPage(postsPageId);
+      const postsCollectionRow = createPostsCollectionRow(postsPage);
+      if (postsCollectionRow) {
+        rows.push(postsCollectionRow);
+      }
+    }
+
+    rows.push(findPage("shop"));
+    return rows.filter(Boolean);
   }, [pagesWithRoles, postsPageId, homepageDisplayMode]);
 
   const categoryPages = useMemo(() => {
     if (activePageType === "pages") {
-      return pagesWithRoles.filter((p) => {
+      const staticPages = pagesWithRoles.filter((p) => {
         if (p.category !== "content") {
           return false;
         }
@@ -994,6 +1067,7 @@ function PagesView() {
         }
         return showDrafts ? true : p.status === "live";
       });
+      return [...staticPages, ...staticHybridRows];
     }
 
     return collectionRows;
@@ -1001,6 +1075,7 @@ function PagesView() {
     activePageType,
     pagesWithRoles,
     showDrafts,
+    staticHybridRows,
     collectionRows,
   ]);
 
@@ -1269,10 +1344,13 @@ function PagesView() {
   const canvasContent = (
     <PreviewCanvas
       page={displayedPreviewPage}
-      onEdit={() =>
-        displayedPreviewPage &&
-        navigate(`/pages/${displayedPreviewPage.id}/edit?inserter=patterns`)
-      }
+      onEdit={() => {
+        if (!displayedPreviewPage) {
+          return;
+        }
+        selectPage(displayedPreviewPage);
+        navigate(`/pages/${displayedPreviewPage.id}/edit?inserter=patterns`);
+      }}
       onPageChange={setPreviewPage}
     />
   );

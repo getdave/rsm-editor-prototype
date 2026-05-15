@@ -193,11 +193,11 @@ export const pages = [
     status: "live",
     level: 0,
     authorDisplay: "WooCommerce",
-    templateLabel: "Product Catalog",
+    templateLabel: "Product listing",
     collectionKind: "shop",
     viewKind: "listing",
     titleTooltip:
-      "Uses WooCommerce's Shop URL (/shop/) while the Product Catalog template controls the store layout visitors see.",
+      "Uses WooCommerce's Shop URL (/shop/) while the product listing template controls the store layout visitors see.",
   },
   {
     id: "404",
