@@ -60,6 +60,8 @@ export const getPageContent = (page) => {
     // Single Templates (Template Hierarchy)
     'product-single': getProductSingleContent(),
     'blog-single': getBlogSingleContent(),
+    'event-list': getEventListContent(),
+    'event-single': getEventSingleContent(),
     'search-results': getSearchResultsContent(),
   };
 
@@ -447,6 +449,68 @@ function getSearchResultsContent() {
   };
 }
 
+function getEventListContent() {
+  return {
+    layout: 'archive',
+    title: 'Events',
+    subtitle: 'Upcoming workshops, talks, and photography sessions',
+    wordpressContext: {
+      type: 'template',
+      templateFile: 'archive-event.html',
+      isInactiveCollection: true
+    },
+    sections: [
+      {
+        type: 'archive-header',
+        title: 'Events',
+        subtitle: 'Upcoming workshops, talks, and photography sessions'
+      },
+      {
+        type: 'post-list',
+        items: [
+          {
+            title: 'Portrait Lighting Workshop',
+            date: 'June 12, 2026',
+            excerpt: 'A practical evening workshop on finding and shaping natural light for portraits.'
+          },
+          {
+            title: 'Riverside Photo Walk',
+            date: 'June 28, 2026',
+            excerpt: 'A guided walk focused on composition, observation, and building a stronger visual story.'
+          },
+          {
+            title: 'Editing Workflow Q&A',
+            date: 'July 9, 2026',
+            excerpt: 'A small-group session covering selection, editing rhythm, and delivery workflows.'
+          }
+        ]
+      }
+    ]
+  };
+}
+
+function getEventSingleContent() {
+  return {
+    layout: 'single',
+    title: 'Portrait Lighting Workshop',
+    subtitle: null,
+    wordpressContext: {
+      type: 'template',
+      templateFile: 'single-event.html',
+      isInactiveCollection: true
+    },
+    sections: [
+      {
+        type: 'post-content',
+        title: 'Portrait Lighting Workshop',
+        date: 'June 12, 2026',
+        author: 'Events Team',
+        content: 'Join a practical workshop on finding natural light, shaping it with simple tools, and building confidence while photographing portraits.'
+      }
+    ]
+  };
+}
+
 /** Content Page (CPT) assigned as “Posts page” in Reading settings — shows latest posts */
 function getBlogPageAsPostsIndexContent(page) {
   const archive = getBlogListContent();
@@ -579,6 +643,8 @@ function getPlaceholderTitle(pageId, layout) {
   if (pageId === 'blog-list') return 'Blog Archive Title';
   if (pageId === 'product-single') return 'Product Title';
   if (pageId === 'blog-single') return 'Post Title';
+  if (pageId === 'event-list') return 'Event listing title';
+  if (pageId === 'event-single') return 'Event Title';
   if (pageId === 'search-results') return 'Search results title';
   if (pageId === '404') return 'Error Page Title';
   if (pageId === 'cart') return 'Shopping Cart';

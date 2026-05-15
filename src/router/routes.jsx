@@ -24,6 +24,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <PreviewView /> },
       { path: 'pages', element: <PagesView /> },
+      { path: 'pages/static', element: <PagesView /> },
+      { path: 'pages/collections', element: <PagesView /> },
       { path: 'pages/:pageId/edit', element: <EditingView /> },
       {
         path: 'templates',

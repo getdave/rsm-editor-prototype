@@ -221,11 +221,14 @@
 }
 
 .pp-show-drafts-toggle.components-base-control,
-.pp-show-drafts-toggle .components-base-control__field {
+.pp-show-drafts-toggle .components-base-control__field,
+.pp-group-collections-toggle.components-base-control,
+.pp-group-collections-toggle .components-base-control__field {
   margin-bottom: 0;
 }
 
-.pp-show-drafts-toggle .components-toggle-control__label {
+.pp-show-drafts-toggle .components-toggle-control__label,
+.pp-group-collections-toggle .components-toggle-control__label {
   font-size: 13px;
 }
 
@@ -699,6 +702,11 @@
   box-shadow: inset 0 0 0 1px rgba(127, 84, 179, 0.16);
 }
 
+.pp-media-thumb--inactive {
+  border-style: dashed;
+  opacity: 0.78;
+}
+
 .pp-media-thumb-icon {
   display: flex;
   align-items: center;
@@ -880,6 +888,12 @@
   color: #888;
 }
 
+.pp-inactive {
+  background: rgba(127, 84, 179, 0.08);
+  color: #7f54b3;
+  border: 1px dashed rgba(127, 84, 179, 0.36);
+}
+
 .pp-nav {
   background: rgba(56, 88, 233, 0.1);
   color: #3858e9;
@@ -888,6 +902,25 @@
 .pp-author-badge:not([style]) {
   background: #f0f0f0;
   color: #505050;
+}
+
+.pp-dataviews .dataviews-view-list__group-header,
+.pp-dataviews .dataviews-view-grid__group-header {
+  margin: 8px 0 4px;
+  padding: 0 16px;
+  color: #50575e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pp-dataviews
+  .dataviews-view-table__group-header-row
+  .dataviews-view-table__group-header-cell {
+  padding: 10px 16px;
+  background: #f6f7f7;
+  color: #50575e;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .pp-page-role--front {
