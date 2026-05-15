@@ -1070,6 +1070,21 @@ function PagesView() {
           ) : null}
         </div>
       </div>
+      {activePageType === "pages" &&
+        homepageDisplayMode === READING_DISPLAY_LATEST && (
+          <div className="pp-static-homepage-notice" role="status">
+            Homepage is currently set to latest posts. Edit that generated page
+            under{" "}
+            <button
+              type="button"
+              className="pp-desc-link"
+              onClick={() => handleTabClick("collections")}
+            >
+              Collections
+            </button>
+            .
+          </div>
+        )}
       <div className="pp-tab-description-row">
         <div className="pp-tab-description-stack">
           {activeTab?.description ? (
@@ -1077,21 +1092,6 @@ function PagesView() {
               {activeTab.description}
             </Text>
           ) : null}
-          {activePageType === "pages" &&
-            homepageDisplayMode === READING_DISPLAY_LATEST && (
-              <div className="pp-static-homepage-notice" role="status">
-                Homepage is currently set to latest posts. Edit that generated
-                page under{" "}
-                <button
-                  type="button"
-                  className="pp-desc-link"
-                  onClick={() => handleTabClick("collections")}
-                >
-                  Collections
-                </button>
-                .
-              </div>
-            )}
         </div>
         <div className="pp-tab-description-actions">
           {activePageType === "pages" ? (
@@ -1145,13 +1145,6 @@ function PagesView() {
         <div
           className={`pp-toolbar-controls${PAGE_TYPE_TABS.length <= 1 ? " pp-toolbar-controls--solo-category" : ""}`}
         >
-          {homepageDisplayMode === READING_DISPLAY_LATEST &&
-            activePageType === "collections" && (
-              <div className="pp-latest-posts-home-tip" role="status">
-                Latest posts are currently using your site&apos;s main address.
-                Edit that generated layout from <strong>Posts page</strong>.
-              </div>
-            )}
           {viewOptionsOpen && (
             <div className="pp-toolbar-row-options">
               <DataViews.Search />
