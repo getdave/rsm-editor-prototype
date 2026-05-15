@@ -4,21 +4,27 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Tooltip, Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
 import { Page } from '@wordpress/admin-ui';
-import { navigationMenus as initialMenus, pages } from '../../data/mockData';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import MenuEditor from '../navigation/MenuEditor';
 import AddMenuModal from '../navigation/AddMenuModal';
 import DeleteMenuConfirmModal from '../modals/DeleteMenuConfirmModal';
+import { useAppState } from '../../hooks/useAppState';
 
 function NavigationView() {
   const navigate = useNavigate();
-  const [menus, setMenus] = useState(initialMenus);
+  const {
+    navigationMenus: menus,
+    setNavigationMenus,
+    pages: appPages,
+    sidebarCollapsed,
+    toggleSidebar,
+  } = useAppState();
   const [selectedMenuId, setSelectedMenuId] = useState(null);
   const [forceShowList, setForceShowList] = useState(false);
   const [showAddMenuModal, setShowAddMenuModal] = useState(false);
   const [menuPendingDelete, setMenuPendingDelete] = useState(null);
   const [previewPage, setPreviewPage] = useState(
-    () => pages.find((p) => p.isFrontPage) || pages[0],
+    () => appPages.find((p) => p.isFrontPage) ?? appPages[0] ?? null,
   );
   const [view, setView] = useState({
     type: 'list',
@@ -46,7 +52,7 @@ function NavigationView() {
       : null;
 
   const updateMenu = (menuId, updates) => {
-    setMenus(prev => prev.map(menu =>
+    setNavigationMenus(prev => prev.map(menu =>
       menu.id === menuId ? { ...menu, ...updates } : menu
     ));
   };
@@ -59,13 +65,13 @@ function NavigationView() {
       items: [],
       usedIn: [],
     };
-    setMenus(prev => [...prev, newMenu]);
+    setNavigationMenus(prev => [...prev, newMenu]);
     setSelectedMenuId(newMenu.id);
     setForceShowList(false);
   };
 
   const deleteMenu = (menuId) => {
-    setMenus((prev) => prev.filter((m) => m.id !== menuId));
+    setNavigationMenus((prev) => prev.filter((m) => m.id !== menuId));
     if (selectedMenuId === menuId) {
       setSelectedMenuId(null);
       setForceShowList(true);
@@ -173,6 +179,7 @@ function NavigationView() {
     <PreviewCanvas
       page={previewPage}
       onEdit={() =>
+        previewPage &&
         navigate(`/pages/${previewPage.id}/edit?inserter=patterns`)
       }
       onPageChange={setPreviewPage}

@@ -1,5 +1,11 @@
-import { createContext, useContext, useState } from 'react';
-import { pages as pagesData } from '../data/mockData';
+import { createContext, useCallback, useContext, useState } from 'react';
+import { pages as pagesData, navigationMenus as navigationMenusInitial } from '../data/mockData';
+import { MAIN_MENU_ID } from '../constants/navigation';
+import {
+  appendTopLevelPageIfMissing,
+  removeItemsByPageId,
+  removePageFromAllMenus,
+} from '../utils/mainMenuTree';
 
 /** Mirrors WP Reading settings — homepage displays latest posts vs static page */
 export const READING_DISPLAY_LATEST = 'latest';
@@ -13,6 +19,8 @@ export function AppStateProvider({ children }) {
 
   // Pages state (mutable for adding new pages and renames in the editor)
   const [pages, setPages] = useState(pagesData);
+
+  const [navigationMenus, setNavigationMenus] = useState(navigationMenusInitial);
 
   // Current page
   const [currentPage, setCurrentPage] = useState(pages[0]); // Home page
@@ -150,6 +158,70 @@ export function AppStateProvider({ children }) {
     setPages(prev => [...prev, newPage]);
   };
 
+  const deletePage = (pageId) => {
+    setNavigationMenus((prev) => removePageFromAllMenus(prev, pageId));
+    setPages((prev) => {
+      const next = prev.filter((p) => p.id !== pageId);
+      setCurrentPage((cur) => {
+        if (!cur || cur.id !== pageId) return cur;
+        const fallback =
+          next.find((p) => p.category === 'content') ?? next[0] ?? null;
+        return fallback;
+      });
+      return next;
+    });
+    setRecentPages((prev) => prev.filter((p) => p.id !== pageId));
+  };
+
+  /** Keeps `pages[].isFrontPage` / `isPostsPage` aligned with Reading-style ids (prototype only). */
+  const syncReadingPageMarkers = useCallback((frontId, postsId) => {
+    setPages((prev) =>
+      prev.map((p) => {
+        if (p.category !== "content") return p;
+        const next = { ...p };
+        if (frontId && p.id === frontId) next.isFrontPage = true;
+        else delete next.isFrontPage;
+        if (postsId && p.id === postsId) next.isPostsPage = true;
+        else delete next.isPostsPage;
+        return next;
+      }),
+    );
+  }, []);
+
+  const addPageToMainMenu = (page) => {
+    if (!page?.id) return;
+    setNavigationMenus((prev) =>
+      prev.map((menu) =>
+        menu.id === MAIN_MENU_ID
+          ? {
+              ...menu,
+              items: appendTopLevelPageIfMissing(menu.items || [], page),
+            }
+          : menu,
+      ),
+    );
+    setPages((list) =>
+      list.map((p) => (p.id === page.id ? { ...p, inMenu: true } : p)),
+    );
+  };
+
+  const removePageFromMainMenu = (pageId) => {
+    if (!pageId) return;
+    setNavigationMenus((prev) =>
+      prev.map((menu) =>
+        menu.id === MAIN_MENU_ID
+          ? {
+              ...menu,
+              items: removeItemsByPageId(menu.items || [], pageId),
+            }
+          : menu,
+      ),
+    );
+    setPages((list) =>
+      list.map((p) => (p.id === pageId ? { ...p, inMenu: false } : p)),
+    );
+  };
+
   const markDirty = () => {
     setHasUnsavedChanges(true);
   };
@@ -202,6 +274,14 @@ export function AppStateProvider({ children }) {
     pages,
     addPage,
     setPageStatus,
+    deletePage,
+    syncReadingPageMarkers,
+    addPageToMainMenu,
+    removePageFromMainMenu,
+
+    // Navigation menus (shared with Navigation screen + main-menu actions from Pages)
+    navigationMenus,
+    setNavigationMenus,
 
     // Current page
     currentPage,

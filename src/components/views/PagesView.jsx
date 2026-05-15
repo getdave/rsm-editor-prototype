@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Button,
@@ -12,18 +12,18 @@ import { Stack, Text, VisuallyHidden } from "@wordpress/ui";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
 import { createInterpolateElement } from "@wordpress/element";
 import {
-  pencil,
-  external,
   plus,
   copy,
   home,
   page as pageIcon,
   postList,
-  seen,
   chevronDown,
   chevronUp,
   moreVertical,
   help,
+  trash,
+  navigation,
+  closeSmall,
 } from "@wordpress/icons";
 import { Page } from "@wordpress/admin-ui";
 import {
@@ -31,8 +31,12 @@ import {
   READING_DISPLAY_LATEST,
   READING_DISPLAY_STATIC,
 } from "../../hooks/useAppState";
+import PageLayoutWireframeThumb from "../shared/PageLayoutWireframeThumb";
 import PreviewCanvas from "../shared/PreviewCanvas";
 import DefinedTerm from "../shared/DefinedTerm";
+import DeleteHomepagePageModal from "../modals/DeleteHomepagePageModal";
+import DeletePostsPageModal from "../modals/DeletePostsPageModal";
+import DeletePageConfirmModal from "../modals/DeletePageConfirmModal";
 
 /** Tooltip primer (concept from WP template hierarchy) */
 const WP_TEMPLATE_TERM_DEFINITION =
@@ -402,6 +406,7 @@ function PagesView() {
     setPagesViewMode,
     pages,
     openAddPageModal,
+    deletePage,
     homepageDisplayMode,
     setHomepageDisplayMode,
     frontPageId,
@@ -409,9 +414,13 @@ function PagesView() {
     postsPageId,
     setPostsPageId,
     setPageStatus,
+    syncReadingPageMarkers,
     showSnackbar,
+    addPageToMainMenu,
+    removePageFromMainMenu,
   } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [activeCategory, setActiveCategory] = useState("published");
   const [view, setView] = useState(() =>
     createPagesDataViewState(pagesViewMode),
@@ -470,6 +479,32 @@ function PagesView() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [configureHomepageOpen]);
 
+  useEffect(() => {
+    const front =
+      homepageDisplayMode === READING_DISPLAY_STATIC ? frontPageId : "";
+    const posts =
+      homepageDisplayMode === READING_DISPLAY_STATIC ? postsPageId : "";
+    syncReadingPageMarkers(front, posts);
+  }, [
+    homepageDisplayMode,
+    frontPageId,
+    postsPageId,
+    syncReadingPageMarkers,
+  ]);
+
+  useEffect(() => {
+    if (!deleteConfirm?.page?.isFrontPage && !deleteConfirm?.page?.isPostsPage) {
+      return;
+    }
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setDeleteConfirm(null);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [deleteConfirm]);
+
   const fields = useMemo(
     () => [
       {
@@ -483,12 +518,16 @@ function PagesView() {
                 : "pp-media-thumb"
             }
           >
-            <span
-              className="pp-media-thumb-icon"
-              style={{ color: "#999", display: "flex" }}
-            >
-              {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
-            </span>
+            {isGridLayout ? (
+              <PageLayoutWireframeThumb page={item} />
+            ) : (
+              <span
+                className="pp-media-thumb-icon"
+                style={{ color: "#999", display: "flex" }}
+              >
+                {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
+              </span>
+            )}
             {item.isFrontPage ? (
               <span className="pp-front-page-overlay">Homepage</span>
             ) : item.isPostsPage ? (
@@ -638,28 +677,6 @@ function PagesView() {
   const actions = useMemo(
     () => [
       {
-        id: "preview",
-        label: "Preview",
-        isPrimary: true,
-        icon: seen,
-        callback: (items) => setPreviewPage(items[0]),
-      },
-      {
-        id: "edit",
-        label: "Edit",
-        icon: pencil,
-        callback: (items) => {
-          selectPage(items[0]);
-          navigate(`/pages/${items[0].id}/edit?inserter=patterns`);
-        },
-      },
-      {
-        id: "view-live",
-        label: "View live",
-        icon: external,
-        callback: (items) => console.log("View live:", items[0].slug),
-      },
-      {
         id: "duplicate",
         label: "Duplicate",
         icon: copy,
@@ -672,6 +689,38 @@ function PagesView() {
           item.category === "content" && item.status === "draft",
         callback: (items) => {
           setPublishConfirmPage(items[0]);
+        },
+      },
+      {
+        id: "add-to-menu",
+        label: "Add to menu",
+        icon: navigation,
+        isEligible: (item) =>
+          item.category === "content" &&
+          !item.isSystem &&
+          item.id !== BLOG_HOMEPAGE_ROOT_TEMPLATE_ID &&
+          !item.inMenu,
+        callback: (items, { onActionPerformed } = {}) => {
+          const page = items[0];
+          addPageToMainMenu(page);
+          showSnackbar(`“${page.name}” added to the main menu.`);
+          onActionPerformed?.(items);
+        },
+      },
+      {
+        id: "remove-from-menu",
+        label: "Remove from menu",
+        icon: closeSmall,
+        isEligible: (item) =>
+          item.category === "content" &&
+          !item.isSystem &&
+          item.id !== BLOG_HOMEPAGE_ROOT_TEMPLATE_ID &&
+          item.inMenu,
+        callback: (items, { onActionPerformed } = {}) => {
+          const page = items[0];
+          removePageFromMainMenu(page.id);
+          showSnackbar(`“${page.name}” removed from the main menu.`);
+          onActionPerformed?.(items);
         },
       },
       {
@@ -741,18 +790,35 @@ function PagesView() {
         disabled: true,
         callback: () => {},
       },
+      {
+        id: "delete",
+        label: () => (
+          <span className="pp-dataviews-action-delete">Delete</span>
+        ),
+        icon: trash,
+        isEligible: (item) =>
+          item.category === "content" &&
+          !item.isSystem &&
+          item.id !== BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
+        callback: (items, { onActionPerformed } = {}) => {
+          setDeleteConfirm({
+            page: items[0],
+            onActionPerformed,
+            actionItems: items,
+          });
+        },
+      },
     ],
     [
-      navigate,
-      selectPage,
       setPreviewPage,
-      setPageStatus,
       showSnackbar,
       frontPageId,
       postsPageId,
       setHomepageDisplayMode,
       setFrontPageId,
       setPostsPageId,
+      addPageToMainMenu,
+      removePageFromMainMenu,
     ],
   );
 
@@ -806,6 +872,70 @@ function PagesView() {
     postsPageId,
     homepageDisplayMode,
   ]);
+
+  const executeDeletePage = useCallback(
+    (
+      page,
+      {
+        onActionPerformed,
+        actionItems,
+        replacementFrontPageId,
+        replacementPostsPageId,
+      } = {},
+    ) => {
+      const replacementFrontRow =
+        replacementFrontPageId &&
+        categoryPages.find((p) => p.id === replacementFrontPageId);
+      const replacementPostsRow =
+        replacementPostsPageId &&
+        categoryPages.find((p) => p.id === replacementPostsPageId);
+      const nextPreview =
+        replacementFrontRow ??
+        replacementPostsRow ??
+        categoryPages.find((p) => p.id !== page.id) ??
+        null;
+
+      if (replacementFrontPageId) {
+        setHomepageDisplayMode(READING_DISPLAY_STATIC);
+        setFrontPageId(replacementFrontPageId);
+        if (replacementFrontPageId === postsPageId) {
+          setPostsPageId("");
+        }
+      }
+
+      if (replacementPostsPageId) {
+        setHomepageDisplayMode(READING_DISPLAY_STATIC);
+        setPostsPageId(replacementPostsPageId);
+        if (replacementPostsPageId === frontPageId) {
+          setFrontPageId("");
+        }
+      }
+
+      deletePage(page.id);
+
+      if (page.isFrontPage && !replacementFrontPageId) {
+        setFrontPageId("");
+      }
+      if (page.isPostsPage && !replacementPostsPageId) {
+        setPostsPageId("");
+      }
+
+      setPreviewPage((p) => (p?.id === page.id ? nextPreview : p));
+      showSnackbar(`“${page.name}” removed from this site.`);
+      onActionPerformed?.(actionItems ?? [page]);
+    },
+    [
+      categoryPages,
+      deletePage,
+      frontPageId,
+      postsPageId,
+      setHomepageDisplayMode,
+      setFrontPageId,
+      setPostsPageId,
+      setPreviewPage,
+      showSnackbar,
+    ],
+  );
 
   const handleReadingModalApply = (draft) => {
     if (draft.homepageDisplayMode === READING_DISPLAY_LATEST) {
@@ -975,7 +1105,10 @@ function PagesView() {
   const canvasContent = (
     <PreviewCanvas
       page={previewPage}
-      onEdit={() => navigate(`/pages/${previewPage.id}/edit?inserter=patterns`)}
+      onEdit={() =>
+        previewPage &&
+        navigate(`/pages/${previewPage.id}/edit?inserter=patterns`)
+      }
       onPageChange={setPreviewPage}
     />
   );
@@ -1009,7 +1142,7 @@ function PagesView() {
           icon={moreVertical}
           label={
             readingConfigureMenuNeedsAttention
-              ? "More options. Homepage settings need attention; choose Configure homepage."
+              ? "More options. Homepage settings need attention; choose Configure Homepage."
               : "More page options"
           }
           toggleProps={{
@@ -1020,7 +1153,7 @@ function PagesView() {
           }}
           controls={[
             {
-              title: "Configure homepage",
+              title: "Configure Homepage",
               onClick: () => setConfigureHomepageOpen(true),
             },
           ]}
@@ -1098,6 +1231,61 @@ function PagesView() {
         >
           {`Publish “${publishConfirmPage.name}”? It will go live on your site.`}
         </ConfirmDialog>
+      ) : null}
+      {deleteConfirm?.page?.isFrontPage ? (
+        <div
+          className="modal-overlay"
+          role="presentation"
+          onClick={() => setDeleteConfirm(null)}
+        >
+          <DeleteHomepagePageModal
+            page={deleteConfirm.page}
+            postsPageId={postsPageId}
+            readingSelectPages={readingSelectPages}
+            onClose={() => setDeleteConfirm(null)}
+            onDelete={({ replacementFrontPageId }) => {
+              executeDeletePage(deleteConfirm.page, {
+                replacementFrontPageId,
+                onActionPerformed: deleteConfirm.onActionPerformed,
+                actionItems: deleteConfirm.actionItems,
+              });
+              setDeleteConfirm(null);
+            }}
+          />
+        </div>
+      ) : deleteConfirm?.page?.isPostsPage ? (
+        <div
+          className="modal-overlay"
+          role="presentation"
+          onClick={() => setDeleteConfirm(null)}
+        >
+          <DeletePostsPageModal
+            page={deleteConfirm.page}
+            frontPageId={frontPageId}
+            readingSelectPages={readingSelectPages}
+            onClose={() => setDeleteConfirm(null)}
+            onDelete={({ replacementPostsPageId }) => {
+              executeDeletePage(deleteConfirm.page, {
+                replacementPostsPageId,
+                onActionPerformed: deleteConfirm.onActionPerformed,
+                actionItems: deleteConfirm.actionItems,
+              });
+              setDeleteConfirm(null);
+            }}
+          />
+        </div>
+      ) : deleteConfirm ? (
+        <DeletePageConfirmModal
+          page={deleteConfirm.page}
+          onClose={() => setDeleteConfirm(null)}
+          onConfirm={() => {
+            executeDeletePage(deleteConfirm.page, {
+              onActionPerformed: deleteConfirm.onActionPerformed,
+              actionItems: deleteConfirm.actionItems,
+            });
+            setDeleteConfirm(null);
+          }}
+        />
       ) : null}
     </>
   );

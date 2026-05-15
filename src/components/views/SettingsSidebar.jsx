@@ -1,13 +1,167 @@
-import { useEffect, useState } from 'react';
-import { Button, PanelBody, Popover, TabPanel, TextControl, Tooltip } from '@wordpress/components';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Button, PanelBody, Popover, TabPanel, TextControl } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { closeSmall } from '@wordpress/icons';
+import {
+  DEFAULT_SECTION_STYLE_ID,
+  SECTION_STYLE_OPTIONS,
+} from '../../constants/sectionInspectorStyles';
 import {
   FOOTER_META,
   getSectionMeta,
   HEADER_META,
   TEMPLATE_ROOT_META,
 } from '../../utils/editCanvasBlockMeta';
+
+const STYLE_PREVIEW_W = 232;
+const STYLE_PREVIEW_MIN_W = 200;
+const STYLE_PREVIEW_MAX_W = 280;
+/** Clear space between flyout’s right edge and the sidebar’s left edge — flyout must never overlap the sidebar. */
+const FLYOUT_SIDEBAR_GAP = 10;
+const STYLE_PREVIEW_HIDE_MS = 100;
+const FLYOUT_APPROX_HEIGHT = 200;
+
+function parseSectionIndex(selectedBlockId) {
+  if (!selectedBlockId?.startsWith('section-')) {
+    return null;
+  }
+  const n = Number.parseInt(selectedBlockId.replace('section-', ''), 10);
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Flyout anchors to the viewport so its right edge is always to the left of the settings
+ * sidebar (never obscures the panel). Width may shrink if the canvas area is narrow.
+ */
+function placeStylePreviewFlyout(targetEl) {
+  const trigger = targetEl.getBoundingClientRect();
+  const sidebarEl = document.querySelector('.settings-sidebar.open');
+  const sidebarLeft = sidebarEl
+    ? sidebarEl.getBoundingClientRect().left
+    : window.innerWidth;
+  const rightEdge = Math.max(0, sidebarLeft - FLYOUT_SIDEBAR_GAP);
+
+  let width = STYLE_PREVIEW_W;
+  let left = rightEdge - width;
+
+  if (left < 8) {
+    left = 8;
+    width = Math.min(
+      STYLE_PREVIEW_MAX_W,
+      Math.max(STYLE_PREVIEW_MIN_W, rightEdge - left - 1)
+    );
+  }
+
+  const maxW = rightEdge - left - 1;
+  if (width > maxW && maxW >= STYLE_PREVIEW_MIN_W) {
+    width = maxW;
+  }
+
+  let top = trigger.top + trigger.height / 2 - FLYOUT_APPROX_HEIGHT / 2;
+  top = Math.max(
+    8,
+    Math.min(top, window.innerHeight - FLYOUT_APPROX_HEIGHT - 8)
+  );
+
+  return { left, top, width };
+}
+
+function StylePreviewPopover({ open, left, top, width, label, previewMod }) {
+  if (!open) {
+    return null;
+  }
+  return createPortal(
+    <div
+      className="ss-style-preview-flyout"
+      style={{ left, top, width }}
+      role="presentation"
+    >
+      <div className={`ss-style-preview-mock ss-style-preview-mock--${previewMod}`}>
+        <div className="ss-style-preview-mock-title">La Mancha</div>
+        <p className="ss-style-preview-mock-text">
+          In a village of La Mancha, the name of which I have no desire…”
+        </p>
+        <span className="ss-style-preview-mock-cta">Read more</span>
+      </div>
+      <Text variant="body-sm" className="ss-style-preview-caption">
+        {label}
+      </Text>
+    </div>,
+    document.body
+  );
+}
+
+function SectionStylesPanel({ sectionIndex, selectedStyleId, onStyleChange }) {
+  const hideTimerRef = useRef(null);
+  const [preview, setPreview] = useState(null);
+
+  const clearHideTimer = () => {
+    if (hideTimerRef.current != null) {
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+  };
+
+  useEffect(() => () => clearHideTimer(), []);
+
+  const showPreviewForTarget = (target, option) => {
+    clearHideTimer();
+    const { left, top, width } = placeStylePreviewFlyout(target);
+    setPreview({
+      left,
+      top,
+      width,
+      label: option.label,
+      previewMod: option.previewMod,
+    });
+  };
+
+  const scheduleHidePreview = () => {
+    clearHideTimer();
+    hideTimerRef.current = window.setTimeout(() => {
+      hideTimerRef.current = null;
+      setPreview(null);
+    }, STYLE_PREVIEW_HIDE_MS);
+  };
+
+  return (
+    <div className="ss-style-picker-root">
+      <StylePreviewPopover
+        open={Boolean(preview)}
+        left={preview?.left ?? 0}
+        top={preview?.top ?? 0}
+        width={preview?.width ?? STYLE_PREVIEW_W}
+        label={preview?.label ?? ''}
+        previewMod={preview?.previewMod ?? 'default'}
+      />
+      <div className="ss-style-grid" role="list">
+        {SECTION_STYLE_OPTIONS.map((option) => {
+          const selected = option.id === selectedStyleId;
+          return (
+            <div className="ss-style-grid-cell" key={option.id} role="presentation">
+              <button
+                type="button"
+                role="listitem"
+                className={`ss-style-btn${selected ? ' ss-style-btn--selected' : ''}`}
+                aria-pressed={selected}
+                onClick={() => onStyleChange(sectionIndex, option.id)}
+                onMouseEnter={(e) => showPreviewForTarget(e.currentTarget, option)}
+                onMouseLeave={scheduleHidePreview}
+                onFocus={(e) => showPreviewForTarget(e.currentTarget, option)}
+                onBlur={scheduleHidePreview}
+              >
+                <Text variant="body-sm" className="ss-style-btn-label">
+                  {option.label}
+                </Text>
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function PageTab({ pageTitle }) {
   const slug = pageTitle?.toLowerCase().replace(/\s+/g, '-') ?? '';
@@ -125,20 +279,19 @@ function SectionLayoutAlternatives() {
     <>
       <div className="ss-layout-buttons" ref={setGroupAnchor}>
         {SECTION_LAYOUT_PRESETS.map(({ id, title }) => (
-          <Tooltip key={id} text={title} placement="top">
-            <Button
-              variant="secondary"
-              isPressed={id === activeId}
-              className="ss-layout-button"
-              onClick={() => setActiveId(id)}
-              onMouseEnter={() => setHoveredId(id)}
-              onMouseLeave={() => handleLeave(id)}
-              onFocus={() => setHoveredId(id)}
-              onBlur={() => handleLeave(id)}
-            >
-              {title}
-            </Button>
-          </Tooltip>
+          <Button
+            key={id}
+            variant="secondary"
+            isPressed={id === activeId}
+            className="ss-layout-button"
+            onClick={() => setActiveId(id)}
+            onMouseEnter={() => setHoveredId(id)}
+            onMouseLeave={() => handleLeave(id)}
+            onFocus={() => setHoveredId(id)}
+            onBlur={() => handleLeave(id)}
+          >
+            {title}
+          </Button>
         ))}
       </div>
       {previewPreset && groupAnchor ? (
@@ -161,94 +314,16 @@ function SectionLayoutAlternatives() {
   );
 }
 
-/**
- * Six visual style variants applied to the same preview card content. Each
- * variant defines the background, text, and accent (button) colors used to
- * paint the preview shown in the hover popover.
- */
-const SECTION_STYLE_VARIANTS = [
-  { id: 'style-01', title: 'Style 01', bg: '#ffffff', text: '#1e1e1e', accent: '#1e1e1e', accentText: '#ffffff' },
-  { id: 'style-02', title: 'Style 02', bg: '#fdd9e9', text: '#1e1e1e', accent: '#1e1e1e', accentText: '#ffffff' },
-  { id: 'style-03', title: 'Style 03', bg: '#1e1e1e', text: '#ffffff', accent: '#facc15', accentText: '#1e1e1e' },
-  { id: 'style-04', title: 'Style 04', bg: '#4338ca', text: '#ffffff', accent: '#f9a8d4', accentText: '#4338ca' },
-  { id: 'style-05', title: 'Style 05', bg: '#fde047', text: '#1e1e1e', accent: '#1e1e1e', accentText: '#fde047' },
-  { id: 'style-06', title: 'Style 06', bg: '#dcfce7', text: '#14532d', accent: '#14532d', accentText: '#dcfce7' },
-];
-
-function StylePreviewCard({ variant }) {
-  return (
-    <div
-      className="ss-style-preview-card"
-      style={{ background: variant.bg, color: variant.text }}
-    >
-      <Text variant="heading-md" className="ss-style-preview-title">La Mancha</Text>
-      <Text variant="body-sm" className="ss-style-preview-body">
-        In a village of La Mancha, the name of which I have no desire to call to mind,
-        there lived not long since one of those gentlemen that keep a lance in the
-        lance-rack, an old buckler, a lean hack, and a greyhound for coursing.
-      </Text>
-      <span
-        className="ss-style-preview-button"
-        style={{ background: variant.accent, color: variant.accentText }}
-      >
-        Read more
-      </span>
-    </div>
-  );
-}
-
-function SectionStyleVariants() {
-  const [activeId, setActiveId] = useState(SECTION_STYLE_VARIANTS[0].id);
-  const [hoveredId, setHoveredId] = useState(null);
-  // Anchor the Popover to the buttons wrapper so the preview stays put as
-  // the user moves across buttons — only the content swaps.
-  const [groupAnchor, setGroupAnchor] = useState(null);
-
-  const showPreview = hoveredId && hoveredId !== activeId;
-  const previewVariant = showPreview
-    ? SECTION_STYLE_VARIANTS.find((v) => v.id === hoveredId)
-    : null;
-
-  const handleLeave = (id) => {
-    setHoveredId((current) => (current === id ? null : current));
-  };
-
-  return (
-    <>
-      <div className="ss-style-buttons" ref={setGroupAnchor}>
-        {SECTION_STYLE_VARIANTS.map(({ id, title }) => (
-          <Tooltip key={id} text={title} placement="top">
-            <Button
-              variant="secondary"
-              isPressed={id === activeId}
-              className="ss-style-button"
-              onClick={() => setActiveId(id)}
-              onMouseEnter={() => setHoveredId(id)}
-              onMouseLeave={() => handleLeave(id)}
-              onFocus={() => setHoveredId(id)}
-              onBlur={() => handleLeave(id)}
-            >
-              {title}
-            </Button>
-          </Tooltip>
-        ))}
-      </div>
-      {previewVariant && groupAnchor ? (
-        <Popover
-          anchor={groupAnchor}
-          placement="left-start"
-          offset={12}
-          focusOnMount={false}
-          className="ss-style-preview"
-        >
-          <StylePreviewCard variant={previewVariant} />
-        </Popover>
-      ) : null}
-    </>
-  );
-}
-
-function BlockTab({ icon: Icon, label, description, showLayoutAlternatives }) {
+function BlockTab({
+  icon: Icon,
+  label,
+  description,
+  showLayoutAlternatives,
+  showSectionStyles,
+  selectedSectionIndex,
+  sectionStyleId,
+  onSectionStyleChange,
+}) {
   return (
     <>
       <Stack direction="row" align="flex-start" gap="sm" className="ss-block-intro">
@@ -265,9 +340,13 @@ function BlockTab({ icon: Icon, label, description, showLayoutAlternatives }) {
           <SectionLayoutAlternatives />
         </PanelBody>
       ) : null}
-      {showLayoutAlternatives ? (
-        <PanelBody title="Style" initialOpen>
-          <SectionStyleVariants />
+      {showSectionStyles && selectedSectionIndex !== null ? (
+        <PanelBody title="Styles" initialOpen>
+          <SectionStylesPanel
+            sectionIndex={selectedSectionIndex}
+            selectedStyleId={sectionStyleId}
+            onStyleChange={onSectionStyleChange}
+          />
         </PanelBody>
       ) : null}
       <PanelBody title="Color" initialOpen={false}>
@@ -315,6 +394,8 @@ export default function SettingsSidebar({
   isTemplate,
   focusBlockTabSignal = 0,
   flashSignal = 0,
+  sectionStyles = {},
+  onSectionStyleChange = () => {},
 }) {
   const [flashHighlight, setFlashHighlight] = useState(false);
 
@@ -345,6 +426,8 @@ export default function SettingsSidebar({
     };
   }, [flashSignal, isOpen]);
 
+  void isTemplate;
+
   let blockMeta = { icon: TEMPLATE_ROOT_META.icon, label: 'Block', isPatternSection: false };
   if (selectedBlockId === 'header') {
     blockMeta = HEADER_META;
@@ -367,6 +450,15 @@ export default function SettingsSidebar({
     { name: 'page', title: 'Page' },
     { name: 'block', title: inspectorTabLabel },
   ];
+
+  const selectedSectionIndex = parseSectionIndex(selectedBlockId);
+  const showSectionStyles = Boolean(
+    blockMeta.isPatternSection && selectedSectionIndex !== null
+  );
+  const sectionStyleId =
+    showSectionStyles && selectedSectionIndex !== null
+      ? sectionStyles[selectedSectionIndex] ?? DEFAULT_SECTION_STYLE_ID
+      : DEFAULT_SECTION_STYLE_ID;
 
   return (
     <div
@@ -396,6 +488,10 @@ export default function SettingsSidebar({
               label={blockMeta.label}
               description={blockDescription}
               showLayoutAlternatives={blockMeta.isPatternSection}
+              showSectionStyles={showSectionStyles}
+              selectedSectionIndex={selectedSectionIndex}
+              sectionStyleId={sectionStyleId}
+              onSectionStyleChange={onSectionStyleChange}
             />
           )
         }

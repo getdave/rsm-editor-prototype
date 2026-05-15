@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { Button, SearchControl, CheckboxControl } from '@wordpress/components';
 import { close } from '@wordpress/icons';
-import { pages } from '../../data/mockData';
+import { useAppState } from '../../hooks/useAppState';
 
 function PagePicker({ menu, onAddItems, onClose }) {
+  const { pages } = useAppState();
   const [selectedPageIds, setSelectedPageIds] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
