@@ -1,5 +1,9 @@
 /* ── SIDEBAR ── */
 .sidebar {
+  --sidebar-active-bleed: 36px;
+  --sidebar-root-nav-block-start: 18px;
+  position: relative;
+  z-index: 2;
   width: 208px;
   min-width: 208px;
   background: var(--wp-chrome-bg, #1e1e1e);
@@ -9,6 +13,10 @@
               min-width 280ms cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   align-self: stretch;
+}
+
+.sidebar:not(.is-design-section) {
+  overflow: visible;
 }
 
 /* In the editor the chrome sidebar collapses to its narrow 48px form
@@ -27,12 +35,17 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 12px;
+  padding: var(--sidebar-root-nav-block-start) 12px 12px;
   overflow: hidden;
 }
 
 .sidebar.collapsed .admin-root-nav {
   padding: 8px 0;
+}
+
+.sidebar-nav-pane-admin,
+.editor-sidebar-root-nav {
+  overflow: visible;
 }
 
 .admin-root-nav .ni {
@@ -54,6 +67,34 @@
 .admin-root-nav .ni.on {
   background: #252525;
   font-weight: 700;
+}
+
+.sidebar-nav-pane-admin > .ni.on,
+.editor-sidebar-root-nav > .ni.on {
+  position: relative;
+  z-index: 1;
+  background: var(--wp-page-area-surface, #fff);
+  color: #1e1e1e;
+  border-radius: 4px 0 0 4px;
+  font-weight: 600;
+}
+
+.sidebar-nav-pane-admin > .ni.on:hover,
+.editor-sidebar-root-nav > .ni.on:hover {
+  background: var(--wp-page-area-surface, #fff);
+  color: #1e1e1e;
+}
+
+.sidebar-nav-pane-admin > .ni.on::after,
+.editor-sidebar-root-nav > .ni.on::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: calc(-1 * var(--sidebar-active-bleed, 24px));
+  bottom: 0;
+  width: var(--sidebar-active-bleed, 24px);
+  background: var(--wp-page-area-surface, #fff);
+  pointer-events: none;
 }
 
 .admin-root-nav .ni-ico {
@@ -292,7 +333,9 @@
 }
 
 .sidebar.collapsed .ni.on {
-  border-left-color: #3858e9;
+  border-left-color: transparent;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 /* Advanced menu item at bottom */
@@ -585,6 +628,10 @@
 .sidebar-nav-pane-design { transform: translateX(100%); }
 .sidebar-nav-slider.is-design .sidebar-nav-pane-admin { transform: translateX(-100%); }
 .sidebar-nav-slider.is-design .sidebar-nav-pane-design { transform: translateX(0); }
+.sidebar:not(.is-design-section) .sidebar-nav-pane-design {
+  visibility: hidden;
+  pointer-events: none;
+}
 
 /* Hide sidebar-bottom when the design section is active. Fade matches the
    nav slider's 0.3s timing for a cohesive transition. */
