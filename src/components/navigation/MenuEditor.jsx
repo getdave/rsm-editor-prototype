@@ -266,7 +266,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     setFlashNavItemIds([item.id]);
   };
 
-  const addPageLinksFromPicker = useCallback(
+  const addLinksFromPicker = useCallback(
     (selectedRows) => {
       if (!selectedRows?.length) {
         showSnackbar('Nothing was added to the menu.');
@@ -275,9 +275,13 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
       }
       const ts = Date.now();
       const newItems = selectedRows.map((row, index) => ({
-        id: `nav-page-${row.id}-${ts}-${index}`,
-        label: row.name,
-        pageId: row.id,
+        id: `nav-${row.id}-${ts}-${index}`,
+        label: row.navLabel ?? row.name,
+        ...(row.navPageId || row.pageId || row.category === 'content'
+          ? { pageId: row.navPageId ?? row.pageId ?? row.id }
+          : {}),
+        ...(row.navUrl || row.url ? { url: row.navUrl ?? row.url } : {}),
+        ...(row.sourceType ? { sourceType: row.sourceType } : {}),
         children: [],
       }));
       onUpdateMenu({ items: [...menu.items, ...newItems] });
@@ -823,7 +827,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           onClose={() => setShowAddPagesModal(false)}
           pages={allPages}
           menuItems={menu.items}
-          onConfirm={addPageLinksFromPicker}
+          onConfirm={addLinksFromPicker}
         />
       ) : null}
     </Page>
