@@ -1396,7 +1396,7 @@ function PagesView() {
       view={activeView}
       onChangeView={handleChangeView}
       defaultLayouts={DEFAULT_LAYOUTS}
-      actions={actions}
+      actions={activePageType === "pages" ? actions : []}
       paginationInfo={paginationInfo}
       onChangeSelection={(ids) => {
         if (ids.length === 1) {
@@ -1447,7 +1447,9 @@ function PagesView() {
   );
 
   const stageContent = (
-    <div className="pp-inner pp-dataviews">
+    <div
+      className={`pp-inner pp-dataviews${activePageType === "dynamic" ? " pp-dataviews--dynamic-pages" : ""}`}
+    >
       <div className="pp-tabs-row">
         <div className="pp-tabs-row__tabs">
           {PAGE_TYPE_TABS.length > 1 ? (

@@ -339,6 +339,11 @@
   min-height: 0;
 }
 
+/* Dynamic Pages tab — no row-level DataViews actions; hide … menu slot (including disabled mobile trigger). */
+.pp-dataviews.pp-dataviews--dynamic-pages .dataviews-item-actions {
+  display: none;
+}
+
 /* DataViews renders a .dataviews-wrapper div — make it fill and flex */
 .pp-dataviews .dataviews-wrapper {
   display: flex;
