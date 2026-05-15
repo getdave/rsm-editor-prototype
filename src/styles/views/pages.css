@@ -730,8 +730,6 @@
 
 .pp-collection-marker-overlay {
   max-width: calc(100% - 8px);
-  padding-inline: 4px;
-  font-size: 7px;
   white-space: nowrap;
   color: #7f54b3;
   background: rgba(127, 84, 179, 0.1);
