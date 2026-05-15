@@ -23,8 +23,7 @@ export default function BlockToolbar({
   setSettingsSidebarOpen,
   globalPartEditActive = false,
   onGlobalPartEdit,
-  onGlobalPartEditCancel,
-  onGlobalPartEditSave,
+  onGlobalPartEditExit,
 }) {
   const ref = useRef(null);
   const rafIdRef = useRef(0);
@@ -162,24 +161,14 @@ export default function BlockToolbar({
           {globalPartEditActive ? (
             <div className="bt-global-part-actions" role="group" aria-label="Editing global template part">
               <Button
-                variant="tertiary"
-                className="bt-tb-edit"
+                variant="primary"
+                className="bt-tb-edit bt-global-part-exit"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onGlobalPartEditCancel();
+                  onGlobalPartEditExit();
                 }}
               >
-                Cancel
-              </Button>
-              <Button
-                variant="tertiary"
-                className="bt-tb-edit bt-tb-edit-global-save"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onGlobalPartEditSave();
-                }}
-              >
-                Save
+                Exit
               </Button>
             </div>
           ) : (

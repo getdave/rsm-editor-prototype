@@ -553,12 +553,19 @@
 
 .edit-card.edit-card--spotlight > [data-edit-block-id]:not(.edit-spotlight-focus) {
   opacity: var(--edit-spotlight-peer-opacity);
+  pointer-events: none;
   transition: opacity var(--edit-spotlight-transition-duration, 0.55s) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .edit-card.edit-card--spotlight > [data-edit-block-id].edit-spotlight-focus {
   opacity: 1;
   transition: opacity var(--edit-spotlight-transition-duration, 0.55s) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.edit-card.edit-card--spotlight > [data-edit-block-id]:not(.edit-spotlight-focus) .add-sec,
+.edit-card.edit-card--spotlight > [data-edit-block-id]:not(.edit-spotlight-focus) .tp-sync-badge {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .g-el {
@@ -576,20 +583,6 @@
    (.g-el otherwise dims globals and reads as an overlay). Spotlight still overrides via .edit-card--spotlight. */
 .g-el.e-block.tp-part {
   opacity: 1;
-}
-
-.g-badge {
-  position: absolute;
-  top: 7px;
-  right: 8px;
-  background: #f0b849;
-  color: #1e1e1e;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 3px;
-  z-index: 5;
-  white-space: nowrap;
 }
 
 /* Canvas blocks — WordPress block hover / selection (blue outline) */
@@ -680,6 +673,48 @@
      wash would replace them and reveal the white .edit-card behind (header looked white). */
   opacity: 1;
 }
+
+.tp-sync-badge {
+  position: absolute;
+  left: 8px;
+  z-index: 25;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--edit-global-accent);
+  background: #fff;
+  border: 2px solid var(--edit-global-accent);
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.p-header .tp-sync-badge {
+  top: calc(100% - 2px);
+  border-radius: 0 0 4px 4px;
+}
+
+.p-footer .tp-sync-badge {
+  bottom: calc(100% - 2px);
+  border-radius: 4px 4px 0 0;
+}
+
+.tp-sync-badge-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+}
+
+.tp-sync-badge-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
 .sec-bar.block-toolbar {
   position: absolute;
   bottom: 100%;
@@ -747,21 +782,19 @@
   flex-shrink: 0;
 }
 
-/* Save: compact filled control; same dimensions/label style as .bt-tb-edit (see bt-tb-edit rule below) */
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-tb-edit.bt-tb-edit-global-save.components-button {
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button {
   background: var(--edit-global-accent);
   border-color: transparent;
   color: #fff;
 }
 
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-tb-edit.bt-tb-edit-global-save.components-button:hover:not(:disabled) {
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button:hover:not(:disabled) {
   background: #6120c1;
   color: #fff;
 }
 
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-tb-edit.bt-tb-edit-global-save.components-button:focus:not(:disabled) {
-  outline: none;
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button:focus:not(:disabled) {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--edit-global-accent);
 }
 
 .e-sec.sel .sec-bar.block-toolbar,

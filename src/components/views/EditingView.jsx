@@ -10,6 +10,7 @@ import {
   moreVertical,
   plus,
   redo,
+  symbolFilled,
   tablet,
   undo,
 } from '@wordpress/icons';
@@ -116,6 +117,16 @@ function AddSectionInserterButton({ variant, onAdd }) {
   );
 }
 
+function TemplatePartSyncBadge({ label }) {
+  return (
+    <span className="tp-sync-badge" aria-label={`${label} is synced across the site`}>
+      <span className="tp-sync-badge-icon" aria-hidden>
+        {symbolFilled}
+      </span>
+    </span>
+  );
+}
+
 function EditableSectionGroup({
   section,
   index,
@@ -165,13 +176,11 @@ function EditingView() {
     hasUnsavedChanges,
     listViewOpen,
     openUnsavedChangesModal,
-    save,
     selectedDevice,
     settingsSidebarOpen,
     setListViewOpen,
     setSelectedDevice,
     setSettingsSidebarOpen,
-    showSnackbar,
     siteTitle,
     toggleListView,
     toggleSettingsSidebar,
@@ -272,21 +281,9 @@ function EditingView() {
     [selectedBlockId, beginGlobalTemplatePartIsolation],
   );
 
-  const handleGlobalPartToolbarCancel = useCallback(() => {
+  const handleGlobalPartToolbarExit = useCallback(() => {
     setConfirmedGlobalSpotlightBlockId(null);
   }, []);
-
-  const handleGlobalPartToolbarSave = useCallback(() => {
-    save();
-    setConfirmedGlobalSpotlightBlockId(null);
-    const partPhrase =
-      selectedBlockId === 'header'
-        ? `${HEADER_META.label} template part`
-        : selectedBlockId === 'footer'
-          ? `${FOOTER_META.label} template part`
-          : 'template part';
-    showSnackbar(`Saved ${partPhrase}`);
-  }, [save, showSnackbar, selectedBlockId]);
 
   const handleGlobalEditWarningContinue = useCallback(() => {
     const id = globalEditWarnForId;
@@ -689,16 +686,15 @@ function EditingView() {
                     confirmedGlobalSpotlightBlockId === 'header'
                   }
                   onGlobalPartEdit={() => beginGlobalTemplatePartIsolation('header')}
-                  onGlobalPartEditCancel={handleGlobalPartToolbarCancel}
-                  onGlobalPartEditSave={handleGlobalPartToolbarSave}
+                  onGlobalPartEditExit={handleGlobalPartToolbarExit}
                 />
               )}
+              <TemplatePartSyncBadge label={HEADER_META.label} />
               <PreviewSiteNavCluster
                 siteTitle={siteTitle}
                 navEntries={editNavEntries}
                 onNavClick={() => {}}
               />
-              <div className="g-badge">⟳ Global — Header</div>
             </div>
 
             {/* Dynamic sections based on current page */}
@@ -738,13 +734,12 @@ function EditingView() {
                     confirmedGlobalSpotlightBlockId === 'footer'
                   }
                   onGlobalPartEdit={() => beginGlobalTemplatePartIsolation('footer')}
-                  onGlobalPartEditCancel={handleGlobalPartToolbarCancel}
-                  onGlobalPartEditSave={handleGlobalPartToolbarSave}
+                  onGlobalPartEditExit={handleGlobalPartToolbarExit}
                 />
               )}
+              <TemplatePartSyncBadge label={FOOTER_META.label} />
               <span className="p-ft">© 2026 {siteTitle}</span>
               <span className="p-ft">Privacy Policy</span>
-              <div className="g-badge">⟳ Global — Footer</div>
             </div>
               </div>
             </div>
