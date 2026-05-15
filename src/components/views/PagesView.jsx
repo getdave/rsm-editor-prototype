@@ -15,14 +15,17 @@ import { createInterpolateElement } from "@wordpress/element";
 import {
   plus,
   copy,
+  external,
   home,
   page as pageIcon,
+  pencil,
   postList,
   archive,
   chevronDown,
   chevronUp,
   moreVertical,
   help,
+  seen,
   trash,
   navigation,
   closeSmall,
@@ -87,6 +90,8 @@ const STATUS_ELEMENTS = [
 
 const DATAVIEW_FIELDS_DEFAULT = ["status", "inMenu", "authorDisplay"];
 const DATAVIEW_FIELDS_LIST = ["status", "pageRole", "inMenu", "authorDisplay"];
+const COLLECTION_DATAVIEW_FIELDS_DEFAULT = ["status", "authorDisplay"];
+const COLLECTION_DATAVIEW_FIELDS_LIST = ["status", "pageRole", "authorDisplay"];
 
 const DEFAULT_VIEW = {
   type: "list",
@@ -135,7 +140,18 @@ const COLLECTION_GROUP_BY = {
 };
 
 function applyPageTypeToView(view, pageType) {
-  const viewWithoutGrouping = { ...view };
+  const allowedFields =
+    pageType === "collections"
+      ? view.type === "list"
+        ? COLLECTION_DATAVIEW_FIELDS_LIST
+        : COLLECTION_DATAVIEW_FIELDS_DEFAULT
+      : null;
+  const viewWithoutGrouping = {
+    ...view,
+    fields: allowedFields
+      ? (view.fields ?? []).filter((field) => allowedFields.includes(field))
+      : view.fields,
+  };
   if (pageType === "collections") {
     return viewWithoutGrouping;
   }
@@ -521,7 +537,75 @@ function ConfigureHomepageReadingModal({
   );
 }
 
+function InactiveCollectionTemplateModal({ item, onClose, onCreate }) {
+  const viewName = item?.name ?? "This view";
+  const createLabel = `Create ${viewName
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ")}`;
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="inactive-template-modal-title"
+      className="modal-box pp-inactive-template-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <Stack
+        direction="row"
+        align="center"
+        justify="space-between"
+        className="modal-hd"
+      >
+        <Text
+          id="inactive-template-modal-title"
+          variant="heading-md"
+          className="modal-title"
+        >
+          Create a custom {viewName} template?
+        </Text>
+        <button
+          type="button"
+          className="modal-close"
+          aria-label="Close dialog"
+          onClick={onClose}
+        >
+          ×
+        </button>
+      </Stack>
+      <div className="modal-body pp-inactive-template-body">
+        <Text variant="body-md" className="pp-inactive-template-copy">
+          <em>{viewName}</em> is using a default layout. To customize how this
+          page looks you can create its own template.
+        </Text>
+        <Text variant="body-md" className="pp-inactive-template-copy">
+          You&apos;ll be able to edit it here just like the other collection
+          pages.
+        </Text>
+      </div>
+      <Stack
+        direction="row"
+        align="center"
+        justify="flex-end"
+        gap="sm"
+        className="modal-footer pp-inactive-template-footer"
+      >
+        <Button variant="tertiary" onClick={onClose}>
+          Keep existing
+        </Button>
+        <Button variant="primary" onClick={() => onCreate(item)}>
+          {createLabel}
+        </Button>
+      </Stack>
+    </div>
+  );
+}
+
 function renderAuthorCell(item) {
+  if (item.collectionState === "inactive") {
+    return <span className="pp-author-empty">—</span>;
+  }
   const text = item.authorDisplay ?? "";
   if (!text) {
     return <span className="pp-author-empty">—</span>;
@@ -553,6 +637,7 @@ function PagesView() {
     setPostsPageId,
     setPageStatus,
     syncReadingPageMarkers,
+    activateCollectionTemplate,
     showSnackbar,
     addPageToMainMenu,
     removePageFromMainMenu,
@@ -567,6 +652,8 @@ function PagesView() {
   const [viewOptionsOpen, setViewOptionsOpen] = useState(false);
   const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
   const [publishConfirmPage, setPublishConfirmPage] = useState(null);
+  const [inactiveTemplateNoticePage, setInactiveTemplateNoticePage] =
+    useState(null);
   const activePageType = location.pathname.startsWith("/pages/collections")
     ? "collections"
     : "pages";
@@ -640,6 +727,19 @@ function PagesView() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [deleteConfirm]);
 
+  useEffect(() => {
+    if (!inactiveTemplateNoticePage) {
+      return;
+    }
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setInactiveTemplateNoticePage(null);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [inactiveTemplateNoticePage]);
+
   const fields = useMemo(
     () => [
       {
@@ -687,8 +787,13 @@ function PagesView() {
         enableGlobalSearch: true,
         render: ({ item }) => {
           const docIcon = getPageIcon(item);
+          const isInactive = item.collectionState === "inactive";
           const isLive = item.status !== "draft";
-          const statusLabel = isLive ? "Page is live" : "Page is a draft";
+          const statusLabel = isInactive
+            ? "Template is inactive"
+            : isLive
+              ? "Page is live"
+              : "Page is a draft";
           const title = (
             <span className="pp-title-cell-inner">
               <span
@@ -714,7 +819,7 @@ function PagesView() {
                 ) : null}
               </Text>
               <span
-                className={`url-dot${isLive ? "" : " url-draft-dot"}`}
+                className={`url-dot${isLive && !isInactive ? "" : " url-draft-dot"}`}
                 role="status"
                 aria-label={statusLabel}
               />
@@ -857,6 +962,33 @@ function PagesView() {
   const actions = useMemo(
     () => [
       {
+        id: "preview",
+        label: "Preview",
+        isPrimary: true,
+        icon: seen,
+        callback: (items) => setPreviewPage(items[0]),
+      },
+      {
+        id: "edit",
+        label: "Edit",
+        icon: pencil,
+        callback: (items) => {
+          const item = items[0];
+          if (item.collectionState === "inactive") {
+            setInactiveTemplateNoticePage(item);
+            return;
+          }
+          selectPage(item);
+          navigate(`/pages/${item.id}/edit?inserter=patterns`);
+        },
+      },
+      {
+        id: "view-live",
+        label: "View live",
+        icon: external,
+        callback: (items) => console.log("View live:", items[0].slug),
+      },
+      {
         id: "duplicate",
         label: "Duplicate",
         icon: copy,
@@ -993,6 +1125,9 @@ function PagesView() {
     [
       setPreviewPage,
       showSnackbar,
+      selectPage,
+      navigate,
+      setInactiveTemplateNoticePage,
       frontPageId,
       postsPageId,
       setHomepageDisplayMode,
@@ -1177,6 +1312,21 @@ function PagesView() {
     setConfigureHomepageOpen(false);
   };
 
+  const handleCreateInactiveTemplate = (item) => {
+    if (!item) {
+      return;
+    }
+    const activatedPage =
+      activateCollectionTemplate(item.id) ?? {
+        ...item,
+        collectionState: undefined,
+      };
+    selectPage(activatedPage);
+    setInactiveTemplateNoticePage(null);
+    showSnackbar(`Created “${item.name}” template.`);
+    navigate(`/pages/${item.id}/edit?inserter=patterns`);
+  };
+
   const { data: processedData, paginationInfo } = useMemo(
     () => filterSortAndPaginate(categoryPages, activeView, fields),
     [categoryPages, activeView, fields],
@@ -1197,10 +1347,17 @@ function PagesView() {
     }
     let fields = newView.fields;
     if (layoutChanged) {
-      fields =
-        newView.type === "list"
-          ? [...DATAVIEW_FIELDS_LIST]
-          : [...DATAVIEW_FIELDS_DEFAULT];
+      if (activePageType === "collections") {
+        fields =
+          newView.type === "list"
+            ? [...COLLECTION_DATAVIEW_FIELDS_LIST]
+            : [...COLLECTION_DATAVIEW_FIELDS_DEFAULT];
+      } else {
+        fields =
+          newView.type === "list"
+            ? [...DATAVIEW_FIELDS_LIST]
+            : [...DATAVIEW_FIELDS_DEFAULT];
+      }
     }
     setView(
       applyPageTypeToView({ ...newView, showMedia, fields }, activePageType),
@@ -1245,6 +1402,10 @@ function PagesView() {
       }}
       isItemClickable={() => true}
       onClickItem={(item) => {
+        if (item.collectionState === "inactive") {
+          setInactiveTemplateNoticePage(item);
+          return;
+        }
         if (!hasPreviewPanel) {
           selectPage(item);
           navigate(`/pages/${item.id}/edit?inserter=patterns`);
@@ -1369,6 +1530,10 @@ function PagesView() {
         if (!displayedPreviewPage) {
           return;
         }
+        if (displayedPreviewPage.collectionState === "inactive") {
+          setInactiveTemplateNoticePage(displayedPreviewPage);
+          return;
+        }
         selectPage(displayedPreviewPage);
         navigate(`/pages/${displayedPreviewPage.id}/edit?inserter=patterns`);
       }}
@@ -1470,6 +1635,19 @@ function PagesView() {
             initialFrontPageId={frontPageId}
             initialPostsPageId={postsPageId}
             readingSelectPages={readingSelectPages}
+          />
+        </div>
+      )}
+      {inactiveTemplateNoticePage && (
+        <div
+          className="modal-overlay"
+          role="presentation"
+          onClick={() => setInactiveTemplateNoticePage(null)}
+        >
+          <InactiveCollectionTemplateModal
+            item={inactiveTemplateNoticePage}
+            onClose={() => setInactiveTemplateNoticePage(null)}
+            onCreate={handleCreateInactiveTemplate}
           />
         </div>
       )}

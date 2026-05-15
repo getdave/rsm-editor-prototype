@@ -60,8 +60,8 @@ export const getPageContent = (page) => {
     // Single Templates (Template Hierarchy)
     'product-single': getProductSingleContent(),
     'blog-single': getBlogSingleContent(),
-    'event-list': getEventListContent(),
-    'event-single': getEventSingleContent(),
+    'event-list': getEventListContent(page),
+    'event-single': getEventSingleContent(page),
     'search-results': getSearchResultsContent(),
   };
 
@@ -493,7 +493,7 @@ function getSearchResultsContent() {
   };
 }
 
-function getEventListContent() {
+function getEventListContent(page = null) {
   return {
     layout: 'archive',
     title: 'Events',
@@ -501,7 +501,9 @@ function getEventListContent() {
     wordpressContext: {
       type: 'template',
       templateFile: 'archive-event.html',
-      isInactiveCollection: true
+      ...(page?.collectionState === 'inactive'
+        ? { isInactiveCollection: true }
+        : {})
     },
     sections: [
       {
@@ -533,7 +535,7 @@ function getEventListContent() {
   };
 }
 
-function getEventSingleContent() {
+function getEventSingleContent(page = null) {
   return {
     layout: 'single',
     title: 'Portrait Lighting Workshop',
@@ -541,7 +543,9 @@ function getEventSingleContent() {
     wordpressContext: {
       type: 'template',
       templateFile: 'single-event.html',
-      isInactiveCollection: true
+      ...(page?.collectionState === 'inactive'
+        ? { isInactiveCollection: true }
+        : {})
     },
     sections: [
       {
