@@ -12,9 +12,6 @@ import { Stack, Text, VisuallyHidden } from "@wordpress/ui";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
 import { createInterpolateElement } from "@wordpress/element";
 import {
-  pencil,
-  external,
-  seen,
   plus,
   copy,
   home,
@@ -680,28 +677,6 @@ function PagesView() {
   const actions = useMemo(
     () => [
       {
-        id: "preview",
-        label: "Preview",
-        isPrimary: true,
-        icon: seen,
-        callback: (items) => setPreviewPage(items[0]),
-      },
-      {
-        id: "edit",
-        label: "Edit",
-        icon: pencil,
-        callback: (items) => {
-          selectPage(items[0]);
-          navigate(`/pages/${items[0].id}/edit?inserter=patterns`);
-        },
-      },
-      {
-        id: "view-live",
-        label: "View live",
-        icon: external,
-        callback: (items) => console.log("View live:", items[0].slug),
-      },
-      {
         id: "duplicate",
         label: "Duplicate",
         icon: copy,
@@ -835,10 +810,7 @@ function PagesView() {
       },
     ],
     [
-      navigate,
-      selectPage,
       setPreviewPage,
-      setPageStatus,
       showSnackbar,
       frontPageId,
       postsPageId,
