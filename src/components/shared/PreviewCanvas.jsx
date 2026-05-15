@@ -9,6 +9,7 @@ import {
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { getPageContent } from '../../services/pageContentService';
+import { PreviewTemplateFrame } from './PreviewSiteChrome';
 
 function docTypeIcon(p) {
   if (p?.isFrontPage) return home;
@@ -22,17 +23,17 @@ function docTypeIcon(p) {
 
 /**
  * Reusable Preview Canvas Component
- * 
+ *
  * Displays a site preview with device switcher and edit button.
  * Dynamically renders content based on WordPress content model (pages, templates, template hierarchy).
- * 
+ *
  * WordPress Template Mapping:
  * - Content Pages → page.html template
  * - System Pages → 404.html, page.html templates
  * - WooCommerce → cart.php, checkout.php templates
  * - Archive Templates → archive.html, home.html templates
  * - Single Templates → single.html, single-product.html templates
- * 
+ *
  * @param {object} page - The page/item to preview
  * @param {function} onEdit - Callback when Edit button is clicked
  * @param {function} onPageChange - Callback when a nav link is clicked; parent decides what switching page means
@@ -78,87 +79,60 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
           label: p.name,
           page: p,
         }));
-  
+
   const handleNavClick = (clickedPage) => {
     onPageChange(clickedPage);
   };
 
   // Render functions for different WordPress template types
-  
-  // Content Pages (page.html) - Regular pages with standard layout
-  const renderPageLayout = (content) => (
-    <>
-      <div className="p-header">
-        <span className="p-sitename">{siteTitle}</span>
-        <div className="p-nav">
-          {navEntries.map((entry) => (
-            <a
-              key={entry.key}
-              href="#"
-              title={entry.kind === 'url' ? entry.href : undefined}
-              onClick={(e) => {
-                e.preventDefault();
-                if (entry.kind === 'page') {
-                  handleNavClick(entry.page);
-                }
-              }}
-            >
-              {entry.label}
-            </a>
-          ))}
-        </div>
-      </div>
-      {content.sections.map((section, index) => {
-        if (section.type === 'hero') {
-          return (
-            <div key={index} className="p-hero">
-              <div>
-                <h1>{section.content.title}</h1>
-                {section.content.subtitle && <p>{section.content.subtitle}</p>}
+
+  // Content Pages (page.html) — main column only; header/footer via PreviewTemplateFrame
+  const renderPageLayout = (content) =>
+    content.sections.map((section, index) => {
+      if (section.type === 'hero') {
+        return (
+          <div key={index} className="p-hero">
+            <div>
+              <h1>{section.content.title}</h1>
+              {section.content.subtitle && <p>{section.content.subtitle}</p>}
+            </div>
+          </div>
+        );
+      }
+      if (section.type === 'text') {
+        return (
+          <div key={index} className="p-section">
+            {section.title && <div className="p-st">{section.title}</div>}
+            <div className="p-body">{section.content}</div>
+          </div>
+        );
+      }
+      if (section.type === 'gallery') {
+        return (
+          <div key={index} className="p-section">
+            {section.title && <div className="p-st">{section.title}</div>}
+            <div className="p-grid">
+              {Array.from({ length: section.items || 3 }).map((_, i) => (
+                <div key={i} className="p-img"></div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+      if (section.type === 'form') {
+        return (
+          <div key={index} className="p-section">
+            {section.title && <div className="p-st">{section.title}</div>}
+            <div className="p-body">
+              <div style={{ padding: '20px', background: '#f5f5f5', borderRadius: '4px', textAlign: 'center' }}>
+                Contact Form
               </div>
             </div>
-          );
-        }
-        if (section.type === 'text') {
-          return (
-            <div key={index} className="p-section">
-              {section.title && <div className="p-st">{section.title}</div>}
-              <div className="p-body">{section.content}</div>
-            </div>
-          );
-        }
-        if (section.type === 'gallery') {
-          return (
-            <div key={index} className="p-section">
-              {section.title && <div className="p-st">{section.title}</div>}
-              <div className="p-grid">
-                {Array.from({ length: section.items || 3 }).map((_, i) => (
-                  <div key={i} className="p-img"></div>
-                ))}
-              </div>
-            </div>
-          );
-        }
-        if (section.type === 'form') {
-          return (
-            <div key={index} className="p-section">
-              {section.title && <div className="p-st">{section.title}</div>}
-              <div className="p-body">
-                <div style={{ padding: '20px', background: '#f5f5f5', borderRadius: '4px', textAlign: 'center' }}>
-                  Contact Form
-                </div>
-              </div>
-            </div>
-          );
-        }
-        return null;
-      })}
-      <div className="p-footer">
-        <span className="p-ft">© 2026 {siteTitle}</span>
-        <span className="p-ft">Privacy Policy</span>
-      </div>
-    </>
-  );
+          </div>
+        );
+      }
+      return null;
+    });
 
   // 404 Error Page (404.html)
   const renderErrorLayout = (content) => (
@@ -298,8 +272,7 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
     );
   };
 
-  // Choose layout based on content type
-  const renderContent = () => {
+  const renderMain = () => {
     switch (content.layout) {
       case 'error':
         return renderErrorLayout(content);
@@ -314,6 +287,12 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
         return renderPageLayout(content);
     }
   };
+
+  const renderContent = () => (
+    <PreviewTemplateFrame siteTitle={siteTitle} navEntries={navEntries} onNavClick={handleNavClick}>
+      {renderMain()}
+    </PreviewTemplateFrame>
+  );
 
   return (
     <div className="canvas" style={{ flexDirection: 'column', padding: 0, width: '100%' }}>

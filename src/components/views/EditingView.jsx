@@ -1,20 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { Button } from '@wordpress/components';
-import { Text } from '@wordpress/ui';
 import {
-  chevronDown,
-  chevronUp,
   desktop,
-  dragHandle,
   drawerRight,
   listView,
   mobile,
   moreVertical,
   plus,
   redo,
-  styles,
   tablet,
   undo,
 } from '@wordpress/icons';
@@ -22,6 +17,7 @@ import ExitSplitButton from '../shared/ExitSplitButton';
 import DocumentActions from '../shared/DocumentActions';
 import EditorLeftPanel from './EditorLeftPanel';
 import SettingsSidebar from './SettingsSidebar';
+import BlockToolbar from './BlockToolbar';
 import { getEditModeContent } from '../../services/pageContentService';
 import {
   FOOTER_META,
@@ -29,6 +25,8 @@ import {
   HEADER_META,
   TEMPLATE_ROOT_META,
 } from '../../utils/editCanvasBlockMeta';
+import { PreviewSiteNavCluster } from '../shared/PreviewSiteChrome';
+import { pages } from '../../data/mockData';
 
 /** Below this block height (px), both inserters show on hover — avoids flicker on short sections. */
 const INSERTER_SPLIT_MIN_HEIGHT_PX = 88;
@@ -99,7 +97,7 @@ function EditableSectionGroup({
   selectedBlockId,
   setSelectedBlockId,
   openInserter,
-  renderBlockToolbar,
+  blockToolbarBindings,
   renderSectionContent,
 }) {
   const blockId = `section-${index}`;
@@ -122,7 +120,9 @@ function EditableSectionGroup({
         className={`e-sec ${selected ? 'sel' : ''}`}
         onClick={() => setSelectedBlockId(blockId)}
       >
-        {selected && renderBlockToolbar(meta)}
+        {selected && (
+          <BlockToolbar toolbarKey={blockId} meta={meta} {...blockToolbarBindings} />
+        )}
         {renderSectionContent(section)}
       </div>
       <AddSectionInserterButton variant="bottom" onAdd={openInserter} />
@@ -157,6 +157,11 @@ function EditingView() {
   // Get page-specific content for editing
   const content = getEditModeContent(currentPage);
 
+  const editNavEntries = useMemo(
+    () => pages.filter((p) => p.inMenu).map((p) => ({ key: p.id, label: p.name, page: p })),
+    [],
+  );
+
   useEffect(() => {
     setSelectedBlockId(content.isTemplate ? 'template' : 'section-0');
   }, [currentPage?.id, content.isTemplate]);
@@ -187,62 +192,12 @@ function EditingView() {
     toggleListView();
   };
 
-  const renderBlockToolbar = (meta) => {
-    const Icon = meta.icon;
-    const isPatternSection = Boolean(meta.isPatternSection);
-    return (
-      <div
-        className={`sec-bar block-toolbar${isPatternSection ? ' block-toolbar--pattern-section' : ''}`}
-        role="toolbar"
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        <div className="bt-pill">
-          <Button
-            className="bt-pill-icon"
-            label={`${meta.label} — toggle document overview`}
-            icon={Icon}
-            iconSize={24}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleListView();
-            }}
-          />
-          <Text variant="body-sm" className="bt-pill-label">{meta.label}</Text>
-        </div>
-        <span className="bt-sep" aria-hidden />
-        <Button className="bt-tb-btn" label="Drag" icon={dragHandle} iconSize={24} />
-        <div className="bt-move-stack" role="group" aria-label="Reorder">
-          <button type="button" className="bt-move-btn" aria-label="Move up">
-            <span className="bt-move-icon" aria-hidden>{chevronUp}</span>
-          </button>
-          <button type="button" className="bt-move-btn" aria-label="Move down">
-            <span className="bt-move-icon" aria-hidden>{chevronDown}</span>
-          </button>
-        </div>
-        <span className="bt-sep" aria-hidden />
-        {isPatternSection ? (
-          <>
-            <Button
-              className="bt-tb-edit"
-              variant="tertiary"
-              icon={styles}
-              label="Change Design"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (settingsSidebarOpen) {
-                  setInspectorFlashSignal((n) => n + 1);
-                }
-                setInspectorBlockTabSignal((n) => n + 1);
-                setSettingsSidebarOpen(true);
-              }}
-            />
-            <span className="bt-sep" aria-hidden />
-          </>
-        ) : null}
-        <Button className="bt-tb-btn" label="Options" icon={moreVertical} iconSize={24} />
-      </div>
-    );
+  const blockToolbarBindings = {
+    onToggleListView: handleToggleListView,
+    settingsSidebarOpen,
+    setInspectorFlashSignal,
+    setInspectorBlockTabSignal,
+    setSettingsSidebarOpen,
   };
 
   // Render section content based on type
@@ -304,7 +259,7 @@ function EditingView() {
       selectedBlockId={selectedBlockId}
       setSelectedBlockId={setSelectedBlockId}
       openInserter={openInserter}
-      renderBlockToolbar={renderBlockToolbar}
+      blockToolbarBindings={blockToolbarBindings}
       renderSectionContent={renderSectionContent}
     />
   );
@@ -585,37 +540,21 @@ function EditingView() {
 
           {/* Edit scroll area */}
           <div className="edit-scroll">
-            <div className={`edit-card preview-device-${selectedDevice}`}>
+            <div className="edit-canvas-area">
+              <div className={`edit-card preview-device-${selectedDevice}`}>
             {/* Header (template part — no section inserters) */}
             <div
               className={`g-el p-header e-block ${selectedBlockId === 'header' ? 'sel' : ''}`}
               onClick={() => setSelectedBlockId('header')}
             >
-              {selectedBlockId === 'header' && renderBlockToolbar(HEADER_META)}
-              <span className="p-sitename">{siteTitle}</span>
-              <div className="p-nav">
-                <a
-                  href="#"
-                  style={{
-                    color: 'rgba(255,255,255,.6)',
-                    fontSize: '11px',
-                    textDecoration: 'none',
-                  }}
-                >
-                  Home
-                </a>
-                <a
-                  href="#"
-                  style={{
-                    color: 'rgba(255,255,255,.6)',
-                    fontSize: '11px',
-                    textDecoration: 'none',
-                    marginLeft: '14px',
-                  }}
-                >
-                  About
-                </a>
-              </div>
+              {selectedBlockId === 'header' && (
+                <BlockToolbar toolbarKey="header" meta={HEADER_META} {...blockToolbarBindings} />
+              )}
+              <PreviewSiteNavCluster
+                siteTitle={siteTitle}
+                navEntries={editNavEntries}
+                onNavClick={() => {}}
+              />
               <div className="g-badge">⟳ Global — Header</div>
             </div>
 
@@ -625,7 +564,9 @@ function EditingView() {
                 className={`template-edit-root e-block ${selectedBlockId === 'template' ? 'sel' : ''}`}
                 onClick={() => setSelectedBlockId('template')}
               >
-                {selectedBlockId === 'template' && renderBlockToolbar(TEMPLATE_ROOT_META)}
+                {selectedBlockId === 'template' && (
+                  <BlockToolbar toolbarKey="template" meta={TEMPLATE_ROOT_META} {...blockToolbarBindings} />
+                )}
                 {renderTemplateLayout(content)}
               </div>
             ) : (
@@ -638,11 +579,14 @@ function EditingView() {
               style={{ position: 'relative' }}
               onClick={() => setSelectedBlockId('footer')}
             >
-              {selectedBlockId === 'footer' && renderBlockToolbar(FOOTER_META)}
+              {selectedBlockId === 'footer' && (
+                <BlockToolbar toolbarKey="footer" meta={FOOTER_META} {...blockToolbarBindings} />
+              )}
               <span className="p-ft">© 2026 {siteTitle}</span>
               <span className="p-ft">Privacy Policy</span>
               <div className="g-badge">⟳ Global — Footer</div>
             </div>
+              </div>
             </div>
           </div>
 
