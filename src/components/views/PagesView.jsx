@@ -20,12 +20,12 @@ import {
   page as pageIcon,
   pencil,
   postList,
-  archive,
+  loop,
+  seen,
   chevronDown,
   chevronUp,
   moreVertical,
   help,
-  seen,
   trash,
   navigation,
   closeSmall,
@@ -67,9 +67,9 @@ const PAGE_TYPE_TABS = [
       "Pages you create and edit directly, plus page-like system destinations.",
   },
   {
-    value: "collections",
-    label: "Collections",
-    icon: archive,
+    value: "dynamic",
+    label: "Dynamic",
+    icon: loop,
     description: (
       <>
         Generated pages for groups of content and special site views. Their
@@ -141,7 +141,7 @@ const COLLECTION_GROUP_BY = {
 
 function applyPageTypeToView(view, pageType) {
   const allowedFields =
-    pageType === "collections"
+    pageType === "dynamic"
       ? view.type === "list"
         ? COLLECTION_DATAVIEW_FIELDS_LIST
         : COLLECTION_DATAVIEW_FIELDS_DEFAULT
@@ -152,7 +152,7 @@ function applyPageTypeToView(view, pageType) {
       ? (view.fields ?? []).filter((field) => allowedFields.includes(field))
       : view.fields,
   };
-  if (pageType === "collections") {
+  if (pageType === "dynamic") {
     return viewWithoutGrouping;
   }
   delete viewWithoutGrouping.groupBy;
@@ -580,8 +580,7 @@ function InactiveCollectionTemplateModal({ item, onClose, onCreate }) {
           page looks you can create its own template.
         </Text>
         <Text variant="body-md" className="pp-inactive-template-copy">
-          You&apos;ll be able to edit it here just like the other collection
-          pages.
+          You&apos;ll be able to edit it here just like the other dynamic pages.
         </Text>
       </div>
       <Stack
@@ -654,9 +653,11 @@ function PagesView() {
   const [publishConfirmPage, setPublishConfirmPage] = useState(null);
   const [inactiveTemplateNoticePage, setInactiveTemplateNoticePage] =
     useState(null);
-  const activePageType = location.pathname.startsWith("/pages/collections")
-    ? "collections"
-    : "pages";
+  const activePageType =
+    location.pathname.startsWith("/pages/dynamic") ||
+    location.pathname.startsWith("/pages/collections")
+      ? "dynamic"
+      : "pages";
   const activeView = useMemo(
     () => applyPageTypeToView(view, activePageType),
     [activePageType, view],
@@ -838,7 +839,7 @@ function PagesView() {
       {
         id: "collectionGroup",
         type: "text",
-        label: "Collection",
+        label: "Content type",
         enableSorting: true,
         enableHiding: false,
         enableGlobalSearch: false,
@@ -1347,7 +1348,7 @@ function PagesView() {
     }
     let fields = newView.fields;
     if (layoutChanged) {
-      if (activePageType === "collections") {
+      if (activePageType === "dynamic") {
         fields =
           newView.type === "list"
             ? [...COLLECTION_DATAVIEW_FIELDS_LIST]
@@ -1366,7 +1367,7 @@ function PagesView() {
 
   const hasPreviewPanel = activeView.type === "list";
   const isCollectionGroupingEnabled =
-    activePageType === "collections" &&
+    activePageType === "dynamic" &&
     activeView.groupBy?.field === COLLECTION_GROUP_BY.field;
 
   const handleCollectionGroupingChange = (enabled) => {
@@ -1380,7 +1381,7 @@ function PagesView() {
       search: "",
       filters: [],
     }));
-    navigate(value === "collections" ? "/pages/collections" : "/pages/static");
+    navigate(value === "dynamic" ? "/pages/dynamic" : "/pages/static");
   };
 
   const activeTab = PAGE_TYPE_TABS.find((t) => t.value === activePageType);
@@ -1423,7 +1424,7 @@ function PagesView() {
           <div className="pp-toolbar-row-options">
             <DataViews.Search />
             <DataViews.LayoutSwitcher />
-            {activePageType === "collections" ? (
+            {activePageType === "dynamic" ? (
               <ToggleControl
                 __nextHasNoMarginBottom
                 className="pp-group-collections-toggle"
@@ -1472,9 +1473,9 @@ function PagesView() {
             <button
               type="button"
               className="pp-desc-link"
-              onClick={() => handleTabClick("collections")}
+              onClick={() => handleTabClick("dynamic")}
             >
-              Collections
+              Dynamic
             </button>
             .
           </div>
@@ -1497,7 +1498,7 @@ function PagesView() {
               onChange={setShowDrafts}
             />
           ) : null}
-          {activePageType === "collections" ? (
+          {activePageType === "dynamic" ? (
             <ToggleControl
               __nextHasNoMarginBottom
               className="pp-system-toggle"
@@ -1554,7 +1555,7 @@ function PagesView() {
           Add page
         </Button>
       )}
-      {activePageType === "collections" && (
+      {activePageType === "dynamic" && (
         <Button variant="secondary" onClick={() => navigate("/templates")}>
           All Templates
         </Button>
