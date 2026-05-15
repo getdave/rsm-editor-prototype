@@ -201,6 +201,9 @@ const postsIndexTemplateRow = Object.freeze({
   titleTooltip: "Uses home.html for the posts index.",
 });
 
+/** Synthetic posts index row ID — excludes template-backed rows from content-only row actions. */
+const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = postsIndexTemplateRow.id;
+
 const productCatalogTemplateRow = Object.freeze({
   id: "product-catalog-template",
   slug: "product-catalog",
