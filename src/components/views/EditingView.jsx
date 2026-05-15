@@ -162,8 +162,10 @@ function EditingView() {
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     currentPage,
+    hasUnsavedChanges,
     listViewOpen,
     openUnsavedChangesModal,
+    save,
     selectedDevice,
     settingsSidebarOpen,
     setListViewOpen,
