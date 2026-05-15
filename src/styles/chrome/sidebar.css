@@ -24,6 +24,8 @@
    transition on .sidebar above animates the change. */
 
 .sidebar.collapsed {
+  /* Active tab ::after extension uses this; disable in narrow rail. */
+  --sidebar-active-bleed: 0;
   width: 48px;
   min-width: 48px;
 }
@@ -95,6 +97,12 @@
   width: var(--sidebar-active-bleed, 24px);
   background: var(--wp-page-area-surface, #fff);
   pointer-events: none;
+}
+
+.sidebar.collapsed .sidebar-nav-pane-admin > .ni.on,
+.sidebar.collapsed .editor-sidebar-root-nav > .ni.on {
+  /* Narrow rail: any radius shows dark chrome wedges — keep the chip square. */
+  border-radius: 0;
 }
 
 .admin-root-nav .ni-ico {
