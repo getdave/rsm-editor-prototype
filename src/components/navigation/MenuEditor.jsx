@@ -41,6 +41,180 @@ function uniquePageId(name, pagesList) {
   return id;
 }
 
+const MAX_MENU_LEVEL = 1;
+
+function getSubtreeDepth(item) {
+  if (!item.children?.length) {
+    return 0;
+  }
+
+  return 1 + Math.max(...item.children.map(getSubtreeDepth));
+}
+
+function getMenuItemMeta(items, itemId, level = 0, ancestors = []) {
+  for (const item of items) {
+    if (item.id === itemId) {
+      return { item, level, ancestors };
+    }
+
+    if (item.children?.length) {
+      const match = getMenuItemMeta(item.children, itemId, level + 1, [
+        ...ancestors,
+        item.id,
+      ]);
+      if (match) {
+        return match;
+      }
+    }
+  }
+
+  return null;
+}
+
+function removeMenuItem(items, itemId) {
+  let removedItem = null;
+  let changed = false;
+  const nextItems = [];
+
+  for (const item of items) {
+    if (item.id === itemId) {
+      removedItem = item;
+      changed = true;
+      continue;
+    }
+
+    if (item.children?.length) {
+      const result = removeMenuItem(item.children, itemId);
+      if (result.removedItem) {
+        removedItem = result.removedItem;
+        changed = true;
+        nextItems.push({ ...item, children: result.items });
+        continue;
+      }
+    }
+
+    nextItems.push(item);
+  }
+
+  return {
+    items: changed ? nextItems : items,
+    removedItem,
+  };
+}
+
+function insertMenuItemRelative(items, targetId, itemToInsert, position) {
+  let inserted = false;
+
+  const nextItems = items.flatMap((item) => {
+    if (item.id === targetId) {
+      inserted = true;
+      return position === 'above'
+        ? [itemToInsert, item]
+        : [item, itemToInsert];
+    }
+
+    if (item.children?.length) {
+      const result = insertMenuItemRelative(
+        item.children,
+        targetId,
+        itemToInsert,
+        position,
+      );
+      if (result.inserted) {
+        inserted = true;
+        return [{ ...item, children: result.items }];
+      }
+    }
+
+    return [item];
+  });
+
+  return { items: inserted ? nextItems : items, inserted };
+}
+
+function insertMenuItemInside(items, targetId, itemToInsert) {
+  let inserted = false;
+
+  const nextItems = items.map((item) => {
+    if (item.id === targetId) {
+      inserted = true;
+      return {
+        ...item,
+        children: [...(item.children || []), itemToInsert],
+      };
+    }
+
+    if (item.children?.length) {
+      const result = insertMenuItemInside(item.children, targetId, itemToInsert);
+      if (result.inserted) {
+        inserted = true;
+        return { ...item, children: result.items };
+      }
+    }
+
+    return item;
+  });
+
+  return { items: inserted ? nextItems : items, inserted };
+}
+
+function isValidDropTarget(items, draggedId, targetId, position) {
+  if (!draggedId || !targetId || draggedId === targetId) {
+    return false;
+  }
+
+  const draggedMeta = getMenuItemMeta(items, draggedId);
+  const targetMeta = getMenuItemMeta(items, targetId);
+  if (!draggedMeta || !targetMeta) {
+    return false;
+  }
+
+  if (targetMeta.ancestors.includes(draggedId)) {
+    return false;
+  }
+
+  const draggedDepth = getSubtreeDepth(draggedMeta.item);
+
+  if (position === 'inside') {
+    return targetMeta.level === 0 && draggedDepth === 0;
+  }
+
+  return targetMeta.level + draggedDepth <= MAX_MENU_LEVEL;
+}
+
+function moveMenuItem(items, draggedId, targetId, position) {
+  if (!isValidDropTarget(items, draggedId, targetId, position)) {
+    return items;
+  }
+
+  const removal = removeMenuItem(items, draggedId);
+  if (!removal.removedItem) {
+    return items;
+  }
+
+  const itemToInsert = {
+    ...removal.removedItem,
+    children: removal.removedItem.children || [],
+  };
+
+  if (position === 'inside') {
+    const result = insertMenuItemInside(
+      removal.items,
+      targetId,
+      itemToInsert,
+    );
+    return result.inserted ? result.items : items;
+  }
+
+  const result = insertMenuItemRelative(
+    removal.items,
+    targetId,
+    itemToInsert,
+    position,
+  );
+  return result.inserted ? result.items : items;
+}
+
 function MenuEditor({ menu, onUpdateMenu, onBack }) {
   const { pages: allPages, addPage, showSnackbar } = useAppState();
   const [expandedItems, setExpandedItems] = useState(new Set());
@@ -56,8 +230,24 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
   const [addPagesModalKey, setAddPagesModalKey] = useState(0);
   /** Nav item row ids that should play the attention flash (newly added links). */
   const [flashNavItemIds, setFlashNavItemIds] = useState([]);
+  const [draggingItemId, setDraggingItemId] = useState(null);
+  const [dropTarget, setDropTargetState] = useState(null);
+  const [dragGhostPosition, setDragGhostPosition] = useState(null);
+  const dragStateRef = useRef({ itemId: null });
 
   const closeInserter = () => setInserterView(null);
+
+  const setDropTarget = useCallback((nextTarget) => {
+    setDropTargetState((prevTarget) => {
+      if (
+        prevTarget?.itemId === nextTarget?.itemId &&
+        prevTarget?.position === nextTarget?.position
+      ) {
+        return prevTarget;
+      }
+      return nextTarget;
+    });
+  }, []);
 
   const openAddPagesModal = useCallback(() => {
     setAddPagesModalKey((k) => k + 1);
@@ -116,6 +306,13 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     () => new Set(flashNavItemIds),
     [flashNavItemIds],
   );
+  const draggedItem = useMemo(
+    () =>
+      draggingItemId
+        ? getMenuItemMeta(menu.items, draggingItemId)?.item ?? null
+        : null,
+    [draggingItemId, menu.items],
+  );
 
   const toggleExpanded = (itemId) => {
     setExpandedItems((prev) => {
@@ -130,17 +327,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
   };
 
   const removeItem = (itemId) => {
-    const removeFromItems = (items) => {
-      return items.filter((item) => {
-        if (item.id === itemId) return false;
-        if (item.children && item.children.length > 0) {
-          item.children = removeFromItems(item.children);
-        }
-        return true;
-      });
-    };
-
-    onUpdateMenu({ items: removeFromItems([...menu.items]) });
+    onUpdateMenu({ items: removeMenuItem(menu.items, itemId).items });
   };
 
   const moveItem = (itemId, direction) => {
@@ -164,6 +351,117 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     };
 
     onUpdateMenu({ items: findAndMove([...menu.items]) });
+  };
+
+  const resolveDropTarget = useCallback(
+    (clientX, clientY) => {
+      const draggedId = dragStateRef.current.itemId;
+      if (!draggedId) {
+        return null;
+      }
+
+      const element = document.elementFromPoint(clientX, clientY);
+      const row = element?.closest?.('[data-nav-menu-item-id]');
+      if (!row) {
+        return null;
+      }
+
+      const targetId = row.dataset.navMenuItemId;
+      const rect = row.getBoundingClientRect();
+      const y = clientY - rect.top;
+      let position = 'inside';
+
+      if (y < rect.height * 0.3) {
+        position = 'above';
+      } else if (y > rect.height * 0.7) {
+        position = 'below';
+      }
+
+      if (!isValidDropTarget(menu.items, draggedId, targetId, position)) {
+        return null;
+      }
+
+      return { itemId: targetId, position };
+    },
+    [menu.items],
+  );
+
+  useEffect(() => {
+    if (!draggingItemId) {
+      return undefined;
+    }
+
+    const handlePointerMove = (event) => {
+      event.preventDefault();
+      setDragGhostPosition({ x: event.clientX, y: event.clientY });
+      setDropTarget(resolveDropTarget(event.clientX, event.clientY));
+    };
+
+    const finishDrag = (event) => {
+      event.preventDefault();
+      const target = resolveDropTarget(event.clientX, event.clientY);
+      const draggedId = dragStateRef.current.itemId;
+
+      if (draggedId && target) {
+        const nextItems = moveMenuItem(
+          menu.items,
+          draggedId,
+          target.itemId,
+          target.position,
+        );
+
+        if (nextItems !== menu.items) {
+          onUpdateMenu({ items: nextItems });
+          if (target.position === 'inside') {
+            setExpandedItems((prev) => new Set(prev).add(target.itemId));
+          }
+        }
+      }
+
+      dragStateRef.current.itemId = null;
+      setDraggingItemId(null);
+      setDragGhostPosition(null);
+      setDropTarget(null);
+    };
+
+    const cancelDrag = (event) => {
+      if (event.key !== 'Escape') {
+        return;
+      }
+      dragStateRef.current.itemId = null;
+      setDraggingItemId(null);
+      setDragGhostPosition(null);
+      setDropTarget(null);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', finishDrag);
+    window.addEventListener('keydown', cancelDrag);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', finishDrag);
+      window.removeEventListener('keydown', cancelDrag);
+    };
+  }, [
+    draggingItemId,
+    menu.items,
+    onUpdateMenu,
+    resolveDropTarget,
+    setDropTarget,
+  ]);
+
+  const startDraggingItem = (event, itemId) => {
+    if (event.button !== 0) {
+      return;
+    }
+
+    event.preventDefault();
+    closeInserter();
+    dragStateRef.current.itemId = itemId;
+    setDraggingItemId(itemId);
+    setDragGhostPosition({ x: event.clientX, y: event.clientY });
+    setDropTarget(null);
   };
 
   const renameItemLabel = (itemId, newLabel) => {
@@ -192,11 +490,22 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     const canMoveUp = index > 0;
     const canMoveDown = index < siblings.length - 1;
     const rowIcon = item.url ? linkIconGlyph : pageIcon;
+    const activeDropPosition =
+      dropTarget?.itemId === item.id ? dropTarget.position : null;
+    const rowClasses = [
+      'nav-menu-editor-item',
+      flashNavItemIdSet.has(item.id) ? 'flash-highlight' : '',
+      draggingItemId === item.id ? 'is-dragging' : '',
+      activeDropPosition ? `is-drop-${activeDropPosition}` : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
 
     return (
       <div key={item.id} className="nav-menu-item-wrapper">
         <div
-          className={`nav-menu-editor-item${flashNavItemIdSet.has(item.id) ? ' flash-highlight' : ''}`}
+          className={rowClasses}
+          data-nav-menu-item-id={item.id}
           style={{ paddingLeft: `${level * 24 + 12}px` }}
         >
           {hasChildren && (
@@ -219,12 +528,14 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
               className="nav-item-drag-handle"
               aria-label="Drag to reorder"
               title="Drag to reorder"
+              onPointerDown={(event) => startDraggingItem(event, item.id)}
             >
               {dragHandle}
             </button>
 
             <DropdownMenu
               icon={moreVertical}
+              iconSize={20}
               label="Menu item options"
               className="nav-item-dropdown"
               popoverProps={{ placement: 'bottom-end' }}
@@ -441,6 +752,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
       ) : null}
     </>
   );
+  const dragGhostIcon = draggedItem?.url ? linkIconGlyph : pageIcon;
 
   return (
     <Page
@@ -471,6 +783,19 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           )}
         </div>
       </div>
+
+      {draggedItem && dragGhostPosition ? (
+        <div
+          className="nav-menu-drag-ghost"
+          style={{
+            transform: `translate3d(${dragGhostPosition.x + 12}px, ${dragGhostPosition.y + 12}px, 0)`,
+          }}
+          aria-hidden="true"
+        >
+          <span className="nav-menu-drag-ghost__icon">{dragGhostIcon}</span>
+          <span className="nav-menu-drag-ghost__label">{draggedItem.label}</span>
+        </div>
+      ) : null}
 
       {renameTarget ? (
         <RenameMenuItemModal
