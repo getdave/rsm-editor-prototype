@@ -889,9 +889,8 @@
 }
 
 .pp-inactive {
-  background: rgba(127, 84, 179, 0.08);
-  color: #7f54b3;
-  border: 1px dashed rgba(127, 84, 179, 0.36);
+  background: #f0f0f0;
+  color: #888;
 }
 
 .pp-nav {

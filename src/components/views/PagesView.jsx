@@ -560,6 +560,7 @@ function PagesView() {
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [showDrafts, setShowDrafts] = useState(false);
+  const [showSystemCollections, setShowSystemCollections] = useState(false);
   const [view, setView] = useState(() =>
     createPagesDataViewState(pagesViewMode),
   );
@@ -1078,11 +1079,14 @@ function PagesView() {
       return [...staticPages, ...staticHybridRows];
     }
 
-    return collectionRows;
+    return showSystemCollections
+      ? collectionRows
+      : collectionRows.filter((p) => p.collectionGroup !== "System");
   }, [
     activePageType,
     pagesWithRoles,
     showDrafts,
+    showSystemCollections,
     staticHybridRows,
     collectionRows,
   ]);
@@ -1330,6 +1334,15 @@ function PagesView() {
               label="Show drafts"
               checked={showDrafts}
               onChange={setShowDrafts}
+            />
+          ) : null}
+          {activePageType === "collections" ? (
+            <ToggleControl
+              __nextHasNoMarginBottom
+              className="pp-system-toggle"
+              label="Show system"
+              checked={showSystemCollections}
+              onChange={setShowSystemCollections}
             />
           ) : null}
           <Button
