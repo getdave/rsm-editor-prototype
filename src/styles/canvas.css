@@ -686,7 +686,7 @@
   color: var(--edit-global-accent);
   background: #fff;
   border: 2px solid var(--edit-global-accent);
-  opacity: 1;
+  opacity: 0;
   pointer-events: none;
   transition: opacity 0.12s ease;
 }
@@ -713,6 +713,10 @@
   width: 24px;
   height: 24px;
   fill: currentColor;
+}
+
+.g-el.e-block.tp-part:not(.sel):hover .tp-sync-badge {
+  opacity: 1;
 }
 
 .sec-bar.block-toolbar {
