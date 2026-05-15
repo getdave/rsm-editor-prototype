@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, PanelBody, Popover, TabPanel, TextControl, Tooltip } from '@wordpress/components';
+import { Button, PanelBody, Popover, TabPanel, TextControl } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { closeSmall } from '@wordpress/icons';
 import {
@@ -139,7 +139,7 @@ function SectionStylesPanel({ sectionIndex, selectedStyleId, onStyleChange }) {
         {SECTION_STYLE_OPTIONS.map((option) => {
           const selected = option.id === selectedStyleId;
           return (
-            <Tooltip key={option.id} text={option.label} delay={200} placement="top">
+            <div className="ss-style-grid-cell" key={option.id} role="presentation">
               <button
                 type="button"
                 role="listitem"
@@ -155,30 +155,10 @@ function SectionStylesPanel({ sectionIndex, selectedStyleId, onStyleChange }) {
                   {option.label}
                 </Text>
               </button>
-            </Tooltip>
+            </div>
           );
         })}
       </div>
-    </div>
-  );
-}
-
-function Accordion({ title, children, defaultOpen = false }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className={`ss-acc ${open ? 'open' : ''}`}>
-      <button
-        type="button"
-        className="ss-acc-hd"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-      >
-        <Text variant="body-md" className="ss-acc-title">{title}</Text>
-        <span className="ss-acc-toggle" aria-hidden>
-          {open ? '−' : '+'}
-        </span>
-      </button>
-      {open && <div className="ss-acc-body">{children}</div>}
     </div>
   );
 }
@@ -299,20 +279,19 @@ function SectionLayoutAlternatives() {
     <>
       <div className="ss-layout-buttons" ref={setGroupAnchor}>
         {SECTION_LAYOUT_PRESETS.map(({ id, title }) => (
-          <Tooltip key={id} text={title} placement="top">
-            <Button
-              variant="secondary"
-              isPressed={id === activeId}
-              className="ss-layout-button"
-              onClick={() => setActiveId(id)}
-              onMouseEnter={() => setHoveredId(id)}
-              onMouseLeave={() => handleLeave(id)}
-              onFocus={() => setHoveredId(id)}
-              onBlur={() => handleLeave(id)}
-            >
-              {title}
-            </Button>
-          </Tooltip>
+          <Button
+            key={id}
+            variant="secondary"
+            isPressed={id === activeId}
+            className="ss-layout-button"
+            onClick={() => setActiveId(id)}
+            onMouseEnter={() => setHoveredId(id)}
+            onMouseLeave={() => handleLeave(id)}
+            onFocus={() => setHoveredId(id)}
+            onBlur={() => handleLeave(id)}
+          >
+            {title}
+          </Button>
         ))}
       </div>
       {previewPreset && groupAnchor ? (
@@ -362,13 +341,13 @@ function BlockTab({
         </PanelBody>
       ) : null}
       {showSectionStyles && selectedSectionIndex !== null ? (
-        <Accordion title="Styles" defaultOpen>
+        <PanelBody title="Styles" initialOpen>
           <SectionStylesPanel
             sectionIndex={selectedSectionIndex}
             selectedStyleId={sectionStyleId}
             onStyleChange={onSectionStyleChange}
           />
-        </Accordion>
+        </PanelBody>
       ) : null}
       <PanelBody title="Color" initialOpen={false}>
         <Text variant="body-sm" className="ss-muted">Color controls would appear here.</Text>

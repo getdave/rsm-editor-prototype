@@ -1339,8 +1339,24 @@
 
 .ss-style-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+}
+
+/* Each grid cell fills the column; Tooltip’s wrapper no longer collapses width */
+.ss-style-grid-cell {
+  display: flex;
+  min-width: 0;
+}
+
+.ss-style-grid-cell > * {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+}
+
+.ss-style-grid-cell button.ss-style-btn {
+  flex: 1;
 }
 
 .ss-style-btn {
