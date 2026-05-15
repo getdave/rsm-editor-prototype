@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   DropdownMenu,
   RadioControl,
   SelectControl,
+  ToggleControl,
   Tooltip,
   __experimentalConfirmDialog as ConfirmDialog,
 } from "@wordpress/components";
@@ -17,6 +18,7 @@ import {
   home,
   page as pageIcon,
   postList,
+  archive,
   chevronDown,
   chevronUp,
   moreVertical,
@@ -53,17 +55,20 @@ const BADGE_STYLES = {
   WooCommerce: { background: "rgba(127,84,179,.12)", color: "#7f54b3" },
 };
 
-const TABS = [
+const PAGE_TYPE_TABS = [
   {
-    value: "published",
-    label: "Published",
+    value: "pages",
+    label: "Static",
+    icon: pageIcon,
     description:
-      "Pages that are published and visible on your site.",
+      "Pages you create and edit directly, plus page-like system destinations.",
   },
   {
-    value: "drafts",
-    label: "Drafts",
-    description: "Pages not yet published.",
+    value: "collections",
+    label: "Collections",
+    icon: archive,
+    description:
+      "Generated pages for groups of content and special site views.",
   },
 ];
 
@@ -71,10 +76,6 @@ const STATUS_ELEMENTS = [
   { value: "live", label: "Published" },
   { value: "draft", label: "Draft" },
 ];
-
-const SYSTEM_FILTER_HIDE = Object.freeze([
-  { field: "isSystem", operator: "is", value: false },
-]);
 
 const DATAVIEW_FIELDS_DEFAULT = ["status", "inMenu", "authorDisplay"];
 const DATAVIEW_FIELDS_LIST = ["status", "pageRole", "inMenu", "authorDisplay"];
@@ -117,26 +118,68 @@ const DEFAULT_LAYOUTS = {
   table: {},
 };
 
-/** Synthetic dynamic row — blog index at `/` when Reading uses “your latest posts” */
+/** Synthetic collection row — blog index at `/` when Reading uses “your latest posts” */
 const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = "blog-home-root";
 
 const blogHomepageRootTemplateRow = Object.freeze({
   id: BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
   slug: "",
   name: "Posts page",
-  type: "Dynamic Page",
+  type: "Collection Page",
   isLive: true,
   inMenu: false,
   isSystem: false,
   isDynamic: true,
-  category: "dynamic",
+  isCollection: true,
+  collectionBadge: "Posts page",
+  collectionOverlay: "Posts page",
+  pageKind: "collection",
+  category: "collection",
+  collectionKind: "posts",
   status: "live",
   level: 0,
   authorDisplay: "WordPress",
+  templateLabel: "Posts Index",
   titleTooltip:
     "Used at your site's main web address while the homepage shows your latest posts. Visitors see your newest posts listed first.",
   isFrontPage: true,
 });
+
+function createPostsCollectionRow(postsPage) {
+  if (!postsPage) {
+    return null;
+  }
+  return {
+    ...postsPage,
+    type: "Collection Page",
+    isLive: true,
+    inMenu: Boolean(postsPage.inMenu),
+    isSystem: false,
+    isDynamic: true,
+    isCollection: true,
+    collectionBadge: "Posts page",
+    collectionOverlay: "Posts page",
+    pageKind: "collection",
+    category: "collection",
+    collectionKind: "posts",
+    status: "live",
+    authorDisplay: "WordPress",
+    templateLabel: "Posts Index",
+    titleTooltip:
+      "Uses the selected Posts page URL while the posts index template controls the layout visitors see.",
+    isPostsPage: true,
+  };
+}
+
+function getPageIcon(item) {
+  if (item.isFrontPage) {
+    return home;
+  }
+  if (item.collectionKind === "posts" || item.isPostsPage) {
+    return postList;
+  }
+  return pageIcon;
+}
 
 function readingPageOptionLabel(p) {
   const prefix = p.level > 0 ? `${"— ".repeat(p.level)}` : "";
@@ -366,21 +409,6 @@ function ConfigureHomepageReadingModal({
   );
 }
 
-function AddNewCard() {
-  return (
-    <div className="pp-card pp-card-add">
-      <div className="pp-card-thumb">
-        <span className="pp-card-icon pp-card-icon-add">{plus}</span>
-      </div>
-      <div className="pp-card-body">
-        <Text variant="body-md" className="pp-card-name">
-          Add new
-        </Text>
-      </div>
-    </div>
-  );
-}
-
 function renderAuthorCell(item) {
   const text = item.authorDisplay ?? "";
   if (!text) {
@@ -396,11 +424,8 @@ function renderAuthorCell(item) {
 
 function PagesView() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const showDynamicPagesTab = searchParams.get("dynamic") === "true";
   const {
     currentPage,
-    setCurrentPage,
     selectPage,
     pagesViewMode,
     setPagesViewMode,
@@ -421,24 +446,14 @@ function PagesView() {
   } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [activeCategory, setActiveCategory] = useState("published");
+  const [activePageType, setActivePageType] = useState("pages");
+  const [showDrafts, setShowDrafts] = useState(false);
   const [view, setView] = useState(() =>
     createPagesDataViewState(pagesViewMode),
   );
   const [viewOptionsOpen, setViewOptionsOpen] = useState(false);
   const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
   const [publishConfirmPage, setPublishConfirmPage] = useState(null);
-
-  /** When Published includes template-backed rows, match former Dynamic tab default filters. */
-  useEffect(() => {
-    if (activeCategory !== "published") {
-      return;
-    }
-    setView((prev) => ({
-      ...prev,
-      filters: showDynamicPagesTab ? [...SYSTEM_FILTER_HIDE] : [],
-    }));
-  }, [showDynamicPagesTab, activeCategory]);
 
   const readingSelectPages = useMemo(
     () => pages.filter((p) => p.category === "content" && p.status === "live"),
@@ -514,8 +529,8 @@ function PagesView() {
           <span
             className={
               isGridLayout
-                ? "pp-media-thumb pp-media-thumb--grid"
-                : "pp-media-thumb"
+                ? `pp-media-thumb pp-media-thumb--grid${item.isCollection ? " pp-media-thumb--collection" : ""}`
+                : `pp-media-thumb${item.isCollection ? " pp-media-thumb--collection" : ""}`
             }
           >
             {isGridLayout ? (
@@ -525,11 +540,15 @@ function PagesView() {
                 className="pp-media-thumb-icon"
                 style={{ color: "#999", display: "flex" }}
               >
-                {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
+                {getPageIcon(item)}
               </span>
             )}
             {item.isFrontPage ? (
               <span className="pp-front-page-overlay">Homepage</span>
+            ) : item.collectionOverlay ? (
+              <span className="pp-collection-marker-overlay">
+                {item.collectionOverlay}
+              </span>
             ) : item.isPostsPage ? (
               <span className="pp-posts-page-overlay">Posts page</span>
             ) : null}
@@ -547,11 +566,7 @@ function PagesView() {
         enableHiding: false,
         enableGlobalSearch: true,
         render: ({ item }) => {
-          const docIcon = item.isFrontPage
-            ? home
-            : item.isPostsPage
-              ? postList
-              : pageIcon;
+          const docIcon = getPageIcon(item);
           const isLive = item.status !== "draft";
           const statusLabel = isLive ? "Page is live" : "Page is a draft";
           const title = (
@@ -571,6 +586,12 @@ function PagesView() {
               </span>
               <Text variant="body-md" className="pp-title-cell-name">
                 {item.name}
+                {item.collectionBadge && item.collectionBadge !== item.name ? (
+                  <span className="pp-title-qualifier">
+                    {" "}
+                    ({item.collectionBadge})
+                  </span>
+                ) : null}
               </Text>
               <span
                 className={`url-dot${isLive ? "" : " url-draft-dot"}`}
@@ -601,7 +622,9 @@ function PagesView() {
         enableHiding: true,
         enableGlobalSearch: false,
         render: ({ item }) =>
-          item.status === "draft" ? (
+          item.isCollection ? (
+            <span className="pp-badge pp-live">Active</span>
+          ) : item.status === "draft" ? (
             <span className="pp-badge pp-draft">Draft</span>
           ) : (
             <span className="pp-badge pp-live">Published</span>
@@ -610,16 +633,28 @@ function PagesView() {
       {
         id: "pageRole",
         type: "text",
-        label: "Homepage",
+        label: "Type",
         enableSorting: false,
         enableHiding: true,
         enableGlobalSearch: false,
         getValue: ({ item }) =>
-          item.isFrontPage ? "front" : item.isPostsPage ? "posts" : "",
+          item.isFrontPage
+            ? "front"
+            : item.collectionBadge
+              ? item.collectionBadge
+              : item.isPostsPage
+                ? "posts"
+                : item.isCollection
+                  ? "collection"
+                  : "",
         render: ({ item }) =>
           item.isFrontPage ? (
             <span className="pp-badge pp-page-role pp-page-role--front">
               Front page
+            </span>
+          ) : item.collectionBadge ? (
+            <span className="pp-badge pp-page-role pp-collection-marker">
+              {item.collectionBadge}
             </span>
           ) : item.isPostsPage ? (
             <span className="pp-badge pp-page-role pp-page-role--posts">
@@ -823,7 +858,7 @@ function PagesView() {
   );
 
   const categoryPages = useMemo(() => {
-    let filtered = pages.map((p) => ({
+    const pagesWithRoles = pages.map((p) => ({
       ...p,
       isFrontPage:
         homepageDisplayMode === READING_DISPLAY_STATIC &&
@@ -837,37 +872,49 @@ function PagesView() {
         p.id === postsPageId,
     }));
 
-    if (activeCategory === "drafts") {
-      filtered = filtered.filter(
-        (p) => p.category === "content" && p.status === "draft",
-      );
-    } else if (activeCategory === "published") {
-      filtered = filtered.filter((p) => {
-        if (p.category === "content") {
-          return p.status === "live";
+    if (activePageType === "pages") {
+      return pagesWithRoles.filter((p) => {
+        if (p.category !== "content") {
+          return false;
         }
-        if (p.category === "dynamic") {
-          return showDynamicPagesTab;
+        if (p.isPostsPage) {
+          return false;
         }
-        return false;
+        return showDrafts ? true : p.status === "live";
       });
-
-      if (
-        showDynamicPagesTab &&
-        homepageDisplayMode === READING_DISPLAY_LATEST &&
-        !filtered.some((p) => p.id === BLOG_HOMEPAGE_ROOT_TEMPLATE_ID)
-      ) {
-        filtered = [blogHomepageRootTemplateRow, ...filtered];
-      }
-    } else {
-      filtered = [];
     }
 
-    return filtered;
+    if (activePageType === "collections") {
+      const collectionRows = [];
+      if (homepageDisplayMode === READING_DISPLAY_LATEST) {
+        collectionRows.push(blogHomepageRootTemplateRow);
+      } else {
+        const postsPage = pagesWithRoles.find((p) => p.id === postsPageId);
+        const postsCollectionRow = createPostsCollectionRow(postsPage);
+        if (postsCollectionRow) {
+          collectionRows.push(postsCollectionRow);
+        }
+      }
+
+      const collectionIds = [
+        "shop",
+        "product-single",
+        "search-results",
+        "404",
+      ];
+      collectionRows.push(
+        ...collectionIds
+          .map((id) => pagesWithRoles.find((p) => p.id === id))
+          .filter(Boolean),
+      );
+      return collectionRows;
+    }
+
+    return [];
   }, [
-    activeCategory,
+    activePageType,
     pages,
-    showDynamicPagesTab,
+    showDrafts,
     frontPageId,
     postsPageId,
     homepageDisplayMode,
@@ -937,6 +984,11 @@ function PagesView() {
     ],
   );
 
+  const displayedPreviewPage =
+    categoryPages.find((p) => p.id === previewPage?.id) ??
+    categoryPages[0] ??
+    previewPage;
+
   const handleReadingModalApply = (draft) => {
     if (draft.homepageDisplayMode === READING_DISPLAY_LATEST) {
       setHomepageDisplayMode(READING_DISPLAY_LATEST);
@@ -985,22 +1037,68 @@ function PagesView() {
   const hasPreviewPanel = view.type === "list";
 
   const handleTabClick = (value) => {
-    setActiveCategory(value);
+    setActivePageType(value);
     setView((prev) => ({
       ...prev,
       page: 1,
       search: "",
-      filters:
-        value === "published" && showDynamicPagesTab
-          ? [...SYSTEM_FILTER_HIDE]
-          : [],
+      filters: [],
     }));
   };
 
-  const activeTab = TABS.find((t) => t.value === activeCategory);
+  const activeTab = PAGE_TYPE_TABS.find((t) => t.value === activePageType);
 
   const stageContent = (
     <div className="pp-inner pp-dataviews">
+      <div className="pp-tabs-row">
+        <div className="pp-tabs-row__tabs">
+          {PAGE_TYPE_TABS.length > 1 ? (
+            <div className="pp-tabs">
+              {PAGE_TYPE_TABS.map((tab) => (
+                <button
+                  key={tab.value}
+                  className={`pp-tab${activePageType === tab.value ? " on" : ""}`}
+                  onClick={() => handleTabClick(tab.value)}
+                >
+                  <span className="pp-tab-icon" aria-hidden="true">
+                    {tab.icon}
+                  </span>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+      <div className="pp-tab-description-row">
+        {activeTab?.description ? (
+          <Text variant="body-md" className="pp-tab-description">
+            {activeTab.description}
+          </Text>
+        ) : null}
+        <div className="pp-tab-description-actions">
+          {activePageType === "pages" ? (
+            <ToggleControl
+              __nextHasNoMarginBottom
+              className="pp-show-drafts-toggle"
+              label="Show drafts"
+              checked={showDrafts}
+              onChange={setShowDrafts}
+            />
+          ) : null}
+          <Button
+            variant="tertiary"
+            className="pp-view-options-toggle"
+            onClick={() => setViewOptionsOpen((o) => !o)}
+            aria-expanded={viewOptionsOpen}
+          >
+            View options
+            <span className="pp-view-options-chevron">
+              {viewOptionsOpen ? chevronUp : chevronDown}
+            </span>
+          </Button>
+        </div>
+      </div>
       <DataViews
         data={processedData}
         fields={fields}
@@ -1027,72 +1125,22 @@ function PagesView() {
         getItemId={(item) => item.id}
         getItemLevel={(item) => item.level ?? 0}
       >
-        <div className="pp-tabs-row">
-          <div className="pp-tabs-row__tabs">
-            {TABS.length > 1 ? (
-              <div className="pp-tabs">
-                {TABS.map((tab) => (
-                  <button
-                    key={tab.value}
-                    className={`pp-tab${activeCategory === tab.value ? " on" : ""}`}
-                    onClick={() => handleTabClick(tab.value)}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
-          <div className="pp-tabs-row__actions">
-            <Button
-              variant="tertiary"
-              className="pp-view-options-toggle"
-              onClick={() => setViewOptionsOpen((o) => !o)}
-              aria-expanded={viewOptionsOpen}
-            >
-              View options
-              <span className="pp-view-options-chevron">
-                {viewOptionsOpen ? chevronUp : chevronDown}
-              </span>
-            </Button>
-          </div>
-        </div>
         <div
-          className={`pp-toolbar-controls${TABS.length <= 1 ? " pp-toolbar-controls--solo-category" : ""}`}
+          className={`pp-toolbar-controls${PAGE_TYPE_TABS.length <= 1 ? " pp-toolbar-controls--solo-category" : ""}`}
         >
           {homepageDisplayMode === READING_DISPLAY_LATEST &&
-            activeCategory === "published" && (
+            activePageType === "collections" && (
               <div className="pp-latest-posts-home-tip" role="status">
-                {showDynamicPagesTab ? (
-                  <>
-                    Latest posts on the homepage? Look for{" "}
-                    <strong>Posts page</strong> in this list.
-                  </>
-                ) : (
-                  <>
-                    Latest posts on the homepage? Edit that layout in{" "}
-                    <button
-                      type="button"
-                      className="pp-desc-link"
-                      onClick={() => navigate("/templates")}
-                    >
-                      Templates
-                    </button>
-                    .
-                  </>
-                )}
+                Latest posts are currently using your site&apos;s main address.
+                Edit that generated layout from <strong>Posts page</strong>.
               </div>
             )}
           {viewOptionsOpen && (
             <div className="pp-toolbar-row-options">
               <DataViews.Search />
-              <DataViews.FiltersToggle />
               <DataViews.LayoutSwitcher />
             </div>
           )}
-        </div>
-        <div className="pp-dv-filters">
-          <DataViews.FiltersToggled />
         </div>
         <div className="pp-dv-scroll">
           <DataViews.Layout />
@@ -1104,10 +1152,10 @@ function PagesView() {
 
   const canvasContent = (
     <PreviewCanvas
-      page={previewPage}
+      page={displayedPreviewPage}
       onEdit={() =>
-        previewPage &&
-        navigate(`/pages/${previewPage.id}/edit?inserter=patterns`)
+        displayedPreviewPage &&
+        navigate(`/pages/${displayedPreviewPage.id}/edit?inserter=patterns`)
       }
       onPageChange={setPreviewPage}
     />
@@ -1116,7 +1164,7 @@ function PagesView() {
   /** Layout: Foundations → Sidebar (RootLayout) + Content Frame + Preview Frame (list). */
   const pageActions = (
     <>
-      {(activeCategory === "published" || activeCategory === "drafts") && (
+      {activePageType === "pages" && (
         <Button
           variant="primary"
           icon={plus}
@@ -1126,7 +1174,7 @@ function PagesView() {
           Add page
         </Button>
       )}
-      {activeCategory === "published" && showDynamicPagesTab && (
+      {activePageType === "collections" && (
         <Button variant="secondary" onClick={() => navigate("/templates")}>
           All Templates
         </Button>
@@ -1170,7 +1218,6 @@ function PagesView() {
             <Page
               className="split-view-stage pages-content-frame"
               title="Pages"
-              subTitle={activeTab?.description || undefined}
               actions={pageActions}
               showSidebarToggle={false}
             >
@@ -1188,7 +1235,6 @@ function PagesView() {
           <Page
             className="pages-panel__grid pages-content-frame"
             title="Pages"
-            subTitle={activeTab?.description || undefined}
             actions={pageActions}
             showSidebarToggle={false}
           >

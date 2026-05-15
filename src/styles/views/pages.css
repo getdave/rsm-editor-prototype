@@ -120,6 +120,11 @@
   color: #1e1e1e;
 }
 
+.pages-content-frame > header {
+  border-block-end: 0;
+  padding-block-end: 8px;
+}
+
 /* Tabs + View options (right): one row */
 .pp-tabs-row {
   display: flex;
@@ -134,15 +139,34 @@
   flex-shrink: 0;
 }
 
+.pp-tab-description-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px 12px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.pp-tab-description {
+  display: block;
+  margin: 0;
+  color: #50575e;
+  line-height: 1.45;
+}
+
+.pp-tab-description-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
 .pp-tabs-row__tabs {
   flex: 1;
   min-width: 0;
-  display: flex;
-  align-items: center;
-}
-
-.pp-tabs-row__actions {
-  flex-shrink: 0;
   display: flex;
   align-items: center;
 }
@@ -176,6 +200,15 @@
 
 .pp-toolbar-controls:has(.pp-latest-posts-home-tip, .pp-toolbar-row-options) {
   padding-top: 8px;
+}
+
+.pp-show-drafts-toggle.components-base-control,
+.pp-show-drafts-toggle .components-base-control__field {
+  margin-bottom: 0;
+}
+
+.pp-show-drafts-toggle .components-toggle-control__label {
+  font-size: 13px;
 }
 
 .pp-latest-posts-home-tip {
@@ -223,6 +256,9 @@
 
 
 .pp-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 10px 14px;
   font-size: 13px;
   font-weight: 500;
@@ -243,6 +279,19 @@
 .pp-tab.on {
   color: #1e1e1e;
   border-bottom-color: #3858e9;
+}
+
+.pp-tab-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  color: currentColor;
+}
+
+.pp-tab-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 /* Spacer to push system toggle to the right */
@@ -637,13 +686,25 @@
   gap: 5%;
 }
 
+.pp-media-thumb--collection {
+  border-color: rgba(127, 84, 179, 0.62);
+  background: rgba(127, 84, 179, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(127, 84, 179, 0.16);
+}
+
 .pp-media-thumb-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #999;
 }
 
-.pp-front-page-overlay {
+.pp-media-thumb.pp-media-thumb--collection .pp-media-thumb-icon {
+  color: #7f54b3;
+}
+
+.pp-front-page-overlay,
+.pp-collection-marker-overlay {
   position: absolute;
   top: 4px;
   left: 4px;
@@ -657,9 +718,24 @@
   line-height: 1.2;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.pp-front-page-overlay {
   color: #3858e9;
   background: rgba(56, 88, 233, 0.1);
   border: 1px solid rgba(56, 88, 233, 0.45);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.pp-collection-marker-overlay {
+  max-width: calc(100% - 8px);
+  padding-inline: 4px;
+  font-size: 7px;
+  white-space: nowrap;
+  color: #7f54b3;
+  background: rgba(127, 84, 179, 0.1);
+  border: 1px solid rgba(127, 84, 179, 0.42);
   border-radius: 2px;
   box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
 }
@@ -689,6 +765,7 @@
 .pp-title-cell-inner {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.35em;
   min-width: 0;
 }
@@ -722,6 +799,10 @@
 
 .pp-title-cell-name {
   min-width: 0;
+}
+
+.pp-title-qualifier {
+  color: #757575;
 }
 
 .pp-menu-empty,
@@ -812,6 +893,12 @@
 .pp-page-role--posts {
   background: rgba(0, 0, 0, 0.06);
   color: #505050;
+}
+
+.pp-collection-marker {
+  background: rgba(127, 84, 179, 0.12);
+  color: #7f54b3;
+  white-space: nowrap;
 }
 
 /* Grid mode: Add New card sits before DataViews grid */
