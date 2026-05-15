@@ -276,6 +276,9 @@
   min-height: 44px;
   padding: 8px 8px 8px 0;
   position: relative;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
 }
 
 /* Newly added rows — 4s ease-out from peak highlight to none (no long “hold” at full tint) */
@@ -355,45 +358,8 @@
   margin-left: auto;
 }
 
-/* Drag handle — slides in from the right on row hover */
-.nav-item-drag-handle {
-  width: 28px;
-  height: 28px;
-  margin: 0;
-  padding: 0;
-  border: none;
-  border-radius: 4px;
-  background: transparent;
-  color: #949494;
-  cursor: grab;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  touch-action: none;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(8px);
-  transition:
-    opacity 0.15s ease,
-    transform 0.15s ease;
-}
-
-.nav-item-drag-handle:active {
-  cursor: grabbing;
-}
-
-.nav-menu-editor-item:hover .nav-item-drag-handle {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(0);
-}
-
-.nav-item-drag-handle svg {
-  width: 16px;
-  height: 16px;
-}
-
 .nav-menu-editor-item.is-dragging {
+  cursor: grabbing;
   opacity: 0.45;
 }
 

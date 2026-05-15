@@ -10,7 +10,6 @@ import { Page } from '@wordpress/admin-ui';
 import {
   chevronDown,
   chevronRight,
-  dragHandle,
   moreVertical,
   page as pageIcon,
   plus,
@@ -455,6 +454,9 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     if (event.button !== 0) {
       return;
     }
+    if (event.target.closest('button, a, input, select, textarea')) {
+      return;
+    }
 
     event.preventDefault();
     closeInserter();
@@ -507,6 +509,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           className={rowClasses}
           data-nav-menu-item-id={item.id}
           style={{ paddingLeft: `${level * 24 + 12}px` }}
+          onPointerDown={(event) => startDraggingItem(event, item.id)}
         >
           {hasChildren && (
             <button
@@ -523,16 +526,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           <span className="nav-item-label">{item.label}</span>
 
           <div className="nav-item-actions">
-            <button
-              type="button"
-              className="nav-item-drag-handle"
-              aria-label="Drag to reorder"
-              title="Drag to reorder"
-              onPointerDown={(event) => startDraggingItem(event, item.id)}
-            >
-              {dragHandle}
-            </button>
-
             <DropdownMenu
               icon={moreVertical}
               iconSize={20}
