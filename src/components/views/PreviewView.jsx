@@ -1,25 +1,87 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Page } from '@wordpress/admin-ui';
 import { Stack } from '@wordpress/ui';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import {
   __experimentalToggleGroupControl as ToggleGroupControl,
   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { useAppState } from '../../hooks/useAppState';
 import PreviewCanvas from '../shared/PreviewCanvas';
+import PageLayoutWireframeThumb from '../shared/PageLayoutWireframeThumb';
 import ContentSuggestions from './ContentSuggestions';
+
+const PAGES_INDEX_FIELDS = [
+  {
+    id: 'media',
+    label: 'Thumbnail',
+    enableSorting: false,
+    enableHiding: false,
+    filterBy: false,
+    enableGlobalSearch: false,
+    render: ({ item }) => (
+      <span className="pp-media-thumb pp-media-thumb--grid">
+        <PageLayoutWireframeThumb page={item} />
+      </span>
+    ),
+  },
+  {
+    id: 'name',
+    type: 'text',
+    label: 'Name',
+    enableHiding: false,
+    enableGlobalSearch: true,
+  },
+  {
+    id: 'pageType',
+    type: 'text',
+    label: 'Type',
+    getValue: ({ item }) =>
+      item.category === 'collection' ? 'Dynamic' : 'Static',
+    enableSorting: false,
+    enableHiding: false,
+    enableGlobalSearch: false,
+  },
+];
+
+const PAGES_INDEX_DEFAULT_VIEW = {
+  type: 'grid',
+  search: '',
+  filters: [],
+  page: 1,
+  perPage: 24,
+  titleField: 'name',
+  mediaField: 'media',
+  fields: ['pageType'],
+  layout: { previewSize: 60 },
+};
+
+const PAGES_INDEX_DEFAULT_LAYOUTS = {
+  grid: { badgeFields: ['pageType'], layout: { previewSize: 60 } },
+};
 
 function PreviewView() {
   const navigate = useNavigate();
   const { currentPage, setCurrentPage, pages } = useAppState();
   const [previewMode, setPreviewMode] = useState('preview');
+  const [pagesIndexView, setPagesIndexView] = useState(
+    PAGES_INDEX_DEFAULT_VIEW,
+  );
 
   const handleEdit = () => {
     navigate(`/pages/${currentPage.id}/edit?inserter=patterns`);
   };
 
-  const livePages = pages.filter((p) => p.status === 'live');
+  const livePages = useMemo(
+    () => pages.filter((p) => p.status === 'live'),
+    [pages],
+  );
+
+  const { data: processedData, paginationInfo } = useMemo(
+    () => filterSortAndPaginate(livePages, pagesIndexView, PAGES_INDEX_FIELDS),
+    [livePages, pagesIndexView],
+  );
 
   return (
     <Stack direction="column" className="cs-stack">
@@ -47,8 +109,8 @@ function PreviewView() {
           showSidebarToggle={false}
         >
           <div className="pp-inner pp-dataviews">
-            <div className="dataviews-wrapper preview-dataviews-wrapper">
-              {previewMode === 'preview' ? (
+            {previewMode === 'preview' ? (
+              <div className="dataviews-wrapper preview-dataviews-wrapper">
                 <article className="preview-thumbnail">
                   <PreviewCanvas
                     page={currentPage}
@@ -56,28 +118,24 @@ function PreviewView() {
                     onPageChange={setCurrentPage}
                   />
                 </article>
-              ) : (
-                <ul className="preview-pages-index">
-                  {livePages.map((page) => (
-                    <li
-                      key={page.id}
-                      className="preview-pages-index-item"
-                    >
-                      <span className="preview-pages-index-name">
-                        {page.name}
-                      </span>
-                      <span
-                        className={`preview-pages-index-type preview-pages-index-type--${
-                          page.category === 'collection' ? 'dynamic' : 'static'
-                        }`}
-                      >
-                        {page.category === 'collection' ? 'Dynamic' : 'Static'}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+              </div>
+            ) : (
+              <DataViews
+                data={processedData}
+                fields={PAGES_INDEX_FIELDS}
+                view={pagesIndexView}
+                onChangeView={setPagesIndexView}
+                defaultLayouts={PAGES_INDEX_DEFAULT_LAYOUTS}
+                paginationInfo={paginationInfo}
+                actions={[]}
+                getItemId={(item) => item.id}
+              >
+                <div className="pp-dv-scroll">
+                  <DataViews.Layout />
+                  <DataViews.Pagination />
+                </div>
+              </DataViews>
+            )}
           </div>
         </Page>
       </div>
