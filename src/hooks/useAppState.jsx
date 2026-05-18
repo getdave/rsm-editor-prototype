@@ -245,6 +245,33 @@ export function AppStateProvider({ children }) {
     );
   };
 
+  const activateCollectionTemplate = (pageId) => {
+    const sourcePage = pages.find((p) => p.id === pageId);
+    const activatedPage = sourcePage ? { ...sourcePage } : null;
+    if (activatedPage) {
+      delete activatedPage.collectionState;
+      activatedPage.authorDisplay = 'John Doe';
+    }
+
+    setPages((prev) =>
+      prev.map((p) => {
+        if (p.id !== pageId) return p;
+        const activePage = { ...p };
+        delete activePage.collectionState;
+        activePage.authorDisplay = 'John Doe';
+        return activePage;
+      }),
+    );
+    setCurrentPage((cur) => {
+      if (!cur || cur.id !== pageId) return cur;
+      const activePage = { ...cur };
+      delete activePage.collectionState;
+      activePage.authorDisplay = 'John Doe';
+      return activePage;
+    });
+    return activatedPage;
+  };
+
   // Wrap setCurrentPage so picking a page also lands it in the recents
   // list. Stable insertion order with FIFO eviction:
   //   - First time a page is opened, it joins at position 1 (top).
@@ -276,6 +303,7 @@ export function AppStateProvider({ children }) {
     setPageStatus,
     deletePage,
     syncReadingPageMarkers,
+    activateCollectionTemplate,
     addPageToMainMenu,
     removePageFromMainMenu,
 
