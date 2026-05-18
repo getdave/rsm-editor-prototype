@@ -3,6 +3,7 @@ import RootLayout from '../layouts/RootLayout';
 import PreviewView from '../components/views/PreviewView';
 import PagesView from '../components/views/PagesView';
 import EditingView from '../components/views/EditingView';
+import TemplateEditingView from '../components/views/TemplateEditingView';
 import StylesView from '../components/views/StylesView';
 import VariationsPanel from '../components/views/styles/VariationsPanel';
 import ColorsPanel from '../components/views/styles/ColorsPanel';
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
       { index: true, element: <PreviewView /> },
       { path: 'pages', element: <PagesView /> },
       { path: 'pages/:pageId/edit', element: <EditingView /> },
+      { path: 'template-editing', element: <TemplateEditingView /> },
       {
         path: 'templates',
         element: (

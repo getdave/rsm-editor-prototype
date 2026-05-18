@@ -114,7 +114,7 @@ const ADVANCED_NAV_ITEMS = [
   },
 ];
 
-const EDIT_ROUTE_PATTERN = /^\/pages\/[^/]+\/edit$/;
+const EDIT_ROUTE_PATTERN = /^\/pages\/[^/]+\/edit$|^\/template-editing$/;
 
 function Sidebar() {
   const navigate = useNavigate();

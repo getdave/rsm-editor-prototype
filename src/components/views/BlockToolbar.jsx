@@ -21,6 +21,9 @@ export default function BlockToolbar({
   setInspectorFlashSignal,
   setInspectorBlockTabSignal,
   setSettingsSidebarOpen,
+  globalPartEditActive = false,
+  onGlobalPartEdit,
+  onGlobalPartEditExit,
 }) {
   const ref = useRef(null);
   const rafIdRef = useRef(0);
@@ -29,6 +32,7 @@ export default function BlockToolbar({
 
   const Icon = meta.icon;
   const isPatternSection = Boolean(meta.isPatternSection);
+  const isTemplatePart = Boolean(meta.isTemplatePart);
 
   const clampToCanvas = useCallback(() => {
     const el = ref.current;
@@ -98,12 +102,12 @@ export default function BlockToolbar({
       cancelAnimationFrame(rafIdRef.current);
       if (ro) ro.disconnect();
     };
-  }, [toolbarKey, clampToCanvas]);
+  }, [toolbarKey, globalPartEditActive, clampToCanvas]);
 
   return (
     <div
       ref={ref}
-      className={`sec-bar block-toolbar${isPatternSection ? ' block-toolbar--pattern-section' : ''}${flipBelow ? ' block-toolbar--flip-below' : ''}`}
+      className={`sec-bar block-toolbar${isPatternSection ? ' block-toolbar--pattern-section' : ''}${isTemplatePart ? ' block-toolbar--template-part' : ''}${flipBelow ? ' block-toolbar--flip-below' : ''}`}
       role="toolbar"
       style={translateX ? { transform: `translateX(${translateX}px)` } : undefined}
       onClick={(e) => e.stopPropagation()}
@@ -149,6 +153,36 @@ export default function BlockToolbar({
               setSettingsSidebarOpen(true);
             }}
           />
+          <span className="bt-sep" aria-hidden />
+        </>
+      ) : null}
+      {isTemplatePart && onGlobalPartEdit ? (
+        <>
+          {globalPartEditActive ? (
+            <div className="bt-global-part-actions" role="group" aria-label="Editing global template part">
+              <Button
+                variant="primary"
+                className="bt-tb-edit bt-global-part-exit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onGlobalPartEditExit();
+                }}
+              >
+                Exit
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="tertiary"
+              className="bt-tb-edit"
+              onClick={(e) => {
+                e.stopPropagation();
+                onGlobalPartEdit();
+              }}
+            >
+              Edit
+            </Button>
+          )}
           <span className="bt-sep" aria-hidden />
         </>
       ) : null}
