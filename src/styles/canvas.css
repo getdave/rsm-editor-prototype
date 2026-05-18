@@ -25,6 +25,11 @@
   overflow: visible;
 }
 
+/* Global (template part) accent — List View global rows + Header/Footer canvas selection */
+:root {
+  --edit-global-accent: #7527e7;
+}
+
 /* Shared canvas wrapper */
 .canvas {
   width: 100%;
@@ -196,8 +201,37 @@
    only handles the cursor flip between view (pointer) and edit (text)
    modes and the no-outline editable region. */
 .doc-actions-name { cursor: pointer; }
+.doc-actions-name.doc-actions-name--readonly { cursor: default; }
 .doc-actions-name.is-editing { cursor: text; }
 .doc-actions-name-text { outline: none; }
+
+.doc-actions.doc-actions--global .preview-bar-doc-icon {
+  color: var(--edit-global-accent);
+}
+
+.doc-actions.doc-actions--global .preview-bar-doc-icon svg {
+  fill: currentColor;
+}
+
+.doc-actions.doc-actions--global .doc-actions-name-text {
+  color: var(--edit-global-accent);
+}
+
+.doc-actions.doc-actions--global .doc-actions-name:hover {
+  background: rgba(117, 39, 231, 0.09);
+}
+
+.doc-actions.doc-actions--global .ct-icon-btn.components-button {
+  color: var(--edit-global-accent);
+}
+
+.doc-actions.doc-actions--global .ct-icon-btn.components-button:hover {
+  background: rgba(117, 39, 231, 0.1);
+}
+
+.doc-actions.doc-actions--global .ct-icon-btn.components-button svg {
+  fill: currentColor;
+}
 
 .preview-canvas-area,
 .edit-canvas-area {
@@ -511,6 +545,29 @@
   margin-right: auto;
 }
 
+/* Dim peer regions when editing a block that opts in via isolatePeersOnSelect meta */
+.edit-card.edit-card--spotlight {
+  --edit-spotlight-peer-opacity: 0.35;
+  --edit-spotlight-transition-duration: 0.55s;
+}
+
+.edit-card.edit-card--spotlight > [data-edit-block-id]:not(.edit-spotlight-focus) {
+  opacity: var(--edit-spotlight-peer-opacity);
+  pointer-events: none;
+  transition: opacity var(--edit-spotlight-transition-duration, 0.55s) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.edit-card.edit-card--spotlight > [data-edit-block-id].edit-spotlight-focus {
+  opacity: 1;
+  transition: opacity var(--edit-spotlight-transition-duration, 0.55s) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.edit-card.edit-card--spotlight > [data-edit-block-id]:not(.edit-spotlight-focus) .add-sec,
+.edit-card.edit-card--spotlight > [data-edit-block-id]:not(.edit-spotlight-focus) .tp-sync-badge {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .g-el {
   position: relative;
   opacity: 0.55;
@@ -522,18 +579,10 @@
   opacity: 0.75;
 }
 
-.g-badge {
-  position: absolute;
-  top: 7px;
-  right: 8px;
-  background: #f0b849;
-  color: #1e1e1e;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 3px;
-  z-index: 5;
-  white-space: nowrap;
+/* Header/Footer template parts share .g-el; keep full opacity so site chrome matches preview
+   (.g-el otherwise dims globals and reads as an overlay). Spotlight still overrides via .edit-card--spotlight. */
+.g-el.e-block.tp-part {
+  opacity: 1;
 }
 
 /* Canvas blocks — WordPress block hover / selection (blue outline) */
@@ -553,7 +602,7 @@
   border-color: #007cba;
 }
 
-/* Selection wash only on page content blocks — not header/footer (template parts keep .p-header / .p-footer surfaces) */
+/* Selection wash on page/template root blocks; Header/Footer template parts (.tp-part) use purple accents below */
 .e-sec.sel,
 .template-edit-root.sel {
   border-color: #007cba;
@@ -614,7 +663,62 @@
   opacity: 1;
 }
 
-/* Floating block toolbar — WordPress block editor style */
+.g-el.e-block.tp-part:hover {
+  border-color: var(--edit-global-accent);
+}
+
+.g-el.e-block.tp-part.sel {
+  border-color: var(--edit-global-accent);
+  /* No selection fill: .p-header / .p-footer set their own surface colors; a translucent
+     wash would replace them and reveal the white .edit-card behind (header looked white). */
+  opacity: 1;
+}
+
+.tp-sync-badge {
+  position: absolute;
+  left: 8px;
+  z-index: 25;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--edit-global-accent);
+  background: #fff;
+  border: 2px solid var(--edit-global-accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.p-header .tp-sync-badge {
+  top: calc(100% - 2px);
+  border-radius: 0 0 4px 4px;
+}
+
+.p-footer .tp-sync-badge {
+  bottom: calc(100% - 2px);
+  border-radius: 4px 4px 0 0;
+}
+
+.tp-sync-badge-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+}
+
+.tp-sync-badge-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.g-el.e-block.tp-part:not(.sel):hover .tp-sync-badge {
+  opacity: 1;
+}
+
 .sec-bar.block-toolbar {
   position: absolute;
   bottom: 100%;
@@ -651,6 +755,50 @@
 .sec-bar.block-toolbar.block-toolbar--pattern-section {
   border-left: 3px solid #007cba;
   padding-left: 8px;
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part {
+  border: 1px solid var(--edit-global-accent);
+  border-left-width: 3px;
+  padding-left: 8px;
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-sep {
+  background: var(--edit-global-accent);
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-pill-label {
+  color: var(--edit-global-accent);
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .components-button.bt-pill-icon {
+  color: var(--edit-global-accent);
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .components-button.bt-pill-icon svg {
+  fill: currentColor;
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button {
+  background: var(--edit-global-accent);
+  border-color: transparent;
+  color: #fff;
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button:hover:not(:disabled) {
+  background: #6120c1;
+  color: #fff;
+}
+
+.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button:focus:not(:disabled) {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--edit-global-accent);
 }
 
 .e-sec.sel .sec-bar.block-toolbar,
@@ -707,10 +855,13 @@
   height: 32px;
   min-height: 32px;
   padding: 0 10px;
+  font-family: var(--wp-font-family, inherit);
   font-size: 12px;
   font-weight: 500;
+  line-height: 1.2;
   color: #1e1e1e;
   box-shadow: none;
+  text-decoration: none;
 }
 
 .bt-tb-edit.components-button:hover {
@@ -982,7 +1133,7 @@
 /* Global template parts (header/footer) get a distinct hint color when
    the row isn't selected — matches WordPress's purple "global" treatment. */
 .lv-row-global:not(.sel) .lv-icon {
-  color: #7527e7;
+  color: var(--edit-global-accent);
 }
 
 .lv-label {
