@@ -16,8 +16,6 @@ function NavigationView() {
     navigationMenus: menus,
     setNavigationMenus,
     pages: appPages,
-    sidebarCollapsed,
-    toggleSidebar,
   } = useAppState();
   const [selectedMenuId, setSelectedMenuId] = useState(null);
   const [forceShowList, setForceShowList] = useState(false);

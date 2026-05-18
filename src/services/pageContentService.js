@@ -490,11 +490,11 @@ function getPlaceholderTitle(pageId, layout) {
   return titles[layout] || 'Page Title';
 }
 
-function getPlaceholderSubtitle(pageId, layout) {
+function getPlaceholderSubtitle() {
   return null; // Most templates don't need subtitle placeholders
 }
 
-function replaceWithPlaceholders(sections, layout, pageId) {
+function replaceWithPlaceholders(sections) {
   return sections.map(section => {
     switch (section.type) {
       case 'archive-header':
@@ -512,7 +512,7 @@ function replaceWithPlaceholders(sections, layout, pageId) {
       case 'cart':
         return {
           ...section,
-          items: section.items.map((_, index) => ({
+          items: section.items.map(() => ({
             name: 'Product Name',
             price: '0.00',
             quantity: 1
@@ -523,13 +523,13 @@ function replaceWithPlaceholders(sections, layout, pageId) {
       case 'checkout':
         return {
           ...section,
-          steps: section.steps.map((_, index) => `Checkout Step ${index + 1}`)
+          steps: section.steps.map((_, stepIndex) => `Checkout Step ${stepIndex + 1}`)
         };
       
       case 'product-grid':
         return {
           ...section,
-          items: section.items.map((_, index) => ({
+          items: section.items.map(() => ({
             name: 'Product Title',
             price: '0.00',
             excerpt: 'Product description text goes here...'
@@ -539,7 +539,7 @@ function replaceWithPlaceholders(sections, layout, pageId) {
       case 'post-list':
         return {
           ...section,
-          items: section.items.map((_, index) => ({
+          items: section.items.map(() => ({
             title: 'Post Title',
             date: 'Post Date',
             excerpt: 'Post excerpt text goes here. This is a preview of the post content...'

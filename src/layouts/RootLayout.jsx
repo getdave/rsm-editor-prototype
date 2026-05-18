@@ -38,7 +38,7 @@ function RootLayout() {
     const isEdit = EDIT_ROUTE_PATTERN.test(location.pathname);
     setSidebarCollapsed(isEdit);
     setMenuExpanded(false);
-  }, [location.pathname]);
+  }, [location.pathname, setMenuExpanded, setSidebarCollapsed]);
 
   // Capture the route the user was on before entering the edit canvas so the
   // split-Exit button knows where to take them back. Cleared on exit. Also
@@ -54,7 +54,7 @@ function RootLayout() {
       setEditorReferrer(null);
     }
     prevPathRef.current = location.pathname;
-  }, [location.pathname]);
+  }, [location.pathname, markDirty, setEditorReferrer]);
 
   return (
     <>

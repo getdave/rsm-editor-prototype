@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { Button } from '@wordpress/components';
 import {
@@ -162,15 +162,19 @@ function EditingView() {
   // Get page-specific content for editing
   const content = getEditModeContent(currentPage);
 
+  const pageTransitionKey = `${currentPage?.id ?? ''}|${String(content.isTemplate)}`;
+  const [prevPageTransitionKey, setPrevPageTransitionKey] =
+    useState(pageTransitionKey);
+  if (prevPageTransitionKey !== pageTransitionKey) {
+    setPrevPageTransitionKey(pageTransitionKey);
+    setSelectedBlockId(content.isTemplate ? 'template' : 'section-0');
+    setSectionStylesByIndex({});
+  }
+
   const editNavEntries = useMemo(
     () => pages.filter((p) => p.inMenu).map((p) => ({ key: p.id, label: p.name, page: p })),
     [],
   );
-
-  useEffect(() => {
-    setSelectedBlockId(content.isTemplate ? 'template' : 'section-0');
-    setSectionStylesByIndex({});
-  }, [currentPage?.id, content.isTemplate]);
 
   const handleSectionStyleChange = (sectionIndex, styleId) => {
     setSectionStylesByIndex((prev) => ({ ...prev, [sectionIndex]: styleId }));
@@ -392,7 +396,7 @@ function EditingView() {
           </div>
         );
       
-      case 'single':
+      case 'single': {
         // Single Templates - exact match to PreviewCanvas
         if (content.sections[0].type === 'product-detail') {
           const product = content.sections[0];
@@ -429,6 +433,7 @@ function EditingView() {
             </article>
           </div>
         );
+      }
       
       default:
         return <div className="p-section">Template content</div>;
@@ -441,7 +446,7 @@ function EditingView() {
 
   return (
     <div
-      className={`edit-canvas ${true ? 'show' : ''}`}
+      className="edit-canvas show"
       style={{
         // When the menu is expanded the canvas keeps its full original
         // width so its left edge sits flush against the 208px sidebar

@@ -366,21 +366,6 @@ function ConfigureHomepageReadingModal({
   );
 }
 
-function AddNewCard() {
-  return (
-    <div className="pp-card pp-card-add">
-      <div className="pp-card-thumb">
-        <span className="pp-card-icon pp-card-icon-add">{plus}</span>
-      </div>
-      <div className="pp-card-body">
-        <Text variant="body-md" className="pp-card-name">
-          Add new
-        </Text>
-      </div>
-    </div>
-  );
-}
-
 function renderAuthorCell(item) {
   const text = item.authorDisplay ?? "";
   if (!text) {
@@ -400,7 +385,6 @@ function PagesView() {
   const showDynamicPagesTab = searchParams.get("dynamic") === "true";
   const {
     currentPage,
-    setCurrentPage,
     selectPage,
     pagesViewMode,
     setPagesViewMode,
@@ -429,16 +413,15 @@ function PagesView() {
   const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
   const [publishConfirmPage, setPublishConfirmPage] = useState(null);
 
-  /** When Published includes template-backed rows, match former Dynamic tab default filters. */
-  useEffect(() => {
+  const effectiveDataView = useMemo(() => {
     if (activeCategory !== "published") {
-      return;
+      return view;
     }
-    setView((prev) => ({
-      ...prev,
+    return {
+      ...view,
       filters: showDynamicPagesTab ? [...SYSTEM_FILTER_HIDE] : [],
-    }));
-  }, [showDynamicPagesTab, activeCategory]);
+    };
+  }, [view, activeCategory, showDynamicPagesTab]);
 
   const readingSelectPages = useMemo(
     () => pages.filter((p) => p.category === "content" && p.status === "live"),
@@ -955,8 +938,8 @@ function PagesView() {
   };
 
   const { data: processedData, paginationInfo } = useMemo(
-    () => filterSortAndPaginate(categoryPages, view, fields),
-    [categoryPages, view, fields],
+    () => filterSortAndPaginate(categoryPages, effectiveDataView, fields),
+    [categoryPages, effectiveDataView, fields],
   );
 
   const handleChangeView = (newView) => {
@@ -1004,7 +987,7 @@ function PagesView() {
       <DataViews
         data={processedData}
         fields={fields}
-        view={view}
+        view={effectiveDataView}
         onChangeView={handleChangeView}
         defaultLayouts={DEFAULT_LAYOUTS}
         actions={actions}

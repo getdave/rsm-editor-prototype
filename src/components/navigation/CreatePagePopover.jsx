@@ -1,11 +1,6 @@
 import { useState } from 'react';
-import {
-  Button,
-  TextControl,
-  CheckboxControl,
-  __experimentalVStack as VStack,
-  __experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Button, TextControl, CheckboxControl } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { arrowLeft } from '@wordpress/icons';
 
 /**
@@ -42,7 +37,7 @@ function CreatePagePopover({ onBack, onCancel, onSave }) {
         </button>
       </div>
 
-      <VStack spacing={4} className="nav-popover-body">
+      <Stack direction="column" gap="md" className="nav-popover-body">
         <TextControl
           label="Page name"
           value={pageName}
@@ -62,16 +57,21 @@ function CreatePagePopover({ onBack, onCancel, onSave }) {
         <p className="nav-create-page-help">
           You can edit this page and choose a layout later under the Pages screen.
         </p>
-      </VStack>
+      </Stack>
 
-      <HStack justify="flex-end" className="nav-popover-footer">
+      <Stack
+        direction="row"
+        justify="flex-end"
+        gap="sm"
+        className="nav-popover-footer"
+      >
         <Button variant="tertiary" onClick={onCancel}>
           Cancel
         </Button>
         <Button variant="primary" onClick={handleSubmit} disabled={!canSave}>
           Create page
         </Button>
-      </HStack>
+      </Stack>
     </div>
   );
 }

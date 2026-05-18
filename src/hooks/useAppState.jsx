@@ -222,9 +222,9 @@ export function AppStateProvider({ children }) {
     );
   };
 
-  const markDirty = () => {
+  const markDirty = useCallback(() => {
     setHasUnsavedChanges(true);
-  };
+  }, []);
 
   const save = () => {
     setHasUnsavedChanges(false);
@@ -371,6 +371,8 @@ export function AppStateProvider({ children }) {
   );
 }
 
+/** Hook for AppStateProvider; exported beside the provider for ergonomics in a prototype. */
+// eslint-disable-next-line react-refresh/only-export-components -- useAppState is intentionally colocated with AppStateProvider
 export function useAppState() {
   const context = useContext(AppStateContext);
   if (!context) {

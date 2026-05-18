@@ -74,10 +74,6 @@ function CommandPaletteContent() {
   }, []);
 
   useEffect(() => {
-    setActive(0);
-  }, [query]);
-
-  useEffect(() => {
     const el = listRef.current?.querySelector('.cp-item.is-active');
     el?.scrollIntoView({ block: 'nearest' });
   }, [active]);
@@ -124,7 +120,10 @@ function CommandPaletteContent() {
           type="text"
           className="cp-input"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setActive(0);
+          }}
           onKeyDown={onKeyDown}
           placeholder="Search anything…"
           aria-label="Search commands"

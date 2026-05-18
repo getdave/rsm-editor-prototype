@@ -13,7 +13,6 @@ function PagesFloatingPanel() {
 
   useEffect(() => {
     if (!sidebarCollapsed) {
-      setIsVisible(false);
       return;
     }
 
@@ -92,10 +91,12 @@ function PagesFloatingPanel() {
     setIsVisible(false);
   };
 
+  const panelOpen = sidebarCollapsed && isVisible;
+
   return (
     <div 
       ref={panelRef}
-      className={`pages-fp ${isVisible ? 'show' : ''}`}
+      className={`pages-fp ${panelOpen ? 'show' : ''}`}
       style={{ left: `${position.left}px`, bottom: `${position.bottom}px`, top: 'auto' }}
     >
       <Stack direction="row" align="center" className="pages-fp-hd">

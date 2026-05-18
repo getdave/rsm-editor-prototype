@@ -7,6 +7,10 @@ import { chevronDown, plus } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import DefinedTerm from '../shared/DefinedTerm';
 
+function createUniquePageId() {
+  return `page-${Date.now()}`;
+}
+
 function AddPageModal() {
   const { addPageModalOpen } = useAppState();
 
@@ -107,9 +111,9 @@ function AddPageModalContent() {
       .replace(/^-+|-+$/g, '');
   };
 
-  const createPageObject = () => {
+  const buildPageObject = (id) => {
     return {
-      id: slugify(pageTitle) || `page-${Date.now()}`,
+      id,
       slug: slugify(pageTitle),
       name: pageTitle,
       type: 'Page',
@@ -125,7 +129,9 @@ function AddPageModalContent() {
 
   const handleCreateAndEdit = () => {
     if (!pageTitle.trim()) return;
-    const newPage = createPageObject();
+    const slug = slugify(pageTitle);
+    const id = slug || createUniquePageId();
+    const newPage = buildPageObject(id);
     addPage(newPage);
     if (newPage.inMenu) {
       addPageToMainMenu(newPage);
@@ -140,7 +146,9 @@ function AddPageModalContent() {
 
   const handleCreate = () => {
     if (!pageTitle.trim()) return;
-    const newPage = createPageObject();
+    const slug = slugify(pageTitle);
+    const id = slug || createUniquePageId();
+    const newPage = buildPageObject(id);
     addPage(newPage);
     if (newPage.inMenu) {
       addPageToMainMenu(newPage);

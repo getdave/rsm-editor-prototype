@@ -1,11 +1,6 @@
 import { useMemo, useState } from 'react';
-import {
-  Button,
-  TextControl,
-  Notice,
-  __experimentalVStack as VStack,
-  __experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Button, TextControl, Notice } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import {
   arrowLeft,
   customLink,
@@ -191,7 +186,7 @@ function AddLinkPopover({ onBack, onCancel, onSave }) {
         </button>
       </div>
 
-      <VStack spacing={4} className="nav-popover-body">
+      <Stack direction="column" gap="md" className="nav-popover-body">
         <div
           className={
             urlError ? 'nav-add-link-url-field nav-add-link-url-field--error' : 'nav-add-link-url-field'
@@ -240,16 +235,21 @@ function AddLinkPopover({ onBack, onCancel, onSave }) {
           help={labelError || 'Label shown in the menu'}
           __nextHasNoMarginBottom
         />
-      </VStack>
+      </Stack>
 
-      <HStack justify="flex-end" className="nav-popover-footer">
+      <Stack
+        direction="row"
+        justify="flex-end"
+        gap="sm"
+        className="nav-popover-footer"
+      >
         <Button variant="tertiary" onClick={onCancel}>
           Cancel
         </Button>
         <Button variant="primary" onClick={validateAndSubmit} disabled={!canSave}>
           Add link
         </Button>
-      </HStack>
+      </Stack>
     </div>
   );
 }
