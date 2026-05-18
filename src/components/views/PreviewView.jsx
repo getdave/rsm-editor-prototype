@@ -20,11 +20,32 @@ const PAGES_INDEX_FIELDS = [
     enableHiding: false,
     filterBy: false,
     enableGlobalSearch: false,
-    render: ({ item }) => (
-      <span className="pp-media-thumb pp-media-thumb--grid">
-        <PageLayoutWireframeThumb page={item} />
-      </span>
-    ),
+    render: ({ item }) => {
+      const className = [
+        'pp-media-thumb',
+        'pp-media-thumb--grid',
+        item.isCollection ? 'pp-media-thumb--collection' : '',
+        item.collectionState === 'inactive'
+          ? 'pp-media-thumb--inactive'
+          : '',
+      ]
+        .filter(Boolean)
+        .join(' ');
+      return (
+        <span className={className}>
+          <PageLayoutWireframeThumb page={item} />
+          {item.isFrontPage ? (
+            <span className="pp-front-page-overlay">Homepage</span>
+          ) : item.collectionOverlay ? (
+            <span className="pp-collection-marker-overlay">
+              {item.collectionOverlay}
+            </span>
+          ) : item.isPostsPage ? (
+            <span className="pp-posts-page-overlay">Posts page</span>
+          ) : null}
+        </span>
+      );
+    },
   },
   {
     id: 'name',
