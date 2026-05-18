@@ -67,42 +67,17 @@
 }
 
 .admin-root-nav .ni.on {
-  background: #252525;
-  font-weight: 700;
-}
-
-.sidebar-nav-pane-admin > .ni.on,
-.editor-sidebar-root-nav > .ni.on {
-  position: relative;
-  z-index: 1;
-  background: var(--wp-page-area-surface, #fff);
-  color: #1e1e1e;
-  border-radius: 4px 0 0 4px;
+  background: transparent;
+  color: inherit;
+  border: 1px solid #1e1e1e;
+  box-shadow: 0 0 0 1px #1e1e1e;
+  border-radius: 4px;
   font-weight: 600;
 }
 
-.sidebar-nav-pane-admin > .ni.on:hover,
-.editor-sidebar-root-nav > .ni.on:hover {
-  background: var(--wp-page-area-surface, #fff);
-  color: #1e1e1e;
-}
-
-.sidebar-nav-pane-admin > .ni.on::after,
-.editor-sidebar-root-nav > .ni.on::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: calc(-1 * var(--sidebar-active-bleed, 24px));
-  bottom: 0;
-  width: var(--sidebar-active-bleed, 24px);
-  background: var(--wp-page-area-surface, #fff);
-  pointer-events: none;
-}
-
-.sidebar.collapsed .sidebar-nav-pane-admin > .ni.on,
-.sidebar.collapsed .editor-sidebar-root-nav > .ni.on {
-  /* Narrow rail: any radius shows dark chrome wedges — keep the chip square. */
-  border-radius: 0;
+.admin-root-nav .ni.on:hover {
+  background: transparent;
+  color: inherit;
 }
 
 .admin-root-nav .ni-ico {
@@ -160,7 +135,7 @@
 }
 
 .admin-root-nav a.sb-advanced-sub.ni.ni-child.on {
-  color: #fff;
+  color: inherit;
 }
 
 .admin-root-nav a.sb-advanced-sub.ni.ni-child .ni-label {
@@ -171,9 +146,12 @@
   color: #bbb;
 }
 
-.admin-root-nav a.sb-advanced-sub.ni.ni-child:hover .ni-label,
-.admin-root-nav a.sb-advanced-sub.ni.ni-child.on .ni-label {
+.admin-root-nav a.sb-advanced-sub.ni.ni-child:hover .ni-label {
   color: #fff;
+}
+
+.admin-root-nav a.sb-advanced-sub.ni.ni-child.on .ni-label {
+  color: inherit;
 }
 
 .sidebar.collapsed .admin-root-nav .sb-advanced-sub.ni.ni-child {
@@ -285,9 +263,11 @@
 }
 
 .ni.on {
-  background: #252525;
-  color: #fff;
-  border-left-color: #3858e9;
+  background: transparent;
+  color: inherit;
+  border: 1px solid #1e1e1e;
+  box-shadow: 0 0 0 1px #1e1e1e;
+  border-radius: 4px;
 }
 
 .ni-ico {
@@ -341,7 +321,6 @@
 }
 
 .sidebar.collapsed .ni.on {
-  border-left-color: transparent;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }

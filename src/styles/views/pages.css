@@ -6,7 +6,7 @@
   height: 100%;
   display: none;
   flex-direction: column;
-  background: transparent;
+  background: var(--wpds-color-bg-surface-neutral-weak, #f4f4f4);
   box-sizing: border-box;
 }
 
@@ -975,4 +975,24 @@
 
 .ch-reading-footer.modal-footer {
   justify-content: flex-end;
+}
+
+/* Preview panel header — used by PreviewView pages-panel wrapper */
+.preview-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 12px 12px;
+}
+
+.preview-panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--wp-gray-900, #1e1e1e);
+}
+
+.preview-panel-header .components-toggle-group-control {
+  min-width: 200px;
 }
