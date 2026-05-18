@@ -390,8 +390,7 @@ export const contentTypes = [
     iconKey: "postList",
     count: 12,
     manageLabel: "Manage posts",
-    description: "Write posts and control how posts appear on the site.",
-    pageDesignIds: ["blog-list", "blog-single"],
+    description: "Write and manage posts for your site.",
   },
   {
     id: "products",
@@ -401,8 +400,7 @@ export const contentTypes = [
     iconKey: "products",
     count: 8,
     manageLabel: "Manage products",
-    description: "Manage products and control how shopping pages appear on the site.",
-    pageDesignIds: ["product-list", "product-single"],
+    description: "Manage product details, prices, stock, and status.",
   },
   {
     id: "events",
@@ -412,8 +410,7 @@ export const contentTypes = [
     iconKey: "calendar",
     count: 6,
     manageLabel: "Manage events",
-    description: "Manage events and see which layouts currently display them.",
-    pageDesignIds: ["event-list", "event-single"],
+    description: "Manage event details, dates, venues, and status.",
   },
 ];
 
