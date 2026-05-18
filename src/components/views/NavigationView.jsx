@@ -16,8 +16,6 @@ function NavigationView() {
     navigationMenus: menus,
     setNavigationMenus,
     pages: appPages,
-    sidebarCollapsed,
-    toggleSidebar,
   } = useAppState();
   const [selectedMenuId, setSelectedMenuId] = useState(null);
   const [forceShowList, setForceShowList] = useState(false);
@@ -144,19 +142,23 @@ function NavigationView() {
     [menus, view, fields]
   );
 
-  /** Top-level menu rows only — matches editor order and labels; drives preview header nav. */
+  /** Menu rows — matches editor order and labels; drives preview header nav. */
   const previewHeaderNavItems = useMemo(() => {
     const menuForPreview =
       selectedMenu ?? menus.find((m) => m.isPrimary) ?? menus[0];
     if (!menuForPreview?.items?.length) {
       return [];
     }
-    return menuForPreview.items.map((item) => ({
+
+    const mapPreviewItem = (item) => ({
       id: item.id,
       label: item.label,
       ...(item.pageId != null ? { pageId: item.pageId } : {}),
       ...(item.url != null ? { url: item.url } : {}),
-    }));
+      children: (item.children || []).map(mapPreviewItem),
+    });
+
+    return menuForPreview.items.map(mapPreviewItem);
   }, [selectedMenu, menus]);
 
   const stageContent = (

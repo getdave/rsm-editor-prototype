@@ -4,13 +4,11 @@ import {
   DropdownMenu,
   MenuGroup,
   MenuItem,
-  Popover,
 } from '@wordpress/components';
 import { Page } from '@wordpress/admin-ui';
 import {
   chevronDown,
   chevronRight,
-  dragHandle,
   moreVertical,
   page as pageIcon,
   plus,
@@ -19,65 +17,217 @@ import {
 import { useAppState } from '../../hooks/useAppState';
 import RenameMenuItemModal from './RenameMenuItemModal';
 import DeleteMenuItemConfirmModal from '../modals/DeleteMenuItemConfirmModal';
-import AddLinkPopover from './AddLinkPopover';
-import CreatePagePopover from './CreatePagePopover';
 import AddPagesToMenuModal from './AddPagesToMenuModal';
 
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+const MAX_MENU_LEVEL = 1;
+
+function getSubtreeDepth(item) {
+  if (!item.children?.length) {
+    return 0;
+  }
+
+  return 1 + Math.max(...item.children.map(getSubtreeDepth));
 }
 
-function uniquePageId(name, pagesList) {
-  const base = slugify(name) || `page-${Date.now()}`;
-  let id = base;
-  let n = 0;
-  while (pagesList.some((p) => p.id === id)) {
-    n += 1;
-    id = `${base}-${n}`;
+function getMenuItemMeta(items, itemId, level = 0, ancestors = []) {
+  for (const item of items) {
+    if (item.id === itemId) {
+      return { item, level, ancestors };
+    }
+
+    if (item.children?.length) {
+      const match = getMenuItemMeta(item.children, itemId, level + 1, [
+        ...ancestors,
+        item.id,
+      ]);
+      if (match) {
+        return match;
+      }
+    }
   }
-  return id;
+
+  return null;
+}
+
+function removeMenuItem(items, itemId) {
+  let removedItem = null;
+  let changed = false;
+  const nextItems = [];
+
+  for (const item of items) {
+    if (item.id === itemId) {
+      removedItem = item;
+      changed = true;
+      continue;
+    }
+
+    if (item.children?.length) {
+      const result = removeMenuItem(item.children, itemId);
+      if (result.removedItem) {
+        removedItem = result.removedItem;
+        changed = true;
+        nextItems.push({ ...item, children: result.items });
+        continue;
+      }
+    }
+
+    nextItems.push(item);
+  }
+
+  return {
+    items: changed ? nextItems : items,
+    removedItem,
+  };
+}
+
+function insertMenuItemRelative(items, targetId, itemToInsert, position) {
+  let inserted = false;
+
+  const nextItems = items.flatMap((item) => {
+    if (item.id === targetId) {
+      inserted = true;
+      return position === 'above'
+        ? [itemToInsert, item]
+        : [item, itemToInsert];
+    }
+
+    if (item.children?.length) {
+      const result = insertMenuItemRelative(
+        item.children,
+        targetId,
+        itemToInsert,
+        position,
+      );
+      if (result.inserted) {
+        inserted = true;
+        return [{ ...item, children: result.items }];
+      }
+    }
+
+    return [item];
+  });
+
+  return { items: inserted ? nextItems : items, inserted };
+}
+
+function insertMenuItemInside(items, targetId, itemToInsert) {
+  let inserted = false;
+
+  const nextItems = items.map((item) => {
+    if (item.id === targetId) {
+      inserted = true;
+      return {
+        ...item,
+        children: [...(item.children || []), itemToInsert],
+      };
+    }
+
+    if (item.children?.length) {
+      const result = insertMenuItemInside(item.children, targetId, itemToInsert);
+      if (result.inserted) {
+        inserted = true;
+        return { ...item, children: result.items };
+      }
+    }
+
+    return item;
+  });
+
+  return { items: inserted ? nextItems : items, inserted };
+}
+
+function isValidDropTarget(items, draggedId, targetId, position) {
+  if (!draggedId || !targetId || draggedId === targetId) {
+    return false;
+  }
+
+  const draggedMeta = getMenuItemMeta(items, draggedId);
+  const targetMeta = getMenuItemMeta(items, targetId);
+  if (!draggedMeta || !targetMeta) {
+    return false;
+  }
+
+  if (targetMeta.ancestors.includes(draggedId)) {
+    return false;
+  }
+
+  const draggedDepth = getSubtreeDepth(draggedMeta.item);
+
+  if (position === 'inside') {
+    return targetMeta.level === 0 && draggedDepth === 0;
+  }
+
+  return targetMeta.level + draggedDepth <= MAX_MENU_LEVEL;
+}
+
+function moveMenuItem(items, draggedId, targetId, position) {
+  if (!isValidDropTarget(items, draggedId, targetId, position)) {
+    return items;
+  }
+
+  const removal = removeMenuItem(items, draggedId);
+  if (!removal.removedItem) {
+    return items;
+  }
+
+  const itemToInsert = {
+    ...removal.removedItem,
+    children: removal.removedItem.children || [],
+  };
+
+  if (position === 'inside') {
+    const result = insertMenuItemInside(
+      removal.items,
+      targetId,
+      itemToInsert,
+    );
+    return result.inserted ? result.items : items;
+  }
+
+  const result = insertMenuItemRelative(
+    removal.items,
+    targetId,
+    itemToInsert,
+    position,
+  );
+  return result.inserted ? result.items : items;
 }
 
 function MenuEditor({ menu, onUpdateMenu, onBack }) {
-  const { pages: allPages, addPage, showSnackbar } = useAppState();
+  const { pages: allPages, showSnackbar } = useAppState();
   const [expandedItems, setExpandedItems] = useState(new Set());
   /** When set, rename modal is open for this menu tree item (by reference shape). */
   const [renameTarget, setRenameTarget] = useState(null);
   /** When set, delete confirmation is open for this menu tree item. */
   const [itemPendingDelete, setItemPendingDelete] = useState(null);
 
-  /** null | 'menu' | 'add-link' | 'create-page' */
-  const [inserterView, setInserterView] = useState(null);
-  const inserterAnchorRef = useRef(null);
   const [showAddPagesModal, setShowAddPagesModal] = useState(false);
   const [addPagesModalKey, setAddPagesModalKey] = useState(0);
   /** Nav item row ids that should play the attention flash (newly added links). */
   const [flashNavItemIds, setFlashNavItemIds] = useState([]);
+  const [draggingItemId, setDraggingItemId] = useState(null);
+  const [dropTarget, setDropTargetState] = useState(null);
+  const [dragGhostPosition, setDragGhostPosition] = useState(null);
+  const dragStateRef = useRef({ itemId: null });
 
-  const closeInserter = () => setInserterView(null);
+  const setDropTarget = useCallback((nextTarget) => {
+    setDropTargetState((prevTarget) => {
+      if (
+        prevTarget?.itemId === nextTarget?.itemId &&
+        prevTarget?.position === nextTarget?.position
+      ) {
+        return prevTarget;
+      }
+      return nextTarget;
+    });
+  }, []);
 
   const openAddPagesModal = useCallback(() => {
     setAddPagesModalKey((k) => k + 1);
     setShowAddPagesModal(true);
   }, []);
 
-  const toggleInserterFromButton = () => {
-    setInserterView((prev) => (prev ? null : 'menu'));
-  };
-
-  const addItemToMenu = (newItem) => {
-    const item = {
-      children: [],
-      ...newItem,
-    };
-    onUpdateMenu({ items: [...menu.items, item] });
-    setFlashNavItemIds([item.id]);
-  };
-
-  const addPageLinksFromPicker = useCallback(
+  const addLinksFromPicker = useCallback(
     (selectedRows) => {
       if (!selectedRows?.length) {
         showSnackbar('Nothing was added to the menu.');
@@ -86,9 +236,13 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
       }
       const ts = Date.now();
       const newItems = selectedRows.map((row, index) => ({
-        id: `nav-page-${row.id}-${ts}-${index}`,
-        label: row.name,
-        pageId: row.id,
+        id: `nav-${row.id}-${ts}-${index}`,
+        label: row.navLabel ?? row.name,
+        ...(row.navPageId || row.pageId || row.category === 'content'
+          ? { pageId: row.navPageId ?? row.pageId ?? row.id }
+          : {}),
+        ...(row.navUrl || row.url ? { url: row.navUrl ?? row.url } : {}),
+        ...(row.sourceType ? { sourceType: row.sourceType } : {}),
         children: [],
       }));
       onUpdateMenu({ items: [...menu.items, ...newItems] });
@@ -116,6 +270,13 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     () => new Set(flashNavItemIds),
     [flashNavItemIds],
   );
+  const draggedItem = useMemo(
+    () =>
+      draggingItemId
+        ? getMenuItemMeta(menu.items, draggingItemId)?.item ?? null
+        : null,
+    [draggingItemId, menu.items],
+  );
 
   const toggleExpanded = (itemId) => {
     setExpandedItems((prev) => {
@@ -130,17 +291,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
   };
 
   const removeItem = (itemId) => {
-    const removeFromItems = (items) => {
-      return items.filter((item) => {
-        if (item.id === itemId) return false;
-        if (item.children && item.children.length > 0) {
-          item.children = removeFromItems(item.children);
-        }
-        return true;
-      });
-    };
-
-    onUpdateMenu({ items: removeFromItems([...menu.items]) });
+    onUpdateMenu({ items: removeMenuItem(menu.items, itemId).items });
   };
 
   const moveItem = (itemId, direction) => {
@@ -164,6 +315,119 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     };
 
     onUpdateMenu({ items: findAndMove([...menu.items]) });
+  };
+
+  const resolveDropTarget = useCallback(
+    (clientX, clientY) => {
+      const draggedId = dragStateRef.current.itemId;
+      if (!draggedId) {
+        return null;
+      }
+
+      const element = document.elementFromPoint(clientX, clientY);
+      const row = element?.closest?.('[data-nav-menu-item-id]');
+      if (!row) {
+        return null;
+      }
+
+      const targetId = row.dataset.navMenuItemId;
+      const rect = row.getBoundingClientRect();
+      const y = clientY - rect.top;
+      let position = 'inside';
+
+      if (y < rect.height * 0.3) {
+        position = 'above';
+      } else if (y > rect.height * 0.7) {
+        position = 'below';
+      }
+
+      if (!isValidDropTarget(menu.items, draggedId, targetId, position)) {
+        return null;
+      }
+
+      return { itemId: targetId, position };
+    },
+    [menu.items],
+  );
+
+  useEffect(() => {
+    if (!draggingItemId) {
+      return undefined;
+    }
+
+    const handlePointerMove = (event) => {
+      event.preventDefault();
+      setDragGhostPosition({ x: event.clientX, y: event.clientY });
+      setDropTarget(resolveDropTarget(event.clientX, event.clientY));
+    };
+
+    const finishDrag = (event) => {
+      event.preventDefault();
+      const target = resolveDropTarget(event.clientX, event.clientY);
+      const draggedId = dragStateRef.current.itemId;
+
+      if (draggedId && target) {
+        const nextItems = moveMenuItem(
+          menu.items,
+          draggedId,
+          target.itemId,
+          target.position,
+        );
+
+        if (nextItems !== menu.items) {
+          onUpdateMenu({ items: nextItems });
+          if (target.position === 'inside') {
+            setExpandedItems((prev) => new Set(prev).add(target.itemId));
+          }
+        }
+      }
+
+      dragStateRef.current.itemId = null;
+      setDraggingItemId(null);
+      setDragGhostPosition(null);
+      setDropTarget(null);
+    };
+
+    const cancelDrag = (event) => {
+      if (event.key !== 'Escape') {
+        return;
+      }
+      dragStateRef.current.itemId = null;
+      setDraggingItemId(null);
+      setDragGhostPosition(null);
+      setDropTarget(null);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', finishDrag);
+    window.addEventListener('keydown', cancelDrag);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', finishDrag);
+      window.removeEventListener('keydown', cancelDrag);
+    };
+  }, [
+    draggingItemId,
+    menu.items,
+    onUpdateMenu,
+    resolveDropTarget,
+    setDropTarget,
+  ]);
+
+  const startDraggingItem = (event, itemId) => {
+    if (event.button !== 0) {
+      return;
+    }
+    if (event.target.closest('button, a, input, select, textarea')) {
+      return;
+    }
+
+    event.preventDefault();
+    dragStateRef.current.itemId = itemId;
+    setDraggingItemId(itemId);
+    setDragGhostPosition({ x: event.clientX, y: event.clientY });
+    setDropTarget(null);
   };
 
   const renameItemLabel = (itemId, newLabel) => {
@@ -192,12 +456,24 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     const canMoveUp = index > 0;
     const canMoveDown = index < siblings.length - 1;
     const rowIcon = item.url ? linkIconGlyph : pageIcon;
+    const activeDropPosition =
+      dropTarget?.itemId === item.id ? dropTarget.position : null;
+    const rowClasses = [
+      'nav-menu-editor-item',
+      flashNavItemIdSet.has(item.id) ? 'flash-highlight' : '',
+      draggingItemId === item.id ? 'is-dragging' : '',
+      activeDropPosition ? `is-drop-${activeDropPosition}` : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
 
     return (
       <div key={item.id} className="nav-menu-item-wrapper">
         <div
-          className={`nav-menu-editor-item${flashNavItemIdSet.has(item.id) ? ' flash-highlight' : ''}`}
+          className={rowClasses}
+          data-nav-menu-item-id={item.id}
           style={{ paddingLeft: `${level * 24 + 12}px` }}
+          onPointerDown={(event) => startDraggingItem(event, item.id)}
         >
           {hasChildren && (
             <button
@@ -214,17 +490,9 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           <span className="nav-item-label">{item.label}</span>
 
           <div className="nav-item-actions">
-            <button
-              type="button"
-              className="nav-item-drag-handle"
-              aria-label="Drag to reorder"
-              title="Drag to reorder"
-            >
-              {dragHandle}
-            </button>
-
             <DropdownMenu
               icon={moreVertical}
+              iconSize={20}
               label="Menu item options"
               className="nav-item-dropdown"
               popoverProps={{ placement: 'bottom-end' }}
@@ -329,124 +597,23 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     </nav>
   );
 
-  const pageActions = (
-    <Button
-      variant="secondary"
-      onClick={openAddPagesModal}
-      className="nav-header-add-btn"
-    >
-      Add pages
-    </Button>
-  );
-
   const quickInserter = (
-    <>
-      <div className="nav-add-item-dropdown">
-        <Button
-          ref={inserterAnchorRef}
-          icon={plus}
-          label="Add to menu"
-          className="nav-add-page-btn"
-          onClick={toggleInserterFromButton}
-          aria-expanded={inserterView !== null}
-          aria-haspopup="dialog"
-        />
-      </div>
-      {inserterView ? (
-        <Popover
-          anchorRef={inserterAnchorRef}
-          placement="bottom-start"
-          onClose={closeInserter}
-          offset={4}
-          focusOnMount="firstElement"
-        >
-          <div key={inserterView} className="nav-inserter-popover-shell">
-            {inserterView === 'menu' ? (
-              <div className="nav-inserter-menu">
-                <div className="nav-inserter-menu-header">Add to menu</div>
-                <MenuGroup>
-                  <MenuItem
-                    icon={pageIcon}
-                    onClick={() => {
-                      closeInserter();
-                      openAddPagesModal();
-                    }}
-                  >
-                    Add pages
-                  </MenuItem>
-                  <MenuItem
-                    icon={linkIconGlyph}
-                    onClick={() => setInserterView('add-link')}
-                  >
-                    Add Link
-                  </MenuItem>
-                </MenuGroup>
-                <MenuGroup>
-                  <MenuItem
-                    icon={plus}
-                    onClick={() => setInserterView('create-page')}
-                  >
-                    Create new page
-                  </MenuItem>
-                </MenuGroup>
-              </div>
-            ) : null}
-            {inserterView === 'add-link' ? (
-              <AddLinkPopover
-                onBack={() => setInserterView('menu')}
-                onCancel={closeInserter}
-                onSave={({ label: linkLabel, url }) => {
-                  addItemToMenu({
-                    id: `nav-link-${Date.now()}`,
-                    label: linkLabel,
-                    url,
-                  });
-                  showSnackbar(`Added "${linkLabel}" to the menu`);
-                  closeInserter();
-                }}
-              />
-            ) : null}
-            {inserterView === 'create-page' ? (
-              <CreatePagePopover
-                onBack={() => setInserterView('menu')}
-                onCancel={closeInserter}
-                onSave={({ name, publishImmediately }) => {
-                  const pageId = uniquePageId(name, allPages);
-                  const newPage = {
-                    id: pageId,
-                    slug: pageId,
-                    name,
-                    type: 'Page',
-                    isLive: publishImmediately,
-                    inMenu: true,
-                    isSystem: false,
-                    category: 'content',
-                    status: publishImmediately ? 'live' : 'draft',
-                    level: 0,
-                    authorDisplay: 'John Doe',
-                  };
-                  addPage(newPage);
-                  addItemToMenu({
-                    id: `nav-page-${pageId}-${Date.now()}`,
-                    label: name,
-                    pageId,
-                  });
-                  showSnackbar(`Created page "${name}" and added it to the menu`);
-                  closeInserter();
-                }}
-              />
-            ) : null}
-          </div>
-        </Popover>
-      ) : null}
-    </>
+    <div className="nav-add-item-dropdown">
+      <Button
+        icon={plus}
+        label="Add to menu"
+        className="nav-add-page-btn"
+        onClick={openAddPagesModal}
+        aria-haspopup="dialog"
+      />
+    </div>
   );
+  const dragGhostIcon = draggedItem?.url ? linkIconGlyph : pageIcon;
 
   return (
     <Page
       className="split-view-stage nav-editor-frame"
       breadcrumbs={breadcrumbs}
-      actions={pageActions}
       showSidebarToggle={false}
     >
       <div className="nav-editor-inner">
@@ -456,7 +623,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
               <div className="nav-empty-state">
                 <p>No items in this menu yet</p>
                 <p className="nav-empty-hint">
-                  Use &quot;Add pages&quot; above or the + button below to add links.
+                  Use the + button below to add links.
                 </p>
               </div>
               {quickInserter}
@@ -471,6 +638,19 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           )}
         </div>
       </div>
+
+      {draggedItem && dragGhostPosition ? (
+        <div
+          className="nav-menu-drag-ghost"
+          style={{
+            transform: `translate3d(${dragGhostPosition.x + 12}px, ${dragGhostPosition.y + 12}px, 0)`,
+          }}
+          aria-hidden="true"
+        >
+          <span className="nav-menu-drag-ghost__icon">{dragGhostIcon}</span>
+          <span className="nav-menu-drag-ghost__label">{draggedItem.label}</span>
+        </div>
+      ) : null}
 
       {renameTarget ? (
         <RenameMenuItemModal
@@ -505,7 +685,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           onClose={() => setShowAddPagesModal(false)}
           pages={allPages}
           menuItems={menu.items}
-          onConfirm={addPageLinksFromPicker}
+          onConfirm={addLinksFromPicker}
         />
       ) : null}
     </Page>

@@ -18,7 +18,7 @@ function docTypeIcon(p) {
 }
 
 /**
- * @typedef {{ id: string, label: string, pageId?: string, url?: string }} HeaderNavItem
+ * @typedef {{ id: string, label: string, pageId?: string, url?: string, children?: HeaderNavItem[] }} HeaderNavItem
  */
 
 /**
@@ -47,37 +47,53 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
 
   const fallbackMenuPages = pages.filter((p) => p.inMenu);
 
+  const resolveHeaderNavItem = (item) => {
+    const children = (item.children || [])
+      .map(resolveHeaderNavItem)
+      .filter(Boolean);
+
+    if (item.pageId) {
+      const targetPage = pages.find((p) => p.id === item.pageId);
+      return targetPage
+        ? {
+            kind: 'page',
+            key: item.id,
+            label: item.label,
+            page: targetPage,
+            children,
+          }
+        : null;
+    }
+
+    if (item.url) {
+      return {
+        kind: 'url',
+        key: item.id,
+        label: item.label,
+        href: item.url,
+        children,
+      };
+    }
+
+    return children.length
+      ? {
+          kind: 'label',
+          key: item.id,
+          label: item.label,
+          children,
+        }
+      : null;
+  };
+
   const navEntries =
     headerNavItems !== undefined
-      ? headerNavItems
-          .map((item) => {
-            if (item.pageId) {
-              const targetPage = pages.find((p) => p.id === item.pageId);
-              return targetPage
-                ? {
-                    kind: 'page',
-                    key: item.id,
-                    label: item.label,
-                    page: targetPage,
-                  }
-                : null;
-            }
-            if (item.url) {
-              return {
-                kind: 'url',
-                key: item.id,
-                label: item.label,
-                href: item.url,
-              };
-            }
-            return null;
-          })
-          .filter(Boolean)
+      ? headerNavItems.map(resolveHeaderNavItem).filter(Boolean)
       : fallbackMenuPages.map((p) => ({
           kind: 'page',
           key: p.id,
           label: p.name,
           page: p,
+          children: [],
         }));
 
   const handleNavClick = (clickedPage) => {

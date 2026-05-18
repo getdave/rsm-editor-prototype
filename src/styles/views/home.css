@@ -44,11 +44,19 @@
 
 .p-nav {
   display: flex;
+  align-items: center;
   gap: 32px;
   padding-right: 60px;
 }
 
-.p-nav a {
+.p-nav-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.p-nav a,
+.p-nav .p-nav-label {
   color: rgba(255, 255, 255, 0.8);
   font-size: 15px;
   text-decoration: none;
@@ -58,6 +66,75 @@
 
 .p-nav a:hover {
   color: #fff;
+}
+
+.p-nav-dropdown-indicator {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+}
+
+.p-nav-dropdown-indicator svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.p-nav-item.has-children:hover .p-nav-dropdown-indicator,
+.p-nav-item.has-children:focus-within .p-nav-dropdown-indicator {
+  color: #fff;
+}
+
+.p-nav-item.has-children::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 10px;
+}
+
+.p-subnav {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 4;
+  display: none;
+  min-width: 160px;
+  padding: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.p-nav-item.has-children:hover .p-subnav,
+.p-nav-item.has-children:focus-within .p-subnav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.p-nav .p-subnav a,
+.p-nav .p-subnav .p-subnav-link {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 3px;
+  color: #1e1e1e;
+  font-size: 14px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.p-nav .p-subnav a:hover,
+.p-nav .p-subnav .p-subnav-link:hover {
+  background: #f0f0f0;
+  color: #1e1e1e;
 }
 
 .p-hero {
