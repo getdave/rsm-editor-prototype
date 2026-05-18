@@ -6,7 +6,7 @@
   height: 100%;
   display: none;
   flex-direction: column;
-  background: var(--wpds-color-bg-surface-neutral-weak, #f4f4f4);
+  background: transparent;
   box-sizing: border-box;
 }
 
@@ -990,9 +990,19 @@
   font-size: 13px;
   font-weight: 600;
   margin: 0;
-  color: var(--wp-gray-900, #1e1e1e);
+  color: #fff;
 }
 
 .preview-panel-header .components-toggle-group-control {
   min-width: 200px;
+}
+
+/* Home preview canvas — raised white card matching .pages-preview-frame */
+.preview-panel .preview-body-canvas {
+  background: var(--wp-page-area-surface, #fff);
+  border-radius: var(--wp-page-area-radius, 8px);
+  border: var(--wp-page-area-border, 1px solid #949494);
+  box-shadow: var(--wp-page-area-shadow);
+  overflow: hidden;
+  min-height: 0;
 }
