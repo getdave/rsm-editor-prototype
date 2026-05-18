@@ -9,6 +9,8 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
 import {
   archive,
   category,
+  chevronDown,
+  chevronUp,
   customLink,
   file,
   home,
@@ -157,6 +159,57 @@ function createAdvancedView(groupId) {
     showMedia: isMediaGroup,
     showDescription: false,
   };
+}
+
+function ModalPickerViewOptionsToggle({ isOpen, onToggle }) {
+  return (
+    <Button
+      variant="tertiary"
+      className="nav-add-picker-view-options-toggle"
+      onClick={onToggle}
+      aria-expanded={isOpen}
+    >
+      View options
+      <span className="nav-add-picker-view-options-chevron">
+        {isOpen ? chevronUp : chevronDown}
+      </span>
+    </Button>
+  );
+}
+
+function ModalPickerChrome({
+  isOpen,
+  onToggle,
+  searchLabel,
+  showToggleRow = true,
+}) {
+  return (
+    <>
+      {showToggleRow ? (
+        <div className="nav-add-picker-view-options-row">
+          <ModalPickerViewOptionsToggle
+            isOpen={isOpen}
+            onToggle={onToggle}
+          />
+        </div>
+      ) : null}
+      {isOpen ? (
+        <>
+          <div className="nav-add-picker-toolbar-row-options">
+            <DataViewsPicker.Search label={searchLabel} />
+            <DataViewsPicker.FiltersToggle />
+            <DataViewsPicker.LayoutSwitcher />
+            <DataViewsPicker.ViewConfig />
+          </div>
+          <DataViewsPicker.FiltersToggled className="nav-add-picker-filters" />
+        </>
+      ) : null}
+      <div className="nav-add-picker-scroll">
+        <DataViewsPicker.Layout />
+      </div>
+      <DataViewsPicker.BulkActionToolbar />
+    </>
+  );
 }
 
 /** Site pages only — excludes dynamic/template routes (`category: dynamic` in mock data). */
@@ -340,6 +393,7 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
     createAdvancedView(TYPE_CONTENT),
   );
   const [advancedSelection, setAdvancedSelection] = useState([]);
+  const [viewOptionsOpen, setViewOptionsOpen] = useState(false);
 
   const pageIdSet = useMemo(
     () => collectPageIdsInMenu(menuItems),
@@ -723,6 +777,10 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
     alert('This would create a new page, but this is a prototype.');
   };
 
+  const toggleViewOptions = () => {
+    setViewOptionsOpen((isOpen) => !isOpen);
+  };
+
   return (
     <Modal
       className="nav-add-pages-modal"
@@ -805,6 +863,10 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
                             </button>
                           ))}
                         </div>
+                        <ModalPickerViewOptionsToggle
+                          isOpen={viewOptionsOpen}
+                          onToggle={toggleViewOptions}
+                        />
                       </div>
 
                       {selectedPageTabId === PAGE_TAB_STATIC ? (
@@ -823,7 +885,14 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
                           config={{ perPageSizes: [10, 25, 50, 100] }}
                           itemListLabel="Static pages"
                           defaultLayouts={DEFAULT_PICKER_LAYOUTS}
-                        />
+                        >
+                          <ModalPickerChrome
+                            isOpen={viewOptionsOpen}
+                            onToggle={toggleViewOptions}
+                            searchLabel="Search static pages"
+                            showToggleRow={false}
+                          />
+                        </DataViewsPicker>
                       ) : (
                         <DataViewsPicker
                           search
@@ -840,7 +909,14 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
                           config={{ perPageSizes: [10, 25, 50, 100] }}
                           itemListLabel="Listing pages"
                           defaultLayouts={ADVANCED_DEFAULT_LAYOUTS}
-                        />
+                        >
+                          <ModalPickerChrome
+                            isOpen={viewOptionsOpen}
+                            onToggle={toggleViewOptions}
+                            searchLabel="Search listing pages"
+                            showToggleRow={false}
+                          />
+                        </DataViewsPicker>
                       )}
                     </>
                   ) : null}
@@ -861,7 +937,13 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
                       config={{ perPageSizes: [10, 25, 50, 100] }}
                       itemListLabel={type.title}
                       defaultLayouts={ADVANCED_DEFAULT_LAYOUTS}
-                    />
+                    >
+                      <ModalPickerChrome
+                        isOpen={viewOptionsOpen}
+                        onToggle={toggleViewOptions}
+                        searchLabel={`Search ${type.title.toLowerCase()}`}
+                      />
+                    </DataViewsPicker>
                   ) : null}
 
                   {type.id === TYPE_CUSTOM_URL ? (
