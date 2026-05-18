@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import {
+  Button,
   Modal,
   privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -718,6 +719,10 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
     ]);
   };
 
+  const showCreatePageNotImplemented = () => {
+    alert('This would create a new page, but this is a prototype.');
+  };
+
   return (
     <Modal
       className="nav-add-pages-modal"
@@ -765,8 +770,18 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
                   className="nav-add-menu-items-panel"
                 >
                   <div className="nav-add-menu-items-panel__header">
-                    <h2>{type.title}</h2>
-                    <p>{type.description}</p>
+                    <div className="nav-add-menu-items-panel__header-copy">
+                      <h2>{type.title}</h2>
+                      <p>{type.description}</p>
+                    </div>
+                    {type.id === TYPE_PAGES ? (
+                      <Button
+                        variant="secondary"
+                        onClick={showCreatePageNotImplemented}
+                      >
+                        Create page
+                      </Button>
+                    ) : null}
                   </div>
 
                   {type.id === TYPE_PAGES ? (

@@ -1008,9 +1008,17 @@
 }
 
 .nav-add-menu-items-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   padding: 16px 20px 12px;
   border-bottom: 1px solid #ddd;
   flex-shrink: 0;
+}
+
+.nav-add-menu-items-panel__header-copy {
+  min-width: 0;
 }
 
 .nav-add-menu-items-panel__header h2 {
