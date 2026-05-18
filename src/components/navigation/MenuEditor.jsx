@@ -637,16 +637,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     </nav>
   );
 
-  const pageActions = (
-    <Button
-      variant="secondary"
-      onClick={openAddPagesModal}
-      className="nav-header-add-btn"
-    >
-      Add pages
-    </Button>
-  );
-
   const quickInserter = (
     <>
       <div className="nav-add-item-dropdown">
@@ -755,7 +745,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     <Page
       className="split-view-stage nav-editor-frame"
       breadcrumbs={breadcrumbs}
-      actions={pageActions}
       showSidebarToggle={false}
     >
       <div className="nav-editor-inner">
@@ -765,7 +754,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
               <div className="nav-empty-state">
                 <p>No items in this menu yet</p>
                 <p className="nav-empty-hint">
-                  Use &quot;Add pages&quot; above or the + button below to add links.
+                  Use the + button below to add links.
                 </p>
               </div>
               {quickInserter}
