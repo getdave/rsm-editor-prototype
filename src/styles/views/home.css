@@ -1,29 +1,3 @@
-/* ── Preview heading row (home view) ── */
-.preview-body {
-  flex-direction: column;
-  gap: 16px;
-  /* Horizontal gutters: parent `.cs-stack` uses `--wp-page-area-gap` like `.pages-panel` */
-  padding: 0;
-}
-
-/* Raised light surface sitting on top of the dark main material. */
-.preview-body-canvas {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #fff;
-  /* Continuous white rim: preview toolbar + viewport read as one chrome shell */
-  border: 2px solid #fff;
-  box-sizing: border-box;
-  /* Lift preview away from chrome so dark site sections don’t merge with UI */
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.35),
-    0 3px 12px rgba(0, 0, 0, 0.2);
-}
-
 /* Preview site - uses serif font to distinguish from editor UI */
 .p-header {
   background: #1e1e1e;

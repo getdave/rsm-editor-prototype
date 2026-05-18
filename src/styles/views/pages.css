@@ -977,30 +977,3 @@
   justify-content: flex-end;
 }
 
-/* Home preview panel — single white card matching the .pages-panel
-   frame look used by /pages (white bg, 1px #949494 border, 8px radius). */
-.pages-panel.preview-panel {
-  background: var(--wp-page-area-surface, #fff);
-  border: var(--wp-page-area-border, 1px solid #949494);
-  border-radius: var(--wp-page-area-radius, 8px);
-  box-shadow: var(--wp-page-area-shadow);
-}
-
-.preview-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 8px 12px 12px;
-}
-
-.preview-panel-title {
-  font-size: 13px;
-  font-weight: 600;
-  margin: 0;
-  color: var(--wp-gray-900, #1e1e1e);
-}
-
-.preview-panel-header .components-toggle-group-control {
-  min-width: 200px;
-}

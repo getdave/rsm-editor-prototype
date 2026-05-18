@@ -150,12 +150,6 @@
   border-radius: 8px;
 }
 
-/* Outer shell (.preview-body-canvas) already provides the rim on home/themes. */
-.preview-body-canvas > .preview-canvas-root.canvas {
-  border: none;
-  border-radius: 0;
-}
-
 /* Browse bar — preview state */
 .preview-bar {
   height: 69px;

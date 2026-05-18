@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Stack } from '@wordpress/ui';
+import { Page } from '@wordpress/admin-ui';
+import { Stack, Text } from '@wordpress/ui';
 import {
   __experimentalToggleGroupControl as ToggleGroupControl,
   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -20,34 +21,37 @@ function PreviewView() {
 
   return (
     <Stack direction="column" className="cs-stack">
-      <div className="pages-panel preview-panel show">
-        <header className="preview-panel-header">
-          <h1 className="preview-panel-title">
-            {previewMode === 'preview'
-              ? 'Live preview of your site'
-              : 'Live pages of your site'}
-          </h1>
-          <ToggleGroupControl
-            __nextHasNoMarginBottom
-            isBlock
-            hideLabelFromVision
-            label="Preview mode"
-            value={previewMode}
-            onChange={(value) => setPreviewMode(value)}
-          >
-            <ToggleGroupControlOption value="preview" label="Preview" />
-            <ToggleGroupControlOption value="pages" label="Pages" />
-          </ToggleGroupControl>
-        </header>
-        <div className="cs-stack-canvas preview-body">
-          <div className="preview-body-canvas">
-            <PreviewCanvas
-              page={currentPage}
-              onEdit={handleEdit}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-        </div>
+      <div className="pages-panel show">
+        <Page
+          className="pages-panel__grid pages-content-frame preview-page"
+          title={
+            <Text variant="heading-xl">
+              {previewMode === 'preview'
+                ? 'Live preview of your site'
+                : 'Live pages of your site'}
+            </Text>
+          }
+          actions={
+            <ToggleGroupControl
+              __nextHasNoMarginBottom
+              isBlock
+              hideLabelFromVision
+              label="Preview mode"
+              value={previewMode}
+              onChange={(value) => setPreviewMode(value)}
+            >
+              <ToggleGroupControlOption value="preview" label="Preview" />
+              <ToggleGroupControlOption value="pages" label="Pages" />
+            </ToggleGroupControl>
+          }
+          showSidebarToggle={false}
+        >
+          <PreviewCanvas
+            page={currentPage}
+            onEdit={handleEdit}
+            onPageChange={setCurrentPage}
+          />
+        </Page>
       </div>
       <ContentSuggestions />
     </Stack>
