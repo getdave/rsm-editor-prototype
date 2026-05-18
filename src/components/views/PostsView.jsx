@@ -1,161 +1,29 @@
-import { useMemo, useState } from 'react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Page } from '@wordpress/admin-ui';
-import { Button } from '@wordpress/components';
+import {
+  Button,
+  CheckboxControl,
+  DropdownMenu,
+  SelectControl,
+  TextControl,
+} from '@wordpress/components';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Text } from '@wordpress/ui';
-import { page as pageIcon, postList } from '@wordpress/icons';
+import {
+  comment,
+  moreVertical,
+  page as pageIcon,
+  pencil,
+  postList,
+  seen,
+  trash,
+} from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
+import { postRecords as sharedPostRecords } from '../../data/postRecords';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import PrototypeNotImplementedButton from '../shared/PrototypeNotImplemented';
 import { showPrototypeNotImplementedAlert } from '../../utils/prototypeNotImplemented';
-
-const POST_RECORDS = [
-  {
-    id: 'post-1',
-    title: 'How to Prepare for an Outdoor Portrait Session',
-    slug: 'prepare-outdoor-portrait-session',
-    status: 'published',
-    author: 'Avery Stone',
-    categories: ['Guides'],
-    tags: ['Portraits', 'Planning'],
-    comments: 8,
-    date: 'May 9, 2026',
-    dateSortable: '2026-05-09',
-  },
-  {
-    id: 'post-2',
-    title: 'Behind the Scenes: Spring Wedding at Riverside Manor',
-    slug: 'spring-wedding-riverside-manor',
-    status: 'published',
-    author: 'Avery Stone',
-    categories: ['Behind the Scenes'],
-    tags: ['Weddings'],
-    comments: 14,
-    date: 'Apr 29, 2026',
-    dateSortable: '2026-04-29',
-  },
-  {
-    id: 'post-3',
-    title: 'Five Simple Ways to Improve Product Photos',
-    slug: 'improve-product-photos',
-    status: 'published',
-    author: 'Maya Chen',
-    categories: ['Guides'],
-    tags: ['Editing'],
-    comments: 5,
-    date: 'Apr 17, 2026',
-    dateSortable: '2026-04-17',
-  },
-  {
-    id: 'post-4',
-    title: 'Client Story: A Brand Refresh for Northline Studio',
-    slug: 'client-story-northline-studio',
-    status: 'published',
-    author: 'Avery Stone',
-    categories: ['Client Stories'],
-    tags: ['Portraits'],
-    comments: 3,
-    date: 'Apr 2, 2026',
-    dateSortable: '2026-04-02',
-  },
-  {
-    id: 'post-5',
-    title: 'Choosing the Right Backdrop for Headshots',
-    slug: 'choosing-backdrop-headshots',
-    status: 'published',
-    author: 'Maya Chen',
-    categories: ['Guides'],
-    tags: ['Portraits', 'Planning'],
-    comments: 2,
-    date: 'Mar 21, 2026',
-    dateSortable: '2026-03-21',
-  },
-  {
-    id: 'post-6',
-    title: 'What Happens During a Family Photo Shoot',
-    slug: 'family-photo-shoot-process',
-    status: 'published',
-    author: 'Avery Stone',
-    categories: ['Guides'],
-    tags: ['Planning', 'Portraits'],
-    comments: 6,
-    date: 'Mar 6, 2026',
-    dateSortable: '2026-03-06',
-  },
-  {
-    id: 'post-7',
-    title: 'Editing Notes: Keeping Skin Tones Natural',
-    slug: 'natural-skin-tones-editing',
-    status: 'draft',
-    author: 'Maya Chen',
-    categories: ['Studio News'],
-    tags: ['Editing'],
-    comments: 0,
-    date: 'Feb 26, 2026',
-    dateSortable: '2026-02-26',
-  },
-  {
-    id: 'post-8',
-    title: 'Location Guide: Three Quiet Spots for Golden Hour',
-    slug: 'quiet-golden-hour-locations',
-    status: 'published',
-    author: 'Avery Stone',
-    categories: ['Locations'],
-    tags: ['Portraits', 'Planning'],
-    comments: 11,
-    date: 'Feb 12, 2026',
-    dateSortable: '2026-02-12',
-  },
-  {
-    id: 'post-9',
-    title: 'How We Build a Shot List for Events',
-    slug: 'event-shot-list-process',
-    status: 'published',
-    author: 'Avery Stone',
-    categories: ['Guides'],
-    tags: ['Weddings', 'Planning'],
-    comments: 4,
-    date: 'Jan 28, 2026',
-    dateSortable: '2026-01-28',
-  },
-  {
-    id: 'post-10',
-    title: 'Studio Update: New Print Finishes Available',
-    slug: 'new-print-finishes',
-    status: 'published',
-    author: 'Maya Chen',
-    categories: ['Studio News'],
-    tags: ['Prints'],
-    comments: 1,
-    date: 'Jan 15, 2026',
-    dateSortable: '2026-01-15',
-  },
-  {
-    id: 'post-11',
-    title: 'Planning a Mini Session Day',
-    slug: 'planning-mini-session-day',
-    status: 'draft',
-    author: 'Avery Stone',
-    categories: ['Studio News'],
-    tags: ['Planning'],
-    comments: 0,
-    date: 'Jan 8, 2026',
-    dateSortable: '2026-01-08',
-  },
-  {
-    id: 'post-12',
-    title: 'A Year in Review: Favorite Frames from 2025',
-    slug: 'favorite-frames-2025',
-    status: 'published',
-    author: 'Avery Stone',
-    categories: ['Behind the Scenes'],
-    tags: ['Portraits', 'Weddings', 'Prints'],
-    comments: 19,
-    date: 'Dec 18, 2025',
-    dateSortable: '2025-12-18',
-  },
-];
 
 const POST_STATUS_ELEMENTS = [
   { value: 'published', label: 'Published' },
@@ -183,7 +51,16 @@ const POST_TAG_ELEMENTS = [
   { value: 'Prints', label: 'Prints' },
 ];
 
-const POST_TABLE_FIELDS = ['author', 'categories', 'date', 'status'];
+const POST_MONTH_ELEMENTS = [
+  { value: '2026-05', label: 'May 2026' },
+  { value: '2026-04', label: 'April 2026' },
+  { value: '2026-03', label: 'March 2026' },
+  { value: '2026-02', label: 'February 2026' },
+  { value: '2026-01', label: 'January 2026' },
+  { value: '2025-12', label: 'December 2025' },
+];
+
+const POST_TABLE_FIELDS = ['author', 'categories', 'comments', 'date'];
 
 const DEFAULT_POSTS_VIEW = {
   type: 'table',
@@ -246,6 +123,139 @@ function getElementLabel(elements, value) {
   return elements.find((element) => element.value === value)?.label || value;
 }
 
+function getPostMonth(item) {
+  return item.dateSortable.slice(0, 7);
+}
+
+function getPostDateState(item) {
+  return item.status === 'draft' ? 'Last modified' : 'Published';
+}
+
+function formatPostDate(dateSortable) {
+  return new Date(`${dateSortable}T00:00:00`).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+function normalizePostRecord(record) {
+  return record;
+}
+
+function createQuickEditDraft(item) {
+  return {
+    id: item.id,
+    title: item.title,
+    slug: item.slug,
+    dateSortable: item.dateSortable,
+    time: item.time,
+    status: item.status,
+    categories: [...item.categories],
+  };
+}
+
+function QuickEditForm({ draft, onCancel, onChange, onSave }) {
+  const setField = (field, value) => {
+    onChange((current) => ({ ...current, [field]: value }));
+  };
+
+  const toggleCategory = (category) => {
+    onChange((current) => {
+      const hasCategory = current.categories.includes(category);
+      const categories = hasCategory
+        ? current.categories.filter((item) => item !== category)
+        : [...current.categories, category];
+      return { ...current, categories };
+    });
+  };
+
+  return (
+    <section className="posts-quick-edit" aria-labelledby="posts-quick-edit-title">
+      <div className="posts-quick-edit-header">
+        <div className="posts-quick-edit-heading">
+          <Text
+            id="posts-quick-edit-title"
+            variant="body-md"
+            className="posts-quick-edit-title"
+          >
+            Quick edit
+          </Text>
+          <Text variant="body-sm" className="posts-quick-edit-subtitle">
+            Update publishing details without leaving Posts.
+          </Text>
+        </div>
+      </div>
+
+      <div className="posts-quick-edit-grid">
+        <div className="posts-quick-edit-column posts-quick-edit-column--primary">
+          <TextControl
+            __nextHasNoMarginBottom
+            label="Title"
+            value={draft.title}
+            onChange={(value) => setField('title', value)}
+          />
+          <TextControl
+            __nextHasNoMarginBottom
+            label="Slug"
+            value={draft.slug}
+            onChange={(value) => setField('slug', value)}
+          />
+          <div className="posts-quick-edit-inline-fields">
+            <TextControl
+              __nextHasNoMarginBottom
+              label="Date"
+              type="date"
+              value={draft.dateSortable}
+              onChange={(value) => setField('dateSortable', value)}
+            />
+            <TextControl
+              __nextHasNoMarginBottom
+              label="Time"
+              value={draft.time}
+              onChange={(value) => setField('time', value)}
+            />
+          </div>
+        </div>
+
+        <fieldset className="posts-quick-edit-fieldset">
+          <legend>Categories</legend>
+          <div className="posts-quick-edit-checklist">
+            {POST_CATEGORY_ELEMENTS.map((category) => (
+              <CheckboxControl
+                key={category.value}
+                __nextHasNoMarginBottom
+                label={category.label}
+                checked={draft.categories.includes(category.value)}
+                onChange={() => toggleCategory(category.value)}
+              />
+            ))}
+          </div>
+        </fieldset>
+
+        <div className="posts-quick-edit-column">
+          <SelectControl
+            __nextHasNoMarginBottom
+            label="Status"
+            value={draft.status}
+            options={POST_STATUS_ELEMENTS}
+            onChange={(value) => setField('status', value)}
+          />
+        </div>
+      </div>
+
+      <div className="posts-quick-edit-actions">
+        <Button variant="primary" onClick={onSave}>
+          Update
+        </Button>
+        <Button variant="tertiary" onClick={onCancel}>
+          Cancel
+        </Button>
+      </div>
+    </section>
+  );
+}
+
 function renderTitle({ item }) {
   return (
     <span className="posts-record-title-cell">
@@ -256,6 +266,9 @@ function renderTitle({ item }) {
       >
         {item.title}
       </button>
+      {item.status === 'draft' ? (
+        <span className="posts-title-status">Draft</span>
+      ) : null}
       {item.slug ? (
         <span className="posts-record-slug">/{item.slug}</span>
       ) : null}
@@ -288,6 +301,28 @@ function renderTerms(terms) {
   );
 }
 
+function renderComments({ item }) {
+  return (
+    <span className="posts-comments-cell" aria-label={`${item.comments} comments`}>
+      <span className="posts-comments-icon" aria-hidden="true">
+        {comment}
+      </span>
+      <span className="posts-record-count">{item.comments}</span>
+    </span>
+  );
+}
+
+function renderDate({ item }) {
+  return (
+    <span className="posts-date-cell">
+      <span className="posts-date-state">{getPostDateState(item)}</span>
+      <span className="posts-record-muted">
+        {item.date} at {item.time}
+      </span>
+    </span>
+  );
+}
+
 const POST_RECORD_FIELDS = [
   {
     id: 'title',
@@ -313,7 +348,7 @@ const POST_RECORD_FIELDS = [
     type: 'array',
     label: 'Categories',
     elements: POST_CATEGORY_ELEMENTS,
-    filterBy: { operators: ['isAny', 'isAll', 'isNone'] },
+    filterBy: { operators: ['isAny', 'isAll', 'isNone'], isPrimary: true },
     enableGlobalSearch: true,
     render: ({ item }) => renderTerms(item.categories),
   },
@@ -330,32 +365,41 @@ const POST_RECORD_FIELDS = [
     id: 'comments',
     type: 'integer',
     label: 'Comments',
-    render: ({ item }) => (
-      <span className="posts-record-count">{item.comments}</span>
-    ),
+    render: renderComments,
   },
   {
     id: 'date',
     type: 'text',
     label: 'Date',
     getValue: ({ item }) => item.dateSortable,
-    render: ({ item }) => (
-      <span className="posts-record-muted">{item.date}</span>
-    ),
+    render: renderDate,
   },
   {
     id: 'status',
     type: 'text',
     label: 'Status',
     elements: POST_STATUS_ELEMENTS,
-    filterBy: { operators: ['isAny'] },
+    filterBy: { operators: ['isAny'], isPrimary: true },
     render: renderStatus,
+  },
+  {
+    id: 'month',
+    type: 'text',
+    label: 'Date',
+    elements: POST_MONTH_ELEMENTS,
+    filterBy: { operators: ['isAny'], isPrimary: true },
+    enableHiding: false,
+    getValue: ({ item }) => getPostMonth(item),
+    render: ({ item }) => getElementLabel(POST_MONTH_ELEMENTS, getPostMonth(item)),
   },
 ];
 
-function createPostsPageTarget(postsPage) {
+function createPostsPageTarget(postsPage, records) {
   if (!postsPage) {
-    return POSTS_INDEX_TEMPLATE_PAGE;
+    return {
+      ...POSTS_INDEX_TEMPLATE_PAGE,
+      postRecords: records,
+    };
   }
 
   return {
@@ -379,10 +423,11 @@ function createPostsPageTarget(postsPage) {
     titleTooltip:
       'Uses the selected Posts page URL while home.html controls the layout visitors see.',
     isPostsPage: true,
+    postRecords: records,
   };
 }
 
-function createSinglePostTarget(singlePostPage) {
+function createSinglePostTarget(singlePostPage, records) {
   return {
     ...SINGLE_POST_TEMPLATE_PAGE,
     ...singlePostPage,
@@ -391,10 +436,11 @@ function createSinglePostTarget(singlePostPage) {
     collectionKind: 'post-single',
     viewKind: 'single',
     templateLabel: 'Single Post',
+    postRecords: records,
   };
 }
 
-function PostDesignCard({ design, isSelected, onEdit, onSelect }) {
+function PostDesignCard({ design, isSelected, onSelect }) {
   return (
     <div className={`posts-design-card${isSelected ? ' is-selected' : ''}`}>
       <button
@@ -419,46 +465,300 @@ function PostDesignCard({ design, isSelected, onEdit, onSelect }) {
           <span className="posts-design-card-meta">{design.meta}</span>
         </span>
       </button>
-      <span className="posts-design-card-action">
-        <Button variant="secondary" onClick={onEdit}>
-          Edit
-        </Button>
-      </span>
     </div>
+  );
+}
+
+function getSortDirection(view, field) {
+  return view.sort?.field === field ? view.sort.direction : null;
+}
+
+function PostsTableHeaderButton({ field, label, view, onChangeView }) {
+  const direction = getSortDirection(view, field);
+  const nextDirection = direction === 'asc' ? 'desc' : 'asc';
+
+  return (
+    <button
+      type="button"
+      className={`posts-table-sort${direction ? ' is-sorted' : ''}`}
+      onClick={() =>
+        onChangeView({
+          ...view,
+          page: 1,
+          sort: {
+            field,
+            direction: nextDirection,
+          },
+        })
+      }
+    >
+      {label}
+      <span className="posts-table-sort-indicator" aria-hidden="true">
+        {direction === 'asc' ? '↑' : '↓'}
+      </span>
+    </button>
+  );
+}
+
+function PostsRecordsTable({
+  data,
+  onChangeView,
+  onQuickEdit,
+  onSaveQuickEdit,
+  onSelect,
+  quickEditDraft,
+  recordsView,
+  selection,
+  setQuickEditDraft,
+  setSelection,
+}) {
+  const visibleIds = data.map((item) => item.id);
+  const selectedVisibleIds = visibleIds.filter((id) => selection.includes(id));
+  const allVisibleSelected =
+    visibleIds.length > 0 && selectedVisibleIds.length === visibleIds.length;
+
+  const toggleAllVisible = () => {
+    if (allVisibleSelected) {
+      setSelection(selection.filter((id) => !visibleIds.includes(id)));
+      return;
+    }
+    setSelection(Array.from(new Set([...selection, ...visibleIds])));
+  };
+
+  const toggleRow = (id) => {
+    setSelection(
+      selection.includes(id)
+        ? selection.filter((selectedId) => selectedId !== id)
+        : [...selection, id],
+    );
+  };
+
+  if (!data.length) {
+    return (
+      <div className="posts-table-empty">
+        No posts found.
+      </div>
+    );
+  }
+
+  return (
+    <table className="posts-table">
+      <thead>
+        <tr>
+          <th className="posts-table-check">
+            <input
+              type="checkbox"
+              checked={allVisibleSelected}
+              aria-label="Select all visible posts"
+              onChange={toggleAllVisible}
+            />
+          </th>
+          <th>
+            <PostsTableHeaderButton
+              field="title"
+              label="Title"
+              view={recordsView}
+              onChangeView={onChangeView}
+            />
+          </th>
+          <th>Author</th>
+          <th>Categories</th>
+          <th className="posts-table-comments-heading">
+            <span className="posts-comments-icon" aria-label="Comments">
+              {comment}
+            </span>
+          </th>
+          <th>
+            <PostsTableHeaderButton
+              field="date"
+              label="Date"
+              view={recordsView}
+              onChangeView={onChangeView}
+            />
+          </th>
+          <th className="posts-table-actions-heading">
+            <span className="screen-reader-text">Actions</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((item) => {
+          const isSelected = selection.includes(item.id);
+          const isQuickEditing = quickEditDraft?.id === item.id;
+          return (
+            <Fragment key={item.id}>
+              <tr className={isQuickEditing ? 'is-quick-editing' : ''}>
+                <td className="posts-table-check">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    aria-label={`Select ${item.title}`}
+                    onChange={() => toggleRow(item.id)}
+                  />
+                </td>
+                <td className="posts-table-title-cell">
+                  <span className="posts-table-title-stack">
+                    <button
+                      type="button"
+                      className="posts-record-title-link"
+                      onClick={() => onSelect(item)}
+                    >
+                      {item.title}
+                    </button>
+                    {item.status === 'draft' ? (
+                      <span className="posts-title-status">Draft</span>
+                    ) : null}
+                    {item.slug ? (
+                      <span className="posts-record-slug">/{item.slug}</span>
+                    ) : null}
+                  </span>
+                </td>
+                <td>
+                  <span className="posts-record-muted">{item.author}</span>
+                </td>
+                <td>{renderTerms(item.categories)}</td>
+                <td>{renderComments({ item })}</td>
+                <td>{renderDate({ item })}</td>
+                <td className="posts-table-actions-cell">
+                  <DropdownMenu
+                    icon={moreVertical}
+                    label={`Actions for ${item.title}`}
+                    toggleProps={{
+                      variant: 'tertiary',
+                      className: 'posts-row-actions-toggle',
+                    }}
+                    controls={[
+                      {
+                        title: 'Edit',
+                        icon: pencil,
+                        onClick: () => onSelect(item),
+                      },
+                      {
+                        title: 'Quick edit',
+                        icon: pencil,
+                        onClick: () => onQuickEdit(item),
+                      },
+                      {
+                        title: 'View',
+                        icon: seen,
+                        onClick: showPrototypeNotImplementedAlert,
+                      },
+                      {
+                        title: 'Move to trash',
+                        icon: trash,
+                        onClick: showPrototypeNotImplementedAlert,
+                      },
+                    ]}
+                  />
+                </td>
+              </tr>
+              {isQuickEditing ? (
+                <tr className="posts-table-quick-edit-row">
+                  <td colSpan={7}>
+                    <QuickEditForm
+                      draft={quickEditDraft}
+                      onCancel={() => setQuickEditDraft(null)}
+                      onChange={setQuickEditDraft}
+                      onSave={onSaveQuickEdit}
+                    />
+                  </td>
+                </tr>
+              ) : null}
+            </Fragment>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }
 
 function PostsView() {
   const navigate = useNavigate();
-  const { pages, postsPageId, selectPage } = useAppState();
+  const { pages, postsPageId, selectPage, showSnackbar } = useAppState();
   const [activeTab, setActiveTab] = useState('records');
   const [selectedDesignId, setSelectedDesignId] = useState('posts-page');
+  const [postRecords, setPostRecords] = useState(() =>
+    sharedPostRecords.map(normalizePostRecord),
+  );
   const [recordsView, setRecordsView] = useState(DEFAULT_POSTS_VIEW);
+  const [selection, setSelection] = useState([]);
+  const [quickEditDraft, setQuickEditDraft] = useState(null);
+
+  const openQuickEdit = useCallback((item) => {
+    setSelection([]);
+    setQuickEditDraft(createQuickEditDraft(normalizePostRecord(item)));
+  }, []);
+
+  const saveQuickEdit = useCallback(() => {
+    if (!quickEditDraft) {
+      return;
+    }
+    setPostRecords((records) =>
+      records.map((record) =>
+        record.id === quickEditDraft.id
+          ? {
+              ...record,
+              title: quickEditDraft.title,
+              slug: quickEditDraft.slug,
+              date: formatPostDate(quickEditDraft.dateSortable),
+              dateSortable: quickEditDraft.dateSortable,
+              time: quickEditDraft.time,
+              status: quickEditDraft.status,
+              categories: quickEditDraft.categories,
+            }
+          : record,
+      ),
+    );
+    showSnackbar(`Updated "${quickEditDraft.title}".`);
+    setQuickEditDraft(null);
+  }, [quickEditDraft, showSnackbar]);
 
   const postRecordActions = useMemo(
     () => [
       {
         id: 'edit',
         label: 'Edit',
+        icon: pencil,
         isPrimary: true,
         callback: showPrototypeNotImplementedAlert,
       },
+      {
+        id: 'quick-edit',
+        label: 'Quick edit',
+        icon: pencil,
+        callback: (items) => openQuickEdit(items[0]),
+      },
+      {
+        id: 'view',
+        label: 'View',
+        icon: seen,
+        callback: showPrototypeNotImplementedAlert,
+      },
+      {
+        id: 'trash',
+        label: (items) =>
+          items.length > 1 ? `Move ${items.length} posts to trash` : 'Move to trash',
+        icon: trash,
+        supportsBulk: true,
+        callback: showPrototypeNotImplementedAlert,
+      },
     ],
-    [],
+    [openQuickEdit],
   );
 
   const { data: processedRecords, paginationInfo } = useMemo(
-    () => filterSortAndPaginate(POST_RECORDS, recordsView, POST_RECORD_FIELDS),
-    [recordsView],
+    () => filterSortAndPaginate(postRecords, recordsView, POST_RECORD_FIELDS),
+    [postRecords, recordsView],
   );
 
   const postDesigns = useMemo(() => {
     const postsPage = postsPageId
       ? pages.find((page) => page.id === postsPageId)
       : null;
-    const postsPageTarget = createPostsPageTarget(postsPage);
+    const postsPageTarget = createPostsPageTarget(postsPage, postRecords);
     const singlePostTarget = createSinglePostTarget(
       pages.find((page) => page.id === 'blog-single'),
+      postRecords,
     );
     const assignedSlug = postsPageTarget.slug ? `/${postsPageTarget.slug}` : '/';
 
@@ -483,7 +783,7 @@ function PostsView() {
         page: singlePostTarget,
       },
     ];
-  }, [pages, postsPageId]);
+  }, [pages, postRecords, postsPageId]);
 
   const selectedDesign =
     postDesigns.find((design) => design.id === selectedDesignId) ??
@@ -544,17 +844,37 @@ function PostsView() {
         actions={postRecordActions}
         defaultLayouts={{ table: { fields: POST_TABLE_FIELDS } }}
         paginationInfo={paginationInfo}
+        selection={selection}
+        onChangeSelection={setSelection}
+        isItemClickable={() => true}
+        onClickItem={showPrototypeNotImplementedAlert}
         getItemId={(item) => item.id}
       >
         <div className="posts-records-toolbar">
           <DataViews.Search />
-          <DataViews.FiltersToggle />
+          <DataViews.Filters />
+          <span className="posts-records-toolbar-spacer" />
         </div>
-        <div className="posts-records-filters">
-          <DataViews.FiltersToggled />
+        <div className="posts-records-utility-row">
+          <DataViews.BulkActionToolbar />
+          <span className="posts-records-count">
+            {paginationInfo.totalItems}{' '}
+            {paginationInfo.totalItems === 1 ? 'item' : 'items'}
+          </span>
         </div>
         <div className="posts-records-table">
-          <DataViews.Layout />
+          <PostsRecordsTable
+            data={processedRecords}
+            recordsView={recordsView}
+            onChangeView={handleChangeRecordsView}
+            selection={selection}
+            setSelection={setSelection}
+            quickEditDraft={quickEditDraft}
+            setQuickEditDraft={setQuickEditDraft}
+            onQuickEdit={openQuickEdit}
+            onSaveQuickEdit={saveQuickEdit}
+            onSelect={showPrototypeNotImplementedAlert}
+          />
           <DataViews.Pagination />
         </div>
       </DataViews>
@@ -571,7 +891,6 @@ function PostsView() {
             design={design}
             isSelected={design.id === selectedDesign.id}
             onSelect={() => setSelectedDesignId(design.id)}
-            onEdit={() => handleEditDesign(design)}
           />
         ))}
       </div>

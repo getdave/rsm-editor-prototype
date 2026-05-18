@@ -8,6 +8,11 @@
  * All content is presented as "Pages" in the UI. The underlying WordPress template
  * architecture (templates, template hierarchy) is not exposed to beginners.
  */
+import {
+  getPrimaryPostRecord,
+  getPublishedPostRecords,
+  postRecords as sharedPostRecords,
+} from '../data/postRecords';
 
 /**
  * Get mock content for a page based on WordPress content model
@@ -54,12 +59,12 @@ export const getPageContent = (page) => {
     // Archive Templates (Template Hierarchy)
     'product-list': getProductListContent(),
     'product-catalog-template': getProductCatalogTemplateContent(page),
-    'blog-list': getBlogListContent(),
+    'blog-list': getBlogListContent(page),
     'posts-index-template': getPostsIndexTemplateContent(page),
     
     // Single Templates (Template Hierarchy)
     'product-single': getProductSingleContent(),
-    'blog-single': getBlogSingleContent(),
+    'blog-single': getBlogSingleContent(page),
     'event-list': getEventListContent(page),
     'event-single': getEventSingleContent(page),
     'search-results': getSearchResultsContent(),
@@ -372,7 +377,21 @@ function getProductCatalogTemplateContent(page = null) {
   };
 }
 
-function getBlogListContent() {
+function getPostSourceRecords(page = null) {
+  return page?.postRecords ?? sharedPostRecords;
+}
+
+function getPostListPreviewItems(page = null) {
+  return getPublishedPostRecords(getPostSourceRecords(page))
+    .slice(0, 3)
+    .map((post) => ({
+      title: post.title,
+      date: post.date,
+      excerpt: post.excerpt,
+    }));
+}
+
+function getBlogListContent(page = null) {
   return {
     layout: 'archive',
     title: 'Blog',
@@ -389,30 +408,14 @@ function getBlogListContent() {
       },
       {
         type: 'post-list',
-        items: [
-          { 
-            title: 'Finding the Perfect Light for Portraits', 
-            date: 'April 15, 2026',
-            excerpt: 'Understanding natural light is key to creating stunning portrait photographs. Here are my top tips...'
-          },
-          { 
-            title: 'Behind the Scenes: Wedding at Riverside Manor', 
-            date: 'April 8, 2026',
-            excerpt: 'A look back at one of the most beautiful weddings I\'ve had the pleasure to photograph this year...'
-          },
-          { 
-            title: '5 Tips for Better Smartphone Photography', 
-            date: 'March 28, 2026',
-            excerpt: 'You don\'t need expensive gear to take great photos. These simple techniques will transform your mobile photography...'
-          }
-        ]
+        items: getPostListPreviewItems(page),
       }
     ]
   };
 }
 
 function getBlogCollectionContent(page = null) {
-  const archive = getBlogListContent();
+  const archive = getBlogListContent(page);
   return {
     ...archive,
     title: page?.name ?? archive.title,
@@ -433,7 +436,7 @@ function getBlogCollectionContent(page = null) {
 }
 
 function getPostsIndexTemplateContent(page = null) {
-  const archive = getBlogListContent();
+  const archive = getBlogListContent(page);
   const title = page?.name ?? 'Posts listing';
   return {
     ...archive,
@@ -561,7 +564,7 @@ function getEventSingleContent(page = null) {
 
 /** Content Page (CPT) assigned as “Posts page” in Reading settings — shows latest posts */
 function getBlogPageAsPostsIndexContent(page) {
-  const archive = getBlogListContent();
+  const archive = getBlogListContent(page);
   return {
     ...archive,
     title: page?.name ?? archive.title,
@@ -611,10 +614,12 @@ function getProductSingleContent() {
   };
 }
 
-function getBlogSingleContent() {
+function getBlogSingleContent(page = null) {
+  const post = getPrimaryPostRecord(getPostSourceRecords(page));
+
   return {
     layout: 'single',
-    title: 'Finding the Perfect Light for Portraits',
+    title: post?.title ?? 'Post',
     subtitle: null,
     wordpressContext: {
       type: 'template',
@@ -623,10 +628,10 @@ function getBlogSingleContent() {
     sections: [
       {
         type: 'post-content',
-        title: 'Finding the Perfect Light for Portraits',
-        date: 'April 15, 2026',
-        author: 'Photographer',
-        content: 'Understanding natural light is one of the most important skills in portrait photography. The quality, direction, and color of light can make or break an image. In this post, I\'ll share my approach to finding and working with beautiful natural light.'
+        title: post?.title ?? 'Post',
+        date: post?.date ?? '',
+        author: post?.author ?? '',
+        content: post?.content ?? 'Post content goes here.'
       }
     ]
   };
