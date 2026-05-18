@@ -1116,9 +1116,10 @@
 
 /* Home preview body — mirrors /pages structure
    (.pp-inner.pp-dataviews > .dataviews-wrapper) so the canvas sits in
-   the same flex column the DataViews list normally occupies. */
+   the same flex column the DataViews list normally occupies. 24px
+   padding matches .dataviews-view-grid's content padding. */
 .preview-dataviews-wrapper {
-  padding: 16px;
+  padding: 24px;
   display: flex;
   flex: 1;
   min-height: 0;
