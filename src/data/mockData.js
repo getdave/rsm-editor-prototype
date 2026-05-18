@@ -380,6 +380,15 @@ export const navigationAdvancedTargets = [
     sourceType: "post-type-archive",
   },
   {
+    id: "collection-events",
+    group: "collections",
+    sectionLabel: "Content listings",
+    name: "All events",
+    typeLabel: "Events listing",
+    url: "/events/",
+    sourceType: "post-type-archive",
+  },
+  {
     id: "media-homepage-hero",
     group: "media",
     sectionLabel: "Images",
