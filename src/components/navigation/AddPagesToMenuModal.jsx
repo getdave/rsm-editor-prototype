@@ -1,6 +1,10 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Modal } from '@wordpress/components';
+import {
+  Modal,
+  privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
+import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import {
   archive,
   category,
@@ -17,6 +21,12 @@ import heroImage from '../../assets/hero.png';
 import { navigationAdvancedTargets } from '../../data/mockData';
 import AddLinkPopover from './AddLinkPopover';
 import { collectPageIdsInMenu, collectUrlsInMenu } from './navigationUtils';
+
+const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+  'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
+  '@wordpress/edit-site',
+);
+const { Tabs } = unlock(componentsPrivateApis);
 
 const VIEW_PICKER_GRID = 'pickerGrid';
 const VIEW_PICKER_TABLE = 'pickerTable';
@@ -44,7 +54,7 @@ const INITIAL_VIEW = {
 const DEFAULT_PICKER_LAYOUTS = {
   pickerGrid: {
     badgeFields: ['inThisMenu'],
-    layout: { previewSize: 60 },
+    layout: { previewSize: 88 },
   },
   pickerTable: {},
 };
@@ -545,9 +555,6 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
     ]);
   };
 
-  const isPagesType = selectedGroupId === TYPE_PAGES;
-  const isCustomUrlType = selectedGroupId === TYPE_CUSTOM_URL;
-
   return (
     <Modal
       className="nav-add-pages-modal"
@@ -557,84 +564,101 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
       size="fill"
     >
       <div className="nav-add-pages-picker-root">
-        <div className="nav-add-menu-items-layout">
-          <aside className="nav-add-menu-items-sidebar" aria-label="Content types">
-            {NAV_ITEM_GROUPS.map((type) => (
-              <button
-                key={type.id}
-                type="button"
-                className={`nav-add-menu-items-type${selectedGroupId === type.id ? ' is-active' : ''}`}
-                onClick={() => selectGroup(type.id)}
-                aria-current={selectedGroupId === type.id ? 'true' : undefined}
-              >
-                <span className="nav-add-menu-items-type__icon" aria-hidden="true">
-                  {type.icon}
-                </span>
-                <span className="nav-add-menu-items-type__text">
-                  <span className="nav-add-menu-items-type__title">
+        <Tabs
+          orientation="vertical"
+          selectedTabId={selectedGroupId}
+          onSelect={selectGroup}
+        >
+          <div className="nav-add-menu-items-layout">
+            <Tabs.TabList
+              className="nav-add-menu-items-tablist"
+              aria-label="Content types"
+            >
+              {NAV_ITEM_GROUPS.map((type) => (
+                <Tabs.Tab
+                  key={type.id}
+                  tabId={type.id}
+                  className="nav-add-menu-items-tab"
+                >
+                  <span
+                    className="nav-add-menu-items-tab__icon"
+                    aria-hidden="true"
+                  >
+                    {type.icon}
+                  </span>
+                  <span className="nav-add-menu-items-tab__title">
                     {type.title}
                   </span>
-                </span>
-              </button>
-            ))}
-          </aside>
+                </Tabs.Tab>
+              ))}
+            </Tabs.TabList>
 
-          <section className="nav-add-menu-items-panel">
-            <div className="nav-add-menu-items-panel__header">
-              <h2>{activeType.title}</h2>
-              <p>{activeType.description}</p>
+            <div className="nav-add-menu-items-panels">
+              {NAV_ITEM_GROUPS.map((type) => (
+                <Tabs.TabPanel
+                  key={type.id}
+                  tabId={type.id}
+                  focusable={false}
+                  className="nav-add-menu-items-panel"
+                >
+                  <div className="nav-add-menu-items-panel__header">
+                    <h2>{type.title}</h2>
+                    <p>{type.description}</p>
+                  </div>
+
+                  {type.id === TYPE_PAGES ? (
+                    <DataViewsPicker
+                      search
+                      searchLabel="Search pages"
+                      actions={pageActions}
+                      selection={pageSelection}
+                      onChangeSelection={setPageSelection}
+                      getItemId={(item) => item.id}
+                      paginationInfo={pagePaginationInfo}
+                      data={processedPageData}
+                      view={pageView}
+                      fields={pageFields}
+                      onChangeView={handlePageChangeView}
+                      config={{ perPageSizes: [10, 25, 50, 100] }}
+                      itemListLabel="Pages"
+                      defaultLayouts={DEFAULT_PICKER_LAYOUTS}
+                    />
+                  ) : null}
+
+                  {type.id !== TYPE_PAGES && type.id !== TYPE_CUSTOM_URL ? (
+                    <DataViewsPicker
+                      search
+                      searchLabel={`Search ${type.title.toLowerCase()}`}
+                      actions={advancedActions}
+                      selection={advancedSelection}
+                      onChangeSelection={setAdvancedSelection}
+                      getItemId={(item) => item.id}
+                      paginationInfo={advancedPaginationInfo}
+                      data={processedAdvancedData}
+                      view={advancedView}
+                      fields={advancedFields}
+                      onChangeView={handleAdvancedChangeView}
+                      config={{ perPageSizes: [10, 25, 50, 100] }}
+                      itemListLabel={type.title}
+                      defaultLayouts={ADVANCED_DEFAULT_LAYOUTS}
+                    />
+                  ) : null}
+
+                  {type.id === TYPE_CUSTOM_URL ? (
+                    <div className="nav-add-pages-custom-link">
+                      <AddLinkPopover
+                        showBack={false}
+                        onBack={() => selectGroup(TYPE_PAGES)}
+                        onCancel={onClose}
+                        onSave={addCustomUrl}
+                      />
+                    </div>
+                  ) : null}
+                </Tabs.TabPanel>
+              ))}
             </div>
-
-            {isPagesType ? (
-              <DataViewsPicker
-                search
-                searchLabel="Search pages"
-                actions={pageActions}
-                selection={pageSelection}
-                onChangeSelection={setPageSelection}
-                getItemId={(item) => item.id}
-                paginationInfo={pagePaginationInfo}
-                data={processedPageData}
-                view={pageView}
-                fields={pageFields}
-                onChangeView={handlePageChangeView}
-                config={{ perPageSizes: [10, 25, 50, 100] }}
-                itemListLabel="Pages"
-                defaultLayouts={DEFAULT_PICKER_LAYOUTS}
-              />
-            ) : null}
-
-            {!isPagesType && !isCustomUrlType ? (
-              <DataViewsPicker
-                search
-                searchLabel={`Search ${activeType.title.toLowerCase()}`}
-                actions={advancedActions}
-                selection={advancedSelection}
-                onChangeSelection={setAdvancedSelection}
-                getItemId={(item) => item.id}
-                paginationInfo={advancedPaginationInfo}
-                data={processedAdvancedData}
-                view={advancedView}
-                fields={advancedFields}
-                onChangeView={handleAdvancedChangeView}
-                config={{ perPageSizes: [10, 25, 50, 100] }}
-                itemListLabel={activeType.title}
-                defaultLayouts={ADVANCED_DEFAULT_LAYOUTS}
-              />
-            ) : null}
-
-            {isCustomUrlType ? (
-              <div className="nav-add-pages-custom-link">
-                <AddLinkPopover
-                  showBack={false}
-                  onBack={() => selectGroup(TYPE_PAGES)}
-                  onCancel={onClose}
-                  onSave={addCustomUrl}
-                />
-              </div>
-            ) : null}
-          </section>
-        </div>
+          </div>
+        </Tabs>
       </div>
     </Modal>
   );
