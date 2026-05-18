@@ -74,8 +74,8 @@ const NAV_ITEM_GROUPS = [
   },
   {
     id: TYPE_COLLECTIONS,
-    title: 'Collections',
-    description: 'Post type archives and generated pages.',
+    title: 'Listing pages',
+    description: 'Generated pages that list posts, products, or other content.',
     icon: archive,
   },
   {
