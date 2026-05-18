@@ -44,13 +44,13 @@ const PAGES_INDEX_DEFAULT_VIEW = {
   titleField: 'name',
   mediaField: 'media',
   fields: [],
-  layout: { density: 'compact', previewSize: 290 },
+  layout: { density: 'compact' },
 };
 
 const PAGES_INDEX_DEFAULT_LAYOUTS = {
   grid: {
     badgeFields: [],
-    layout: { density: 'compact', previewSize: 290 },
+    layout: { density: 'compact' },
   },
 };
 
@@ -122,6 +122,13 @@ function PreviewView() {
                 paginationInfo={paginationInfo}
                 actions={[]}
                 getItemId={(item) => item.id}
+                isItemClickable={() => true}
+                onClickItem={(item) => {
+                  setCurrentPage(item);
+                  navigate(
+                    `/pages/${item.id}/edit?inserter=patterns`,
+                  );
+                }}
               >
                 <div className="pp-dv-scroll">
                   <DataViews.Layout />
