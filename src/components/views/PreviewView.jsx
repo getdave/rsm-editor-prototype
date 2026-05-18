@@ -1,21 +1,37 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Page } from '@wordpress/admin-ui';
-import { Stack } from '@wordpress/ui';
+import { Card, Stack, Text } from '@wordpress/ui';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import {
+  Tooltip,
   __experimentalToggleGroupControl as ToggleGroupControl,
   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
+import { home, page as pageIcon, postList } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import PageLayoutWireframeThumb from '../shared/PageLayoutWireframeThumb';
 import ContentSuggestions from './ContentSuggestions';
 
+function getPageIcon(item) {
+  if (item.isFrontPage) {
+    return home;
+  }
+  if (item.collectionKind === 'posts' || item.isPostsPage) {
+    return postList;
+  }
+  return pageIcon;
+}
+
+function isSyncedPageRow(item) {
+  return Boolean(item?.isCollection || item?.isPostsPage);
+}
+
 const PAGES_INDEX_FIELDS = [
   {
     id: 'media',
-    label: 'Thumbnail',
+    label: 'Icon',
     enableSorting: false,
     enableHiding: false,
     filterBy: false,
@@ -50,9 +66,47 @@ const PAGES_INDEX_FIELDS = [
   {
     id: 'name',
     type: 'text',
-    label: 'Name',
+    label: 'Title',
     enableHiding: false,
     enableGlobalSearch: true,
+    render: ({ item }) => {
+      const docIcon = getPageIcon(item);
+      const title = (
+        <span className="pp-title-cell-inner">
+          <span
+            className={`pp-title-glyph-icon${
+              isSyncedPageRow(item) ? ' pp-title-glyph-icon--sync' : ''
+            }`}
+            aria-hidden="true"
+            title={
+              item.isFrontPage
+                ? 'Homepage'
+                : item.isPostsPage
+                  ? 'Posts page'
+                  : undefined
+            }
+          >
+            {docIcon}
+          </span>
+          <Text variant="body-md" className="pp-title-cell-name">
+            {item.name}
+          </Text>
+          <span
+            className="url-dot"
+            role="status"
+            aria-label="Page is live"
+          />
+        </span>
+      );
+      if (!item.titleTooltip) {
+        return title;
+      }
+      return (
+        <Tooltip text={item.titleTooltip} delay={400} placement="top">
+          <span className="pp-title-cell-tooltip-wrap">{title}</span>
+        </Tooltip>
+      );
+    },
   },
 ];
 
@@ -61,7 +115,7 @@ const PAGES_INDEX_DEFAULT_VIEW = {
   search: '',
   filters: [],
   page: 1,
-  perPage: 24,
+  perPage: 50,
   titleField: 'name',
   mediaField: 'media',
   fields: [],
@@ -125,13 +179,13 @@ function PreviewView() {
           <div className="pp-inner pp-dataviews">
             {previewMode === 'preview' ? (
               <div className="dataviews-wrapper preview-dataviews-wrapper">
-                <article className="preview-thumbnail">
+                <Card.Root className="preview-thumbnail">
                   <PreviewCanvas
                     page={currentPage}
                     onEdit={handleEdit}
                     onPageChange={setCurrentPage}
                   />
-                </article>
+                </Card.Root>
               </div>
             ) : (
               <DataViews
@@ -143,6 +197,8 @@ function PreviewView() {
                 paginationInfo={paginationInfo}
                 actions={[]}
                 getItemId={(item) => item.id}
+                getItemLevel={(item) => item.level ?? 0}
+                onChangeSelection={() => {}}
                 isItemClickable={() => true}
                 onClickItem={(item) => {
                   setCurrentPage(item);
