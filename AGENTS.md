@@ -286,7 +286,8 @@ Vite reads `VITE_PORT` from `.env.local`, so each worktree has its own localhost
 
 ```bash
 npm run worktree:list                           # See all worktrees
-npm run worktree:remove -- ../path-to-worktree  # Remove a worktree
+npm run worktree:cleanup -- feature/my-change   # Remove a worktree and clear its port assignment
+npm run worktree:remove -- ../path-to-worktree  # Raw git worktree remove passthrough
 ```
 
 **How you know which preview is which**
@@ -305,9 +306,12 @@ For an existing clone, use `vite --port 5180` or `npm run dev:port -- 5180`.
 **Remove a worktree** when done:
 
 ```bash
-git worktree remove ../rsm-prototyping-feature-my-change
-git branch -d feature/my-change   # if the branch is fully merged
+npm run worktree:cleanup -- feature/my-change
+npm run worktree:cleanup -- feature/my-change --delete-branch   # also delete the branch
+npm run worktree:cleanup -- feature/my-change --delete-branch --force
 ```
+
+Stop the worktree's dev server with `Ctrl-C` before cleanup. The cleanup command removes the checkout and the local port registry entry; it does not kill running processes.
 
 ### Running the Prototype
 ```bash

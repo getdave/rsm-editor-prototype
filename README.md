@@ -159,6 +159,12 @@ Optional explicit port:
 npm run worktree:create -- feature/my-change 5180
 ```
 
+When you are done, stop that worktree's dev server with `Ctrl-C`, then remove the worktree:
+
+```bash
+npm run worktree:cleanup -- feature/my-change --delete-branch
+```
+
 ### Principles
 
 Before adding something new, check it against three questions:

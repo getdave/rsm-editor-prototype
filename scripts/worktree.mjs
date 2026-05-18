@@ -15,10 +15,12 @@ const STALE_LOCK_MS = 30000
 function usage() {
   console.error(`Usage:
   node scripts/worktree.mjs create <branch-name> [port]
+  node scripts/worktree.mjs cleanup <branch-or-path> [--delete-branch] [--force]
   node scripts/worktree.mjs setup [port]
 
 Commands:
   create  Create a sibling git worktree, write .env.local, and run npm ci.
+  cleanup Remove a worktree, clear its port assignment, and optionally delete its branch.
   setup   Write .env.local for the current worktree. Used by Cursor setup.
 `)
   process.exit(1)
@@ -38,6 +40,20 @@ function gitSucceeds(args, cwd = process.cwd()) {
     stdio: 'ignore',
   })
   return result.status === 0
+}
+
+function gitOutput(args, cwd = process.cwd()) {
+  const result = spawnSync('git', args, {
+    cwd,
+    encoding: 'utf8',
+    stdio: [ 'ignore', 'pipe', 'pipe' ],
+  })
+
+  if (result.status !== 0) {
+    throw new Error(result.stderr.trim() || `git ${args.join(' ')} failed`)
+  }
+
+  return result.stdout.trim()
 }
 
 function run(command, args, cwd) {
@@ -173,6 +189,26 @@ function cleanupRegistry(registry) {
       delete registry.assignments[worktreePath]
     }
   }
+}
+
+async function removeRegistryAssignment(commonDir, worktreePath) {
+  const registryPath = path.join(commonDir, REGISTRY_FILE)
+
+  await withRegistryLock(commonDir, async () => {
+    const registry = readRegistry(registryPath)
+    cleanupRegistry(registry)
+
+    const candidates = new Set([
+      worktreePath,
+      fs.existsSync(worktreePath) ? fs.realpathSync(worktreePath) : worktreePath,
+    ])
+
+    for (const candidate of candidates) {
+      delete registry.assignments[candidate]
+    }
+
+    writeRegistry(registryPath, registry)
+  })
 }
 
 async function allocatePort(worktreePath, label, explicitPort, commonDir = getGitCommonDir(worktreePath)) {
@@ -329,6 +365,99 @@ function inferLabel(worktreePath) {
   }
 }
 
+function listWorktrees(root) {
+  const output = gitOutput([ 'worktree', 'list', '--porcelain' ], root)
+  const worktrees = []
+  let current = null
+
+  for (const line of output.split(/\r?\n/)) {
+    if (line.startsWith('worktree ')) {
+      if (current) {
+        worktrees.push(current)
+      }
+
+      current = {
+        path: line.slice('worktree '.length),
+        branchName: null,
+      }
+      continue
+    }
+
+    if (current && line.startsWith('branch refs/heads/')) {
+      current.branchName = line.slice('branch refs/heads/'.length)
+    }
+  }
+
+  if (current) {
+    worktrees.push(current)
+  }
+
+  return worktrees
+}
+
+function normalizeExistingPath(value) {
+  return fs.existsSync(value) ? fs.realpathSync(value) : path.resolve(value)
+}
+
+function resolveWorktreeTarget(root, target) {
+  const worktrees = listWorktrees(root)
+  const pathCandidate = path.isAbsolute(target)
+    ? path.resolve(target)
+    : path.resolve(root, target)
+  const normalizedCandidate = normalizeExistingPath(pathCandidate)
+  const matches = worktrees.filter((worktree) => {
+    const normalizedWorktreePath = normalizeExistingPath(worktree.path)
+
+    return (
+      normalizedWorktreePath === normalizedCandidate ||
+      worktree.path === target ||
+      worktree.branchName === target ||
+      path.basename(worktree.path) === target ||
+      path.basename(worktree.path) === `rsm-prototyping-${slugify(target)}`
+    )
+  })
+
+  if (matches.length === 1) {
+    return matches[0]
+  }
+
+  if (matches.length > 1) {
+    throw new Error(`Multiple worktrees match "${target}". Use an absolute path.`)
+  }
+
+  throw new Error(`No worktree found for "${target}". Run npm run worktree:list to see active worktrees.`)
+}
+
+function parseCleanupArgs(args) {
+  let target = null
+  let deleteBranch = false
+  let force = false
+
+  for (const arg of args) {
+    if (arg === '--delete-branch') {
+      deleteBranch = true
+      continue
+    }
+
+    if (arg === '--force') {
+      force = true
+      continue
+    }
+
+    if (target) {
+      throw new Error(`Unexpected argument "${arg}".`)
+    }
+
+    target = arg
+  }
+
+  if (!target) {
+    usage()
+  }
+
+  return { target, deleteBranch, force }
+}
+
 async function setupCurrentWorktree(portArg) {
   const worktreePath = fs.realpathSync(getRepoRoot())
   const explicitPort = parsePort(portArg)
@@ -391,6 +520,42 @@ async function createWorktree(branchName, portArg) {
   printReady(info, realWorktreePath)
 }
 
+async function cleanupWorktree(args) {
+  const { target, deleteBranch, force } = parseCleanupArgs(args)
+  const root = fs.realpathSync(getRepoRoot())
+  const commonDir = getGitCommonDir(root)
+  const worktree = resolveWorktreeTarget(root, target)
+  const worktreePath = normalizeExistingPath(worktree.path)
+
+  if (worktreePath === root) {
+    throw new Error('Refusing to remove the current worktree.')
+  }
+
+  const removeArgs = [ 'worktree', 'remove' ]
+  if (force) {
+    removeArgs.push('--force')
+  }
+  removeArgs.push(worktree.path)
+
+  run('git', removeArgs, root)
+  await removeRegistryAssignment(commonDir, worktreePath)
+
+  if (deleteBranch) {
+    if (!worktree.branchName) {
+      console.warn('No local branch was associated with this worktree.')
+    } else {
+      run('git', [ 'branch', force ? '-D' : '-d', worktree.branchName ], root)
+    }
+  }
+
+  console.log('')
+  console.log('Worktree removed')
+  console.log(`  Path: ${worktree.path}`)
+  if (worktree.branchName) {
+    console.log(`  Branch: ${deleteBranch ? 'deleted ' : ''}${worktree.branchName}`)
+  }
+}
+
 function printReady(info, worktreePath) {
   console.log('')
   console.log('Worktree ready')
@@ -403,10 +568,15 @@ function printReady(info, worktreePath) {
 }
 
 async function main() {
-  const [ command, firstArg, secondArg ] = process.argv.slice(2)
+  const [ command, firstArg, secondArg, ...remainingArgs ] = process.argv.slice(2)
 
   if (command === 'create') {
     await createWorktree(firstArg, secondArg)
+    return
+  }
+
+  if (command === 'cleanup') {
+    await cleanupWorktree([ firstArg, secondArg, ...remainingArgs ].filter(Boolean))
     return
   }
 
