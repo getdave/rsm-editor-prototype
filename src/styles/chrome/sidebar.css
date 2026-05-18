@@ -608,8 +608,6 @@
   margin: 0;
   color: #fff;
 }
-.ni-section-header .ni-section-title { font-size: 20px; }
-.ni-section-header .ni-section-desc { font-size: 13px; }
 
 /* Design sidebar grouping: 24px between groups, 8px within a group. */
 .admin-root-nav.design-nav,

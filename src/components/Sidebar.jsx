@@ -209,7 +209,7 @@ function Sidebar() {
       return (
         <Stack direction="column" gap="xs" className="ni-section-header">
           <Text variant="heading-lg" className="ni-section-title">{item.title}</Text>
-          <Text variant="body-sm" className="ni-section-desc">{item.description}</Text>
+          <Text variant="body-md" className="ni-section-desc">{item.description}</Text>
         </Stack>
       );
     }
