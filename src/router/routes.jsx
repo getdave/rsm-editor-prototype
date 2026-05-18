@@ -14,9 +14,8 @@ import LayoutPanel from '../components/views/styles/LayoutPanel';
 import ThemesInstalledView from '../components/views/ThemesInstalledView';
 import ThemesBrowseView from '../components/views/ThemesBrowseView';
 import NavigationView from '../components/views/NavigationView';
+import PostsView from '../components/views/PostsView';
 import PlaceholderAdminView from '../components/views/PlaceholderAdminView';
-
-import PostsRouteGate from './PostsRouteGate';
 
 export const router = createBrowserRouter([
   {
@@ -39,7 +38,7 @@ export const router = createBrowserRouter([
           />
         ),
       },
-      { path: 'posts', element: <PostsRouteGate /> },
+      { path: 'posts', element: <PostsView /> },
       { path: 'navigation', element: <NavigationView /> },
       {
         path: 'patterns',
