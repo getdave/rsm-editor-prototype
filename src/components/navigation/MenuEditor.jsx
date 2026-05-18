@@ -4,7 +4,6 @@ import {
   DropdownMenu,
   MenuGroup,
   MenuItem,
-  Popover,
 } from '@wordpress/components';
 import { Page } from '@wordpress/admin-ui';
 import {
@@ -18,27 +17,7 @@ import {
 import { useAppState } from '../../hooks/useAppState';
 import RenameMenuItemModal from './RenameMenuItemModal';
 import DeleteMenuItemConfirmModal from '../modals/DeleteMenuItemConfirmModal';
-import AddLinkPopover from './AddLinkPopover';
-import CreatePagePopover from './CreatePagePopover';
 import AddPagesToMenuModal from './AddPagesToMenuModal';
-
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-function uniquePageId(name, pagesList) {
-  const base = slugify(name) || `page-${Date.now()}`;
-  let id = base;
-  let n = 0;
-  while (pagesList.some((p) => p.id === id)) {
-    n += 1;
-    id = `${base}-${n}`;
-  }
-  return id;
-}
 
 const MAX_MENU_LEVEL = 1;
 
@@ -215,16 +194,13 @@ function moveMenuItem(items, draggedId, targetId, position) {
 }
 
 function MenuEditor({ menu, onUpdateMenu, onBack }) {
-  const { pages: allPages, addPage, showSnackbar } = useAppState();
+  const { pages: allPages, showSnackbar } = useAppState();
   const [expandedItems, setExpandedItems] = useState(new Set());
   /** When set, rename modal is open for this menu tree item (by reference shape). */
   const [renameTarget, setRenameTarget] = useState(null);
   /** When set, delete confirmation is open for this menu tree item. */
   const [itemPendingDelete, setItemPendingDelete] = useState(null);
 
-  /** null | 'menu' | 'add-link' | 'create-page' */
-  const [inserterView, setInserterView] = useState(null);
-  const inserterAnchorRef = useRef(null);
   const [showAddPagesModal, setShowAddPagesModal] = useState(false);
   const [addPagesModalKey, setAddPagesModalKey] = useState(0);
   /** Nav item row ids that should play the attention flash (newly added links). */
@@ -233,8 +209,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
   const [dropTarget, setDropTargetState] = useState(null);
   const [dragGhostPosition, setDragGhostPosition] = useState(null);
   const dragStateRef = useRef({ itemId: null });
-
-  const closeInserter = () => setInserterView(null);
 
   const setDropTarget = useCallback((nextTarget) => {
     setDropTargetState((prevTarget) => {
@@ -252,19 +226,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     setAddPagesModalKey((k) => k + 1);
     setShowAddPagesModal(true);
   }, []);
-
-  const toggleInserterFromButton = () => {
-    setInserterView((prev) => (prev ? null : 'menu'));
-  };
-
-  const addItemToMenu = (newItem) => {
-    const item = {
-      children: [],
-      ...newItem,
-    };
-    onUpdateMenu({ items: [...menu.items, item] });
-    setFlashNavItemIds([item.id]);
-  };
 
   const addLinksFromPicker = useCallback(
     (selectedRows) => {
@@ -463,7 +424,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     }
 
     event.preventDefault();
-    closeInserter();
     dragStateRef.current.itemId = itemId;
     setDraggingItemId(itemId);
     setDragGhostPosition({ x: event.clientX, y: event.clientY });
@@ -638,106 +598,15 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
   );
 
   const quickInserter = (
-    <>
-      <div className="nav-add-item-dropdown">
-        <Button
-          ref={inserterAnchorRef}
-          icon={plus}
-          label="Add to menu"
-          className="nav-add-page-btn"
-          onClick={toggleInserterFromButton}
-          aria-expanded={inserterView !== null}
-          aria-haspopup="dialog"
-        />
-      </div>
-      {inserterView ? (
-        <Popover
-          anchorRef={inserterAnchorRef}
-          placement="bottom-start"
-          onClose={closeInserter}
-          offset={4}
-          focusOnMount="firstElement"
-        >
-          <div key={inserterView} className="nav-inserter-popover-shell">
-            {inserterView === 'menu' ? (
-              <div className="nav-inserter-menu">
-                <div className="nav-inserter-menu-header">Add to menu</div>
-                <MenuGroup>
-                  <MenuItem
-                    icon={pageIcon}
-                    onClick={() => {
-                      closeInserter();
-                      openAddPagesModal();
-                    }}
-                  >
-                    Add pages
-                  </MenuItem>
-                  <MenuItem
-                    icon={linkIconGlyph}
-                    onClick={() => setInserterView('add-link')}
-                  >
-                    Add Link
-                  </MenuItem>
-                </MenuGroup>
-                <MenuGroup>
-                  <MenuItem
-                    icon={plus}
-                    onClick={() => setInserterView('create-page')}
-                  >
-                    Create new page
-                  </MenuItem>
-                </MenuGroup>
-              </div>
-            ) : null}
-            {inserterView === 'add-link' ? (
-              <AddLinkPopover
-                onBack={() => setInserterView('menu')}
-                onCancel={closeInserter}
-                onSave={({ label: linkLabel, url }) => {
-                  addItemToMenu({
-                    id: `nav-link-${Date.now()}`,
-                    label: linkLabel,
-                    url,
-                  });
-                  showSnackbar(`Added "${linkLabel}" to the menu`);
-                  closeInserter();
-                }}
-              />
-            ) : null}
-            {inserterView === 'create-page' ? (
-              <CreatePagePopover
-                onBack={() => setInserterView('menu')}
-                onCancel={closeInserter}
-                onSave={({ name, publishImmediately }) => {
-                  const pageId = uniquePageId(name, allPages);
-                  const newPage = {
-                    id: pageId,
-                    slug: pageId,
-                    name,
-                    type: 'Page',
-                    isLive: publishImmediately,
-                    inMenu: true,
-                    isSystem: false,
-                    category: 'content',
-                    status: publishImmediately ? 'live' : 'draft',
-                    level: 0,
-                    authorDisplay: 'John Doe',
-                  };
-                  addPage(newPage);
-                  addItemToMenu({
-                    id: `nav-page-${pageId}-${Date.now()}`,
-                    label: name,
-                    pageId,
-                  });
-                  showSnackbar(`Created page "${name}" and added it to the menu`);
-                  closeInserter();
-                }}
-              />
-            ) : null}
-          </div>
-        </Popover>
-      ) : null}
-    </>
+    <div className="nav-add-item-dropdown">
+      <Button
+        icon={plus}
+        label="Add to menu"
+        className="nav-add-page-btn"
+        onClick={openAddPagesModal}
+        aria-haspopup="dialog"
+      />
+    </div>
   );
   const dragGhostIcon = draggedItem?.url ? linkIconGlyph : pageIcon;
 
