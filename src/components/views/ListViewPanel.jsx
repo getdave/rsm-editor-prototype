@@ -104,7 +104,7 @@ export default function ListViewPanel({
                     </div>
                     {templateExpanded && (
                       <div className="lv-nested">
-                        <Text variant="body-sm" className="lv-placeholder-note">Template structure</Text>
+                        <Text variant="body-sm" className="lv-placeholder-note">Design structure</Text>
                       </div>
                     )}
                   </div>

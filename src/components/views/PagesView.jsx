@@ -981,6 +981,32 @@ function PagesView() {
     [isGridLayout],
   );
 
+  const isPostsPageItem = useCallback(
+    (item) =>
+      homepageDisplayMode === READING_DISPLAY_STATIC &&
+      Boolean(postsPageId) &&
+      item?.category === "content" &&
+      item.id === postsPageId,
+    [homepageDisplayMode, postsPageId],
+  );
+
+  const editPageOrDesign = useCallback(
+    (item) => {
+      if (!item) return;
+      if (item.collectionState === "inactive") {
+        setInactiveTemplateNoticePage(item);
+        return;
+      }
+      if (isPostsPageItem(item)) {
+        navigate("/page-designs/blog-list/edit?inserter=patterns");
+        return;
+      }
+      selectPage(item);
+      navigate(`/pages/${item.id}/edit?inserter=patterns`);
+    },
+    [isPostsPageItem, navigate, selectPage],
+  );
+
   const actions = useMemo(
     () => [
       {
@@ -995,13 +1021,7 @@ function PagesView() {
         label: "Edit",
         icon: pencil,
         callback: (items) => {
-          const item = items[0];
-          if (item.collectionState === "inactive") {
-            setInactiveTemplateNoticePage(item);
-            return;
-          }
-          selectPage(item);
-          navigate(`/pages/${item.id}/edit?inserter=patterns`);
+          editPageOrDesign(items[0]);
         },
       },
       {
@@ -1145,6 +1165,7 @@ function PagesView() {
       },
     ],
     [
+      editPageOrDesign,
       setPreviewPage,
       showSnackbar,
       selectPage,
@@ -1414,13 +1435,8 @@ function PagesView() {
       }}
       isItemClickable={() => true}
       onClickItem={(item) => {
-        if (item.collectionState === "inactive") {
-          setInactiveTemplateNoticePage(item);
-          return;
-        }
         if (!hasPreviewPanel) {
-          selectPage(item);
-          navigate(`/pages/${item.id}/edit?inserter=patterns`);
+          editPageOrDesign(item);
         } else {
           setPreviewPage(item);
         }
@@ -1541,14 +1557,10 @@ function PagesView() {
         if (!displayedPreviewPage) {
           return;
         }
-        if (displayedPreviewPage.collectionState === "inactive") {
-          setInactiveTemplateNoticePage(displayedPreviewPage);
-          return;
-        }
-        selectPage(displayedPreviewPage);
-        navigate(`/pages/${displayedPreviewPage.id}/edit?inserter=patterns`);
+        editPageOrDesign(displayedPreviewPage);
       }}
       onPageChange={setPreviewPage}
+      editLabel="Edit"
     />
   );
 

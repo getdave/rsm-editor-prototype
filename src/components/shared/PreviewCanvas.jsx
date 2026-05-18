@@ -6,12 +6,14 @@ import {
   home,
   page as pageIcon,
   postList,
+  styles,
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { getPageContent } from '../../services/pageContentService';
 import { PreviewTemplateFrame } from './PreviewSiteChrome';
 
 function docTypeIcon(p) {
+  if (p?.isPageDesign) return styles;
   if (p?.isFrontPage) return home;
   if (p?.isPostsPage) return postList;
   return pageIcon;
@@ -25,8 +27,8 @@ function docTypeIcon(p) {
  * Reusable Preview Canvas Component
  *
  * Displays a site preview with device switcher and edit button.
- * Dynamically renders content based on WordPress content model (pages, templates, template hierarchy).
- *
+ * Dynamically renders content for the selected page or page-design target
+ * using the WordPress content model (pages, templates, template hierarchy).
  * WordPress Template Mapping:
  * - Content Pages → page.html template
  * - System Pages → 404.html, page.html templates
@@ -39,13 +41,37 @@ function docTypeIcon(p) {
  * @param {function} onPageChange - Callback when a nav link is clicked; parent decides what switching page means
  * @param {HeaderNavItem[]|null|undefined} headerNavItems - Optional top-level nav links (pageId or custom url order). When omitted, uses pages with `inMenu`.
  */
-function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }) {
+function PreviewCanvas({
+  page,
+  onEdit,
+  onPageChange = () => {},
+  headerNavItems,
+  editLabel = 'Edit',
+  documentLabel,
+  scopeNotice,
+}) {
   const { selectedDevice, setSelectedDevice, siteTitle, pages } = useAppState();
 
   // Get WordPress-appropriate content for this page
   const content = getPageContent(page);
 
-  const fallbackMenuPages = pages.filter((p) => p.inMenu);
+  const defaultMenuPages = pages.filter((p) => p.inMenu);
+  const isInactiveTemplate = page.templateState === 'inactive';
+  const statusLabel = isInactiveTemplate
+    ? `Inactive. Using ${page.defaultTemplateLabel}.`
+    : page.isPageDesign
+      ? 'Design is active'
+      : page.isLive ? 'Page is live' : 'Page is a draft';
+  const documentName = documentLabel || page.name;
+  const documentStatusLabel = scopeNotice || statusLabel;
+  const documentNameElement = (
+    <span
+      className={`ct-btn preview-bar-doc-name${scopeNotice ? ' preview-bar-doc-name--has-scope' : ''}`}
+      style={{ cursor: 'default' }}
+    >
+      {documentName}
+    </span>
+  );
 
   const resolveHeaderNavItem = (item) => {
     const children = (item.children || [])
@@ -88,7 +114,7 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
   const navEntries =
     headerNavItems !== undefined
       ? headerNavItems.map(resolveHeaderNavItem).filter(Boolean)
-      : fallbackMenuPages.map((p) => ({
+      : defaultMenuPages.map((p) => ({
           kind: 'page',
           key: p.id,
           label: p.name,
@@ -318,7 +344,7 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
           className="ct-edit"
           onClick={onEdit}
         >
-          Edit
+          {editLabel}
         </Button>
 
         <div className="ct-space"></div>
@@ -329,9 +355,15 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
           >
             {docTypeIcon(page)}
           </span>
-          <span className="ct-btn" style={{ cursor: 'default' }}>{page.name}</span>
+          {scopeNotice ? (
+            <Tooltip text={scopeNotice} placement="bottom">
+              {documentNameElement}
+            </Tooltip>
+          ) : (
+            documentNameElement
+          )}
           <Tooltip
-            text={page.isLive ? 'Page is live' : 'Page is a draft'}
+            text={documentStatusLabel}
             placement="bottom"
           >
             <span
@@ -347,10 +379,10 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
               }}
             >
               <span
-                className={`url-dot${page.isLive ? '' : ' url-draft-dot'}`}
+                className={`url-dot${page.isLive && !isInactiveTemplate ? '' : ' url-draft-dot'}`}
                 style={{ margin: 0 }}
                 role="status"
-                aria-label={page.isLive ? 'Page is live' : 'Page is a draft'}
+                aria-label={documentStatusLabel}
               />
             </span>
           </Tooltip>
@@ -382,8 +414,10 @@ function PreviewCanvas({ page, onEdit, onPageChange = () => {}, headerNavItems }
         </div>
       </div>
       <div className="preview-canvas-area">
-        <div className="site-card">
-          {renderContent()}
+        <div className="preview-canvas-stack">
+          <div className="site-card">
+            {renderContent()}
+          </div>
         </div>
       </div>
     </div>

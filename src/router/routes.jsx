@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import RootLayout from '../layouts/RootLayout';
 import PreviewView from '../components/views/PreviewView';
 import PagesView from '../components/views/PagesView';
+import ContentView from '../components/views/ContentView';
 import EditingView from '../components/views/EditingView';
 import TemplateEditingView from '../components/views/TemplateEditingView';
 import StylesView from '../components/views/StylesView';
@@ -16,8 +17,6 @@ import ThemesBrowseView from '../components/views/ThemesBrowseView';
 import NavigationView from '../components/views/NavigationView';
 import PlaceholderAdminView from '../components/views/PlaceholderAdminView';
 
-import PostsRouteGate from './PostsRouteGate';
-
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -28,8 +27,10 @@ export const router = createBrowserRouter([
       { path: 'pages/static', element: <PagesView /> },
       { path: 'pages/dynamic', element: <PagesView /> },
       { path: 'pages/collections', element: <PagesView /> },
+      { path: 'pages/:legacySegment', element: <Navigate to="/pages" replace /> },
       { path: 'pages/:pageId/edit', element: <EditingView /> },
       { path: 'template-editing', element: <TemplateEditingView /> },
+      { path: 'page-designs/:designId/edit', element: <EditingView /> },
       {
         path: 'templates',
         element: (
@@ -39,7 +40,9 @@ export const router = createBrowserRouter([
           />
         ),
       },
-      { path: 'posts', element: <PostsRouteGate /> },
+      { path: 'content', element: <ContentView /> },
+      { path: 'content/:contentTypeId', element: <ContentView /> },
+      { path: 'posts', element: <Navigate to="/content" replace /> },
       { path: 'navigation', element: <NavigationView /> },
       {
         path: 'patterns',
@@ -94,6 +97,7 @@ export const router = createBrowserRouter([
           />
         ),
       },
+      { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
 ]);

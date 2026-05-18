@@ -40,6 +40,7 @@ const ADMIN_NAV_ITEM_POSTS = Object.freeze({
 const ADMIN_NAV_ITEMS_BASE = [
   { kind: 'item', id: 'home', icon: home, label: 'Home', path: '/', tip: "View your site's home page" },
   { kind: 'item', id: 'pages', icon: pageIcon, label: 'Pages', path: '/pages', tip: "View your site's Pages" },
+  { kind: 'item', id: 'content', icon: postList, label: 'Content', path: '/content', tip: 'Manage content and page designs' },
   { kind: 'item', id: 'navigation', icon: navigation, label: 'Navigation', path: '/navigation', tip: 'Assign pages to your Main Menu and manage other menus' },
   { kind: 'item', id: 'design', icon: styles, label: 'Design', path: '/design', tip: 'Modify your site design and styling', chevron: true },
 ];
@@ -115,7 +116,7 @@ const DESIGN_NAV_ITEMS = [
   },
 ];
 
-const EDIT_ROUTE_PATTERN = /^\/pages\/[^/]+\/edit$|^\/template-editing$/;
+const EDIT_ROUTE_PATTERN = /^\/(?:pages|page-designs)\/[^/]+\/edit$|^\/template-editing$/;
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -189,6 +190,12 @@ function Sidebar() {
     }
     if (itemPath === '/pages') {
       return activePathname.startsWith('/pages');
+    }
+    if (itemPath === '/content') {
+      return (
+        activePathname.startsWith('/content') ||
+        activePathname.startsWith('/page-designs')
+      );
     }
     return activePathname === itemPath;
   };
