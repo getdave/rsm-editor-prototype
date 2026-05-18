@@ -929,6 +929,37 @@
   color: #505050;
 }
 
+.nav-add-shop-page-overlay {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  left: auto;
+  z-index: 2;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border: 1px solid rgba(127, 84, 179, 0.42);
+  background: rgba(127, 84, 179, 0.1);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+  color: #7f54b3;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.nav-add-title-glyph-icon--shop {
+  color: #7f54b3;
+}
+
+.nav-add-dynamic-page-type {
+  background: rgba(0, 0, 0, 0.06);
+  color: #505050;
+}
+
 .nav-add-menu-items-layout {
   display: flex;
   flex: 1;
