@@ -38,14 +38,11 @@ export default function DocumentActions({
   const renameEnabled = canRename && !activeDocument?.isPageDesign && !isGlobalOverride && !isTemplate;
   const isReadonly = !renameEnabled;
   const [editing, setEditing] = useState(false);
+  const isEditing = editing && !isReadonly;
   const ref = useRef(null);
 
   useEffect(() => {
-    if (isReadonly) setEditing(false);
-  }, [isReadonly]);
-
-  useEffect(() => {
-    if (editing && ref.current && !isReadonly) {
+    if (isEditing && ref.current) {
       ref.current.focus();
       const sel = window.getSelection();
       const range = document.createRange();
@@ -53,7 +50,7 @@ export default function DocumentActions({
       sel.removeAllRanges();
       sel.addRange(range);
     }
-  }, [editing, isReadonly]);
+  }, [isEditing]);
 
   const documentName = activeDocument?.name ?? 'Untitled';
   const displayName = isGlobalOverride
@@ -106,7 +103,7 @@ export default function DocumentActions({
       )}
       <Tooltip text={nameTooltipText} placement="bottom">
         <span
-          className={`ct-btn doc-actions-name${editing ? ' is-editing' : ''}${isReadonly ? ' doc-actions-name--readonly' : ''}`}
+          className={`ct-btn doc-actions-name${isEditing ? ' is-editing' : ''}${isReadonly ? ' doc-actions-name--readonly' : ''}`}
           onClick={() => renameEnabled && !editing && setEditing(true)}
         >
           <span
@@ -124,13 +121,13 @@ export default function DocumentActions({
             <span
               ref={ref}
               className="doc-actions-name-text"
-              contentEditable={editing}
+              contentEditable={isEditing}
               suppressContentEditableWarning
               role="textbox"
               tabIndex={0}
-              onBlur={editing ? commit : undefined}
+              onBlur={isEditing ? commit : undefined}
               onKeyDown={(e) => {
-                if (!editing) return;
+                if (!isEditing) return;
                 if (e.key === 'Enter') {
                   e.preventDefault();
                   commit();

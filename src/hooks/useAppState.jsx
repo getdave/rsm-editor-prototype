@@ -396,14 +396,6 @@ export function AppStateProvider({ children }) {
     pagesViewMode,
     setPagesViewMode,
 
-    // Reading / homepage
-    homepageDisplayMode,
-    setHomepageDisplayMode,
-    frontPageId,
-    setFrontPageId,
-    postsPageId,
-    setPostsPageId,
-
     // Edit canvas panels
     listViewOpen,
     setListViewOpen,

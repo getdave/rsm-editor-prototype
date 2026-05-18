@@ -178,7 +178,6 @@ function EditingView() {
     pageDesigns,
     listViewOpen,
     openUnsavedChangesModal,
-    hasUnsavedChanges,
     selectedDevice,
     settingsSidebarOpen,
     setListViewOpen,

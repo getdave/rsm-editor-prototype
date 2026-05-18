@@ -27,6 +27,7 @@ export const router = createBrowserRouter([
       { path: 'pages/static', element: <PagesView /> },
       { path: 'pages/dynamic', element: <PagesView /> },
       { path: 'pages/collections', element: <PagesView /> },
+      { path: 'pages/:legacySegment', element: <Navigate to="/pages" replace /> },
       { path: 'pages/:pageId/edit', element: <EditingView /> },
       { path: 'template-editing', element: <TemplateEditingView /> },
       { path: 'page-designs/:designId/edit', element: <EditingView /> },
@@ -96,6 +97,7 @@ export const router = createBrowserRouter([
           />
         ),
       },
+      { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
 ]);
