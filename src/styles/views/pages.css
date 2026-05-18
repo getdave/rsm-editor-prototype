@@ -120,6 +120,11 @@
   color: #1e1e1e;
 }
 
+.pages-content-frame > header {
+  border-block-end: 0;
+  padding-block-end: 8px;
+}
+
 /* Tabs + View options (right): one row */
 .pp-tabs-row {
   display: flex;
@@ -134,15 +139,52 @@
   flex-shrink: 0;
 }
 
+.pp-tab-description-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px 12px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.pp-tab-description-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pp-tab-description {
+  display: block;
+  margin: 0;
+  color: #50575e;
+  line-height: 1.45;
+}
+
+.pp-tab-description-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.pp-static-homepage-notice {
+  padding: 9px 12px;
+  margin: 10px 16px 0 20px;
+  background: #fcf9e8;
+  border-left: 4px solid #dba617;
+  border-radius: 2px;
+  color: #1e1e1e;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .pp-tabs-row__tabs {
   flex: 1;
   min-width: 0;
-  display: flex;
-  align-items: center;
-}
-
-.pp-tabs-row__actions {
-  flex-shrink: 0;
   display: flex;
   align-items: center;
 }
@@ -174,19 +216,20 @@
   border-top: none;
 }
 
-.pp-toolbar-controls:has(.pp-latest-posts-home-tip, .pp-toolbar-row-options) {
+.pp-toolbar-controls:has(.pp-toolbar-row-options) {
   padding-top: 8px;
 }
 
-.pp-latest-posts-home-tip {
-  padding: 10px 14px;
-  margin: 0 0 10px;
-  background: #fcf9e8;
-  border-left: 4px solid #dba617;
-  border-radius: 2px;
+.pp-show-drafts-toggle.components-base-control,
+.pp-show-drafts-toggle .components-base-control__field,
+.pp-group-collections-toggle.components-base-control,
+.pp-group-collections-toggle .components-base-control__field {
+  margin-bottom: 0;
+}
+
+.pp-show-drafts-toggle .components-toggle-control__label,
+.pp-group-collections-toggle .components-toggle-control__label {
   font-size: 13px;
-  line-height: 1.45;
-  color: #1e1e1e;
 }
 
 .pp-toolbar-row-options {
@@ -223,6 +266,9 @@
 
 
 .pp-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 10px 14px;
   font-size: 13px;
   font-weight: 500;
@@ -278,6 +324,11 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
+}
+
+/* Dynamic Pages tab — no row-level DataViews actions; hide … menu slot (including disabled mobile trigger). */
+.pp-dataviews.pp-dataviews--dynamic-pages .dataviews-item-actions {
+  display: none;
 }
 
 /* DataViews renders a .dataviews-wrapper div — make it fill and flex */
@@ -637,13 +688,34 @@
   gap: 5%;
 }
 
+.pp-media-thumb--collection {
+  border-color: rgba(127, 84, 179, 0.62);
+  background: rgba(127, 84, 179, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(127, 84, 179, 0.16);
+}
+
+.pp-media-thumb--inactive {
+  border-style: dashed;
+  opacity: 0.78;
+}
+
 .pp-media-thumb-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #999;
 }
 
-.pp-front-page-overlay {
+.pp-media-thumb.pp-media-thumb--collection .pp-media-thumb-icon {
+  color: #7f54b3;
+}
+
+.pp-media-thumb-icon--sync {
+  color: #7f54b3;
+}
+
+.pp-front-page-overlay,
+.pp-collection-marker-overlay {
   position: absolute;
   top: 4px;
   left: 4px;
@@ -657,9 +729,22 @@
   line-height: 1.2;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.pp-front-page-overlay {
   color: #3858e9;
   background: rgba(56, 88, 233, 0.1);
   border: 1px solid rgba(56, 88, 233, 0.45);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.pp-collection-marker-overlay {
+  max-width: calc(100% - 8px);
+  white-space: nowrap;
+  color: #7f54b3;
+  background: rgba(127, 84, 179, 0.1);
+  border: 1px solid rgba(127, 84, 179, 0.42);
   border-radius: 2px;
   box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
 }
@@ -689,6 +774,7 @@
 .pp-title-cell-inner {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.35em;
   min-width: 0;
 }
@@ -709,8 +795,8 @@
   vertical-align: middle;
 }
 
-.pp-title-glyph-icon--posts {
-  color: #007017;
+.pp-title-glyph-icon--sync {
+  color: #7f54b3;
 }
 
 .pp-title-glyph-icon svg {
@@ -794,6 +880,11 @@
   color: #888;
 }
 
+.pp-inactive {
+  background: #f0f0f0;
+  color: #888;
+}
+
 .pp-nav {
   background: rgba(56, 88, 233, 0.1);
   color: #3858e9;
@@ -804,6 +895,25 @@
   color: #505050;
 }
 
+.pp-dataviews .dataviews-view-list__group-header,
+.pp-dataviews .dataviews-view-grid__group-header {
+  margin: 8px 0 4px;
+  padding: 0 16px;
+  color: #50575e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pp-dataviews
+  .dataviews-view-table__group-header-row
+  .dataviews-view-table__group-header-cell {
+  padding: 10px 16px;
+  background: #f6f7f7;
+  color: #50575e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .pp-page-role--front {
   background: rgba(0, 0, 0, 0.06);
   color: #505050;
@@ -812,6 +922,12 @@
 .pp-page-role--posts {
   background: rgba(0, 0, 0, 0.06);
   color: #505050;
+}
+
+.pp-collection-marker {
+  background: rgba(127, 84, 179, 0.12);
+  color: #7f54b3;
+  white-space: nowrap;
 }
 
 /* Grid mode: Add New card sits before DataViews grid */
@@ -974,5 +1090,26 @@
 }
 
 .ch-reading-footer.modal-footer {
+  justify-content: flex-end;
+}
+
+.pp-inactive-template-modal.modal-box {
+  width: min(400px, calc(100vw - 48px));
+  max-width: 400px;
+}
+
+.pp-inactive-template-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pp-inactive-template-copy {
+  margin: 0;
+  color: #50575e;
+  line-height: 1.5;
+}
+
+.pp-inactive-template-footer.modal-footer {
   justify-content: flex-end;
 }
