@@ -54,11 +54,14 @@ const PAGES_INDEX_DEFAULT_VIEW = {
   titleField: 'name',
   mediaField: 'media',
   fields: ['pageType'],
-  layout: { previewSize: 60 },
+  layout: { density: 'compact', previewSize: 60 },
 };
 
 const PAGES_INDEX_DEFAULT_LAYOUTS = {
-  grid: { badgeFields: ['pageType'], layout: { previewSize: 60 } },
+  grid: {
+    badgeFields: ['pageType'],
+    layout: { density: 'compact', previewSize: 60 },
+  },
 };
 
 function PreviewView() {
