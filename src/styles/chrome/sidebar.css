@@ -612,8 +612,10 @@
 .ni-section-header .ni-section-desc { font-size: 13px; }
 
 /* Design sidebar grouping: 24px between groups, 8px within a group. */
-.admin-root-nav.design-nav { gap: 24px; }
-.admin-root-nav.design-nav .ni-group {
+.admin-root-nav.design-nav,
+.admin-root-nav.advanced-nav { gap: 24px; }
+.admin-root-nav.design-nav .ni-group,
+.admin-root-nav.advanced-nav .ni-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
