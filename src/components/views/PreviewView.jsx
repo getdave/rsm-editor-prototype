@@ -33,16 +33,6 @@ const PAGES_INDEX_FIELDS = [
     enableHiding: false,
     enableGlobalSearch: true,
   },
-  {
-    id: 'pageType',
-    type: 'text',
-    label: 'Type',
-    getValue: ({ item }) =>
-      item.category === 'collection' ? 'Dynamic' : 'Static',
-    enableSorting: false,
-    enableHiding: false,
-    enableGlobalSearch: false,
-  },
 ];
 
 const PAGES_INDEX_DEFAULT_VIEW = {
@@ -53,14 +43,14 @@ const PAGES_INDEX_DEFAULT_VIEW = {
   perPage: 24,
   titleField: 'name',
   mediaField: 'media',
-  fields: ['pageType'],
-  layout: { density: 'compact', previewSize: 60 },
+  fields: [],
+  layout: { density: 'compact', previewSize: 290 },
 };
 
 const PAGES_INDEX_DEFAULT_LAYOUTS = {
   grid: {
-    badgeFields: ['pageType'],
-    layout: { density: 'compact', previewSize: 60 },
+    badgeFields: [],
+    layout: { density: 'compact', previewSize: 290 },
   },
 };
 
