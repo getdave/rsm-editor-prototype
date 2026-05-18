@@ -255,8 +255,8 @@ Use **git worktrees** when you want several features (or agents) in parallel, ea
 Cursor isolates agents in separate Git checkouts. This repo includes [`.cursor/worktrees.json`](.cursor/worktrees.json) so Cursor runs a proper setup when it creates a worktree:
 
 - **`npm ci`** in the new checkout (Cursor [recommends installing dependencies per worktree](https://cursor.com/docs/configuration/worktrees) instead of symlinking `node_modules`).
-- **`.env.local`** with a **stable `VITE_PORT`** derived from the worktree path (reduces port clashes between parallel agents). If your main workspace has `.env.local`, non-`VITE_PORT` lines are copied into the worktree first.
-  - **Port range**: Cursor worktrees use ports **5174–5973** (800 possible ports). The port is deterministically calculated from the worktree's absolute path using a checksum, so the same worktree always gets the same port.
+- **`.env.local`** with a stable `VITE_PORT`, `VITE_WORKTREE_LABEL`, `VITE_WORKTREE_SLUG`, and `VITE_BRANCH_NAME` fallback.
+- **Port allocation** through `scripts/worktree.mjs`, which coordinates all worktrees through `.git/rsm-worktree-ports.json`, reuses stable per-worktree ports, and avoids ports already in use. The main checkout conventionally stays on `5173`; worktrees use `5174-5973`.
 
 Scripts live next to the config: [`.cursor/setup-worktree-unix.sh`](.cursor/setup-worktree-unix.sh), [`.cursor/setup-worktree-windows.ps1`](.cursor/setup-worktree-windows.ps1). If setup fails, use the editor **Output** panel and choose **Worktrees Setup** (per Cursor docs).
 
@@ -267,11 +267,11 @@ Editor commands: **`/worktree`**, **`/best-of-n`**, **`/apply-worktree`**, **`/d
 **Create a worktree** from the main clone (run at the repo root):
 
 ```bash
-npm run worktree:create -- feature/my-change 5174
-# or: bash scripts/create-worktree.sh feature/my-change 5174
+npm run worktree:create -- feature/my-change
+# or: bash scripts/create-worktree.sh feature/my-change
 ```
 
-This adds a sibling directory `../rsm-prototyping-feature-my-change`, checks out branch `feature/my-change` (creating it if needed), writes **`.env.local`** with **`VITE_PORT`** (and **`VITE_BRANCH_NAME`** as a fallback for tooling), copies any other keys from the main clone’s `.env.local` when present, and runs **`npm ci`** in the new checkout. Per **[Cursor’s worktrees docs](https://cursor.com/docs/configuration/worktrees)**, do **not** symlink `node_modules` into worktrees — use a normal install (`npm ci` here; **pnpm**/**bun** are fine if you adapt the script).
+This adds a sibling directory `../rsm-prototyping-feature-my-change`, checks out branch `feature/my-change` (creating it if needed), writes **`.env.local`** with worktree metadata, copies any unmanaged keys from the main clone’s `.env.local` when present, assigns a stable available port, and runs **`npm ci`** in the new checkout. Per **[Cursor’s worktrees docs](https://cursor.com/docs/configuration/worktrees)**, do **not** symlink `node_modules` into worktrees — use a normal install (`npm ci` here; **pnpm**/**bun** are fine if you adapt the script).
 
 **Run the dev server** in that directory:
 
@@ -280,28 +280,38 @@ cd ../rsm-prototyping-feature-my-change
 npm run dev
 ```
 
-Vite reads `VITE_PORT` from `.env.local`, so each worktree can use a different localhost port. Prefer a simple convention: `5173` for the main trunk clone, then `5174`, `5175`, … for additional worktrees.
+Vite reads `VITE_PORT` from `.env.local`, so each worktree has its own localhost preview. The script prints the exact URL.
 
 **List and manage worktrees**:
 
 ```bash
 npm run worktree:list                           # See all worktrees
-npm run worktree:remove -- ../path-to-worktree  # Remove a worktree
+npm run worktree:cleanup -- feature/my-change   # Remove a worktree and clear its port assignment
+npm run worktree:remove -- ../path-to-worktree  # Raw git worktree remove passthrough
 ```
 
 **How you know which preview is which**
 
-- Browser tab title in dev: `RSM Prototype (<branch>)` (from the current **Git** branch, with `VITE_BRANCH_NAME` as fallback if needed).
-- A **dev-only** control in the **bottom-right** of the app (label = current **Git** branch): click the small pill to expand a note that this is not part of the prototype UI.
+- Browser tab title in dev includes the branch and port.
+- A **dev-only** icon in the **bottom-right** of the app expands to show branch, port, and preview URL details.
 
-**Optional port override** (any clone): `vite --port 5180` or `npm run dev:port -- 5180`.
+**Optional port override**:
+
+```bash
+npm run worktree:create -- feature/my-change 5180
+```
+
+For an existing clone, use `vite --port 5180` or `npm run dev:port -- 5180`.
 
 **Remove a worktree** when done:
 
 ```bash
-git worktree remove ../rsm-prototyping-feature-my-change
-git branch -d feature/my-change   # if the branch is fully merged
+npm run worktree:cleanup -- feature/my-change
+npm run worktree:cleanup -- feature/my-change --delete-branch   # also delete the branch
+npm run worktree:cleanup -- feature/my-change --delete-branch --force
 ```
+
+Stop the worktree's dev server with `Ctrl-C` before cleanup. The cleanup command removes the checkout and the local port registry entry; it does not kill running processes.
 
 ### Running the Prototype
 ```bash

@@ -141,6 +141,30 @@ src/
 
 **Commits:** conventional format — `feat:`, `fix:`, `refactor:`, `style:`, `docs:`
 
+**Parallel worktrees:** use git worktrees when you want multiple features or AI agents running at the same time, each with its own checkout and localhost preview.
+
+```bash
+npm run worktree:create -- feature/my-change
+cd ../rsm-prototyping-feature-my-change
+npm run dev
+```
+
+The worktree command creates or reuses the branch, installs dependencies with `npm ci`, writes `.env.local`, and assigns a stable local port from `5174-5973`. The main checkout conventionally stays on `5173`.
+
+The dev preview URL stays a normal localhost URL, for example `http://localhost:5174/`. In development, the prototype shows a bottom-right icon. Click it to see the branch, port, and full preview URL.
+
+Optional explicit port:
+
+```bash
+npm run worktree:create -- feature/my-change 5180
+```
+
+When you are done, stop that worktree's dev server with `Ctrl-C`, then remove the worktree:
+
+```bash
+npm run worktree:cleanup -- feature/my-change --delete-branch
+```
+
 ### Principles
 
 Before adding something new, check it against three questions:

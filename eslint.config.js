@@ -29,6 +29,8 @@ export default defineConfig([
       globals: {
         ...globals.browser,
         __RSM_DEV_BRANCH_LABEL__: 'readonly',
+        __RSM_DEV_PREVIEW_URL__: 'readonly',
+        __RSM_DEV_SERVER_PORT__: 'readonly',
       },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
