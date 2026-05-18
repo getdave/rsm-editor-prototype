@@ -1,5 +1,8 @@
 {
   "setup-worktree-unix": "setup-worktree-unix.sh",
   "setup-worktree-windows": "setup-worktree-windows.ps1",
-  "setup-worktree": ["npm ci"]
+  "setup-worktree": [
+    "npm ci",
+    "node scripts/worktree.mjs setup"
+  ]
 }

@@ -3,6 +3,11 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
 function resolveDevBranchLabel(env) {
+  const worktreeLabel = env.VITE_WORKTREE_LABEL?.trim()
+  if (worktreeLabel) {
+    return worktreeLabel
+  }
+
   try {
     const abbr = execSync('git rev-parse --abbrev-ref HEAD', {
       encoding: 'utf8',
@@ -42,6 +47,9 @@ export default defineConfig(({ mode }) => {
 
   const devBranchLabel =
     mode === 'development' ? resolveDevBranchLabel(env) : ''
+  const devServerPort = mode === 'development' ? String(port) : ''
+  const devPreviewUrl =
+    mode === 'development' ? `http://localhost:${port}/` : ''
 
   return {
     plugins: [ react() ],
@@ -59,6 +67,8 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       __RSM_DEV_BRANCH_LABEL__: JSON.stringify(devBranchLabel),
+      __RSM_DEV_SERVER_PORT__: JSON.stringify(devServerPort),
+      __RSM_DEV_PREVIEW_URL__: JSON.stringify(devPreviewUrl),
     },
   }
 })
