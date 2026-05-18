@@ -91,11 +91,6 @@ const PAGES_INDEX_FIELDS = [
           <Text variant="body-md" className="pp-title-cell-name">
             {item.name}
           </Text>
-          <span
-            className="url-dot"
-            role="status"
-            aria-label="Page is live"
-          />
         </span>
       );
       if (!item.titleTooltip) {
