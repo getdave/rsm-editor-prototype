@@ -57,15 +57,9 @@ function buildVisibleAdminNavItems(homepageDisplayMode) {
   return [...ADMIN_NAV_ITEMS_BASE];
 }
 
-/** Sub-links under Advanced — icons + indent (no tree-line connectors) */
+/** Sub-links under Advanced — icons + indent (no tree-line connectors).
+    Used by the editor-canvas sidebar variant which keeps inline expand/collapse. */
 const ADVANCED_SUB_NAV_ITEMS = Object.freeze([
-  {
-    id: 'advanced-posts',
-    label: 'Posts',
-    path: '/posts',
-    tip: 'Manage posts on your site',
-    icon: postList,
-  },
   {
     id: 'advanced-templates',
     label: 'Templates',
@@ -82,15 +76,7 @@ const ADVANCED_SUB_NAV_ITEMS = Object.freeze([
   },
 ]);
 
-/** Advanced submenu — omit Posts when it already appears in the root nav */
-function buildVisibleAdvancedSubNavItems(homepageDisplayMode) {
-  if (homepageDisplayMode === READING_DISPLAY_LATEST) {
-    return ADVANCED_SUB_NAV_ITEMS.filter((row) => row.id !== 'advanced-posts');
-  }
-  return [...ADVANCED_SUB_NAV_ITEMS];
-}
-
-const ADVANCED_ROUTE_PREFIXES = ['/posts', '/templates', '/patterns'];
+const ADVANCED_ROUTE_PREFIXES = ['/templates', '/patterns'];
 
 const DESIGN_NAV_ITEMS = [
   { kind: 'back', id: 'back', icon: chevronLeft, label: 'Back', path: '/', tip: 'Back to admin' },
@@ -115,6 +101,19 @@ const DESIGN_NAV_ITEMS = [
   },
 ];
 
+const ADVANCED_NAV_ITEMS = [
+  { kind: 'back', id: 'back', icon: chevronLeft, label: 'Back', path: '/', tip: 'Back to admin' },
+  { kind: 'header', id: 'advanced-header', title: 'Advanced', description: 'Configure advanced tools of your site' },
+  {
+    kind: 'group',
+    id: 'advanced-group',
+    items: [
+      { kind: 'item', id: 'templates', icon: addTemplate, label: 'Templates', path: '/templates', tip: 'Edit templates that control how your site renders' },
+      { kind: 'item', id: 'patterns', icon: symbolFilled, label: 'Patterns', path: '/patterns', tip: 'Reusable sets of blocks for layouts and sections' },
+    ],
+  },
+];
+
 const EDIT_ROUTE_PATTERN = /^\/pages\/[^/]+\/edit$/;
 
 function Sidebar() {
@@ -135,11 +134,11 @@ function Sidebar() {
     () => buildVisibleAdminNavItems(homepageDisplayMode),
     [homepageDisplayMode],
   );
-  const visibleAdvancedSubNavItems = useMemo(
-    () => buildVisibleAdvancedSubNavItems(homepageDisplayMode),
-    [homepageDisplayMode],
-  );
   const isDesignSection = location.pathname.startsWith('/design');
+  const isAdvancedSection = ADVANCED_ROUTE_PREFIXES.some(
+    (prefix) =>
+      location.pathname === prefix || location.pathname.startsWith(`${prefix}/`),
+  );
   const isEditCanvas = EDIT_ROUTE_PATTERN.test(location.pathname);
   const activePathname =
     isEditCanvas && editorReferrer ? editorReferrer : location.pathname;
@@ -193,17 +192,7 @@ function Sidebar() {
     return activePathname === itemPath;
   };
 
-  const advancedRoutePrefixesForHighlight = useMemo(() => {
-    if (homepageDisplayMode === READING_DISPLAY_LATEST) {
-      return ADVANCED_ROUTE_PREFIXES.filter((p) => p !== '/posts');
-    }
-    return ADVANCED_ROUTE_PREFIXES;
-  }, [homepageDisplayMode]);
-
-  const isAdvancedChildRouteActive = advancedRoutePrefixesForHighlight.some(
-    (prefix) =>
-      location.pathname === prefix || location.pathname.startsWith(`${prefix}/`),
-  );
+  const isAdvancedChildRouteActive = isAdvancedSection;
 
   const renderItem = (item) => {
     if (item.kind === 'back') {
@@ -332,7 +321,7 @@ function Sidebar() {
           </div>
         </Tooltip>
         {showChildren &&
-          visibleAdvancedSubNavItems.map((row) => {
+          ADVANCED_SUB_NAV_ITEMS.map((row) => {
             const isOn = isItemActive(row.path);
             return (
               <Tooltip key={row.id} text={row.tip} placement="right">
@@ -464,9 +453,13 @@ function Sidebar() {
     <div
       className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${
         isDesignSection ? 'is-design-section' : ''
-      }`}
+      } ${isAdvancedSection ? 'is-advanced-section' : ''}`}
     >
-      <div className={`sidebar-nav-slider ${isDesignSection ? 'is-design' : ''}`}>
+      <div
+        className={`sidebar-nav-slider ${isDesignSection ? 'is-design' : ''} ${
+          isAdvancedSection ? 'is-advanced' : ''
+        }`}
+      >
         <nav className="admin-root-nav sidebar-nav-pane sidebar-nav-pane-admin">
           {visibleAdminNavItems.map((item) => (
             <Fragment key={item.id}>{renderItem(item)}</Fragment>
@@ -477,11 +470,36 @@ function Sidebar() {
             <Fragment key={item.id}>{renderItem(item)}</Fragment>
           ))}
         </nav>
+        <nav
+          className="admin-root-nav advanced-nav sidebar-nav-pane sidebar-nav-pane-advanced"
+          aria-label="Advanced"
+        >
+          {ADVANCED_NAV_ITEMS.map((item) => (
+            <Fragment key={item.id}>{renderItem(item)}</Fragment>
+          ))}
+        </nav>
       </div>
 
-      {!isDesignSection && (
+      {!isDesignSection && !isAdvancedSection && (
         <nav className="admin-root-nav sidebar-advanced-dock" aria-label="Advanced">
-          {renderAdvancedSection()}
+          <Tooltip text="Configure advanced tools of your site" placement="right">
+            <div
+              className="ni ni-with-chevron sb-advanced-parent"
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate('/templates')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate('/templates');
+                }
+              }}
+            >
+              <span className="ni-ico">{tool}</span>
+              <Text variant="body-md" className="ni-label">Advanced</Text>
+              <span className="ni-chevron">{chevronRight}</span>
+            </div>
+          </Tooltip>
         </nav>
       )}
 
