@@ -414,21 +414,25 @@ export default function SettingsSidebar({
       return undefined;
     }
     let cancelled = false;
-    const raf1 = window.requestAnimationFrame(() => {
+    let timeoutId;
+    queueMicrotask(() => {
       if (cancelled) return;
       setFlashHighlight(false);
-      window.requestAnimationFrame(() => {
-        if (cancelled) return;
-        setFlashHighlight(true);
-      });
     });
-    const t = window.setTimeout(() => {
-      setFlashHighlight(false);
-    }, 920);
+    const raf = window.requestAnimationFrame(() => {
+      if (cancelled) return;
+      setFlashHighlight(true);
+      timeoutId = window.setTimeout(() => {
+        if (cancelled) return;
+        setFlashHighlight(false);
+      }, 920);
+    });
     return () => {
       cancelled = true;
-      window.cancelAnimationFrame(raf1);
-      window.clearTimeout(t);
+      window.cancelAnimationFrame(raf);
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
     };
   }, [flashSignal, isOpen]);
 

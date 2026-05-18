@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppState, READING_DISPLAY_LATEST } from '../hooks/useAppState';
 import { Tooltip } from '@wordpress/components';
@@ -149,6 +149,15 @@ function Sidebar() {
   const sidebarNestedNavHidden = isEditCanvas
     ? sidebarCollapsed && !menuExpanded
     : sidebarCollapsed;
+
+  useEffect(() => {
+    if (!sidebarNestedNavHidden) {
+      return;
+    }
+    queueMicrotask(() => {
+      setAdvancedExpanded(false);
+    });
+  }, [sidebarNestedNavHidden]);
 
   /** Collapsed chrome: first interaction expands the sidebar/menu and opens Advanced */
   const handleAdvancedParentActivate = () => {

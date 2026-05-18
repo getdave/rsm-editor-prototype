@@ -413,15 +413,18 @@ function PagesView() {
   const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
   const [publishConfirmPage, setPublishConfirmPage] = useState(null);
 
-  const effectiveDataView = useMemo(() => {
+  /** Seed default filters for Published when the tab or `?dynamic=true` changes. Deferred so eslint react-hooks/set-state-in-effect does not apply to sync setState in the effect body. */
+  useEffect(() => {
     if (activeCategory !== "published") {
-      return view;
+      return;
     }
-    return {
-      ...view,
-      filters: showDynamicPagesTab ? [...SYSTEM_FILTER_HIDE] : [],
-    };
-  }, [view, activeCategory, showDynamicPagesTab]);
+    queueMicrotask(() => {
+      setView((prev) => ({
+        ...prev,
+        filters: showDynamicPagesTab ? [...SYSTEM_FILTER_HIDE] : [],
+      }));
+    });
+  }, [showDynamicPagesTab, activeCategory]);
 
   const readingSelectPages = useMemo(
     () => pages.filter((p) => p.category === "content" && p.status === "live"),
@@ -938,8 +941,8 @@ function PagesView() {
   };
 
   const { data: processedData, paginationInfo } = useMemo(
-    () => filterSortAndPaginate(categoryPages, effectiveDataView, fields),
-    [categoryPages, effectiveDataView, fields],
+    () => filterSortAndPaginate(categoryPages, view, fields),
+    [categoryPages, view, fields],
   );
 
   const handleChangeView = (newView) => {
@@ -987,7 +990,7 @@ function PagesView() {
       <DataViews
         data={processedData}
         fields={fields}
-        view={effectiveDataView}
+        view={view}
         onChangeView={handleChangeView}
         defaultLayouts={DEFAULT_LAYOUTS}
         actions={actions}

@@ -171,6 +171,8 @@ function EditingView() {
     setSectionStylesByIndex({});
   }
 
+  // Toolbar preview nav: `pages` comes from mockData (static for the prototype). Empty deps —
+  // if this is later wired to `useAppState().pages`, add that to the dependency array.
   const editNavEntries = useMemo(
     () => pages.filter((p) => p.inMenu).map((p) => ({ key: p.id, label: p.name, page: p })),
     [],

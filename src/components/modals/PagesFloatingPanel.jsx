@@ -12,6 +12,16 @@ function PagesFloatingPanel() {
   const panelRef = useRef(null);
 
   useEffect(() => {
+    if (sidebarCollapsed) {
+      return;
+    }
+    queueMicrotask(() => {
+      setIsVisible(false);
+      setPosition({ left: 0, bottom: 0 });
+    });
+  }, [sidebarCollapsed]);
+
+  useEffect(() => {
     if (!sidebarCollapsed) {
       return;
     }
