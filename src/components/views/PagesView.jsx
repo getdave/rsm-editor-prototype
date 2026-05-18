@@ -20,7 +20,6 @@ import {
   page as pageIcon,
   pencil,
   postList,
-  loop,
   seen,
   chevronDown,
   chevronUp,
@@ -62,14 +61,12 @@ const PAGE_TYPE_TABS = [
   {
     value: "pages",
     label: "Static",
-    icon: pageIcon,
     description:
       "Pages you create and edit directly, plus page-like system destinations.",
   },
   {
     value: "dynamic",
     label: "Dynamic",
-    icon: loop,
     description: (
       <>
         Generated pages for groups of content and special site views. Their
@@ -88,10 +85,21 @@ const STATUS_ELEMENTS = [
   { value: "draft", label: "Draft" },
 ];
 
-const DATAVIEW_FIELDS_DEFAULT = ["status", "inMenu", "authorDisplay"];
+const DATAVIEW_FIELDS_GRID = ["status", "inMenu", "authorDisplay"];
 const DATAVIEW_FIELDS_LIST = ["status", "pageRole", "inMenu", "authorDisplay"];
-const COLLECTION_DATAVIEW_FIELDS_DEFAULT = ["status", "authorDisplay"];
+const DATAVIEW_FIELDS_TABLE = [
+  "status",
+  "pageRole",
+  "inMenu",
+  "authorDisplay",
+];
+const COLLECTION_DATAVIEW_FIELDS_GRID = ["status", "authorDisplay"];
 const COLLECTION_DATAVIEW_FIELDS_LIST = ["status", "pageRole", "authorDisplay"];
+const COLLECTION_DATAVIEW_FIELDS_TABLE = [
+  "status",
+  "pageRole",
+  "authorDisplay",
+];
 
 const DEFAULT_VIEW = {
   type: "list",
@@ -102,9 +110,20 @@ const DEFAULT_VIEW = {
   sort: undefined,
   titleField: "name",
   mediaField: "media",
-  fields: [...DATAVIEW_FIELDS_DEFAULT],
+  fields: [...DATAVIEW_FIELDS_GRID],
   layout: { density: "compact" },
 };
+
+function getDefaultFieldsForView(type, pageType) {
+  const isDynamic = pageType === "dynamic";
+  if (type === "list") {
+    return isDynamic ? COLLECTION_DATAVIEW_FIELDS_LIST : DATAVIEW_FIELDS_LIST;
+  }
+  if (type === "table") {
+    return isDynamic ? COLLECTION_DATAVIEW_FIELDS_TABLE : DATAVIEW_FIELDS_TABLE;
+  }
+  return isDynamic ? COLLECTION_DATAVIEW_FIELDS_GRID : DATAVIEW_FIELDS_GRID;
+}
 
 function createPagesDataViewState(mode) {
   const next = { ...DEFAULT_VIEW, type: mode };
@@ -112,17 +131,17 @@ function createPagesDataViewState(mode) {
     return {
       ...next,
       showMedia: false,
-      fields: [...DATAVIEW_FIELDS_LIST],
+      fields: [...getDefaultFieldsForView(mode, "pages")],
     };
   }
   if (mode === "table") {
     return {
       ...next,
       showMedia: false,
-      fields: [...DATAVIEW_FIELDS_DEFAULT],
+      fields: [...getDefaultFieldsForView(mode, "pages")],
     };
   }
-  return { ...next, fields: [...DATAVIEW_FIELDS_DEFAULT] };
+  return { ...next, fields: [...getDefaultFieldsForView(mode, "pages")] };
 }
 
 const DEFAULT_LAYOUTS = {
@@ -142,9 +161,7 @@ const COLLECTION_GROUP_BY = {
 function applyPageTypeToView(view, pageType) {
   const allowedFields =
     pageType === "dynamic"
-      ? view.type === "list"
-        ? COLLECTION_DATAVIEW_FIELDS_LIST
-        : COLLECTION_DATAVIEW_FIELDS_DEFAULT
+      ? getDefaultFieldsForView(view.type, pageType)
       : null;
   const viewWithoutGrouping = {
     ...view,
@@ -295,6 +312,21 @@ function getPageIcon(item) {
     return postList;
   }
   return pageIcon;
+}
+
+function isSyncedPageRow(item) {
+  return Boolean(item?.isCollection || item?.isPostsPage);
+}
+
+function getCustomTemplatePageLabel(item) {
+  if (item?.collectionKind === "event-list") {
+    return "Event listing page";
+  }
+  if (item?.collectionKind === "event-single") {
+    return "Event page";
+  }
+  const name = item?.name ?? "Dynamic Page";
+  return /\bpage$/i.test(name) ? name : `${name} page`;
 }
 
 function asCollectionRow(row, collectionGroup) {
@@ -541,11 +573,7 @@ function ConfigureHomepageReadingModal({
 }
 
 function InactiveCollectionTemplateModal({ item, onClose, onCreate }) {
-  const viewName = item?.name ?? "This view";
-  const createLabel = `Create ${viewName
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")}`;
+  const pageLabel = getCustomTemplatePageLabel(item);
 
   return (
     <div
@@ -566,7 +594,7 @@ function InactiveCollectionTemplateModal({ item, onClose, onCreate }) {
           variant="heading-md"
           className="modal-title"
         >
-          Create a custom {viewName} template?
+          Customize this Dynamic Page?
         </Text>
         <button
           type="button"
@@ -579,11 +607,8 @@ function InactiveCollectionTemplateModal({ item, onClose, onCreate }) {
       </Stack>
       <div className="modal-body pp-inactive-template-body">
         <Text variant="body-md" className="pp-inactive-template-copy">
-          <em>{viewName}</em> is using a default layout. To customize how this
-          page looks you can create its own template.
-        </Text>
-        <Text variant="body-md" className="pp-inactive-template-copy">
-          You&apos;ll be able to edit it here just like the other dynamic pages.
+          The <em>{pageLabel}</em> is currently using a default template. Create
+          a custom template to edit how this page appears on your site.
         </Text>
       </div>
       <Stack
@@ -597,7 +622,7 @@ function InactiveCollectionTemplateModal({ item, onClose, onCreate }) {
           Keep existing
         </Button>
         <Button variant="primary" onClick={() => onCreate(item)}>
-          {createLabel}
+          Create custom template
         </Button>
       </Stack>
     </div>
@@ -761,8 +786,7 @@ function PagesView() {
               <PageLayoutWireframeThumb page={item} />
             ) : (
               <span
-                className="pp-media-thumb-icon"
-                style={{ color: "#999", display: "flex" }}
+                className={`pp-media-thumb-icon${isSyncedPageRow(item) ? " pp-media-thumb-icon--sync" : ""}`}
               >
                 {getPageIcon(item)}
               </span>
@@ -801,7 +825,7 @@ function PagesView() {
           const title = (
             <span className="pp-title-cell-inner">
               <span
-                className={`pp-title-glyph-icon${item.isPostsPage ? " pp-title-glyph-icon--posts" : ""}`}
+                className={`pp-title-glyph-icon${isSyncedPageRow(item) ? " pp-title-glyph-icon--sync" : ""}`}
                 aria-hidden="true"
                 title={
                   item.isFrontPage
@@ -815,12 +839,6 @@ function PagesView() {
               </span>
               <Text variant="body-md" className="pp-title-cell-name">
                 {item.name}
-                {item.collectionBadge && item.collectionBadge !== item.name ? (
-                  <span className="pp-title-qualifier">
-                    {" "}
-                    ({item.collectionBadge})
-                  </span>
-                ) : null}
               </Text>
               <span
                 className={`url-dot${isLive && !isInactive ? "" : " url-draft-dot"}`}
@@ -1351,17 +1369,7 @@ function PagesView() {
     }
     let fields = newView.fields;
     if (layoutChanged) {
-      if (activePageType === "dynamic") {
-        fields =
-          newView.type === "list"
-            ? [...COLLECTION_DATAVIEW_FIELDS_LIST]
-            : [...COLLECTION_DATAVIEW_FIELDS_DEFAULT];
-      } else {
-        fields =
-          newView.type === "list"
-            ? [...DATAVIEW_FIELDS_LIST]
-            : [...DATAVIEW_FIELDS_DEFAULT];
-      }
+      fields = [...getDefaultFieldsForView(newView.type, activePageType)];
     }
     setView(
       applyPageTypeToView({ ...newView, showMedia, fields }, activePageType),
@@ -1460,9 +1468,6 @@ function PagesView() {
                   className={`pp-tab${activePageType === tab.value ? " on" : ""}`}
                   onClick={() => handleTabClick(tab.value)}
                 >
-                  <span className="pp-tab-icon" aria-hidden="true">
-                    {tab.icon}
-                  </span>
                   {tab.label}
                 </button>
               ))}

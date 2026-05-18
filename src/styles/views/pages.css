@@ -291,19 +291,6 @@
   border-bottom-color: #3858e9;
 }
 
-.pp-tab-icon {
-  display: inline-flex;
-  width: 16px;
-  height: 16px;
-  color: currentColor;
-}
-
-.pp-tab-icon svg {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
-}
-
 /* Spacer to push system toggle to the right */
 .pp-toolbar-spacer {
   flex: 1;
@@ -723,6 +710,10 @@
   color: #7f54b3;
 }
 
+.pp-media-thumb-icon--sync {
+  color: #7f54b3;
+}
+
 .pp-front-page-overlay,
 .pp-collection-marker-overlay {
   position: absolute;
@@ -804,8 +795,8 @@
   vertical-align: middle;
 }
 
-.pp-title-glyph-icon--posts {
-  color: #007017;
+.pp-title-glyph-icon--sync {
+  color: #7f54b3;
 }
 
 .pp-title-glyph-icon svg {
@@ -817,10 +808,6 @@
 
 .pp-title-cell-name {
   min-width: 0;
-}
-
-.pp-title-qualifier {
-  color: #757575;
 }
 
 .pp-menu-empty,
