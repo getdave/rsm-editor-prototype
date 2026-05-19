@@ -47,15 +47,9 @@
   overflow: visible;
 }
 
-/* Theme the WP UI Button used for sidebar nav rows. Active state comes from
-   the Button's built-in `[aria-pressed=true].is-minimal.is-neutral` rule
-   (neutral-strong tokens). The sizing/layout vars apply to all sidebar
-   Buttons; the color overrides are scoped to `:not([aria-pressed="true"])`
-   so they never compete with the pressed-state vars — important because
-   Button ships its rules in `@layer wp-ui-components` and unlayered rules
-   win regardless of specificity. Vars are set directly on `.ni` (not on a
-   parent) because Button sets these vars on the element itself, which
-   blocks inheritance. */
+/* Theme the WP UI Button used for sidebar nav rows. Vars are set directly
+   on `.ni` (not on a parent) because Button sets these vars on the element
+   itself, which blocks inheritance. */
 .sidebar .ni {
   --wp-ui-button-min-width: 0;
   /* base.css has unlayered `* { padding: 0 }` which beats Button's layered
@@ -69,6 +63,14 @@
   --wp-ui-button-foreground-color: #bbb;
   --wp-ui-button-background-color-active: #2a2a2a;
   --wp-ui-button-foreground-color-active: #fff;
+}
+
+.sidebar .ni[aria-pressed="true"] {
+  --wp-ui-button-background-color: #2a2a2a;
+  --wp-ui-button-background-color-active: #2a2a2a;
+  --wp-ui-button-foreground-color: #fff;
+  --wp-ui-button-foreground-color-active: #fff;
+  font-weight: 600;
 }
 
 /* Vertical nav contexts fill the column width and left-align contents. */
