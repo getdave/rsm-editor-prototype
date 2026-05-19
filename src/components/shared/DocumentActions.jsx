@@ -22,7 +22,7 @@ import { getDocumentOptionsLabel } from '../../utils/documentOptionsLabel';
  * - `mode`: Block Editor mode (`'page' | 'template'`). The template mode swaps
  *   icon, badge, and disables rename.
  * - `templateTitle`: optional template label shown in template mode.
- * - `documentOptions`: optional document menu actions.
+ * - `documentOptions`: optional document menu actions; no dropdown renders when empty.
  */
 export default function DocumentActions({
   document: documentProp = null,

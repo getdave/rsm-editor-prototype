@@ -59,14 +59,17 @@ function PreviewView() {
   };
 
   const documentOptions = useMemo(
-    () => [
-      {
-        label: 'Configure Homepage',
-        icon: settings,
-        onClick: openConfigureHomepageModal,
-      },
-    ],
-    [openConfigureHomepageModal],
+    () =>
+      previewTarget?.id === resolvedHomeKey
+        ? [
+            {
+              label: 'Configure Homepage',
+              icon: settings,
+              onClick: openConfigureHomepageModal,
+            },
+          ]
+        : [],
+    [openConfigureHomepageModal, previewTarget?.id, resolvedHomeKey],
   );
 
   return (
