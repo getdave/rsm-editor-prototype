@@ -689,7 +689,12 @@
 
 /* BlockToolbar positioning wrapper — the WP <Toolbar> inside owns the
  * chrome (background, border, shadow). This element only handles the
- * floating placement above (or, on flip, below) the selected block. */
+ * floating placement above (or, on flip, below) the selected block.
+ *
+ * Force the WP UI font so the toolbar isn't dragged into the host
+ * site's serif content font when it's rendered inside `.p-header` /
+ * `.p-footer` (which set `font-family: var(--wp-content-font)` to
+ * differentiate rendered site content from editor chrome). */
 .sec-bar.block-toolbar {
   position: absolute;
   bottom: 100%;
@@ -698,6 +703,7 @@
   top: auto;
   display: none;
   z-index: 30;
+  font-family: var(--wp-font-family);
 }
 
 /* When floating above would clip the canvas top, open below the block */
