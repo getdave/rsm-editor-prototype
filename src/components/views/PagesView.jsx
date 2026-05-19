@@ -261,8 +261,8 @@ const collectionTemplateDisplay = {
     titleTooltip: "Uses archive-event.html.",
   },
   "event-single": {
-    name: "Single event",
-    templateLabel: "Single event",
+    name: "Single Event",
+    templateLabel: "Single Event",
     titleTooltip: "Uses single-event.html.",
   },
   "search-results": {
@@ -323,7 +323,7 @@ function getCustomTemplatePageLabel(item) {
     return "Event listing page";
   }
   if (item?.collectionKind === "event-single") {
-    return "Event page";
+    return "Single Event Page";
   }
   const name = item?.name ?? "Dynamic Page";
   return /\bpage$/i.test(name) ? name : `${name} page`;

@@ -36,14 +36,11 @@ const VIEW_PICKER_GRID = 'pickerGrid';
 const VIEW_PICKER_TABLE = 'pickerTable';
 const TYPE_PAGES = 'pages';
 const TYPE_CONTENT = 'content';
-const TYPE_LISTING_PAGES = 'collections';
+const TYPE_ARCHIVE_DESTINATIONS = 'collections';
 const TYPE_TAXONOMY = 'taxonomy';
 const TYPE_MEDIA = 'media';
 const TYPE_CUSTOM_URL = 'custom-url';
-const PAGE_TAB_STATIC = 'static';
-const PAGE_TAB_DYNAMIC = 'dynamic';
-const PAGE_PICKER_FIELDS = ['status', 'inThisMenu'];
-const DYNAMIC_PAGE_PICKER_FIELDS = ['typeLabel', 'linkLabel', 'inThisMenu'];
+const PAGE_PICKER_FIELDS = ['typeLabel', 'linkLabel', 'status', 'inThisMenu'];
 
 /** Picker grid + picker table only — @wordpress/dataviews does not ship list/activity variants for DataViewsPicker. */
 const INITIAL_VIEW = {
@@ -57,17 +54,10 @@ const INITIAL_VIEW = {
   mediaField: 'media',
   fields: [...PAGE_PICKER_FIELDS],
   showMedia: true,
+  showDescription: false,
 };
 
 const DEFAULT_PICKER_LAYOUTS = {
-  pickerGrid: {
-    badgeFields: ['status', 'inThisMenu'],
-    layout: { previewSize: 88 },
-  },
-  pickerTable: {},
-};
-
-const DYNAMIC_PAGE_PICKER_LAYOUTS = {
   pickerGrid: {
     badgeFields: ['typeLabel', 'inThisMenu'],
     layout: { previewSize: 264 },
@@ -105,21 +95,6 @@ const NAV_ITEM_GROUPS = [
     title: 'Custom link',
     description: 'Any URL, email, phone, anchor, or relative link.',
     icon: customLink,
-  },
-];
-
-const PAGE_SUB_TABS = [
-  {
-    id: PAGE_TAB_STATIC,
-    title: 'Static',
-    itemListLabel: 'Static pages',
-    searchLabel: 'Search static pages',
-  },
-  {
-    id: PAGE_TAB_DYNAMIC,
-    title: 'Dynamic',
-    itemListLabel: 'Dynamic pages',
-    searchLabel: 'Search dynamic pages',
   },
 ];
 
@@ -166,21 +141,6 @@ function createAdvancedView(groupId) {
       previewSize: isMediaGroup ? 140 : 120,
     },
     showMedia: isMediaGroup,
-    showDescription: false,
-  };
-}
-
-function createDynamicPageView() {
-  return {
-    ...INITIAL_VIEW,
-    perPage: 25,
-    sort: { field: 'name', direction: 'asc' },
-    descriptionField: 'linkLabel',
-    fields: [...DYNAMIC_PAGE_PICKER_FIELDS],
-    layout: {
-      badgeFields: ['typeLabel', 'inThisMenu'],
-      previewSize: 264,
-    },
     showDescription: false,
   };
 }
@@ -296,6 +256,36 @@ function configuredArchivePageForTarget(target, pagesList) {
     return pagesList.find((page) => page.isShopPage);
   }
   return undefined;
+}
+
+function typeLabelForPage(page) {
+  if (page.isPostsPage) {
+    return 'Posts page';
+  }
+  if (page.isShopPage) {
+    return 'Shop page';
+  }
+  return 'Page';
+}
+
+function rowForContentPage(page, { pageUrlById, pageIdSet }) {
+  return {
+    ...page,
+    navLabel: page.name,
+    navPageId: page.id,
+    linkLabel: pageUrlById.get(page.id) ?? '',
+    typeLabel: typeLabelForPage(page),
+    inThisMenu: pageIdSet.has(page.id),
+  };
+}
+
+function isLinkableArchiveDestination(target, pagesList) {
+  return (
+    target.group === TYPE_ARCHIVE_DESTINATIONS &&
+    target.sourceType === 'post-type-archive' &&
+    Boolean(target.url) &&
+    !configuredArchivePageForTarget(target, pagesList)
+  );
 }
 
 function rowForNavigationTarget(target, { fallbackIcon, pageUrlById, pagesList, pageIdSet, urlSet }) {
@@ -472,153 +462,13 @@ function createTargetFields(typeElements) {
   ];
 }
 
-function createDynamicPageFields(typeElements, isGridLayout) {
-  return [
-    {
-      id: 'media',
-      label: 'Icon',
-      render: ({ item }) => {
-        const previewPage = item.previewPage ?? item;
-        return (
-          <span
-            className={
-              isGridLayout
-                ? 'pp-media-thumb pp-media-thumb--grid'
-                : 'pp-media-thumb'
-            }
-          >
-            {isGridLayout ? (
-              <PageLayoutWireframeThumb page={previewPage} />
-            ) : (
-              <span
-                className="pp-media-thumb-icon"
-                style={{ color: '#999', display: 'flex' }}
-              >
-                {item.isPostsPage
-                  ? postList
-                  : item.isShopPage
-                    ? store
-                    : archive}
-              </span>
-            )}
-            {item.isPostsPage ? (
-              <span className="pp-posts-page-overlay">
-                Posts page
-              </span>
-            ) : item.isShopPage ? (
-              <span className="nav-add-shop-page-overlay">
-                Shop page
-              </span>
-            ) : null}
-          </span>
-        );
-      },
-      enableSorting: false,
-      enableHiding: false,
-      filterBy: false,
-      enableGlobalSearch: false,
-    },
-    {
-      id: 'name',
-      type: 'text',
-      label: 'Title',
-      enableHiding: false,
-      enableGlobalSearch: true,
-      render: ({ item }) => {
-        const docIcon = item.isPostsPage
-          ? postList
-          : item.isShopPage
-            ? store
-            : archive;
-        const isLive = item.status !== 'draft';
-        return (
-          <span className="pp-title-cell-inner">
-            <span
-              className={`pp-title-glyph-icon${item.isPostsPage ? ' pp-title-glyph-icon--posts' : ''}${item.isShopPage ? ' nav-add-title-glyph-icon--shop' : ''}`}
-              aria-hidden="true"
-              title={
-                item.isPostsPage
-                  ? 'Posts page'
-                  : item.isShopPage
-                    ? 'Shop page'
-                    : 'Archive'
-              }
-            >
-              {docIcon}
-            </span>
-            <span className="pp-title-cell-name">{item.name}</span>
-            <span
-              className={`url-dot${isLive ? '' : ' url-draft-dot'}`}
-              role="status"
-              aria-label={isLive ? 'Page is live' : 'Page is a draft'}
-            />
-          </span>
-        );
-      },
-    },
-    {
-      id: 'typeLabel',
-      type: 'text',
-      label: 'Type',
-      elements: typeElements,
-      enableSorting: false,
-      enableHiding: false,
-      filterBy: {
-        isPrimary: true,
-        operators: ['isAny'],
-      },
-      enableGlobalSearch: true,
-      render: ({ item }) => (
-        <span className="pp-badge nav-add-dynamic-page-type">
-          {item.typeLabel}
-        </span>
-      ),
-    },
-    {
-      id: 'linkLabel',
-      type: 'text',
-      label: 'Link',
-      enableSorting: false,
-      filterBy: false,
-      enableGlobalSearch: true,
-      render: ({ item }) => (
-        <span className="nav-add-menu-items-url">{item.linkLabel}</span>
-      ),
-    },
-    {
-      id: 'inThisMenu',
-      type: 'text',
-      label: 'Menu',
-      enableSorting: false,
-      enableHiding: false,
-      filterBy: false,
-      enableGlobalSearch: false,
-      render: ({ item }) =>
-        item.inThisMenu ? (
-          <span className="pp-badge pp-nav">
-            In this menu
-          </span>
-        ) : (
-          <span className="pp-menu-empty">
-            —
-          </span>
-        ),
-    },
-  ];
-}
-
 /**
  * Mount only when open; parent passes a changing `key` so internal picker state resets per open.
  */
 function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
   const [selectedGroupId, setSelectedGroupId] = useState(TYPE_PAGES);
-  const [selectedPageTabId, setSelectedPageTabId] = useState(PAGE_TAB_STATIC);
   const [pageView, setPageView] = useState(() => ({ ...INITIAL_VIEW }));
   const [pageSelection, setPageSelection] = useState([]);
-  const [listingPageView, setListingPageView] = useState(() =>
-    createDynamicPageView(),
-  );
-  const [listingPageSelection, setListingPageSelection] = useState([]);
   const [advancedView, setAdvancedView] = useState(() =>
     createAdvancedView(TYPE_CONTENT),
   );
@@ -652,52 +502,81 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
   );
 
   const isPageGridLayout = pageView.type === VIEW_PICKER_GRID;
-  const isListingPageGridLayout = listingPageView.type === VIEW_PICKER_GRID;
+
+  const pageRows = useMemo(
+    () => [
+      ...contentPagesOnly.map((page) =>
+        rowForContentPage(page, { pageUrlById, pageIdSet }),
+      ),
+      ...navigationAdvancedTargets
+        .filter((target) => isLinkableArchiveDestination(target, pages))
+        .map((target) =>
+          rowForNavigationTarget(target, {
+            fallbackIcon: archive,
+            pageUrlById,
+            pagesList: pages,
+            pageIdSet,
+            urlSet,
+          }),
+        ),
+    ],
+    [contentPagesOnly, pageIdSet, pageUrlById, pages, urlSet],
+  );
+
+  const pageTypeElements = useMemo(
+    () => typeElementsForRows(pageRows, 'typeLabel'),
+    [pageRows],
+  );
 
   const pageFields = useMemo(
     () => [
       {
         id: 'media',
         label: 'Icon',
-        render: ({ item }) => (
-          <span
-            className={
-              isPageGridLayout
-                ? 'pp-media-thumb pp-media-thumb--grid'
-                : 'pp-media-thumb'
-            }
-          >
-            {isPageGridLayout ? (
-              <PageLayoutWireframeThumb page={item} />
-            ) : (
-              <span
-                className="pp-media-thumb-icon"
-                style={{ color: '#999', display: 'flex' }}
-              >
-                {item.isFrontPage
-                  ? home
-                  : item.isPostsPage
-                    ? postList
-                    : item.isShopPage
-                      ? store
-                      : pageIcon}
-              </span>
-            )}
-            {item.isFrontPage ? (
-              <span className="pp-front-page-overlay">
-                Homepage
-              </span>
-            ) : item.isPostsPage ? (
-              <span className="pp-posts-page-overlay">
-                Posts page
-              </span>
-            ) : item.isShopPage ? (
-              <span className="nav-add-shop-page-overlay">
-                Shop page
-              </span>
-            ) : null}
-          </span>
-        ),
+        render: ({ item }) => {
+          const previewPage = item.previewPage ?? item;
+          const fallbackIcon =
+            item.sourceType === 'post-type-archive' ? archive : pageIcon;
+          return (
+            <span
+              className={
+                isPageGridLayout
+                  ? 'pp-media-thumb pp-media-thumb--grid'
+                  : 'pp-media-thumb'
+              }
+            >
+              {isPageGridLayout ? (
+                <PageLayoutWireframeThumb page={previewPage} />
+              ) : (
+                <span
+                  className="pp-media-thumb-icon"
+                  style={{ color: '#999', display: 'flex' }}
+                >
+                  {item.isFrontPage
+                    ? home
+                    : item.isPostsPage
+                      ? postList
+                      : item.isShopPage
+                        ? store
+                        : fallbackIcon}
+                </span>
+              )}
+              {item.isFrontPage ? (
+                <span className="pp-front-page-overlay">
+                  Homepage
+                </span>
+              ) : item.isPostsPage ? (
+                <span className="pp-posts-page-overlay">
+                  Posts page
+                </span>
+              ) : item.isShopPage ? (
+                <span className="nav-add-shop-page-overlay">
+                  Shop page
+                </span>
+              ) : null}
+            </span>
+          );
+        },
         enableSorting: false,
         enableHiding: false,
         filterBy: false,
@@ -710,13 +589,15 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
         enableHiding: false,
         enableGlobalSearch: true,
         render: ({ item }) => {
+          const fallbackIcon =
+            item.sourceType === 'post-type-archive' ? archive : pageIcon;
           const docIcon = item.isFrontPage
             ? home
             : item.isPostsPage
               ? postList
               : item.isShopPage
                 ? store
-                : pageIcon;
+                : fallbackIcon;
           const isLive = item.status !== 'draft';
           return (
             <span className="pp-title-cell-inner">
@@ -730,7 +611,9 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
                       ? 'Posts page'
                       : item.isShopPage
                         ? 'Shop page'
-                        : undefined
+                        : item.sourceType === 'post-type-archive'
+                          ? 'Post type archive'
+                          : undefined
                 }
               >
                 {docIcon}
@@ -744,6 +627,37 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
             </span>
           );
         },
+      },
+      {
+        id: 'typeLabel',
+        type: 'text',
+        label: 'Type',
+        elements: pageTypeElements,
+        enableSorting: false,
+        enableHiding: false,
+        filterBy: {
+          isPrimary: true,
+          operators: ['isAny'],
+        },
+        enableGlobalSearch: true,
+        render: ({ item }) => (
+          <span
+            className={`pp-badge nav-add-dynamic-page-type${item.isPostsPage || item.isShopPage ? ' nav-add-dynamic-page-type--sync' : ''}`}
+          >
+            {item.typeLabel}
+          </span>
+        ),
+      },
+      {
+        id: 'linkLabel',
+        type: 'text',
+        label: 'Link',
+        enableSorting: false,
+        filterBy: false,
+        enableGlobalSearch: true,
+        render: ({ item }) => (
+          <span className="nav-add-menu-items-url">{item.linkLabel}</span>
+        ),
       },
       {
         id: 'status',
@@ -780,32 +694,7 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
           ),
       },
     ],
-    [isPageGridLayout],
-  );
-
-  const pageRows = useMemo(
-    () =>
-      contentPagesOnly.map((p) => ({
-        ...p,
-        inThisMenu: pageIdSet.has(p.id),
-      })),
-    [contentPagesOnly, pageIdSet],
-  );
-
-  const listingPageRows = useMemo(
-    () =>
-      navigationAdvancedTargets
-        .filter((target) => target.group === TYPE_LISTING_PAGES)
-        .map((target) =>
-          rowForNavigationTarget(target, {
-            fallbackIcon: archive,
-            pageUrlById,
-            pagesList: pages,
-            pageIdSet,
-            urlSet,
-          }),
-        ),
-    [pageIdSet, pageUrlById, pages, urlSet],
+    [isPageGridLayout, pageTypeElements],
   );
 
   const advancedRows = useMemo(
@@ -829,19 +718,9 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
     [advancedRows],
   );
 
-  const listingPageTypeElements = useMemo(
-    () => typeElementsForRows(listingPageRows, 'typeLabel'),
-    [listingPageRows],
-  );
-
   const advancedFields = useMemo(
     () => createTargetFields(advancedTypeElements),
     [advancedTypeElements],
-  );
-
-  const listingPageFields = useMemo(
-    () => createDynamicPageFields(listingPageTypeElements, isListingPageGridLayout),
-    [listingPageTypeElements, isListingPageGridLayout],
   );
 
   const selectedAdvancedItems = useMemo(
@@ -849,22 +728,9 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
     [advancedRows, advancedSelection],
   );
 
-  const selectedListingPageItems = useMemo(
-    () => selectedItemsFromIds(listingPageRows, listingPageSelection),
-    [listingPageRows, listingPageSelection],
-  );
-
   const { data: processedPageData, paginationInfo: pagePaginationInfo } = useMemo(
     () => filterSortAndPaginate(pageRows, pageView, pageFields),
     [pageRows, pageView, pageFields],
-  );
-
-  const {
-    data: processedListingPageData,
-    paginationInfo: listingPagePaginationInfo,
-  } = useMemo(
-    () => filterSortAndPaginate(listingPageRows, listingPageView, listingPageFields),
-    [listingPageRows, listingPageView, listingPageFields],
   );
 
   const {
@@ -927,31 +793,6 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
     [onClose, onConfirm, selectedAdvancedItems],
   );
 
-  const listingPageActions = useMemo(
-    () => [
-      {
-        id: 'cancel',
-        label: 'Cancel',
-        supportsBulk: true,
-        callback() {
-          onClose();
-        },
-      },
-      {
-        id: 'confirm',
-        label: 'Add to menu',
-        isPrimary: true,
-        supportsBulk: true,
-        callback() {
-          if (selectedListingPageItems.length) {
-            onConfirm(selectedListingPageItems);
-          }
-        },
-      },
-    ],
-    [onClose, onConfirm, selectedListingPageItems],
-  );
-
   const handlePageChangeView = useCallback((newView) => {
     setPageView((prev) => {
       const merged = { ...prev, ...newView };
@@ -961,6 +802,7 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
         fields: [...PAGE_PICKER_FIELDS],
         // Thumbnail/media only in grid; table (and any non-grid picker layout) is title + data columns only.
         showMedia: type === VIEW_PICKER_GRID,
+        showDescription: false,
       };
     });
   }, []);
@@ -977,33 +819,11 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
     [selectedGroupId],
   );
 
-  const handleListingPageChangeView = useCallback((newView) => {
-    setListingPageView((prev) => {
-      const merged = {
-        ...prev,
-        ...newView,
-      };
-      return {
-        ...merged,
-        fields: [...DYNAMIC_PAGE_PICKER_FIELDS],
-        showMedia: merged.type === VIEW_PICKER_GRID,
-        showDescription: false,
-      };
-    });
-  }, []);
-
-  const selectPageTab = (tabId) => {
-    setSelectedPageTabId(tabId);
-    setPageSelection([]);
-    setListingPageSelection([]);
-  };
-
   const selectGroup = (groupId) => {
     setSelectedGroupId(groupId);
     setAdvancedSelection([]);
     if (groupId !== TYPE_PAGES) {
       setPageSelection([]);
-      setListingPageSelection([]);
       setAdvancedView(createAdvancedView(groupId));
     }
   };
@@ -1089,82 +909,28 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
                   </div>
 
                   {type.id === TYPE_PAGES ? (
-                    <>
-                      <div className="nav-add-pages-subtabs-row">
-                        <div
-                          className="nav-add-pages-subtabs"
-                          role="tablist"
-                          aria-label="Page types"
-                        >
-                          {PAGE_SUB_TABS.map((tab) => (
-                            <button
-                              key={tab.id}
-                              type="button"
-                              role="tab"
-                              aria-selected={selectedPageTabId === tab.id}
-                              className={`nav-add-pages-subtab${selectedPageTabId === tab.id ? ' is-active' : ''}`}
-                              onClick={() => selectPageTab(tab.id)}
-                            >
-                              {tab.title}
-                            </button>
-                          ))}
-                        </div>
-                        <ModalPickerViewOptionsToggle
-                          isOpen={viewOptionsOpen}
-                          onToggle={toggleViewOptions}
-                        />
-                      </div>
-
-                      {selectedPageTabId === PAGE_TAB_STATIC ? (
-                        <DataViewsPicker
-                          search
-                          searchLabel="Search static pages"
-                          actions={pageActions}
-                          selection={pageSelection}
-                          onChangeSelection={setPageSelection}
-                          getItemId={(item) => item.id}
-                          paginationInfo={pagePaginationInfo}
-                          data={processedPageData}
-                          view={pageView}
-                          fields={pageFields}
-                          onChangeView={handlePageChangeView}
-                          config={{ perPageSizes: [10, 25, 50, 100] }}
-                          itemListLabel="Static pages"
-                          defaultLayouts={DEFAULT_PICKER_LAYOUTS}
-                        >
-                          <ModalPickerChrome
-                            isOpen={viewOptionsOpen}
-                            onToggle={toggleViewOptions}
-                            searchLabel="Search static pages"
-                            showToggleRow={false}
-                          />
-                        </DataViewsPicker>
-                      ) : (
-                        <DataViewsPicker
-                          search
-                          searchLabel="Search dynamic pages"
-                          actions={listingPageActions}
-                          selection={listingPageSelection}
-                          onChangeSelection={setListingPageSelection}
-                          getItemId={(item) => item.id}
-                          paginationInfo={listingPagePaginationInfo}
-                          data={processedListingPageData}
-                          view={listingPageView}
-                          fields={listingPageFields}
-                          onChangeView={handleListingPageChangeView}
-                          config={{ perPageSizes: [10, 25, 50, 100] }}
-                          itemListLabel="Dynamic pages"
-                          defaultLayouts={DYNAMIC_PAGE_PICKER_LAYOUTS}
-                        >
-                          <ModalPickerChrome
-                            isOpen={viewOptionsOpen}
-                            onToggle={toggleViewOptions}
-                            searchLabel="Search dynamic pages"
-                            showToggleRow={false}
-                          />
-                        </DataViewsPicker>
-                      )}
-                    </>
+                    <DataViewsPicker
+                      search
+                      searchLabel="Search pages"
+                      actions={pageActions}
+                      selection={pageSelection}
+                      onChangeSelection={setPageSelection}
+                      getItemId={(item) => item.id}
+                      paginationInfo={pagePaginationInfo}
+                      data={processedPageData}
+                      view={pageView}
+                      fields={pageFields}
+                      onChangeView={handlePageChangeView}
+                      config={{ perPageSizes: [10, 25, 50, 100] }}
+                      itemListLabel="Pages"
+                      defaultLayouts={DEFAULT_PICKER_LAYOUTS}
+                    >
+                      <ModalPickerChrome
+                        isOpen={viewOptionsOpen}
+                        onToggle={toggleViewOptions}
+                        searchLabel="Search pages"
+                      />
+                    </DataViewsPicker>
                   ) : null}
 
                   {type.id !== TYPE_PAGES && type.id !== TYPE_CUSTOM_URL ? (
