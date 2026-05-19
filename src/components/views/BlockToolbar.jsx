@@ -119,14 +119,13 @@ export default function BlockToolbar({
         <ToolbarGroup>
           <ToolbarButton
             icon={Icon}
+            text={meta.label}
             label={`${meta.label} — toggle document overview`}
             onClick={(e) => {
               e.stopPropagation();
               onToggleListView();
             }}
-          >
-            {meta.label}
-          </ToolbarButton>
+          />
         </ToolbarGroup>
 
         <ToolbarGroup>
