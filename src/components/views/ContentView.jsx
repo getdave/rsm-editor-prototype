@@ -704,7 +704,7 @@ function ContentView() {
             <span className="content-tab-icon" aria-hidden>
               {grid}
             </span>
-            {getTemplateScopeLabel(selectedContentType, { capitalize: true })}
+            Templates
           </button>
         </div>
 
