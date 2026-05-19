@@ -608,12 +608,12 @@
   margin: 0;
   color: #fff;
 }
-.ni-section-header .ni-section-title { font-size: 20px; }
-.ni-section-header .ni-section-desc { font-size: 13px; }
 
 /* Design sidebar grouping: 24px between groups, 8px within a group. */
-.admin-root-nav.design-nav { gap: 24px; }
-.admin-root-nav.design-nav .ni-group {
+.admin-root-nav.design-nav,
+.admin-root-nav.advanced-nav { gap: 24px; }
+.admin-root-nav.design-nav .ni-group,
+.admin-root-nav.advanced-nav .ni-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -634,17 +634,25 @@
 }
 .sidebar-nav-pane-admin { transform: translateX(0); }
 .sidebar-nav-pane-design { transform: translateX(100%); }
+.sidebar-nav-pane-advanced { transform: translateX(100%); }
 .sidebar-nav-slider.is-design .sidebar-nav-pane-admin { transform: translateX(-100%); }
 .sidebar-nav-slider.is-design .sidebar-nav-pane-design { transform: translateX(0); }
+.sidebar-nav-slider.is-advanced .sidebar-nav-pane-admin { transform: translateX(-100%); }
+.sidebar-nav-slider.is-advanced .sidebar-nav-pane-advanced { transform: translateX(0); }
 .sidebar:not(.is-design-section) .sidebar-nav-pane-design {
   visibility: hidden;
   pointer-events: none;
 }
+.sidebar:not(.is-advanced-section) .sidebar-nav-pane-advanced {
+  visibility: hidden;
+  pointer-events: none;
+}
 
-/* Hide sidebar-bottom when the design section is active. Fade matches the
-   nav slider's 0.3s timing for a cohesive transition. */
+/* Hide sidebar-bottom when the design or advanced section is active. Fade
+   matches the nav slider's 0.3s timing for a cohesive transition. */
 .sidebar-bottom { transition: opacity 0.3s ease; }
-.sidebar.is-design-section .sidebar-bottom {
+.sidebar.is-design-section .sidebar-bottom,
+.sidebar.is-advanced-section .sidebar-bottom {
   opacity: 0;
   pointer-events: none;
 }
