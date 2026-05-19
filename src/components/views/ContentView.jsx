@@ -729,7 +729,7 @@ function ContentView() {
             </div>
             <p className="content-template-gateway">
               For more advanced control over{' '}
-              {getTemplateScopeLabel(selectedContentType)},{' '}
+              {getTemplateScopeLabel(selectedContentType, { capitalize: true })},{' '}
               <Link
                 to={`/templates?contentType=${selectedContentType.id}`}
                 className="content-template-gateway-link"
