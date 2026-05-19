@@ -157,10 +157,10 @@ npm run dev
 
 `npm run dev` uses the port written to `.env.local`. Open the printed local preview URL in your browser.
 
-If the workspace should inherit unmanaged values from the main checkout's `.env.local`, pass the source checkout explicitly:
+If the workspace should inherit unmanaged values from the main checkout's `.env.local`, pass the source checkout explicitly. Replace `/path/to/main/checkout` with the absolute path to that checkout:
 
 ```bash
-ROOT_WORKTREE_PATH=/Users/davidsmith/Sites/rsm-prototyping npm run workspace:setup
+ROOT_WORKTREE_PATH=/path/to/main/checkout npm run workspace:setup
 npm run dev
 ```
 
