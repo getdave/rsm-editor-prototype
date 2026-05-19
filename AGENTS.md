@@ -250,6 +250,31 @@ Only work directly on `trunk` for:
 
 Use **git worktrees** when you want several features (or agents) in parallel, each with its own checkout and dev server.
 
+#### Agent workspaces and already-created checkouts
+
+There are two setup commands:
+
+- `npm run worktree:setup` only writes `.env.local`, assigns/reuses a stable port, and prints the preview URL.
+- `npm run workspace:setup` runs `npm ci` first, then runs `worktree:setup`. Use this for fresh already-created agent workspaces and worktrees.
+
+When an agent tool has already created a fresh checkout/workspace for you, run:
+
+```bash
+npm run workspace:setup
+npm run dev
+```
+
+This installs dependencies with `npm ci`, writes **`.env.local`** with `VITE_PORT`, `VITE_WORKTREE_LABEL`, `VITE_WORKTREE_SLUG`, and `VITE_BRANCH_NAME`, and assigns a stable available port through `scripts/worktree.mjs`. The port registry is stored in the repository's Git common directory, which you can locate with `git rev-parse --git-common-dir`, so Cursor and manual worktrees share assignments and avoid port conflicts.
+
+If the workspace should inherit unmanaged values from the main checkout's `.env.local`, pass the source checkout explicitly. Replace `/path/to/main/checkout` with the absolute path to that checkout:
+
+```bash
+ROOT_WORKTREE_PATH=/path/to/main/checkout npm run workspace:setup
+npm run dev
+```
+
+After setup, always start the dev server and open the localhost preview in the browser. Use the preview URL printed by `npm run workspace:setup`, or read `VITE_PORT` from `.env.local` and open `http://localhost:$VITE_PORT/`. If the app binds to `127.0.0.1`, open `http://127.0.0.1:$VITE_PORT/` instead. If a browser cannot be opened automatically, report the exact preview URL.
+
 #### Cursor worktrees (Agents Window, `/worktree`, CLI)
 
 Cursor isolates agents in separate Git checkouts. This repo includes [`.cursor/worktrees.json`](.cursor/worktrees.json) so Cursor runs a proper setup when it creates a worktree:

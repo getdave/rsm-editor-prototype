@@ -143,6 +143,27 @@ src/
 
 **Parallel worktrees:** use git worktrees when you want multiple features or AI agents running at the same time, each with its own checkout and localhost preview.
 
+There are two setup commands:
+
+- `npm run worktree:setup` only writes `.env.local`, assigns/reuses a stable port, and prints the preview URL.
+- `npm run workspace:setup` runs `npm ci` first, then runs `worktree:setup`. Use this for fresh already-created agent workspaces and worktrees.
+
+For any fresh already-created agent workspace or worktree, run:
+
+```bash
+npm run workspace:setup
+npm run dev
+```
+
+`npm run dev` uses the port written to `.env.local`. Open the printed local preview URL in your browser.
+
+If the workspace should inherit unmanaged values from the main checkout's `.env.local`, pass the source checkout explicitly. Replace `/path/to/main/checkout` with the absolute path to that checkout:
+
+```bash
+ROOT_WORKTREE_PATH=/path/to/main/checkout npm run workspace:setup
+npm run dev
+```
+
 ```bash
 npm run worktree:create -- feature/my-change
 cd ../rsm-prototyping-feature-my-change
