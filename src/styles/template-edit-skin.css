@@ -64,9 +64,10 @@
 
 /* Template badge — replace the default WP gray with sync-tinted
  * variants while keeping the same Badge structure / sizing. */
-.is-template-context .components-badge.is-default {
+.is-template-context .doc-template-badge {
   background-color: var(--wp-block-synced-color-tint-bg);
   color: var(--wp-block-synced-color-tint-fg);
+  border-color: transparent;
 }
 
 /* Side panels (inserter, list view, settings sidebar) inherit the

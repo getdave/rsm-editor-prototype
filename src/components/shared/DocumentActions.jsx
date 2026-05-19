@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Dropdown, MenuGroup, MenuItem, Tooltip } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Badge, Stack } from '@wordpress/ui';
 import {
   chevronDown,
   home,
@@ -97,13 +97,7 @@ export default function DocumentActions({
       gap="xs"
       className={`doc-actions${isGlobalOverride ? ' doc-actions--global' : ''}`}
     >
-      {isTemplate && (
-        <span className="components-badge is-default">
-          <span className="components-badge__flex-wrapper">
-            <span className="components-badge__content">Template</span>
-          </span>
-        </span>
-      )}
+      {isTemplate && <Badge className="doc-template-badge">Template</Badge>}
       <Tooltip text={nameTooltipText} placement="bottom">
         <span
           className={`ct-btn doc-actions-name${isEditing ? ' is-editing' : ''}${isReadonly ? ' doc-actions-name--readonly' : ''}`}
@@ -166,7 +160,6 @@ export default function DocumentActions({
             aria-expanded={isOpen}
             label="Document options"
             icon={chevronDown}
-            iconSize={20}
           />
         )}
         renderContent={() => (
