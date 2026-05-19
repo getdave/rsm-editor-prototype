@@ -118,7 +118,6 @@ export default function BlockToolbar({
           className="bt-pill-icon"
           label={`${meta.label} — toggle document overview`}
           icon={Icon}
-          iconSize={24}
           onClick={(e) => {
             e.stopPropagation();
             onToggleListView();
@@ -127,14 +126,10 @@ export default function BlockToolbar({
         <Text variant="body-sm" className="bt-pill-label">{meta.label}</Text>
       </div>
       <span className="bt-sep" aria-hidden />
-      <Button className="bt-tb-btn" label="Drag" icon={dragHandle} iconSize={24} />
+      <Button className="bt-tb-btn" label="Drag" icon={dragHandle} />
       <div className="bt-move-stack" role="group" aria-label="Reorder">
-        <button type="button" className="bt-move-btn" aria-label="Move up">
-          <span className="bt-move-icon" aria-hidden>{chevronUp}</span>
-        </button>
-        <button type="button" className="bt-move-btn" aria-label="Move down">
-          <span className="bt-move-icon" aria-hidden>{chevronDown}</span>
-        </button>
+        <Button className="bt-move-btn" label="Move up" icon={chevronUp} iconSize={14} />
+        <Button className="bt-move-btn" label="Move down" icon={chevronDown} iconSize={14} />
       </div>
       <span className="bt-sep" aria-hidden />
       {isPatternSection ? (
@@ -186,7 +181,7 @@ export default function BlockToolbar({
           <span className="bt-sep" aria-hidden />
         </>
       ) : null}
-      <Button className="bt-tb-btn" label="Options" icon={moreVertical} iconSize={24} />
+      <Button className="bt-tb-btn" label="Options" icon={moreVertical} />
     </div>
   );
 }

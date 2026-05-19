@@ -817,37 +817,15 @@
   flex-shrink: 0;
 }
 
-.bt-move-btn {
+.bt-move-btn.components-button {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: 0;
+  height: auto;
   width: 100%;
   margin: 0;
   padding: 0;
-  border: none;
   border-radius: 2px;
-  background: transparent;
   color: #1e1e1e;
-  cursor: pointer;
-  line-height: 0;
-}
-
-.bt-move-btn:hover {
-  background: #f0f0f0;
-}
-
-.bt-move-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.bt-move-icon svg {
-  width: 14px;
-  height: 14px;
-  fill: currentColor;
 }
 
 .sec-group {
