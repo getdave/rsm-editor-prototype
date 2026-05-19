@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
-import { Button } from '@wordpress/components';
+import {
+  Button,
+  __experimentalToggleGroupControl as ToggleGroupControl,
+  __experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+} from '@wordpress/components';
 import {
   desktop,
   drawerRight,
@@ -587,28 +591,25 @@ function BlockEditor() {
           <ExitSplitButton />
           <Button
             variant="primary"
-            className="ct-btn primary"
+            className="ct-btn"
             onClick={toggleInserter}
             icon={plus}
-            iconSize={20}
           />
           <Button
             className="ct-btn"
             label="Undo"
             icon={undo}
-            iconSize={20}
           />
           <Button
             className="ct-btn"
             label="Redo"
             icon={redo}
-            iconSize={20}
           />
           <Button
-            className={`ct-btn ${listViewOpen ? 'active' : ''}`}
+            className="ct-btn"
             label="Document Overview"
             icon={listView}
-            iconSize={20}
+            isPressed={listViewOpen}
             onClick={handleToggleListView}
           />
 
@@ -623,35 +624,25 @@ function BlockEditor() {
           <div className="ct-space"></div>
 
           {/* Right zone */}
-          <div className="ct-view-modes">
-            <Button
-              className={`ct-view-btn ${selectedDevice === 'desktop' ? 'active' : ''}`}
-              onClick={() => setSelectedDevice('desktop')}
-              label="Desktop view"
-              icon={desktop}
-              iconSize={20}
-            />
-            <Button
-              className={`ct-view-btn ${selectedDevice === 'tablet' ? 'active' : ''}`}
-              onClick={() => setSelectedDevice('tablet')}
-              label="Tablet view"
-              icon={tablet}
-              iconSize={20}
-            />
-            <Button
-              className={`ct-view-btn ${selectedDevice === 'mobile' ? 'active' : ''}`}
-              onClick={() => setSelectedDevice('mobile')}
-              label="Mobile view"
-              icon={mobile}
-              iconSize={20}
-            />
-          </div>
+          <ToggleGroupControl
+            className="ct-view-modes"
+            label="Device preview"
+            hideLabelFromVision
+            value={selectedDevice}
+            onChange={setSelectedDevice}
+            isBlock
+            __nextHasNoMarginBottom
+          >
+            <ToggleGroupControlOptionIcon value="desktop" icon={desktop} label="Desktop view" />
+            <ToggleGroupControlOptionIcon value="tablet" icon={tablet} label="Tablet view" />
+            <ToggleGroupControlOptionIcon value="mobile" icon={mobile} label="Mobile view" />
+          </ToggleGroupControl>
 
           <Button
-            className={`ct-icon-btn ${settingsSidebarOpen ? 'active' : ''}`}
+            className="ct-icon-btn"
             label="Toggle settings sidebar"
             icon={drawerRight}
-            iconSize={20}
+            isPressed={settingsSidebarOpen}
             onClick={toggleSettingsSidebar}
           />
 
@@ -659,12 +650,10 @@ function BlockEditor() {
             className="ct-icon-btn"
             label="More options"
             icon={moreVertical}
-            iconSize={20}
           />
 
           <Button
             variant="primary"
-            className="ct-save show"
             onClick={openUnsavedChangesModal}
             disabled={!hasUnsavedChanges}
           >

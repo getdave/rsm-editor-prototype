@@ -343,21 +343,6 @@
   background: #f0f0f0;
 }
 
-.ct-btn.primary {
-  background: #3858e9;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 400;
-  width: 36px;
-  height: 36px;
-  border-radius: 4px;
-  padding: 0;
-}
-
-.ct-btn.primary:hover {
-  background: #2a47d4;
-}
-
 .ct-sep {
   width: 1px;
   height: 20px;
@@ -375,8 +360,9 @@
   color: #757575;
 }
 
-/* View mode switcher */
-.ct-view-modes {
+/* Device switcher inside the preview bar (PreviewCanvas only — the
+ * Block Editor uses ToggleGroupControl instead). */
+.preview-bar .ct-view-modes {
   display: flex;
   gap: 0;
   background: #f0f0f0;
@@ -384,7 +370,7 @@
   padding: 2px;
 }
 
-.ct-view-btn {
+.preview-bar .ct-view-btn {
   width: 32px;
   height: 32px;
   border: none;
@@ -398,11 +384,11 @@
   transition: all 0.12s;
 }
 
-.ct-view-btn:hover {
+.preview-bar .ct-view-btn:hover {
   color: #1e1e1e;
 }
 
-.ct-view-btn.active {
+.preview-bar .ct-view-btn.active {
   background: #fff;
   color: #1e1e1e;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -427,63 +413,6 @@
   background: #f0f0f0;
 }
 
-/* Save status and button */
-.ct-saved {
-  color: #00a32a;
-  font-size: 11px;
-  padding: 0 8px;
-  font-weight: 500;
-}
-
-/* Save and Exit button group */
-.ct-save {
-  padding: 8px 16px;
-  background: #3858e9;
-  color: #fff;
-  border: 1px solid #3858e9;
-  border-radius: 4px;
-  font: 500 12px var(--wp-font-family);
-  cursor: pointer;
-  display: none;
-  transition: background 0.12s;
-  height: 36px;
-}
-
-.ct-save:hover {
-  background: #2a47d4;
-  border-color: #2a47d4;
-}
-
-.ct-save.show {
-  display: block;
-  border-radius: 4px 0 0 4px;
-}
-
-.ct-exit {
-  padding: 8px 16px;
-  background: transparent;
-  color: #1e1e1e;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font: 500 12px var(--wp-font-family);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.12s;
-  height: 36px;
-}
-
-.ct-exit:hover {
-  border-color: #999;
-  background: #f9f9f9;
-}
-
-/* When Save is shown, Exit button connects to it */
-.ct-save.show + .ct-exit {
-  border-radius: 0 4px 4px 0;
-  border-left: none;
-}
 
 /* Editing canvas — header full width; side panels sit in a row beneath it */
 .edit-canvas {
@@ -1022,12 +951,6 @@
 .sec-group[data-inserter='both'] .add-sec {
   opacity: 1;
   pointer-events: auto;
-}
-
-.ct-btn.active,
-.ct-icon-btn.active {
-  background: #e0e0e0;
-  color: #1e1e1e;
 }
 
 /* ── List View + Inserter shared shell (inside .edit-left-panel) ──

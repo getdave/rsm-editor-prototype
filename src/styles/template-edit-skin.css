@@ -51,30 +51,6 @@
   --wpds-color-stroke-focus-brand: #3858e9;
 }
 
-/* ── Canvas toolbar — primary actions (hardcoded literals in canvas.css) ── */
-.is-template-context .ct-btn.primary {
-  background: var(--wp-block-synced-color);
-}
-
-.is-template-context .ct-btn.primary:hover {
-  background: var(--wp-block-synced-color-hover);
-}
-
-.is-template-context .ct-save {
-  background: var(--wp-block-synced-color);
-  border-color: var(--wp-block-synced-color);
-}
-
-.is-template-context .ct-save:hover {
-  background: var(--wp-block-synced-color-hover);
-  border-color: var(--wp-block-synced-color-hover);
-}
-
-/* Active device-mode toggle */
-.is-template-context .ct-view-btn.active {
-  color: var(--wp-block-synced-color);
-}
-
 /* Doc-actions layout icon (next to "Template title") picks up the
  * sync color. The WP icon SVGs ship without a `fill` attribute, so
  * we force `fill: currentColor` to make the wrapper `color` apply. */
