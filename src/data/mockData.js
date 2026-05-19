@@ -327,7 +327,7 @@ export const pages = [
     collectionKind: "event-list",
     viewKind: "listing",
     titleTooltip:
-      "Shows generated event listings. This content type is currently using a default layout until a dedicated Events layout is customized.",
+      "Shows generated Event listings. This content type is currently using a default layout until a dedicated Events layout is customized.",
   },
   {
     id: "event-single",
@@ -348,7 +348,7 @@ export const pages = [
     collectionKind: "event-single",
     viewKind: "single",
     titleTooltip:
-      "Controls generated event detail pages. This content type is currently using a default layout until a dedicated Event layout is customized.",
+      "Controls generated Event detail pages. This content type is currently using a default layout until a dedicated Event layout is customized.",
   },
   {
     id: "search-results",
@@ -409,8 +409,8 @@ export const contentTypes = [
     provider: "Events plugin",
     iconKey: "calendar",
     count: 6,
-    manageLabel: "Manage events",
-    description: "Manage event details, dates, venues, and status.",
+    manageLabel: "Manage Events",
+    description: "Manage Event details, dates, venues, and status.",
   },
 ];
 
@@ -554,8 +554,8 @@ export const pageDesigns = [
   {
     id: "event-single",
     slug: "events/example-event",
-    name: "Event page layout",
-    shortName: "Event page",
+    name: "Single Event Page layout",
+    shortName: "Single Event Page",
     type: "Page Layout",
     contentTypeId: "events",
     provider: "Events plugin",
@@ -566,12 +566,12 @@ export const pageDesigns = [
     defaultTemplateId: "template-single",
     defaultTemplateLabel: "default single template",
     defaultTemplateRoute: "/templates?template=default-single&contentType=events",
-    sharedUsageLabels: ["Event pages"],
+    sharedUsageLabels: ["Single Event Pages"],
     layoutKind: "single",
     actionLabel: "Edit",
-    description: "Event pages are currently shown with the default item layout.",
-    scopeNotice: "Event pages currently use the default single template. Create a template to customize Events without changing other content types.",
-    previewLabel: "Event page",
+    description: "Single Event Pages are currently shown with the default item layout.",
+    scopeNotice: "Single Event Pages currently use the default single template. Create a template to customize Events without changing other content types.",
+    previewLabel: "Single Event Page",
   },
   {
     id: "blog-home-root",

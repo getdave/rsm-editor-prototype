@@ -960,6 +960,11 @@
   color: #505050;
 }
 
+.nav-add-dynamic-page-type--sync {
+  background: rgba(127, 84, 179, 0.12);
+  color: #7f54b3;
+}
+
 .nav-add-menu-items-layout {
   display: flex;
   flex: 1;
@@ -1065,54 +1070,6 @@
   color: #646970;
   font-size: 13px;
   line-height: 1.4;
-}
-
-.nav-add-pages-subtabs-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-width: 0;
-  padding: 0 16px 0 20px;
-  border-bottom: 1px solid #ddd;
-  background: #fff;
-  flex-shrink: 0;
-}
-
-.nav-add-pages-subtabs {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  min-width: 0;
-  padding: 0 8px 0 0;
-}
-
-.nav-add-pages-subtab {
-  padding: 10px 14px;
-  margin: 0 0 -1px;
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: #757575;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  transition: color 0.12s, background 0.12s;
-}
-
-.nav-add-pages-subtab:hover,
-.nav-add-pages-subtab.is-active {
-  color: #1e1e1e;
-}
-
-.nav-add-pages-subtab.is-active {
-  border-bottom-color: #3858e9;
-}
-
-.nav-add-pages-subtab:focus-visible {
-  outline: 2px solid #3858e9;
-  outline-offset: -2px;
 }
 
 .nav-add-picker-view-options-row {
