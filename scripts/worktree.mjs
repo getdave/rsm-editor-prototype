@@ -17,11 +17,13 @@ function usage() {
   node scripts/worktree.mjs create <branch-name> [port]
   node scripts/worktree.mjs cleanup <branch-or-path> [--delete-branch] [--force]
   node scripts/worktree.mjs setup [port]
+  node scripts/worktree.mjs teardown
 
 Commands:
   create  Create a sibling git worktree, write .env.local, and run npm ci.
   cleanup Remove a worktree, clear its port assignment, and optionally delete its branch.
   setup   Write .env.local for the current worktree. Used by Cursor setup.
+  teardown Remove the current workspace from the main checkout. Used by Conductor.
 `)
   process.exit(1)
 }
@@ -520,9 +522,9 @@ async function createWorktree(branchName, portArg) {
   printReady(info, realWorktreePath)
 }
 
-async function cleanupWorktree(args) {
+async function cleanupWorktreeFromRoot(root, args) {
   const { target, deleteBranch, force } = parseCleanupArgs(args)
-  const root = fs.realpathSync(getRepoRoot())
+  root = fs.realpathSync(root)
   const commonDir = getGitCommonDir(root)
   const worktree = resolveWorktreeTarget(root, target)
   const worktreePath = normalizeExistingPath(worktree.path)
@@ -556,6 +558,17 @@ async function cleanupWorktree(args) {
   }
 }
 
+async function cleanupWorktree(args) {
+  await cleanupWorktreeFromRoot(getRepoRoot(), args)
+}
+
+async function teardownCurrentWorkspace() {
+  const worktreePath = fs.realpathSync(getRepoRoot())
+  const mainRoot = path.dirname(getGitCommonDir(worktreePath))
+
+  await cleanupWorktreeFromRoot(mainRoot, [ worktreePath ])
+}
+
 function printReady(info, worktreePath) {
   console.log('')
   console.log('Worktree ready')
@@ -582,6 +595,11 @@ async function main() {
 
   if (command === 'setup') {
     await setupCurrentWorktree(firstArg)
+    return
+  }
+
+  if (command === 'teardown') {
+    await teardownCurrentWorkspace()
     return
   }
 
