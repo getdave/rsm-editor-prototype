@@ -47,43 +47,50 @@
   overflow: visible;
 }
 
-/* Theme the WP UI Button used for nav rows. Active state comes from the
-   Button's built-in `[aria-pressed=true].is-minimal.is-neutral` rule
-   (neutral-strong tokens). The sizing/layout overrides apply to all rows;
-   the color overrides are scoped to `:not([aria-pressed="true"])` so they
-   never compete with the pressed-state vars — important because Button
-   ships its rules in `@layer wp-ui-components` and unlayered rules win
-   regardless of specificity. Vars are set directly on `.ni` (not on the
+/* Theme the WP UI Button used for sidebar nav rows. Active state comes from
+   the Button's built-in `[aria-pressed=true].is-minimal.is-neutral` rule
+   (neutral-strong tokens). The sizing/layout vars apply to all sidebar
+   Buttons; the color overrides are scoped to `:not([aria-pressed="true"])`
+   so they never compete with the pressed-state vars — important because
+   Button ships its rules in `@layer wp-ui-components` and unlayered rules
+   win regardless of specificity. Vars are set directly on `.ni` (not on a
    parent) because Button sets these vars on the element itself, which
-   blocks inheritance from `.admin-root-nav`. */
-.admin-root-nav .ni {
+   blocks inheritance. */
+.sidebar .ni {
   --wp-ui-button-min-width: 0;
-  --wp-ui-button-padding-inline: 8px;
-  justify-content: flex-start;
-  width: 100%;
+  /* base.css has unlayered `* { padding: 0 }` which beats Button's layered
+     `padding-inline: var(--wp-ui-button-padding-inline)`, so set padding
+     directly here. */
+  padding-inline: 8px;
   border-radius: 4px;
 }
 
-.admin-root-nav .ni:not([aria-pressed="true"]) {
+.sidebar .ni:not([aria-pressed="true"]) {
   --wp-ui-button-foreground-color: #bbb;
   --wp-ui-button-background-color-active: #2a2a2a;
   --wp-ui-button-foreground-color-active: #fff;
 }
 
-.admin-root-nav .ni-ico {
+/* Vertical nav contexts fill the column width and left-align contents. */
+.admin-root-nav .ni {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.sidebar .ni-ico {
   width: 24px;
   height: 24px;
   flex-shrink: 0;
   color: inherit;
 }
 
-.admin-root-nav .ni-ico svg {
+.sidebar .ni-ico svg {
   width: 24px;
   height: 24px;
   fill: currentColor;
 }
 
-.admin-root-nav .ni-label {
+.sidebar .ni-label {
   flex: 1;
   min-width: 0;
   white-space: nowrap;
@@ -222,126 +229,16 @@
   display: none;
 }
 
-.sb-dashboard {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* Bottom-row Buttons: WP Admin grows to fill, Customize stays content-width. */
+.sidebar-bottom .sb-dashboard {
   flex: 1;
+  justify-content: flex-start;
   min-width: 0;
-  height: 32px;
-  padding: 0 6px;
-  background: transparent;
-  border: none;
-  border-radius: 4px;
-  color: #ddd;
-  text-decoration: none;
-  font: inherit;
-  font-size: 13px;
-  line-height: 20px;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.sb-dashboard-inner {
-  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.sb-dashboard:hover .sb-dashboard-inner,
-.sb-dashboard:focus-visible .sb-dashboard-inner {
-  transform: translateX(6px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sb-dashboard-inner {
-    transition: none;
-  }
-
-  .sb-dashboard:hover .sb-dashboard-inner,
-  .sb-dashboard:focus-visible .sb-dashboard-inner {
-    transform: none;
-  }
-
-  .sb-dashboard-ico-layer {
-    transition: none;
-  }
-}
-
-.sb-dashboard:hover,
-.sb-dashboard:focus-visible {
-  background: #2a2a2a;
-  color: #fff;
-  outline: none;
-}
-
-.sb-dashboard-ico-wrap {
-  position: relative;
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-.sb-dashboard-ico-layer {
-  position: absolute;
-  inset: 0;
-  display: inline-flex;
-  align-items: center;
+.sidebar-bottom .sb-customize {
+  flex: 0 0 auto;
   justify-content: center;
-  transition: opacity 0.18s ease;
-}
-
-.sb-dashboard-ico-layer svg {
-  width: 24px;
-  height: 24px;
-  fill: currentColor;
-}
-
-.sb-dashboard .sb-dashboard-ico-layer--arrow {
-  opacity: 0;
-}
-
-.sb-dashboard:hover .sb-dashboard-ico-layer--wp,
-.sb-dashboard:focus-visible .sb-dashboard-ico-layer--wp {
-  opacity: 0;
-}
-
-.sb-dashboard:hover .sb-dashboard-ico-layer--arrow,
-.sb-dashboard:focus-visible .sb-dashboard-ico-layer--arrow {
-  opacity: 1;
-}
-
-.sb-dashboard-label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sb-customize {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  padding: 0;
-  border-radius: 4px;
-  color: #999;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-  font: inherit;
-}
-
-.sb-customize:hover,
-.sb-customize:focus-visible {
-  background: #2a2a2a;
-  color: #fff;
-  outline: none;
-}
-
-.sb-customize svg {
-  width: 20px;
-  height: 20px;
-  fill: currentColor;
 }
 
 /* ── DESIGN SECTION SIDEBAR ── */

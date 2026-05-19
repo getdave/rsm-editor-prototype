@@ -16,7 +16,6 @@ import {
   chevronUp,
   chevronDown,
   wordpress,
-  arrowLeft,
   color,
   typography,
   background,
@@ -408,15 +407,17 @@ function Sidebar() {
             className="sidebar-bottom editor-sidebar-section editor-sidebar-hamburger"
           >
             <Tooltip text="Expand menu" placement="right">
-              <button
-                type="button"
-                className="sb-customize"
+              <Button
+                tone="neutral"
+                variant="minimal"
+                size="compact"
+                className="ni sb-customize"
                 aria-label="Expand menu"
                 aria-expanded={menuExpanded}
                 onClick={toggleMenuExpanded}
               >
-                {menu}
-              </button>
+                <span className="ni-ico">{menu}</span>
+              </Button>
             </Tooltip>
           </Stack>
         )}
@@ -539,32 +540,31 @@ function Sidebar() {
         className="sidebar-bottom"
       >
         <Tooltip text="Return to the WordPress dashboard" placement="top">
-          <button
-            type="button"
-            className="sb-dashboard"
+          <Button
+            tone="neutral"
+            variant="minimal"
+            size="compact"
+            className="ni sb-dashboard"
             onClick={() =>
               alert(
                 'This would take you back to WP Admin, but this is a prototype.',
               )
             }
           >
-            <Stack direction="row" align="center" gap="sm" className="sb-dashboard-inner">
-              <span className="sb-dashboard-ico-wrap" aria-hidden="true">
-                <span className="sb-dashboard-ico-layer sb-dashboard-ico-layer--wp">{wordpress}</span>
-                <span className="sb-dashboard-ico-layer sb-dashboard-ico-layer--arrow">{arrowLeft}</span>
-              </span>
-              <Text variant="body-md" className="sb-dashboard-label">WP Admin</Text>
-            </Stack>
-          </button>
+            <span className="ni-ico">{wordpress}</span>
+            <span className="ni-label">WP Admin</span>
+          </Button>
         </Tooltip>
         <Tooltip text="Customize navigation" placement="top">
-          <button
-            type="button"
-            className="sb-customize"
+          <Button
+            tone="neutral"
+            variant="minimal"
+            size="compact"
+            className="ni sb-customize"
             aria-label="Customize navigation"
           >
-            {settings}
-          </button>
+            <span className="ni-ico">{settings}</span>
+          </Button>
         </Tooltip>
       </Stack>
     </div>
