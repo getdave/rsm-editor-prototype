@@ -155,11 +155,12 @@
   border-radius: 0;
 }
 
-/* Browse bar — preview state */
+/* Browse bar — preview state. Height matches `.canvas-toolbar` so the
+ * admin and editing chrome share the same vertical rhythm. */
 .preview-bar {
-  height: 69px;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+  height: 64px;
+  background: var(--wp-bg-card);
+  border-bottom: 1px solid var(--wp-border-light);
   display: flex;
   align-items: center;
   padding: 0 12px;
@@ -327,7 +328,7 @@
   min-width: 36px;
   border: none;
   background: transparent;
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -401,12 +402,19 @@
   border: none;
   background: transparent;
   color: var(--wp-gray-900);
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.12s;
+}
+
+/* Add a wider visual gap between the device ToggleGroupControl and the
+ * right-side action buttons (settings sidebar, more options, save).
+ * Adds 10px to the toolbar's baseline 6px gap = 16px total. */
+.canvas-toolbar .ct-icon-btn--after-tgc {
+  margin-left: 10px;
 }
 
 .ct-icon-btn:hover {
@@ -1453,41 +1461,16 @@
   font-weight: 600;
 }
 
-/* Style preview flyout — anchored with its right edge left of the sidebar; never overlaps the panel */
-.ss-style-preview-flyout {
-  position: fixed;
-  z-index: 100040;
-  pointer-events: none;
-  padding: 10px 12px 12px;
-  box-sizing: border-box;
-  transform-origin: right center;
-  border: 1px solid #c3c4c7;
-  border-right: none;
-  border-radius: 8px 0 0 8px;
-  background: #fff;
-  box-shadow: -10px 6px 28px rgba(0, 0, 0, 0.12);
-  animation: ss-style-flyout-enter 0.16s ease-out;
-}
-
-@keyframes ss-style-flyout-enter {
-  from {
-    opacity: 0;
-    transform: translateX(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.ss-style-preview-flyout .ss-style-preview-mock {
+/* Style preview popover content (anchored to the styles grid, matching
+ * the Layout panel pattern). Padding / shadows come from WP Popover. */
+.ss-style-preview .ss-style-preview-mock {
   box-shadow: none;
   border: none;
   border-radius: 6px;
   padding: 10px 10px 12px;
 }
 
-.ss-style-preview-flyout .ss-style-preview-caption {
+.ss-style-preview .ss-style-preview-caption {
   margin-top: 8px;
   padding-left: 2px;
 }

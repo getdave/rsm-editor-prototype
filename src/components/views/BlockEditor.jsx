@@ -591,22 +591,22 @@ function BlockEditor() {
           <ExitSplitButton />
           <Button
             variant="primary"
-            className="ct-btn"
+            className="ct-icon-btn"
             onClick={toggleInserter}
             icon={plus}
           />
           <Button
-            className="ct-btn"
+            className="ct-icon-btn"
             label="Undo"
             icon={undo}
           />
           <Button
-            className="ct-btn"
+            className="ct-icon-btn"
             label="Redo"
             icon={redo}
           />
           <Button
-            className="ct-btn"
+            className="ct-icon-btn"
             label="Document Overview"
             icon={listView}
             isPressed={listViewOpen}
@@ -639,7 +639,7 @@ function BlockEditor() {
           </ToggleGroupControl>
 
           <Button
-            className="ct-icon-btn"
+            className="ct-icon-btn ct-icon-btn--after-tgc"
             label="Toggle settings sidebar"
             icon={drawerRight}
             isPressed={settingsSidebarOpen}
