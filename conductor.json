@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "setup": "npm run workspace:setup",
+    "run": "npm run dev",
+    "teardown": "npm --prefix \"$(dirname \"$(git rev-parse --path-format=absolute --git-common-dir)\")\" run worktree:cleanup -- \"$PWD\""
+  }
+}
