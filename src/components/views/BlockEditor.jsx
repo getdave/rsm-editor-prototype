@@ -170,7 +170,6 @@ function EditableSectionGroup({
         {selected && (
           <BlockToolbar toolbarKey={blockId} meta={meta} {...blockToolbarBindings} />
         )}
-        <SyncContentBadge label={meta.label} icon={meta.icon} />
         {renderSectionContent(section)}
       </div>
       <AddSectionInserterButton variant="bottom" onAdd={openInserter} />

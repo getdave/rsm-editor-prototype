@@ -663,18 +663,51 @@
   fill: currentColor;
 }
 
-.g-el.e-block.tp-part:not(.sel):hover .tp-sync-badge,
-.e-sec:not(.sel):hover .tp-sync-badge {
+.g-el.e-block.tp-part:not(.sel):hover .tp-sync-badge {
   opacity: 1;
 }
 
-/* Pattern-section sync badge sits at the top-left of the section card —
- * a "this is sync content" hint that previews the section's toolbar
- * location. Same visual treatment as the template-part badge. */
-.e-sec .tp-sync-badge {
-  top: 8px;
-  left: 8px;
-  border-radius: 4px;
+/* Template-part toolbars (header/footer) wear the prototype's
+ * "sync content" color. Rebind WPDS theme tokens so focus rings and
+ * pressed states use sync purple, and paint the toolbar surface itself
+ * with the sync color (matching Gutenberg's treatment for synced
+ * patterns / template parts). */
+.tp-part .sec-bar.block-toolbar {
+  --wp-admin-theme-color: var(--wp-block-synced-color);
+  --wp-admin-theme-color-darker-10: var(--wp-block-synced-color-hover);
+  --wp-admin-theme-color-darker-20: var(--wp-block-synced-color-hover);
+  --wp-components-color-accent: var(--wp-block-synced-color);
+  --wp-components-color-accent-darker-10: var(--wp-block-synced-color-hover);
+  --wp-components-color-accent-darker-20: var(--wp-block-synced-color-hover);
+}
+
+.tp-part .sec-bar.block-toolbar .components-accessible-toolbar {
+  background: var(--wp-block-synced-color);
+  border-color: var(--wp-block-synced-color);
+  color: var(--wp-bg-card);
+}
+
+.tp-part .sec-bar.block-toolbar .components-toolbar-group {
+  background: transparent;
+  border-color: var(--wp-block-synced-color);
+}
+
+.tp-part .sec-bar.block-toolbar .components-toolbar-button {
+  color: var(--wp-bg-card);
+}
+
+.tp-part .sec-bar.block-toolbar .components-toolbar-button:hover:not(:disabled) {
+  background: var(--wp-block-synced-color-hover);
+  color: var(--wp-bg-card);
+}
+
+.tp-part .sec-bar.block-toolbar .components-toolbar-button.is-pressed {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--wp-bg-card);
+}
+
+.tp-part .sec-bar.block-toolbar .components-toolbar-group + .components-toolbar-group {
+  border-left-color: rgba(255, 255, 255, 0.25);
 }
 
 /* BlockToolbar positioning wrapper — the WP <Toolbar> inside owns the
