@@ -10,6 +10,14 @@ import { getPageContent } from '../services/pageContentService';
  * @returns {PageWireframeVariant}
  */
 export function getPageWireframeVariant(page) {
+  if (page?.isShopPage) {
+    return 'archive-grid';
+  }
+
+  if (page?.isArchiveListing || page?.sourceType === 'post-type-archive') {
+    return 'archive-list';
+  }
+
   const content = getPageContent(page);
   const layout = content?.layout ?? 'default';
 

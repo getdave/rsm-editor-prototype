@@ -1,3 +1,5 @@
+import { chevronDown } from '@wordpress/icons';
+
 /**
  * Front-of-site chrome: mirrors a block theme template framing
  * (header template part + main + footer template part).
@@ -7,13 +9,44 @@
  *   label: string,
  *   kind?: 'page',
  *   page: object,
+ *   children?: NavEntry[],
  * } | {
  *   key: string,
  *   label: string,
  *   kind: 'url',
  *   href: string,
+ *   children?: NavEntry[],
+ * } | {
+ *   key: string,
+ *   label: string,
+ *   kind: 'label',
+ *   children?: NavEntry[],
  * }} NavEntry
  */
+
+function NavEntryControl({ entry, onNavClick, className }) {
+  const isUrl = entry.kind === 'url';
+
+  if (entry.kind === 'label') {
+    return <span className={className || 'p-nav-label'}>{entry.label}</span>;
+  }
+
+  return (
+    <a
+      className={className}
+      href="#"
+      title={isUrl ? entry.href : undefined}
+      onClick={(e) => {
+        e.preventDefault();
+        if (!isUrl && entry.page) {
+          onNavClick(entry.page);
+        }
+      }}
+    >
+      {entry.label}
+    </a>
+  );
+}
 
 /**
  * Sitename + primary nav (inside `.p-header` or alone for editor header row).
@@ -24,21 +57,32 @@ export function PreviewSiteNavCluster({ siteTitle, navEntries, onNavClick }) {
       <span className="p-sitename">{siteTitle}</span>
       <div className="p-nav">
         {navEntries.map((entry) => {
-          const isUrl = entry.kind === 'url';
+          const children = entry.children || [];
+          const hasChildren = children.length > 0;
           return (
-            <a
+            <div
               key={entry.key}
-              href="#"
-              title={isUrl ? entry.href : undefined}
-              onClick={(e) => {
-                e.preventDefault();
-                if (!isUrl && entry.page) {
-                  onNavClick(entry.page);
-                }
-              }}
+              className={`p-nav-item${hasChildren ? ' has-children' : ''}`}
             >
-              {entry.label}
-            </a>
+              <NavEntryControl entry={entry} onNavClick={onNavClick} />
+              {hasChildren ? (
+                <span className="p-nav-dropdown-indicator" aria-hidden="true">
+                  {chevronDown}
+                </span>
+              ) : null}
+              {hasChildren ? (
+                <div className="p-subnav">
+                  {children.map((child) => (
+                    <NavEntryControl
+                      key={child.key}
+                      entry={child}
+                      onNavClick={onNavClick}
+                      className="p-subnav-link"
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </div>
           );
         })}
       </div>

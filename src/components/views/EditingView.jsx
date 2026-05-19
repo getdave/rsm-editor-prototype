@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { Button } from '@wordpress/components';
 import {
@@ -170,10 +170,12 @@ function EditableSectionGroup({
 }
 
 function EditingView() {
+  const { designId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     currentPage,
     hasUnsavedChanges,
+    pageDesigns,
     listViewOpen,
     openUnsavedChangesModal,
     selectedDevice,
@@ -186,6 +188,11 @@ function EditingView() {
     toggleSettingsSidebar,
     menuExpanded,
   } = useAppState();
+  const pageDesignTarget = designId
+    ? pageDesigns.find((design) => design.id === designId)
+    : null;
+  const editTarget = pageDesignTarget || currentPage;
+  const isPageDesignEdit = Boolean(pageDesignTarget);
   const [selectedBlockId, setSelectedBlockId] = useState('section-0');
   /** Second acknowledgment for Header/Footer before peer spotlight + global doc-actions label apply. */
   const [confirmedGlobalSpotlightBlockId, setConfirmedGlobalSpotlightBlockId] = useState(null);
@@ -198,7 +205,7 @@ function EditingView() {
   const [sectionStylesByIndex, setSectionStylesByIndex] = useState({});
 
   // Get page-specific content for editing
-  const content = getEditModeContent(currentPage);
+  const content = getEditModeContent(editTarget);
 
   const editNavEntries = useMemo(
     () => pages.filter((p) => p.inMenu).map((p) => ({ key: p.id, label: p.name, page: p })),
@@ -206,9 +213,10 @@ function EditingView() {
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset selection when switching edited documents.
     setSelectedBlockId(content.isTemplate ? 'template' : 'section-0');
     setSectionStylesByIndex({});
-  }, [currentPage?.id, content.isTemplate]);
+  }, [editTarget?.id, content.isTemplate]);
 
   const handleSectionStyleChange = (sectionIndex, styleId) => {
     setSectionStylesByIndex((prev) => ({ ...prev, [sectionIndex]: styleId }));
@@ -502,7 +510,7 @@ function EditingView() {
           </div>
         );
       
-      case 'single':
+      case 'single': {
         // Single Templates - exact match to PreviewCanvas
         if (content.sections[0].type === 'product-detail') {
           const product = content.sections[0];
@@ -539,19 +547,22 @@ function EditingView() {
             </article>
           </div>
         );
+      }
       
       default:
         return <div className="p-section">Template content</div>;
     }
   };
 
-  const pageInspectorTitle = content.title || currentPage?.name || 'Untitled';
+  const pageInspectorTitle = isPageDesignEdit
+    ? pageDesignTarget.name
+    : content.title || currentPage?.name || 'Untitled';
 
   const leftPanelMode = listViewOpen ? 'list' : isInserterOpen ? 'inserter' : null;
 
   return (
     <div
-      className={`edit-canvas ${true ? 'show' : ''}`}
+      className="edit-canvas show"
       style={{
         // When the menu is expanded the canvas keeps its full original
         // width so its left edge sits flush against the 208px sidebar
@@ -596,6 +607,8 @@ function EditingView() {
           <div className="ct-space"></div>
           {/* Center zone */}
           <DocumentActions
+            document={editTarget}
+            canRename={!isPageDesignEdit}
             documentLabelOverride={spotlightGlobalDocLabel}
             isTemplate={content.isTemplate}
           />
@@ -700,7 +713,7 @@ function EditingView() {
               />
             </div>
 
-            {/* Dynamic sections based on current page */}
+            {/* Document sections based on the current edit target */}
             {content.isTemplate ? (
               <div
                 className={`template-edit-root e-block ${selectedBlockId === 'template' ? 'sel' : ''}${
@@ -744,7 +757,7 @@ function EditingView() {
               <span className="p-ft">© 2026 {siteTitle}</span>
               <span className="p-ft">Privacy Policy</span>
             </div>
-              </div>
+            </div>
             </div>
           </div>
 
@@ -754,6 +767,7 @@ function EditingView() {
             pageTitle={pageInspectorTitle}
             selectedBlockId={selectedBlockId}
             sections={content.sections}
+            isTemplate={Boolean(content.isTemplate)}
             focusBlockTabSignal={inspectorBlockTabSignal}
             flashSignal={inspectorFlashSignal}
             sectionStyles={sectionStylesByIndex}

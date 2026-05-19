@@ -1,6 +1,6 @@
 /* ── SIDEBAR ── */
 .sidebar {
-  --sidebar-active-bleed: 36px;
+  --sidebar-active-bleed: calc(13px + var(--wp-page-area-gap, 12px));
   --sidebar-root-nav-block-start: 18px;
   position: relative;
   z-index: 2;

@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Button,
   DropdownMenu,
   RadioControl,
   SelectControl,
+  ToggleControl,
   Tooltip,
   __experimentalConfirmDialog as ConfirmDialog,
 } from "@wordpress/components";
@@ -14,9 +15,12 @@ import { createInterpolateElement } from "@wordpress/element";
 import {
   plus,
   copy,
+  external,
   home,
   page as pageIcon,
+  pencil,
   postList,
+  seen,
   chevronDown,
   chevronUp,
   moreVertical,
@@ -53,17 +57,26 @@ const BADGE_STYLES = {
   WooCommerce: { background: "rgba(127,84,179,.12)", color: "#7f54b3" },
 };
 
-const TABS = [
+const PAGE_TYPE_TABS = [
   {
-    value: "published",
-    label: "Published",
+    value: "pages",
+    label: "Static",
     description:
-      "Pages that are published and visible on your site.",
+      "Pages you create and edit directly, plus page-like system destinations.",
   },
   {
-    value: "drafts",
-    label: "Drafts",
-    description: "Pages not yet published.",
+    value: "dynamic",
+    label: "Dynamic",
+    description: (
+      <>
+        Generated pages for groups of content and special site views. Their
+        layouts are controlled by{" "}
+        <Link className="pp-desc-link" to="/templates">
+          Templates
+        </Link>
+        .
+      </>
+    ),
   },
 ];
 
@@ -72,12 +85,21 @@ const STATUS_ELEMENTS = [
   { value: "draft", label: "Draft" },
 ];
 
-const SYSTEM_FILTER_HIDE = Object.freeze([
-  { field: "isSystem", operator: "is", value: false },
-]);
-
-const DATAVIEW_FIELDS_DEFAULT = ["status", "inMenu", "authorDisplay"];
+const DATAVIEW_FIELDS_GRID = ["status", "inMenu", "authorDisplay"];
 const DATAVIEW_FIELDS_LIST = ["status", "pageRole", "inMenu", "authorDisplay"];
+const DATAVIEW_FIELDS_TABLE = [
+  "status",
+  "pageRole",
+  "inMenu",
+  "authorDisplay",
+];
+const COLLECTION_DATAVIEW_FIELDS_GRID = ["status", "authorDisplay"];
+const COLLECTION_DATAVIEW_FIELDS_LIST = ["status", "pageRole", "authorDisplay"];
+const COLLECTION_DATAVIEW_FIELDS_TABLE = [
+  "status",
+  "pageRole",
+  "authorDisplay",
+];
 
 const DEFAULT_VIEW = {
   type: "list",
@@ -88,9 +110,20 @@ const DEFAULT_VIEW = {
   sort: undefined,
   titleField: "name",
   mediaField: "media",
-  fields: [...DATAVIEW_FIELDS_DEFAULT],
+  fields: [...DATAVIEW_FIELDS_GRID],
   layout: { density: "compact" },
 };
+
+function getDefaultFieldsForView(type, pageType) {
+  const isDynamic = pageType === "dynamic";
+  if (type === "list") {
+    return isDynamic ? COLLECTION_DATAVIEW_FIELDS_LIST : DATAVIEW_FIELDS_LIST;
+  }
+  if (type === "table") {
+    return isDynamic ? COLLECTION_DATAVIEW_FIELDS_TABLE : DATAVIEW_FIELDS_TABLE;
+  }
+  return isDynamic ? COLLECTION_DATAVIEW_FIELDS_GRID : DATAVIEW_FIELDS_GRID;
+}
 
 function createPagesDataViewState(mode) {
   const next = { ...DEFAULT_VIEW, type: mode };
@@ -98,17 +131,17 @@ function createPagesDataViewState(mode) {
     return {
       ...next,
       showMedia: false,
-      fields: [...DATAVIEW_FIELDS_LIST],
+      fields: [...getDefaultFieldsForView(mode, "pages")],
     };
   }
   if (mode === "table") {
     return {
       ...next,
       showMedia: false,
-      fields: [...DATAVIEW_FIELDS_DEFAULT],
+      fields: [...getDefaultFieldsForView(mode, "pages")],
     };
   }
-  return { ...next, fields: [...DATAVIEW_FIELDS_DEFAULT] };
+  return { ...next, fields: [...getDefaultFieldsForView(mode, "pages")] };
 }
 
 const DEFAULT_LAYOUTS = {
@@ -117,26 +150,199 @@ const DEFAULT_LAYOUTS = {
   table: {},
 };
 
-/** Synthetic dynamic row — blog index at `/` when Reading uses “your latest posts” */
-const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = "blog-home-root";
+const COLLECTION_GROUP_ORDER = ["Posts", "Products", "Events", "System"];
 
-const blogHomepageRootTemplateRow = Object.freeze({
-  id: BLOG_HOMEPAGE_ROOT_TEMPLATE_ID,
-  slug: "",
-  name: "Posts page",
-  type: "Dynamic Page",
+const COLLECTION_GROUP_BY = {
+  field: "collectionGroup",
+  direction: "asc",
+  showLabel: false,
+};
+
+function applyPageTypeToView(view, pageType) {
+  const allowedFields =
+    pageType === "dynamic"
+      ? getDefaultFieldsForView(view.type, pageType)
+      : null;
+  const viewWithoutGrouping = {
+    ...view,
+    fields: allowedFields
+      ? (view.fields ?? []).filter((field) => allowedFields.includes(field))
+      : view.fields,
+  };
+  if (pageType === "dynamic") {
+    return viewWithoutGrouping;
+  }
+  delete viewWithoutGrouping.groupBy;
+  delete viewWithoutGrouping.showLevels;
+  return viewWithoutGrouping;
+}
+
+function setCollectionGrouping(view, enabled) {
+  if (enabled) {
+    return {
+      ...view,
+      groupBy: COLLECTION_GROUP_BY,
+      showLevels: false,
+      page: 1,
+    };
+  }
+  const next = {
+    ...view,
+    page: 1,
+  };
+  delete next.groupBy;
+  delete next.showLevels;
+  return next;
+}
+
+const postsIndexTemplateRow = Object.freeze({
+  id: "posts-index-template",
+  slug: "posts-index",
+  name: "Posts listing",
+  type: "Collection Page",
   isLive: true,
   inMenu: false,
   isSystem: false,
   isDynamic: true,
-  category: "dynamic",
+  isCollection: true,
+  collectionBadge: "Posts page",
+  collectionOverlay: "Posts page",
+  pageKind: "collection",
+  category: "collection",
+  collectionKind: "posts-index-template",
+  viewKind: "listing",
   status: "live",
   level: 0,
   authorDisplay: "WordPress",
-  titleTooltip:
-    "Used at your site's main web address while the homepage shows your latest posts. Visitors see your newest posts listed first.",
-  isFrontPage: true,
+  templateLabel: "Posts listing",
+  titleTooltip: "Uses home.html for the posts index.",
 });
+
+/** Synthetic posts index row ID — excludes template-backed rows from content-only row actions. */
+const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = postsIndexTemplateRow.id;
+
+const productCatalogTemplateRow = Object.freeze({
+  id: "product-catalog-template",
+  slug: "product-catalog",
+  name: "Product listing",
+  type: "Collection Page",
+  isLive: true,
+  inMenu: false,
+  isSystem: false,
+  isDynamic: true,
+  isCollection: true,
+  collectionBadge: "Shop page",
+  collectionOverlay: "Shop page",
+  pageKind: "collection",
+  category: "collection",
+  collectionKind: "product-catalog-template",
+  viewKind: "listing",
+  status: "live",
+  level: 0,
+  authorDisplay: "WooCommerce",
+  templateLabel: "Product listing",
+  titleTooltip: "Uses archive-product.html.",
+});
+
+const collectionTemplateDisplay = {
+  "blog-single": {
+    name: "Single post",
+    templateLabel: "Single post",
+    titleTooltip: "Uses single.html.",
+  },
+  "product-single": {
+    name: "Single product",
+    templateLabel: "Single product",
+    titleTooltip: "Uses single-product.html.",
+  },
+  "event-list": {
+    name: "Event listing",
+    templateLabel: "Event listing",
+    titleTooltip: "Uses archive-event.html.",
+  },
+  "event-single": {
+    name: "Single event",
+    templateLabel: "Single event",
+    titleTooltip: "Uses single-event.html.",
+  },
+  "search-results": {
+    name: "Search results",
+    templateLabel: "Search results",
+    titleTooltip: "Uses search.html.",
+  },
+  "404": {
+    name: "404 page",
+    templateLabel: "404 page",
+    titleTooltip: "Uses 404.html.",
+  },
+};
+
+function createPostsCollectionRow(postsPage) {
+  if (!postsPage) {
+    return null;
+  }
+  return {
+    ...postsPage,
+    type: "Collection Page",
+    isLive: true,
+    inMenu: Boolean(postsPage.inMenu),
+    isSystem: false,
+    isDynamic: true,
+    isCollection: true,
+    collectionBadge: "Posts page",
+    collectionOverlay: "Posts page",
+    pageKind: "collection",
+    category: "collection",
+    collectionKind: "posts",
+    viewKind: "listing",
+    status: "live",
+    authorDisplay: "WordPress",
+    templateLabel: "Posts listing",
+    titleTooltip:
+      "Uses the selected Posts page URL while home.html controls the layout visitors see.",
+    isPostsPage: true,
+  };
+}
+
+function getPageIcon(item) {
+  if (item.isFrontPage) {
+    return home;
+  }
+  if (item.collectionKind === "posts" || item.isPostsPage) {
+    return postList;
+  }
+  return pageIcon;
+}
+
+function isSyncedPageRow(item) {
+  return Boolean(item?.isCollection || item?.isPostsPage);
+}
+
+function getCustomTemplatePageLabel(item) {
+  if (item?.collectionKind === "event-list") {
+    return "Event listing page";
+  }
+  if (item?.collectionKind === "event-single") {
+    return "Event page";
+  }
+  const name = item?.name ?? "Dynamic Page";
+  return /\bpage$/i.test(name) ? name : `${name} page`;
+}
+
+function asCollectionRow(row, collectionGroup) {
+  if (!row) {
+    return null;
+  }
+  const display = collectionTemplateDisplay[row.id] ?? {};
+  return {
+    ...row,
+    ...display,
+    level: 0,
+    isCollection: true,
+    category: "collection",
+    collectionGroup,
+  };
+}
 
 function readingPageOptionLabel(p) {
   const prefix = p.level > 0 ? `${"— ".repeat(p.level)}` : "";
@@ -366,22 +572,67 @@ function ConfigureHomepageReadingModal({
   );
 }
 
-function AddNewCard() {
+function InactiveCollectionTemplateModal({ item, onClose, onCreate }) {
+  const pageLabel = getCustomTemplatePageLabel(item);
+
   return (
-    <div className="pp-card pp-card-add">
-      <div className="pp-card-thumb">
-        <span className="pp-card-icon pp-card-icon-add">{plus}</span>
-      </div>
-      <div className="pp-card-body">
-        <Text variant="body-md" className="pp-card-name">
-          Add new
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="inactive-template-modal-title"
+      className="modal-box pp-inactive-template-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <Stack
+        direction="row"
+        align="center"
+        justify="space-between"
+        className="modal-hd"
+      >
+        <Text
+          id="inactive-template-modal-title"
+          variant="heading-md"
+          className="modal-title"
+        >
+          Customize this Dynamic Page?
+        </Text>
+        <button
+          type="button"
+          className="modal-close"
+          aria-label="Close dialog"
+          onClick={onClose}
+        >
+          ×
+        </button>
+      </Stack>
+      <div className="modal-body pp-inactive-template-body">
+        <Text variant="body-md" className="pp-inactive-template-copy">
+          The <em>{pageLabel}</em> is currently using a default template. Create
+          a custom template to edit how this page appears on your site.
         </Text>
       </div>
+      <Stack
+        direction="row"
+        align="center"
+        justify="flex-end"
+        gap="sm"
+        className="modal-footer pp-inactive-template-footer"
+      >
+        <Button variant="tertiary" onClick={onClose}>
+          Keep existing
+        </Button>
+        <Button variant="primary" onClick={() => onCreate(item)}>
+          Create custom template
+        </Button>
+      </Stack>
     </div>
   );
 }
 
 function renderAuthorCell(item) {
+  if (item.collectionState === "inactive") {
+    return <span className="pp-author-empty">—</span>;
+  }
   const text = item.authorDisplay ?? "";
   if (!text) {
     return <span className="pp-author-empty">—</span>;
@@ -396,11 +647,9 @@ function renderAuthorCell(item) {
 
 function PagesView() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const showDynamicPagesTab = searchParams.get("dynamic") === "true";
+  const location = useLocation();
   const {
     currentPage,
-    setCurrentPage,
     selectPage,
     pagesViewMode,
     setPagesViewMode,
@@ -415,30 +664,32 @@ function PagesView() {
     setPostsPageId,
     setPageStatus,
     syncReadingPageMarkers,
+    activateCollectionTemplate,
     showSnackbar,
     addPageToMainMenu,
     removePageFromMainMenu,
   } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [activeCategory, setActiveCategory] = useState("published");
+  const [showDrafts, setShowDrafts] = useState(false);
+  const [showSystemCollections, setShowSystemCollections] = useState(false);
   const [view, setView] = useState(() =>
     createPagesDataViewState(pagesViewMode),
   );
   const [viewOptionsOpen, setViewOptionsOpen] = useState(false);
   const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
   const [publishConfirmPage, setPublishConfirmPage] = useState(null);
-
-  /** When Published includes template-backed rows, match former Dynamic tab default filters. */
-  useEffect(() => {
-    if (activeCategory !== "published") {
-      return;
-    }
-    setView((prev) => ({
-      ...prev,
-      filters: showDynamicPagesTab ? [...SYSTEM_FILTER_HIDE] : [],
-    }));
-  }, [showDynamicPagesTab, activeCategory]);
+  const [inactiveTemplateNoticePage, setInactiveTemplateNoticePage] =
+    useState(null);
+  const activePageType =
+    location.pathname.startsWith("/pages/dynamic") ||
+    location.pathname.startsWith("/pages/collections")
+      ? "dynamic"
+      : "pages";
+  const activeView = useMemo(
+    () => applyPageTypeToView(view, activePageType),
+    [activePageType, view],
+  );
 
   const readingSelectPages = useMemo(
     () => pages.filter((p) => p.category === "content" && p.status === "live"),
@@ -464,7 +715,7 @@ function PagesView() {
     return false;
   }, [homepageDisplayMode, frontPageId, postsPageId, readingSelectPages]);
 
-  const isGridLayout = view.type === "grid";
+  const isGridLayout = activeView.type === "grid";
 
   useEffect(() => {
     if (!configureHomepageOpen) {
@@ -505,6 +756,19 @@ function PagesView() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [deleteConfirm]);
 
+  useEffect(() => {
+    if (!inactiveTemplateNoticePage) {
+      return;
+    }
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setInactiveTemplateNoticePage(null);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [inactiveTemplateNoticePage]);
+
   const fields = useMemo(
     () => [
       {
@@ -514,22 +778,25 @@ function PagesView() {
           <span
             className={
               isGridLayout
-                ? "pp-media-thumb pp-media-thumb--grid"
-                : "pp-media-thumb"
+                ? `pp-media-thumb pp-media-thumb--grid${item.isCollection ? " pp-media-thumb--collection" : ""}${item.collectionState === "inactive" ? " pp-media-thumb--inactive" : ""}`
+                : `pp-media-thumb${item.isCollection ? " pp-media-thumb--collection" : ""}${item.collectionState === "inactive" ? " pp-media-thumb--inactive" : ""}`
             }
           >
             {isGridLayout ? (
               <PageLayoutWireframeThumb page={item} />
             ) : (
               <span
-                className="pp-media-thumb-icon"
-                style={{ color: "#999", display: "flex" }}
+                className={`pp-media-thumb-icon${isSyncedPageRow(item) ? " pp-media-thumb-icon--sync" : ""}`}
               >
-                {item.isFrontPage ? home : item.isPostsPage ? postList : pageIcon}
+                {getPageIcon(item)}
               </span>
             )}
             {item.isFrontPage ? (
               <span className="pp-front-page-overlay">Homepage</span>
+            ) : item.collectionOverlay ? (
+              <span className="pp-collection-marker-overlay">
+                {item.collectionOverlay}
+              </span>
             ) : item.isPostsPage ? (
               <span className="pp-posts-page-overlay">Posts page</span>
             ) : null}
@@ -547,17 +814,18 @@ function PagesView() {
         enableHiding: false,
         enableGlobalSearch: true,
         render: ({ item }) => {
-          const docIcon = item.isFrontPage
-            ? home
-            : item.isPostsPage
-              ? postList
-              : pageIcon;
+          const docIcon = getPageIcon(item);
+          const isInactive = item.collectionState === "inactive";
           const isLive = item.status !== "draft";
-          const statusLabel = isLive ? "Page is live" : "Page is a draft";
+          const statusLabel = isInactive
+            ? "Template is inactive"
+            : isLive
+              ? "Page is live"
+              : "Page is a draft";
           const title = (
             <span className="pp-title-cell-inner">
               <span
-                className={`pp-title-glyph-icon${item.isPostsPage ? " pp-title-glyph-icon--posts" : ""}`}
+                className={`pp-title-glyph-icon${isSyncedPageRow(item) ? " pp-title-glyph-icon--sync" : ""}`}
                 aria-hidden="true"
                 title={
                   item.isFrontPage
@@ -573,7 +841,7 @@ function PagesView() {
                 {item.name}
               </Text>
               <span
-                className={`url-dot${isLive ? "" : " url-draft-dot"}`}
+                className={`url-dot${isLive && !isInactive ? "" : " url-draft-dot"}`}
                 role="status"
                 aria-label={statusLabel}
               />
@@ -590,6 +858,29 @@ function PagesView() {
         },
       },
       {
+        id: "collectionGroup",
+        type: "text",
+        label: "Content type",
+        enableSorting: true,
+        enableHiding: false,
+        enableGlobalSearch: false,
+        filterBy: false,
+        getValue: ({ item }) => item.collectionGroup ?? "",
+        sort: (aValue, bValue, direction) => {
+          const aIndex = COLLECTION_GROUP_ORDER.indexOf(aValue);
+          const bIndex = COLLECTION_GROUP_ORDER.indexOf(bValue);
+          const safeAIndex =
+            aIndex === -1 ? COLLECTION_GROUP_ORDER.length : aIndex;
+          const safeBIndex =
+            bIndex === -1 ? COLLECTION_GROUP_ORDER.length : bIndex;
+          const comparison =
+            safeAIndex === safeBIndex
+              ? String(aValue).localeCompare(String(bValue))
+              : safeAIndex - safeBIndex;
+          return direction === "desc" ? -comparison : comparison;
+        },
+      },
+      {
         id: "status",
         type: "text",
         label: "Status",
@@ -601,7 +892,11 @@ function PagesView() {
         enableHiding: true,
         enableGlobalSearch: false,
         render: ({ item }) =>
-          item.status === "draft" ? (
+          item.collectionState === "inactive" ? (
+            <span className="pp-badge pp-inactive">Inactive</span>
+          ) : item.isCollection ? (
+            <span className="pp-badge pp-live">Active</span>
+          ) : item.status === "draft" ? (
             <span className="pp-badge pp-draft">Draft</span>
           ) : (
             <span className="pp-badge pp-live">Published</span>
@@ -610,16 +905,28 @@ function PagesView() {
       {
         id: "pageRole",
         type: "text",
-        label: "Homepage",
+        label: "Type",
         enableSorting: false,
         enableHiding: true,
         enableGlobalSearch: false,
         getValue: ({ item }) =>
-          item.isFrontPage ? "front" : item.isPostsPage ? "posts" : "",
+          item.isFrontPage
+            ? "front"
+            : item.collectionBadge
+              ? item.collectionBadge
+              : item.isPostsPage
+                ? "posts"
+                : item.isCollection
+                  ? "collection"
+                  : "",
         render: ({ item }) =>
           item.isFrontPage ? (
             <span className="pp-badge pp-page-role pp-page-role--front">
               Front page
+            </span>
+          ) : item.collectionBadge ? (
+            <span className="pp-badge pp-page-role pp-collection-marker">
+              {item.collectionBadge}
             </span>
           ) : item.isPostsPage ? (
             <span className="pp-badge pp-page-role pp-page-role--posts">
@@ -674,12 +981,60 @@ function PagesView() {
     [isGridLayout],
   );
 
+  const isPostsPageItem = useCallback(
+    (item) =>
+      homepageDisplayMode === READING_DISPLAY_STATIC &&
+      Boolean(postsPageId) &&
+      item?.category === "content" &&
+      item.id === postsPageId,
+    [homepageDisplayMode, postsPageId],
+  );
+
+  const editPageOrDesign = useCallback(
+    (item) => {
+      if (!item) return;
+      if (item.collectionState === "inactive") {
+        setInactiveTemplateNoticePage(item);
+        return;
+      }
+      if (isPostsPageItem(item)) {
+        navigate("/page-designs/blog-list/edit?inserter=patterns");
+        return;
+      }
+      selectPage(item);
+      navigate(`/pages/${item.id}/edit?inserter=patterns`);
+    },
+    [isPostsPageItem, navigate, selectPage],
+  );
+
   const actions = useMemo(
     () => [
+      {
+        id: "preview",
+        label: "Preview",
+        isPrimary: true,
+        icon: seen,
+        callback: (items) => setPreviewPage(items[0]),
+      },
+      {
+        id: "edit",
+        label: "Edit",
+        icon: pencil,
+        callback: (items) => {
+          editPageOrDesign(items[0]);
+        },
+      },
+      {
+        id: "view-live",
+        label: "View live",
+        icon: external,
+        callback: (items) => console.log("View live:", items[0].slug),
+      },
       {
         id: "duplicate",
         label: "Duplicate",
         icon: copy,
+        isEligible: (item) => item.category === "content",
         callback: (items) => console.log("Duplicate:", items[0].slug),
       },
       {
@@ -810,8 +1165,12 @@ function PagesView() {
       },
     ],
     [
+      editPageOrDesign,
       setPreviewPage,
       showSnackbar,
+      selectPage,
+      navigate,
+      setInactiveTemplateNoticePage,
       frontPageId,
       postsPageId,
       setHomepageDisplayMode,
@@ -822,55 +1181,92 @@ function PagesView() {
     ],
   );
 
-  const categoryPages = useMemo(() => {
-    let filtered = pages.map((p) => ({
-      ...p,
-      isFrontPage:
-        homepageDisplayMode === READING_DISPLAY_STATIC &&
-        Boolean(frontPageId) &&
-        p.category === "content" &&
-        p.id === frontPageId,
-      isPostsPage:
-        homepageDisplayMode === READING_DISPLAY_STATIC &&
-        Boolean(postsPageId) &&
-        p.category === "content" &&
-        p.id === postsPageId,
-    }));
+  const pagesWithRoles = useMemo(
+    () =>
+      pages.map((p) => ({
+        ...p,
+        isFrontPage:
+          homepageDisplayMode === READING_DISPLAY_STATIC &&
+          Boolean(frontPageId) &&
+          p.category === "content" &&
+          p.id === frontPageId,
+        isPostsPage:
+          homepageDisplayMode === READING_DISPLAY_STATIC &&
+          Boolean(postsPageId) &&
+          p.category === "content" &&
+          p.id === postsPageId,
+      })),
+    [pages, homepageDisplayMode, frontPageId, postsPageId],
+  );
 
-    if (activeCategory === "drafts") {
-      filtered = filtered.filter(
-        (p) => p.category === "content" && p.status === "draft",
-      );
-    } else if (activeCategory === "published") {
-      filtered = filtered.filter((p) => {
-        if (p.category === "content") {
-          return p.status === "live";
-        }
-        if (p.category === "dynamic") {
-          return showDynamicPagesTab;
-        }
-        return false;
-      });
+  const collectionRows = useMemo(() => {
+    const rows = [];
+    const findPage = (id) => pagesWithRoles.find((p) => p.id === id);
+    const postsListingTemplate =
+      homepageDisplayMode === READING_DISPLAY_LATEST
+        ? {
+            ...postsIndexTemplateRow,
+            name: "Latest posts",
+            templateLabel: "Latest posts",
+            collectionBadge: "Homepage",
+            collectionOverlay: "Homepage",
+            isFrontPage: true,
+            titleTooltip: "Uses home.html for the posts index.",
+          }
+        : postsIndexTemplateRow;
+    rows.push(
+      asCollectionRow(postsListingTemplate, "Posts"),
+      asCollectionRow(findPage("blog-single"), "Posts"),
+      asCollectionRow(productCatalogTemplateRow, "Products"),
+      asCollectionRow(findPage("product-single"), "Products"),
+      asCollectionRow(findPage("event-list"), "Events"),
+      asCollectionRow(findPage("event-single"), "Events"),
+      asCollectionRow(findPage("search-results"), "System"),
+      asCollectionRow(findPage("404"), "System"),
+    );
+    return rows.filter(Boolean);
+  }, [pagesWithRoles, homepageDisplayMode]);
 
-      if (
-        showDynamicPagesTab &&
-        homepageDisplayMode === READING_DISPLAY_LATEST &&
-        !filtered.some((p) => p.id === BLOG_HOMEPAGE_ROOT_TEMPLATE_ID)
-      ) {
-        filtered = [blogHomepageRootTemplateRow, ...filtered];
+  const staticHybridRows = useMemo(() => {
+    const rows = [];
+    const findPage = (id) => pagesWithRoles.find((p) => p.id === id);
+
+    if (homepageDisplayMode === READING_DISPLAY_STATIC) {
+      const postsPage = findPage(postsPageId);
+      const postsCollectionRow = createPostsCollectionRow(postsPage);
+      if (postsCollectionRow) {
+        rows.push(postsCollectionRow);
       }
-    } else {
-      filtered = [];
     }
 
-    return filtered;
+    rows.push(findPage("shop"));
+    return rows.filter(Boolean);
+  }, [pagesWithRoles, postsPageId, homepageDisplayMode]);
+
+  const categoryPages = useMemo(() => {
+    if (activePageType === "pages") {
+      const staticPages = pagesWithRoles.filter((p) => {
+        if (p.category !== "content") {
+          return false;
+        }
+        if (p.isPostsPage) {
+          return false;
+        }
+        return showDrafts ? true : p.status === "live";
+      });
+      return [...staticPages, ...staticHybridRows];
+    }
+
+    return showSystemCollections
+      ? collectionRows
+      : collectionRows.filter((p) => p.collectionGroup !== "System");
   }, [
-    activeCategory,
-    pages,
-    showDynamicPagesTab,
-    frontPageId,
-    postsPageId,
-    homepageDisplayMode,
+    activePageType,
+    pagesWithRoles,
+    showDrafts,
+    showSystemCollections,
+    staticHybridRows,
+    collectionRows,
   ]);
 
   const executeDeletePage = useCallback(
@@ -937,6 +1333,11 @@ function PagesView() {
     ],
   );
 
+  const displayedPreviewPage =
+    categoryPages.find((p) => p.id === previewPage?.id) ??
+    categoryPages[0] ??
+    previewPage;
+
   const handleReadingModalApply = (draft) => {
     if (draft.homepageDisplayMode === READING_DISPLAY_LATEST) {
       setHomepageDisplayMode(READING_DISPLAY_LATEST);
@@ -954,13 +1355,28 @@ function PagesView() {
     setConfigureHomepageOpen(false);
   };
 
+  const handleCreateInactiveTemplate = (item) => {
+    if (!item) {
+      return;
+    }
+    const activatedPage =
+      activateCollectionTemplate(item.id) ?? {
+        ...item,
+        collectionState: undefined,
+      };
+    selectPage(activatedPage);
+    setInactiveTemplateNoticePage(null);
+    showSnackbar(`Created “${item.name}” template.`);
+    navigate(`/pages/${item.id}/edit?inserter=patterns`);
+  };
+
   const { data: processedData, paginationInfo } = useMemo(
-    () => filterSortAndPaginate(categoryPages, view, fields),
-    [categoryPages, view, fields],
+    () => filterSortAndPaginate(categoryPages, activeView, fields),
+    [categoryPages, activeView, fields],
   );
 
   const handleChangeView = (newView) => {
-    const layoutChanged = newView.type !== view.type;
+    const layoutChanged = newView.type !== activeView.type;
     if (layoutChanged) {
       setPagesViewMode(newView.type);
     }
@@ -974,149 +1390,184 @@ function PagesView() {
     }
     let fields = newView.fields;
     if (layoutChanged) {
-      fields =
-        newView.type === "list"
-          ? [...DATAVIEW_FIELDS_LIST]
-          : [...DATAVIEW_FIELDS_DEFAULT];
+      fields = [...getDefaultFieldsForView(newView.type, activePageType)];
     }
-    setView({ ...newView, showMedia, fields });
+    setView(
+      applyPageTypeToView({ ...newView, showMedia, fields }, activePageType),
+    );
   };
 
-  const hasPreviewPanel = view.type === "list";
+  const hasPreviewPanel = activeView.type === "list";
+  const isCollectionGroupingEnabled =
+    activePageType === "dynamic" &&
+    activeView.groupBy?.field === COLLECTION_GROUP_BY.field;
+
+  const handleCollectionGroupingChange = (enabled) => {
+    setView((prev) => setCollectionGrouping(prev, enabled));
+  };
 
   const handleTabClick = (value) => {
-    setActiveCategory(value);
     setView((prev) => ({
       ...prev,
       page: 1,
       search: "",
-      filters:
-        value === "published" && showDynamicPagesTab
-          ? [...SYSTEM_FILTER_HIDE]
-          : [],
+      filters: [],
     }));
+    navigate(value === "dynamic" ? "/pages/dynamic" : "/pages/static");
   };
 
-  const activeTab = TABS.find((t) => t.value === activeCategory);
+  const activeTab = PAGE_TYPE_TABS.find((t) => t.value === activePageType);
 
-  const stageContent = (
-    <div className="pp-inner pp-dataviews">
-      <DataViews
-        data={processedData}
-        fields={fields}
-        view={view}
-        onChangeView={handleChangeView}
-        defaultLayouts={DEFAULT_LAYOUTS}
-        actions={actions}
-        paginationInfo={paginationInfo}
-        onChangeSelection={(ids) => {
-          if (ids.length === 1) {
-            const clicked = categoryPages.find((p) => p.id === ids[0]);
-            if (clicked) setPreviewPage(clicked);
-          }
-        }}
-        isItemClickable={() => true}
-        onClickItem={(item) => {
-          if (!hasPreviewPanel) {
-            selectPage(item);
-            navigate(`/pages/${item.id}/edit?inserter=patterns`);
-          } else {
-            setPreviewPage(item);
-          }
-        }}
-        getItemId={(item) => item.id}
-        getItemLevel={(item) => item.level ?? 0}
+  const dataViewsContent = (
+    <DataViews
+      data={processedData}
+      fields={fields}
+      view={activeView}
+      onChangeView={handleChangeView}
+      defaultLayouts={DEFAULT_LAYOUTS}
+      actions={activePageType === "pages" ? actions : []}
+      paginationInfo={paginationInfo}
+      onChangeSelection={(ids) => {
+        if (ids.length === 1) {
+          const clicked = categoryPages.find((p) => p.id === ids[0]);
+          if (clicked) setPreviewPage(clicked);
+        }
+      }}
+      isItemClickable={() => true}
+      onClickItem={(item) => {
+        if (!hasPreviewPanel) {
+          editPageOrDesign(item);
+        } else {
+          setPreviewPage(item);
+        }
+      }}
+      getItemId={(item) => item.id}
+      getItemLevel={(item) => item.level ?? 0}
+    >
+      <div
+        className={`pp-toolbar-controls${PAGE_TYPE_TABS.length <= 1 ? " pp-toolbar-controls--solo-category" : ""}`}
       >
-        <div className="pp-tabs-row">
-          <div className="pp-tabs-row__tabs">
-            {TABS.length > 1 ? (
-              <div className="pp-tabs">
-                {TABS.map((tab) => (
-                  <button
-                    key={tab.value}
-                    className={`pp-tab${activeCategory === tab.value ? " on" : ""}`}
-                    onClick={() => handleTabClick(tab.value)}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
+        {viewOptionsOpen && (
+          <div className="pp-toolbar-row-options">
+            <DataViews.Search />
+            <DataViews.LayoutSwitcher />
+            {activePageType === "dynamic" ? (
+              <ToggleControl
+                __nextHasNoMarginBottom
+                className="pp-group-collections-toggle"
+                label="Group by type"
+                checked={isCollectionGroupingEnabled}
+                onChange={handleCollectionGroupingChange}
+              />
             ) : null}
           </div>
-          <div className="pp-tabs-row__actions">
-            <Button
-              variant="tertiary"
-              className="pp-view-options-toggle"
-              onClick={() => setViewOptionsOpen((o) => !o)}
-              aria-expanded={viewOptionsOpen}
-            >
-              View options
-              <span className="pp-view-options-chevron">
-                {viewOptionsOpen ? chevronUp : chevronDown}
-              </span>
-            </Button>
-          </div>
-        </div>
-        <div
-          className={`pp-toolbar-controls${TABS.length <= 1 ? " pp-toolbar-controls--solo-category" : ""}`}
-        >
-          {homepageDisplayMode === READING_DISPLAY_LATEST &&
-            activeCategory === "published" && (
-              <div className="pp-latest-posts-home-tip" role="status">
-                {showDynamicPagesTab ? (
-                  <>
-                    Latest posts on the homepage? Look for{" "}
-                    <strong>Posts page</strong> in this list.
-                  </>
-                ) : (
-                  <>
-                    Latest posts on the homepage? Edit that layout in{" "}
-                    <button
-                      type="button"
-                      className="pp-desc-link"
-                      onClick={() => navigate("/templates")}
-                    >
-                      Templates
-                    </button>
-                    .
-                  </>
-                )}
-              </div>
-            )}
-          {viewOptionsOpen && (
-            <div className="pp-toolbar-row-options">
-              <DataViews.Search />
-              <DataViews.FiltersToggle />
-              <DataViews.LayoutSwitcher />
+        )}
+      </div>
+      <div className="pp-dv-scroll">
+        <DataViews.Layout />
+        <DataViews.Pagination />
+      </div>
+    </DataViews>
+  );
+
+  const stageContent = (
+    <div
+      className={`pp-inner pp-dataviews${activePageType === "dynamic" ? " pp-dataviews--dynamic-pages" : ""}`}
+    >
+      <div className="pp-tabs-row">
+        <div className="pp-tabs-row__tabs">
+          {PAGE_TYPE_TABS.length > 1 ? (
+            <div className="pp-tabs">
+              {PAGE_TYPE_TABS.map((tab) => (
+                <button
+                  key={tab.value}
+                  className={`pp-tab${activePageType === tab.value ? " on" : ""}`}
+                  onClick={() => handleTabClick(tab.value)}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
-          )}
+          ) : null}
         </div>
-        <div className="pp-dv-filters">
-          <DataViews.FiltersToggled />
+      </div>
+      {activePageType === "pages" &&
+        homepageDisplayMode === READING_DISPLAY_LATEST && (
+          <div className="pp-static-homepage-notice" role="status">
+            Homepage is currently set to latest posts. Edit that generated page
+            under{" "}
+            <button
+              type="button"
+              className="pp-desc-link"
+              onClick={() => handleTabClick("dynamic")}
+            >
+              Dynamic
+            </button>
+            .
+          </div>
+        )}
+      <div className="pp-tab-description-row">
+        <div className="pp-tab-description-stack">
+          {activeTab?.description ? (
+            <Text variant="body-md" className="pp-tab-description">
+              {activeTab.description}
+            </Text>
+          ) : null}
         </div>
-        <div className="pp-dv-scroll">
-          <DataViews.Layout />
-          <DataViews.Pagination />
+        <div className="pp-tab-description-actions">
+          {activePageType === "pages" ? (
+            <ToggleControl
+              __nextHasNoMarginBottom
+              className="pp-show-drafts-toggle"
+              label="Show drafts"
+              checked={showDrafts}
+              onChange={setShowDrafts}
+            />
+          ) : null}
+          {activePageType === "dynamic" ? (
+            <ToggleControl
+              __nextHasNoMarginBottom
+              className="pp-system-toggle"
+              label="Show system"
+              checked={showSystemCollections}
+              onChange={setShowSystemCollections}
+            />
+          ) : null}
+          <Button
+            variant="tertiary"
+            className="pp-view-options-toggle"
+            onClick={() => setViewOptionsOpen((o) => !o)}
+            aria-expanded={viewOptionsOpen}
+          >
+            View options
+            <span className="pp-view-options-chevron">
+              {viewOptionsOpen ? chevronUp : chevronDown}
+            </span>
+          </Button>
         </div>
-      </DataViews>
+      </div>
+      {dataViewsContent}
     </div>
   );
 
   const canvasContent = (
     <PreviewCanvas
-      page={previewPage}
-      onEdit={() =>
-        previewPage &&
-        navigate(`/pages/${previewPage.id}/edit?inserter=patterns`)
-      }
+      page={displayedPreviewPage}
+      onEdit={() => {
+        if (!displayedPreviewPage) {
+          return;
+        }
+        editPageOrDesign(displayedPreviewPage);
+      }}
       onPageChange={setPreviewPage}
+      editLabel="Edit"
     />
   );
 
   /** Layout: Foundations → Sidebar (RootLayout) + Content Frame + Preview Frame (list). */
   const pageActions = (
     <>
-      {(activeCategory === "published" || activeCategory === "drafts") && (
+      {activePageType === "pages" && (
         <Button
           variant="primary"
           icon={plus}
@@ -1126,7 +1577,7 @@ function PagesView() {
           Add page
         </Button>
       )}
-      {activeCategory === "published" && showDynamicPagesTab && (
+      {activePageType === "dynamic" && (
         <Button variant="secondary" onClick={() => navigate("/templates")}>
           All Templates
         </Button>
@@ -1170,7 +1621,6 @@ function PagesView() {
             <Page
               className="split-view-stage pages-content-frame"
               title="Pages"
-              subTitle={activeTab?.description || undefined}
               actions={pageActions}
               showSidebarToggle={false}
             >
@@ -1188,7 +1638,6 @@ function PagesView() {
           <Page
             className="pages-panel__grid pages-content-frame"
             title="Pages"
-            subTitle={activeTab?.description || undefined}
             actions={pageActions}
             showSidebarToggle={false}
           >
@@ -1209,6 +1658,19 @@ function PagesView() {
             initialFrontPageId={frontPageId}
             initialPostsPageId={postsPageId}
             readingSelectPages={readingSelectPages}
+          />
+        </div>
+      )}
+      {inactiveTemplateNoticePage && (
+        <div
+          className="modal-overlay"
+          role="presentation"
+          onClick={() => setInactiveTemplateNoticePage(null)}
+        >
+          <InactiveCollectionTemplateModal
+            item={inactiveTemplateNoticePage}
+            onClose={() => setInactiveTemplateNoticePage(null)}
+            onCreate={handleCreateInactiveTemplate}
           />
         </div>
       )}

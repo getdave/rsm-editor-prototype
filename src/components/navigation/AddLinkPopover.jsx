@@ -3,9 +3,8 @@ import {
   Button,
   TextControl,
   Notice,
-  __experimentalVStack as VStack,
-  __experimentalHStack as HStack,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import {
   arrowLeft,
   customLink,
@@ -68,11 +67,12 @@ const LINK_TYPE_ICONS = {
 /**
  * Form content for adding a custom URL menu item (parent renders Popover shell).
  *
+ * @param {boolean} showBack
  * @param {() => void} onBack
  * @param {() => void} onCancel
  * @param {{ label: string, url: string }} onSave
  */
-function AddLinkPopover({ onBack, onCancel, onSave }) {
+function AddLinkPopover({ showBack = true, onBack, onCancel, onSave }) {
   const [urlInput, setUrlInput] = useState('');
   const [label, setLabel] = useState('');
   const [urlError, setUrlError] = useState('');
@@ -178,20 +178,22 @@ function AddLinkPopover({ onBack, onCancel, onSave }) {
 
   return (
     <div className="nav-inserter-popover nav-inserter-popover--add-link">
-      <div className="nav-popover-header">
-        <button
-          type="button"
-          className="nav-popover-back"
-          onClick={onBack}
-        >
-          <span className="nav-popover-back__icon" aria-hidden="true">
-            {arrowLeft}
-          </span>
-          Back
-        </button>
-      </div>
+      {showBack ? (
+        <div className="nav-popover-header">
+          <button
+            type="button"
+            className="nav-popover-back"
+            onClick={onBack}
+          >
+            <span className="nav-popover-back__icon" aria-hidden="true">
+              {arrowLeft}
+            </span>
+            Back
+          </button>
+        </div>
+      ) : null}
 
-      <VStack spacing={4} className="nav-popover-body">
+      <Stack direction="column" gap="md" className="nav-popover-body">
         <div
           className={
             urlError ? 'nav-add-link-url-field nav-add-link-url-field--error' : 'nav-add-link-url-field'
@@ -240,16 +242,16 @@ function AddLinkPopover({ onBack, onCancel, onSave }) {
           help={labelError || 'Label shown in the menu'}
           __nextHasNoMarginBottom
         />
-      </VStack>
+      </Stack>
 
-      <HStack justify="flex-end" className="nav-popover-footer">
+      <Stack direction="row" justify="flex-end" className="nav-popover-footer">
         <Button variant="tertiary" onClick={onCancel}>
           Cancel
         </Button>
         <Button variant="primary" onClick={validateAndSubmit} disabled={!canSave}>
           Add link
         </Button>
-      </HStack>
+      </Stack>
     </div>
   );
 }

@@ -3,45 +3,46 @@ import { Button, Dropdown, MenuGroup, MenuItem, Tooltip } from '@wordpress/compo
 import { Stack } from '@wordpress/ui';
 import {
   chevronDown,
+  home,
   layout,
   page as pageIcon,
   postList,
+  styles,
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 
 function docTypeIcon(page) {
+  if (page?.isPageDesign) return styles;
+  if (page?.isFrontPage) return home;
   if (page?.isPostsPage) return postList;
   return pageIcon;
 }
 
 /**
  * Props:
- * - `documentLabelOverride`: optional label shown instead of the current page title
- *   (e.g. when a global template part is selected with peer spotlight). When set,
- *   inline rename is disabled.
- * - `isTemplate`: switches the header into template-editing presentation — a
- *   "Template" badge before the name field, the `layout` icon, a fixed
- *   "Template title" label, and no live/draft status dot. Inline rename is
- *   disabled. When both props are set, `documentLabelOverride` wins for the
- *   name text (more specific spotlight context).
+ * - `document`: optional document target for contextual page-design editing.
+ * - `canRename`: disables inline rename for read-only contextual documents.
+ * - `documentLabelOverride`: optional label shown instead of the current title
+ *   when a global template part is selected with peer spotlight.
+ * - `isTemplate`: switches the header into template-editing presentation.
  */
 export default function DocumentActions({
+  document: documentProp = null,
+  canRename = true,
   documentLabelOverride = null,
   isTemplate = false,
 }) {
   const { currentPage, setCurrentPageName } = useAppState();
+  const activeDocument = documentProp || currentPage;
+  const isGlobalOverride = documentLabelOverride != null;
+  const renameEnabled = canRename && !activeDocument?.isPageDesign && !isGlobalOverride && !isTemplate;
+  const isReadonly = !renameEnabled;
   const [editing, setEditing] = useState(false);
+  const isEditing = editing && !isReadonly;
   const ref = useRef(null);
 
-  const isGlobalOverride = documentLabelOverride != null;
-  const isReadonly = isGlobalOverride || isTemplate;
-
   useEffect(() => {
-    if (isReadonly) setEditing(false);
-  }, [isReadonly]);
-
-  useEffect(() => {
-    if (editing && ref.current && !isReadonly) {
+    if (isEditing && ref.current) {
       ref.current.focus();
       const sel = window.getSelection();
       const range = document.createRange();
@@ -49,33 +50,42 @@ export default function DocumentActions({
       sel.removeAllRanges();
       sel.addRange(range);
     }
-  }, [editing, isReadonly]);
+  }, [isEditing]);
+
+  const documentName = activeDocument?.name ?? 'Untitled';
+  const displayName = isGlobalOverride
+    ? documentLabelOverride
+    : isTemplate
+      ? documentLabelOverride ?? 'Template title'
+      : documentName;
 
   const commit = () => {
     const next = ref.current?.innerText.trim();
-    if (next && next !== currentPage.name) {
+    if (renameEnabled && next && next !== documentName) {
       setCurrentPageName(next);
     } else if (ref.current) {
-      ref.current.innerText = currentPage.name;
+      ref.current.innerText = documentName;
     }
     setEditing(false);
   };
 
   const cancel = () => {
-    if (ref.current) ref.current.innerText = currentPage.name;
+    if (ref.current) ref.current.innerText = documentName;
     setEditing(false);
   };
 
-  const isLive = currentPage.isLive;
-  const statusLabel = isLive ? 'Page is live' : 'Page is a draft';
+  const isLive = activeDocument?.isLive;
+  const statusLabel = activeDocument?.isPageDesign
+    ? 'Design is active'
+    : isLive ? 'Page is live' : 'Page is a draft';
 
   const nameTooltipText = isGlobalOverride
     ? 'Global template part'
     : isTemplate
       ? 'Template title'
-      : 'Rename page';
+      : renameEnabled ? 'Rename page' : documentName;
 
-  const docIcon = isTemplate ? layout : docTypeIcon(currentPage);
+  const docIcon = isTemplate ? layout : docTypeIcon(activeDocument);
 
   return (
     <Stack
@@ -93,8 +103,8 @@ export default function DocumentActions({
       )}
       <Tooltip text={nameTooltipText} placement="bottom">
         <span
-          className={`ct-btn doc-actions-name${editing ? ' is-editing' : ''}${isReadonly ? ' doc-actions-name--readonly' : ''}`}
-          onClick={() => !isReadonly && !editing && setEditing(true)}
+          className={`ct-btn doc-actions-name${isEditing ? ' is-editing' : ''}${isReadonly ? ' doc-actions-name--readonly' : ''}`}
+          onClick={() => renameEnabled && !editing && setEditing(true)}
         >
           <span
             className="preview-bar-doc-icon"
@@ -105,19 +115,19 @@ export default function DocumentActions({
           </span>
           {isReadonly ? (
             <span className="doc-actions-name-text" aria-live="polite">
-              {documentLabelOverride ?? 'Template title'}
+              {displayName}
             </span>
           ) : (
             <span
               ref={ref}
               className="doc-actions-name-text"
-              contentEditable={editing}
+              contentEditable={isEditing}
               suppressContentEditableWarning
               role="textbox"
               tabIndex={0}
-              onBlur={editing ? commit : undefined}
+              onBlur={isEditing ? commit : undefined}
               onKeyDown={(e) => {
-                if (!editing) return;
+                if (!isEditing) return;
                 if (e.key === 'Enter') {
                   e.preventDefault();
                   commit();
@@ -127,7 +137,7 @@ export default function DocumentActions({
                 }
               }}
             >
-              {currentPage.name}
+              {documentName}
             </span>
           )}
         </span>

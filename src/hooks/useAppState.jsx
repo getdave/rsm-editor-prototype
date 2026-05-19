@@ -1,5 +1,10 @@
 import { createContext, useCallback, useContext, useState } from 'react';
-import { pages as pagesData, navigationMenus as navigationMenusInitial } from '../data/mockData';
+import {
+  initialReadingSettings,
+  navigationMenus as navigationMenusInitial,
+  pageDesigns as pageDesignsData,
+  pages as pagesData,
+} from '../data/mockData';
 import { MAIN_MENU_ID } from '../constants/navigation';
 import {
   appendTopLevelPageIfMissing,
@@ -22,8 +27,24 @@ export function AppStateProvider({ children }) {
 
   const [navigationMenus, setNavigationMenus] = useState(navigationMenusInitial);
 
+  // Contextual page-design targets (template-backed surfaces surfaced by intent).
+  // These are static mock records, so read them directly to avoid stale HMR state.
+  const pageDesigns = pageDesignsData;
+
   // Current page
   const [currentPage, setCurrentPage] = useState(pages[0]); // Home page
+
+  // Homepage configuration. Kept global so Home, Pages, and Content all resolve
+  // the same front-page/posts-page state.
+  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
+    initialReadingSettings.homepageDisplayMode,
+  );
+  const [frontPageId, setFrontPageId] = useState(
+    initialReadingSettings.frontPageId,
+  );
+  const [postsPageId, setPostsPageId] = useState(
+    initialReadingSettings.postsPageId,
+  );
 
   // Where the user came from when entering the edit canvas — drives the
   // split-Exit button label/destination. null when not inside the editor.
@@ -78,17 +99,6 @@ export function AppStateProvider({ children }) {
   
   // Pages view mode (list/grid)
   const [pagesViewMode, setPagesViewMode] = useState('grid');
-
-  // Reading / homepage (Configure homepage in Pages — drives Posts nav visibility)
-  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
-    READING_DISPLAY_STATIC,
-  );
-  const [frontPageId, setFrontPageId] = useState(
-    () => pagesData.find((p) => p.isFrontPage)?.id ?? 'home',
-  );
-  const [postsPageId, setPostsPageId] = useState(
-    () => pagesData.find((p) => p.isPostsPage)?.id ?? 'blog',
-  );
 
   // Edit canvas: List View panel and block inspector sidebar (WordPress-style)
   const [listViewOpen, setListViewOpen] = useState(false);
@@ -245,6 +255,33 @@ export function AppStateProvider({ children }) {
     );
   };
 
+  const activateCollectionTemplate = (pageId) => {
+    const sourcePage = pages.find((p) => p.id === pageId);
+    const activatedPage = sourcePage ? { ...sourcePage } : null;
+    if (activatedPage) {
+      delete activatedPage.collectionState;
+      activatedPage.authorDisplay = 'John Doe';
+    }
+
+    setPages((prev) =>
+      prev.map((p) => {
+        if (p.id !== pageId) return p;
+        const activePage = { ...p };
+        delete activePage.collectionState;
+        activePage.authorDisplay = 'John Doe';
+        return activePage;
+      }),
+    );
+    setCurrentPage((cur) => {
+      if (!cur || cur.id !== pageId) return cur;
+      const activePage = { ...cur };
+      delete activePage.collectionState;
+      activePage.authorDisplay = 'John Doe';
+      return activePage;
+    });
+    return activatedPage;
+  };
+
   // Wrap setCurrentPage so picking a page also lands it in the recents
   // list. Stable insertion order with FIFO eviction:
   //   - First time a page is opened, it joins at position 1 (top).
@@ -276,12 +313,24 @@ export function AppStateProvider({ children }) {
     setPageStatus,
     deletePage,
     syncReadingPageMarkers,
+    activateCollectionTemplate,
     addPageToMainMenu,
     removePageFromMainMenu,
 
     // Navigation menus (shared with Navigation screen + main-menu actions from Pages)
     navigationMenus,
     setNavigationMenus,
+
+    // Contextual page-design targets
+    pageDesigns,
+
+    // Homepage configuration
+    homepageDisplayMode,
+    setHomepageDisplayMode,
+    frontPageId,
+    setFrontPageId,
+    postsPageId,
+    setPostsPageId,
 
     // Current page
     currentPage,
@@ -347,14 +396,6 @@ export function AppStateProvider({ children }) {
     pagesViewMode,
     setPagesViewMode,
 
-    // Reading / homepage
-    homepageDisplayMode,
-    setHomepageDisplayMode,
-    frontPageId,
-    setFrontPageId,
-    postsPageId,
-    setPostsPageId,
-
     // Edit canvas panels
     listViewOpen,
     setListViewOpen,
@@ -371,6 +412,7 @@ export function AppStateProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- app state hook intentionally lives beside its provider in this prototype.
 export function useAppState() {
   const context = useContext(AppStateContext);
   if (!context) {

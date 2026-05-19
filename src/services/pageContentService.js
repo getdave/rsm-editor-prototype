@@ -20,6 +20,15 @@ export const getPageContent = (page) => {
     return getDefaultContent();
   }
 
+  if (page.isCollection) {
+    if (page.collectionKind === 'posts') {
+      return getBlogCollectionContent(page);
+    }
+    if (page.collectionKind === 'shop') {
+      return getShopCatalogContent(page);
+    }
+  }
+
   if (page.isPostsPage) {
     return getBlogPageAsPostsIndexContent(page);
   }
@@ -40,16 +49,22 @@ export const getPageContent = (page) => {
     // WooCommerce Templates (Plugin-provided)
     'cart': getCartContent(),
     'checkout': getCheckoutContent(),
+    'shop': getShopCatalogContent(page),
     
     // Archive Templates (Template Hierarchy)
     'product-list': getProductListContent(),
-    /** Blog index at `/` when homepage displays latest posts (home.php hierarchy) */
+    'product-catalog-template': getProductCatalogTemplateContent(page),
+    /** Posts index at `/` when homepage displays latest posts (home.php hierarchy) */
     'blog-home-root': getBlogListContent(),
     'blog-list': getBlogListContent(),
+    'posts-index-template': getPostsIndexTemplateContent(page),
     
     // Single Templates (Template Hierarchy)
     'product-single': getProductSingleContent(),
     'blog-single': getBlogSingleContent(),
+    'event-list': getEventListContent(page),
+    'event-single': getEventSingleContent(page),
+    'search-results': getSearchResultsContent(),
   };
 
   return contentMap[page.id] || getDefaultContent(page);
@@ -307,10 +322,62 @@ function getProductListContent() {
   };
 }
 
+function getShopCatalogContent(page = null) {
+  return {
+    layout: 'archive',
+    title: page?.name ?? 'Store',
+    subtitle: 'Browse photography services and products',
+    wordpressContext: {
+      type: 'template',
+      templateFile: 'archive-product.html',
+      plugin: 'WooCommerce',
+      usesAssignedUrl: true
+    },
+    sections: [
+      {
+        type: 'archive-header',
+        title: page?.name ?? 'Store',
+        subtitle: 'Browse photography services and products'
+      },
+      {
+        type: 'product-grid',
+        items: [
+          { name: 'Portrait Session', price: 250, excerpt: '2-hour portrait photography session' },
+          { name: 'Wedding Photography', price: 2500, excerpt: 'Full day wedding coverage' },
+          { name: 'Event Photography', price: 500, excerpt: 'Corporate and private events' },
+          { name: 'Headshots', price: 150, excerpt: 'Professional business headshots' }
+        ]
+      }
+    ]
+  };
+}
+
+function getProductCatalogTemplateContent(page = null) {
+  const title = page?.name ?? 'Product listing';
+  const catalog = getShopCatalogContent({ name: title });
+  return {
+    ...catalog,
+    title,
+    wordpressContext: {
+      ...catalog.wordpressContext,
+      type: 'template',
+      usesAssignedUrl: false
+    },
+    sections: catalog.sections.map((section, i) =>
+      i === 0 && section.type === 'archive-header'
+        ? {
+            ...section,
+            title,
+          }
+        : section
+    ),
+  };
+}
+
 function getBlogListContent() {
   return {
     layout: 'archive',
-    title: 'Blog',
+    title: 'Latest posts',
     subtitle: 'Photography tips, stories, and updates',
     wordpressContext: {
       type: 'template',
@@ -319,7 +386,7 @@ function getBlogListContent() {
     sections: [
       {
         type: 'archive-header',
-        title: 'Blog',
+        title: 'Latest posts',
         subtitle: 'Photography tips, stories, and updates'
       },
       {
@@ -341,6 +408,154 @@ function getBlogListContent() {
             excerpt: 'You don\'t need expensive gear to take great photos. These simple techniques will transform your mobile photography...'
           }
         ]
+      }
+    ]
+  };
+}
+
+function getBlogCollectionContent(page = null) {
+  const archive = getBlogListContent();
+  return {
+    ...archive,
+    title: page?.name ?? archive.title,
+    wordpressContext: {
+      type: 'template',
+      templateFile: 'home.html',
+      usesAssignedUrl: true
+    },
+    sections: archive.sections.map((section, i) =>
+      i === 0 && section.type === 'archive-header'
+        ? {
+            ...section,
+            title: page?.name ?? section.title,
+          }
+        : section
+    ),
+  };
+}
+
+function getPostsIndexTemplateContent(page = null) {
+  const archive = getBlogListContent();
+  const title = page?.name ?? 'Posts listing';
+  return {
+    ...archive,
+    title,
+    wordpressContext: {
+      type: 'template',
+      templateFile: 'home.html',
+      usesAssignedUrl: false
+    },
+    sections: archive.sections.map((section, i) =>
+      i === 0 && section.type === 'archive-header'
+        ? {
+            ...section,
+            title,
+          }
+        : section
+    ),
+  };
+}
+
+function getSearchResultsContent() {
+  return {
+    layout: 'archive',
+    title: 'Search Results',
+    subtitle: 'Results matching a visitor search',
+    wordpressContext: {
+      type: 'template',
+      templateFile: 'search.html'
+    },
+    sections: [
+      {
+        type: 'archive-header',
+        title: 'Search Results',
+        subtitle: 'Results matching a visitor search'
+      },
+      {
+        type: 'post-list',
+        items: [
+          {
+            title: 'Finding the Perfect Light for Portraits',
+            date: 'April 15, 2026',
+            excerpt: 'A matching post excerpt appears here as part of the generated search results.'
+          },
+          {
+            title: 'Portrait Session',
+            date: 'Product',
+            excerpt: 'Matching products can appear alongside other searchable site content.'
+          },
+          {
+            title: 'Gallery',
+            date: 'Page',
+            excerpt: 'Pages that match the visitor search can also be listed.'
+          }
+        ]
+      }
+    ]
+  };
+}
+
+function getEventListContent(page = null) {
+  return {
+    layout: 'archive',
+    title: 'Events',
+    subtitle: 'Upcoming workshops, talks, and photography sessions',
+    wordpressContext: {
+      type: 'template',
+      templateFile: 'archive-event.html',
+      ...(page?.collectionState === 'inactive'
+        ? { isInactiveCollection: true }
+        : {})
+    },
+    sections: [
+      {
+        type: 'archive-header',
+        title: 'Events',
+        subtitle: 'Upcoming workshops, talks, and photography sessions'
+      },
+      {
+        type: 'post-list',
+        items: [
+          {
+            title: 'Portrait Lighting Workshop',
+            date: 'June 12, 2026',
+            excerpt: 'A practical evening workshop on finding and shaping natural light for portraits.'
+          },
+          {
+            title: 'Riverside Photo Walk',
+            date: 'June 28, 2026',
+            excerpt: 'A guided walk focused on composition, observation, and building a stronger visual story.'
+          },
+          {
+            title: 'Editing Workflow Q&A',
+            date: 'July 9, 2026',
+            excerpt: 'A small-group session covering selection, editing rhythm, and delivery workflows.'
+          }
+        ]
+      }
+    ]
+  };
+}
+
+function getEventSingleContent(page = null) {
+  return {
+    layout: 'single',
+    title: 'Portrait Lighting Workshop',
+    subtitle: null,
+    wordpressContext: {
+      type: 'template',
+      templateFile: 'single-event.html',
+      ...(page?.collectionState === 'inactive'
+        ? { isInactiveCollection: true }
+        : {})
+    },
+    sections: [
+      {
+        type: 'post-content',
+        title: 'Portrait Lighting Workshop',
+        date: 'June 12, 2026',
+        author: 'Events Team',
+        content: 'Join a practical workshop on finding natural light, shaping it with simple tools, and building confidence while photographing portraits.'
       }
     ]
   };
@@ -460,22 +675,37 @@ export const getEditModeContent = (page) => {
       isTemplate: true,
       templateName: page.name,
       templateDescription: getTemplateDescription(content.layout),
-      title: getPlaceholderTitle(page.id, content.layout),
-      subtitle: getPlaceholderSubtitle(page.id, content.layout),
-      sections: replaceWithPlaceholders(content.sections, content.layout, page.id)
+      title: getPlaceholderTitle(page, content.layout),
+      subtitle: getPlaceholderSubtitle(),
+      sections: replaceWithPlaceholders(content.sections)
     };
   }
   
   return content;
 };
 
-function getPlaceholderTitle(pageId, layout) {
+function getPlaceholderTitle(pageOrId, layout) {
+  const pageId = typeof pageOrId === 'string' ? pageOrId : pageOrId?.id;
+  const pageName = typeof pageOrId === 'string' ? null : pageOrId?.name;
+
   // Specific titles for known page types
   if (pageId === 'product-list') return 'Product Category Title';
-  if (pageId === 'blog-home-root') return 'Blog Homepage';
-  if (pageId === 'blog-list') return 'Blog Archive Title';
+  if (pageId === 'shop') return 'Store page title';
+  if (pageId === 'product-catalog-template') return 'Product listing title';
+  if (pageId === 'blog') return 'Blog page title';
+  if (pageId === 'blog-home-root') return 'Latest Posts Homepage';
+  if (pageId === 'blog-list') return 'Posts Page Title';
+  if (pageId === 'posts-index-template') {
+    return pageName === 'Latest posts'
+      ? 'Latest posts title'
+      : 'Posts listing title';
+  }
+  if (pageId === 'template-archive') return 'Archive Title';
   if (pageId === 'product-single') return 'Product Title';
   if (pageId === 'blog-single') return 'Post Title';
+  if (pageId === 'event-list') return 'Event listing title';
+  if (pageId === 'event-single') return 'Event Title';
+  if (pageId === 'search-results') return 'Search results title';
   if (pageId === '404') return 'Error Page Title';
   if (pageId === 'cart') return 'Shopping Cart';
   if (pageId === 'checkout') return 'Checkout';
@@ -490,11 +720,11 @@ function getPlaceholderTitle(pageId, layout) {
   return titles[layout] || 'Page Title';
 }
 
-function getPlaceholderSubtitle(pageId, layout) {
+function getPlaceholderSubtitle() {
   return null; // Most templates don't need subtitle placeholders
 }
 
-function replaceWithPlaceholders(sections, layout, pageId) {
+function replaceWithPlaceholders(sections) {
   return sections.map(section => {
     switch (section.type) {
       case 'archive-header':
@@ -512,7 +742,7 @@ function replaceWithPlaceholders(sections, layout, pageId) {
       case 'cart':
         return {
           ...section,
-          items: section.items.map((_, index) => ({
+          items: section.items.map(() => ({
             name: 'Product Name',
             price: '0.00',
             quantity: 1
@@ -529,7 +759,7 @@ function replaceWithPlaceholders(sections, layout, pageId) {
       case 'product-grid':
         return {
           ...section,
-          items: section.items.map((_, index) => ({
+          items: section.items.map(() => ({
             name: 'Product Title',
             price: '0.00',
             excerpt: 'Product description text goes here...'
@@ -539,7 +769,7 @@ function replaceWithPlaceholders(sections, layout, pageId) {
       case 'post-list':
         return {
           ...section,
-          items: section.items.map((_, index) => ({
+          items: section.items.map(() => ({
             title: 'Post Title',
             date: 'Post Date',
             excerpt: 'Post excerpt text goes here. This is a preview of the post content...'
@@ -565,7 +795,7 @@ function replaceWithPlaceholders(sections, layout, pageId) {
           title: 'Post Title',
           date: 'Post Date',
           author: 'Author Name',
-          content: 'Post content goes here. This is where the full blog post text would be displayed with multiple paragraphs and formatting.'
+          content: 'Post content goes here. This is where the full post text would be displayed with multiple paragraphs and formatting.'
         };
       
       default:

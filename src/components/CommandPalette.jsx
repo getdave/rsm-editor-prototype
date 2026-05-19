@@ -45,6 +45,7 @@ function CommandPaletteContent() {
     const navigateCommands = [
       { id: 'home', label: 'Go to Home', group: 'Navigate', perform: () => navigate('/') },
       { id: 'pages', label: 'Go to Pages', group: 'Navigate', perform: () => navigate('/pages') },
+      { id: 'content', label: 'Go to Content', group: 'Navigate', perform: () => navigate('/content') },
       {
         id: 'posts',
         label: 'Go to Posts',
