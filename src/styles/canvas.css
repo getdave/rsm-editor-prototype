@@ -115,24 +115,24 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #00a32a;
+  background: var(--wp-green);
   margin: 0 5px 0 8px;
   flex-shrink: 0;
 }
 
 .url-status {
-  color: #00a32a;
+  color: var(--wp-green);
   font-size: 10px;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .url-draft-dot {
-  background: #888;
+  background: var(--wp-gray-200);
 }
 
 .url-draft {
-  color: #888;
+  color: var(--wp-gray-200);
 }
 
 /* Preview canvas wrapper — stacks the toolbar on top of the scrollable
@@ -173,7 +173,7 @@
   display: inline-flex;
   width: 24px;
   height: 24px;
-  color: #1e1e1e;
+  color: var(--wp-gray-900);
 }
 
 .preview-bar-doc-name {
@@ -312,8 +312,8 @@
 /* ── GUTENBERG CANVAS TOOLBAR (full width; side panels sit below) ── */
 .canvas-toolbar {
   height: 64px;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--wp-bg-card);
+  border-bottom: 1px solid var(--wp-border-light);
   display: flex;
   align-items: center;
   padding: 0 12px;
@@ -332,7 +332,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #1e1e1e;
+  color: var(--wp-gray-900);
   font-size: 13px;
   padding: 0 8px;
   gap: 5px;
@@ -340,13 +340,13 @@
 }
 
 .ct-btn:hover {
-  background: #f0f0f0;
+  background: var(--wp-light-gray-50);
 }
 
 .ct-sep {
   width: 1px;
   height: 20px;
-  background: #e0e0e0;
+  background: var(--wp-border-light);
   margin: 0 4px;
   flex-shrink: 0;
 }
@@ -400,7 +400,7 @@
   height: 36px;
   border: none;
   background: transparent;
-  color: #1e1e1e;
+  color: var(--wp-gray-900);
   border-radius: 4px;
   cursor: pointer;
   display: flex;
@@ -410,7 +410,7 @@
 }
 
 .ct-icon-btn:hover {
-  background: #f0f0f0;
+  background: var(--wp-light-gray-50);
 }
 
 
@@ -466,7 +466,7 @@
 .edit-card {
   width: 100%;
   max-width: 100%;
-  background: #fff;
+  background: var(--wp-bg-card);
   /* border-radius / box-shadow: match `.preview-canvas-area .site-card` via grouped rule */
   overflow: visible;
   box-sizing: border-box;
@@ -624,7 +624,7 @@
   width: 36px;
   height: 36px;
   color: var(--edit-global-accent);
-  background: #fff;
+  background: var(--wp-bg-card);
   border: 2px solid var(--edit-global-accent);
   opacity: 0;
   pointer-events: none;
@@ -671,8 +671,8 @@
   gap: 2px;
   min-height: 40px;
   padding: 4px 6px;
-  background: #fff;
-  border: 1px solid #1e1e1e;
+  background: var(--wp-bg-card);
+  border: 1px solid var(--wp-gray-900);
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   z-index: 30;
@@ -729,16 +729,16 @@
 .sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button {
   background: var(--edit-global-accent);
   border-color: transparent;
-  color: #fff;
+  color: var(--wp-bg-card);
 }
 
 .sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button:hover:not(:disabled) {
-  background: #6120c1;
-  color: #fff;
+  background: var(--wp-block-synced-color-hover);
+  color: var(--wp-bg-card);
 }
 
 .sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button:focus:not(:disabled) {
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--edit-global-accent);
+  box-shadow: 0 0 0 2px var(--wp-bg-card), 0 0 0 4px var(--edit-global-accent);
 }
 
 .e-sec.sel .sec-bar.block-toolbar,
@@ -758,7 +758,7 @@
 .bt-pill-label {
   font-size: 12px;
   font-weight: 500;
-  color: #1e1e1e;
+  color: var(--wp-gray-900);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -768,14 +768,14 @@
   min-width: 36px;
   height: 32px;
   padding: 0;
-  color: #1e1e1e;
+  color: var(--wp-gray-900);
 }
 
 .bt-sep {
   width: 1px;
   align-self: stretch;
   margin: -4px 4px;
-  background: #1e1e1e;
+  background: var(--wp-gray-900);
   flex-shrink: 0;
 }
 
@@ -783,12 +783,12 @@
   min-width: 36px;
   height: 32px;
   padding: 0;
-  color: #1e1e1e;
+  color: var(--wp-gray-900);
   box-shadow: none;
 }
 
 .bt-tb-btn.components-button:hover {
-  background: #f0f0f0;
+  background: var(--wp-light-gray-50);
 }
 
 .bt-tb-edit.components-button {
@@ -799,13 +799,13 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
-  color: #1e1e1e;
+  color: var(--wp-gray-900);
   box-shadow: none;
   text-decoration: none;
 }
 
 .bt-tb-edit.components-button:hover {
-  background: #f0f0f0;
+  background: var(--wp-light-gray-50);
 }
 
 /* Stacked move up / down — no border, mirrors WP block editor */
@@ -825,7 +825,7 @@
   margin: 0;
   padding: 0;
   border-radius: 2px;
-  color: #1e1e1e;
+  color: var(--wp-gray-900);
 }
 
 .sec-group {
