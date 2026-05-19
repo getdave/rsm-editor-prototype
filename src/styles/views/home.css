@@ -263,10 +263,19 @@
 
 .cs-area {
   flex-shrink: 0;
-  background: #1e1e1e;
+  background: #242424;
   padding: 16px 18px 18px;
-  border-top: 1px solid #2a2a2a;
-  transition: padding .15s ease;
+  border: 1px solid #3c3c3c;
+  border-radius: 8px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 10px 24px rgba(0, 0, 0, 0.22);
+  margin-top: 12px;
+  transition:
+    background-color .15s ease,
+    border-color .15s ease,
+    box-shadow .15s ease,
+    padding .15s ease;
 }
 
 .cs-head {
@@ -524,6 +533,46 @@
   color: #3858e9;
   font-size: 13px;
   font-weight: 500;
+}
+
+.cs-learn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 12px;
+  color: #c3c4c7;
+  font-size: 13px;
+  line-height: 20px;
+  text-decoration: none;
+}
+
+.cs-learn-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.cs-learn-link:focus-visible {
+  outline: 2px solid #f6f7f7;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.cs-learn-link-icon,
+.cs-learn-link-external {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: currentColor;
+}
+
+.cs-learn-link-icon svg,
+.cs-learn-link-external svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 .cs-area.collapsed .cs-banners {
