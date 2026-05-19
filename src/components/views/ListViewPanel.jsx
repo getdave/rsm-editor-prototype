@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, TabPanel } from '@wordpress/components';
-import { Stack, Text } from '@wordpress/ui';
+import { Badge, Stack, Text } from '@wordpress/ui';
 import { chevronRight, closeSmall } from '@wordpress/icons';
 import {
   FOOTER_META,
@@ -56,7 +56,7 @@ export default function ListViewPanel({
           </span>
           <Text variant="body-md" className="lv-label">{meta.label}</Text>
           {meta.isPatternSection ? (
-            <span className="lv-row-badge">section</span>
+            <Badge className="lv-row-badge">section</Badge>
           ) : null}
         </span>
       </button>
@@ -89,7 +89,6 @@ export default function ListViewPanel({
                           e.stopPropagation();
                           setTemplateExpanded((v) => !v);
                         }}
-                        iconSize={20}
                       />
                       <button
                         type="button"

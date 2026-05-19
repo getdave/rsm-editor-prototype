@@ -1078,22 +1078,18 @@
   white-space: nowrap;
 }
 
+/* Position the WPDS Badge at the row's right edge; Badge owns its own
+ * sizing / typography. State overrides (selected, hover) re-color it to
+ * keep contrast on the dark selected row background. */
 .lv-row-badge {
   flex-shrink: 0;
   margin-left: auto;
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 1.2;
-  padding: 2px 7px;
-  border-radius: var(--wpds-border-radius-sm);
-  background: var(--wpds-color-bg-surface-neutral-weak);
-  color: var(--wpds-color-fg-content-neutral-weak);
-  letter-spacing: 0.02em;
 }
 
 .lv-row.sel .lv-row-badge {
   background: rgba(255, 255, 255, 0.22);
   color: rgba(255, 255, 255, 0.95);
+  border-color: transparent;
 }
 
 .lv-row:not(.sel):hover .lv-row-badge {
