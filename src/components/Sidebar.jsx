@@ -2,7 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppState, READING_DISPLAY_LATEST } from '../hooks/useAppState';
 import { Tooltip } from '@wordpress/components';
-import { Stack, Text } from '@wordpress/ui';
+import { Button, Stack, Text } from '@wordpress/ui';
 import {
   home,
   page as pageIcon,
@@ -16,7 +16,6 @@ import {
   chevronUp,
   chevronDown,
   wordpress,
-  arrowLeft,
   color,
   typography,
   background,
@@ -205,10 +204,16 @@ function Sidebar() {
     if (item.kind === 'back') {
       return (
         <Tooltip text={item.tip} placement="right">
-          <div className="ni" onClick={() => navigate(item.path)}>
+          <Button
+            tone="neutral"
+            variant="minimal"
+            size="compact"
+            className="ni"
+            onClick={() => navigate(item.path)}
+          >
             <span className="ni-ico">{item.icon}</span>
-            <Text variant="body-md" className="ni-label">{item.label}</Text>
-          </div>
+            <span className="ni-label">{item.label}</span>
+          </Button>
         </Tooltip>
       );
     }
@@ -222,27 +227,38 @@ function Sidebar() {
     }
     if (item.kind === 'item') {
       // Dummy link variant: when item.href is set, render as <a> with no
-      // navigation. Reuses existing .ni-child anchor reset.
+      // navigation.
       if (item.href) {
         return (
           <Tooltip text={item.tip} placement="right">
-            <a href={item.href} className="ni ni-child">
+            <Button
+              tone="neutral"
+              variant="minimal"
+              size="compact"
+              className="ni ni-child"
+              nativeButton={false}
+              render={<a href={item.href} />}
+            >
               <span className="ni-ico">{item.icon}</span>
-              <Text variant="body-md" className="ni-label">{item.label}</Text>
-            </a>
+              <span className="ni-label">{item.label}</span>
+            </Button>
           </Tooltip>
         );
       }
       return (
         <Tooltip text={item.tip} placement="right">
-          <div
-            className={`ni ${item.chevron ? 'ni-with-chevron' : ''} ${isItemActive(item.path) ? 'on' : ''}`}
+          <Button
+            tone="neutral"
+            variant="minimal"
+            size="compact"
+            aria-pressed={isItemActive(item.path)}
+            className={`ni ${item.chevron ? 'ni-with-chevron' : ''}`}
             onClick={() => navigate(item.path)}
           >
             <span className="ni-ico">{item.icon}</span>
-            <Text variant="body-md" className="ni-label">{item.label}</Text>
+            <span className="ni-label">{item.label}</span>
             {item.chevron && <span className="ni-chevron">{chevronRight}</span>}
-          </div>
+          </Button>
         </Tooltip>
       );
     }
@@ -258,14 +274,19 @@ function Sidebar() {
           }
         : undefined;
       return (
-        <a
-          href={href}
-          className={`ni ni-child ${isOn ? 'on' : ''}`}
+        <Button
+          tone="neutral"
+          variant="minimal"
+          size="compact"
+          aria-pressed={isOn}
+          className="ni ni-child"
+          nativeButton={false}
+          render={<a href={href} />}
           onClick={handleClick}
         >
           <span className="ni-ico" aria-hidden="true">{connector}</span>
-          <Text variant="body-md" className="ni-label">{item.label}</Text>
-        </a>
+          <span className="ni-label">{item.label}</span>
+        </Button>
       );
     }
     if (item.kind === 'group') {
@@ -276,18 +297,20 @@ function Sidebar() {
         <Stack direction="column" className="ni-group">
           {parent && (
             <Tooltip text={parent.tip} placement="right">
-              <div
+              <Button
+                tone="neutral"
+                variant="minimal"
+                size="compact"
+                aria-expanded={!isCollapsed}
                 className="ni ni-with-chevron ni-group-parent"
                 onClick={() => toggleGroup(item.id)}
-                role="button"
-                aria-expanded={!isCollapsed}
               >
                 <span className="ni-ico">{parent.icon}</span>
-                <Text variant="body-md" className="ni-label">{parent.label}</Text>
+                <span className="ni-label">{parent.label}</span>
                 <span className="ni-chevron">
                   {isCollapsed ? chevronDown : chevronUp}
                 </span>
-              </div>
+              </Button>
             </Tooltip>
           )}
           {(!parent || !isCollapsed) &&
@@ -305,44 +328,43 @@ function Sidebar() {
     return (
       <Stack direction="column" gap="xs" className="sb-advanced-block">
         <Tooltip text="Less common tools beyond everyday editing." placement="right">
-          <div
-            className={`ni ni-with-chevron ni-group-parent sb-advanced-parent ${
-              isAdvancedChildRouteActive ? 'on' : ''
-            }`}
-            role="button"
-            tabIndex={0}
+          <Button
+            tone="neutral"
+            variant="minimal"
+            size="compact"
+            aria-pressed={isAdvancedChildRouteActive}
             aria-expanded={showChildren}
+            className="ni ni-with-chevron ni-group-parent sb-advanced-parent"
             onClick={handleAdvancedParentActivate}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleAdvancedParentActivate();
-              }
-            }}
           >
             <span className="ni-ico">{tool}</span>
-            <Text variant="body-md" className="ni-label">Advanced</Text>
+            <span className="ni-label">Advanced</span>
             <span className="ni-chevron">
               {advancedExpanded ? chevronDown : chevronUp}
             </span>
-          </div>
+          </Button>
         </Tooltip>
         {showChildren &&
           ADVANCED_SUB_NAV_ITEMS.map((row) => {
             const isOn = isItemActive(row.path);
             return (
               <Tooltip key={row.id} text={row.tip} placement="right">
-                <a
-                  href={row.path}
-                  className={`ni ni-child sb-advanced-sub ${isOn ? 'on' : ''}`}
+                <Button
+                  tone="neutral"
+                  variant="minimal"
+                  size="compact"
+                  aria-pressed={isOn}
+                  className="ni ni-child sb-advanced-sub"
+                  nativeButton={false}
+                  render={<a href={row.path} />}
                   onClick={(e) => {
                     e.preventDefault();
                     navigate(row.path);
                   }}
                 >
                   <span className="ni-ico">{row.icon}</span>
-                  <Text variant="body-md" className="ni-label">{row.label}</Text>
-                </a>
+                  <span className="ni-label">{row.label}</span>
+                </Button>
               </Tooltip>
             );
           })}
@@ -365,21 +387,16 @@ function Sidebar() {
         {menuExpanded ? (
           <nav className="admin-root-nav editor-sidebar-section editor-sidebar-toggle-row">
             <Tooltip text="Hide menu" placement="right">
-              <div
+              <Button
+                tone="neutral"
+                variant="minimal"
+                size="compact"
                 className="ni"
-                role="button"
-                tabIndex={0}
                 onClick={toggleMenuExpanded}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleMenuExpanded();
-                  }
-                }}
               >
                 <span className="ni-ico">{chevronLeft}</span>
-                <Text variant="body-md" className="ni-label">Hide menu</Text>
-              </div>
+                <span className="ni-label">Hide menu</span>
+              </Button>
             </Tooltip>
           </nav>
         ) : (
@@ -390,15 +407,17 @@ function Sidebar() {
             className="sidebar-bottom editor-sidebar-section editor-sidebar-hamburger"
           >
             <Tooltip text="Expand menu" placement="right">
-              <button
-                type="button"
-                className="sb-customize"
+              <Button
+                tone="neutral"
+                variant="minimal"
+                size="compact"
+                className="ni sb-customize"
                 aria-label="Expand menu"
                 aria-expanded={menuExpanded}
                 onClick={toggleMenuExpanded}
               >
-                {menu}
-              </button>
+                <span className="ni-ico">{menu}</span>
+              </Button>
             </Tooltip>
           </Stack>
         )}
@@ -407,13 +426,17 @@ function Sidebar() {
         <nav className="admin-root-nav editor-sidebar-section editor-sidebar-root-nav">
           {visibleAdminNavItems.map((item) => (
             <Tooltip key={item.id} text={item.tip} placement="right">
-              <div
-                className={`ni ${isItemActive(item.path) ? 'on' : ''}`}
+              <Button
+                tone="neutral"
+                variant="minimal"
+                size="compact"
+                aria-pressed={isItemActive(item.path)}
+                className="ni"
                 onClick={() => navigateSmooth(item.path)}
               >
                 <span className="ni-ico">{item.icon}</span>
-                <Text variant="body-md" className="ni-label">{item.label}</Text>
-              </div>
+                <span className="ni-label">{item.label}</span>
+              </Button>
             </Tooltip>
           ))}
         </nav>
@@ -432,7 +455,10 @@ function Sidebar() {
         <nav className="admin-root-nav editor-sidebar-section editor-sidebar-recent-list">
           {recentPages.map((p) => (
             <Tooltip key={p.id} text={p.name} placement="right">
-              <div
+              <Button
+                tone="neutral"
+                variant="minimal"
+                size="compact"
                 className="ni"
                 onClick={() => {
                   selectPage(p);
@@ -440,8 +466,8 @@ function Sidebar() {
                 }}
               >
                 <span className="ni-ico">{pageIcon}</span>
-                <Text variant="body-md" className="ni-label">{p.name}</Text>
-              </div>
+                <span className="ni-label">{p.name}</span>
+              </Button>
             </Tooltip>
           ))}
         </nav>
@@ -490,22 +516,17 @@ function Sidebar() {
       {!isDesignSection && !isAdvancedSection && (
         <nav className="admin-root-nav sidebar-advanced-dock" aria-label="Advanced">
           <Tooltip text="Configure advanced tools of your site" placement="right">
-            <div
+            <Button
+              tone="neutral"
+              variant="minimal"
+              size="compact"
               className="ni ni-with-chevron sb-advanced-parent"
-              role="button"
-              tabIndex={0}
               onClick={() => navigate('/templates')}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  navigate('/templates');
-                }
-              }}
             >
               <span className="ni-ico">{tool}</span>
-              <Text variant="body-md" className="ni-label">Advanced</Text>
+              <span className="ni-label">Advanced</span>
               <span className="ni-chevron">{chevronRight}</span>
-            </div>
+            </Button>
           </Tooltip>
         </nav>
       )}
@@ -519,32 +540,31 @@ function Sidebar() {
         className="sidebar-bottom"
       >
         <Tooltip text="Return to the WordPress dashboard" placement="top">
-          <button
-            type="button"
-            className="sb-dashboard"
+          <Button
+            tone="neutral"
+            variant="minimal"
+            size="compact"
+            className="ni sb-dashboard"
             onClick={() =>
               alert(
                 'This would take you back to WP Admin, but this is a prototype.',
               )
             }
           >
-            <Stack direction="row" align="center" gap="sm" className="sb-dashboard-inner">
-              <span className="sb-dashboard-ico-wrap" aria-hidden="true">
-                <span className="sb-dashboard-ico-layer sb-dashboard-ico-layer--wp">{wordpress}</span>
-                <span className="sb-dashboard-ico-layer sb-dashboard-ico-layer--arrow">{arrowLeft}</span>
-              </span>
-              <Text variant="body-md" className="sb-dashboard-label">WP Admin</Text>
-            </Stack>
-          </button>
+            <span className="ni-ico">{wordpress}</span>
+            <span className="ni-label">WP Admin</span>
+          </Button>
         </Tooltip>
         <Tooltip text="Customize navigation" placement="top">
-          <button
-            type="button"
-            className="sb-customize"
+          <Button
+            tone="neutral"
+            variant="minimal"
+            size="compact"
+            className="ni sb-customize"
             aria-label="Customize navigation"
           >
-            {settings}
-          </button>
+            <span className="ni-ico">{settings}</span>
+          </Button>
         </Tooltip>
       </Stack>
     </div>
