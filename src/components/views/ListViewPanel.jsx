@@ -7,7 +7,8 @@ import {
   getSectionMeta,
   HEADER_META,
   TEMPLATE_ROOT_META,
-} from '../../utils/editCanvasBlockMeta';
+} from '../../utils/blockEditorMeta';
+import { EDITOR_MODES } from '../../services/blockEditorMode';
 
 const TABS = [
   { name: 'list', title: 'List View' },
@@ -23,7 +24,7 @@ const TABS = [
  * @param {object} props
  * @param {() => void} props.onClose
  * @param {object[]} props.sections - page sections (when not template)
- * @param {boolean} props.isTemplate
+ * @param {'page' | 'template'} props.mode - Block Editor mode
  * @param {string} props.selectedBlockId - 'header' | 'footer' | 'template' | 'section-0' | …
  * @param {(id: string) => void} props.onSelectBlock
  * @param {string} props.pageTitle - document title for Outline tab
@@ -31,11 +32,12 @@ const TABS = [
 export default function ListViewPanel({
   onClose,
   sections = [],
-  isTemplate,
+  mode = EDITOR_MODES.PAGE,
   selectedBlockId,
   onSelectBlock,
   pageTitle,
 }) {
+  const isTemplate = mode === EDITOR_MODES.TEMPLATE;
   const [templateExpanded, setTemplateExpanded] = useState(true);
 
   const renderRow = (id, meta, options = {}) => {
@@ -121,7 +123,7 @@ export default function ListViewPanel({
               <Stack direction="column" gap="sm" className="lv-outline">
                 <Text variant="heading-md" className="lv-outline-h1">{pageTitle || 'Untitled'}</Text>
                 <Text variant="body-sm" className="lv-outline-muted">
-                  Heading structure appears here as you add headings in the canvas.
+                  Heading structure appears here as you add headings in the Block Editor.
                 </Text>
               </Stack>
             )}

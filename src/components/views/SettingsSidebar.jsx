@@ -12,7 +12,8 @@ import {
   getSectionMeta,
   HEADER_META,
   TEMPLATE_ROOT_META,
-} from '../../utils/editCanvasBlockMeta';
+} from '../../utils/blockEditorMeta';
+import { EDITOR_MODES } from '../../services/blockEditorMode';
 
 const STYLE_PREVIEW_W = 232;
 const STYLE_PREVIEW_MIN_W = 200;
@@ -32,7 +33,7 @@ function parseSectionIndex(selectedBlockId) {
 
 /**
  * Flyout anchors to the viewport so its right edge is always to the left of the settings
- * sidebar (never obscures the panel). Width may shrink if the canvas area is narrow.
+ * sidebar (never obscures the panel). Width may shrink if the Block Editor area is narrow.
  */
 function placeStylePreviewFlyout(targetEl) {
   const trigger = targetEl.getBoundingClientRect();
@@ -373,7 +374,7 @@ const BLOCK_DESCRIPTIONS = {
   Gallery: 'Display multiple images in a rich gallery.',
   'Contact Form': 'Collect information from visitors with a form.',
   Content: 'Content for this design.',
-  Block: 'Block settings for the selected canvas region.',
+  Block: 'Block settings for the selected region.',
 };
 
 function descriptionForLabel(label) {
@@ -391,12 +392,13 @@ export default function SettingsSidebar({
   pageTitle,
   selectedBlockId,
   sections = [],
-  isTemplate,
+  mode = EDITOR_MODES.PAGE,
   focusBlockTabSignal = 0,
   flashSignal = 0,
   sectionStyles = {},
   onSectionStyleChange = () => {},
 }) {
+  const isTemplate = mode === EDITOR_MODES.TEMPLATE;
   const [flashHighlight, setFlashHighlight] = useState(false);
 
   // Each time the parent increments `focusBlockTabSignal` (e.g. clicking
@@ -426,8 +428,6 @@ export default function SettingsSidebar({
     };
   }, [flashSignal, isOpen]);
 
-  void isTemplate;
-
   let blockMeta = { icon: TEMPLATE_ROOT_META.icon, label: 'Block', isPatternSection: false };
   if (selectedBlockId === 'header') {
     blockMeta = HEADER_META;
@@ -442,7 +442,7 @@ export default function SettingsSidebar({
   }
 
   const blockDescription = blockMeta.isPatternSection
-    ? 'Built from a ready-made section you can customise on the canvas.'
+    ? 'Built from a ready-made section you can customise in the Block Editor.'
     : descriptionForLabel(blockMeta.label);
 
   const inspectorTabLabel = blockMeta.isPatternSection ? 'Section' : 'Block';

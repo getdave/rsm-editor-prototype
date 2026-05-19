@@ -10,6 +10,7 @@ import {
   styles,
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
+import { EDITOR_MODES } from '../../services/blockEditorMode';
 
 function docTypeIcon(page) {
   if (page?.isPageDesign) return styles;
@@ -24,14 +25,16 @@ function docTypeIcon(page) {
  * - `canRename`: disables inline rename for read-only contextual documents.
  * - `documentLabelOverride`: optional label shown instead of the current title
  *   when a global template part is selected with peer spotlight.
- * - `isTemplate`: switches the header into template-editing presentation.
+ * - `mode`: Block Editor mode (`'page' | 'template'`). The template mode swaps
+ *   icon, badge, and disables rename.
  */
 export default function DocumentActions({
   document: documentProp = null,
   canRename = true,
   documentLabelOverride = null,
-  isTemplate = false,
+  mode = EDITOR_MODES.PAGE,
 }) {
+  const isTemplate = mode === EDITOR_MODES.TEMPLATE;
   const { currentPage, setCurrentPageName } = useAppState();
   const activeDocument = documentProp || currentPage;
   const isGlobalOverride = documentLabelOverride != null;
