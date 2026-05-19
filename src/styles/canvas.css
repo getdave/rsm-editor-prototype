@@ -181,6 +181,15 @@
   cursor: default;
 }
 
+.preview-bar-doc-name.ct-btn:hover {
+  background: transparent;
+}
+
+.preview-bar-doc-options {
+  display: inline-flex;
+  margin-left: -7px;
+}
+
 .preview-bar-doc-name--has-scope {
   text-decoration: underline dotted #757575;
   text-underline-offset: 4px;

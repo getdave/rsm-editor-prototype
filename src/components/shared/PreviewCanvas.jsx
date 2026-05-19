@@ -1,10 +1,14 @@
 import {
   Button,
+  Dropdown,
+  MenuGroup,
+  MenuItem,
   Tooltip,
   __experimentalToggleGroupControl as ToggleGroupControl,
   __experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
 import {
+  chevronDown,
   desktop,
   tablet,
   mobile,
@@ -16,6 +20,7 @@ import {
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { getPageContent } from '../../services/pageContentService';
+import { getDocumentOptionsLabel } from '../../utils/documentOptionsLabel';
 import { PreviewTemplateFrame } from './PreviewSiteChrome';
 
 function docTypeIcon(p) {
@@ -47,6 +52,7 @@ function docTypeIcon(p) {
  * @param {function} onEdit - Callback when Edit button is clicked
  * @param {function} onPageChange - Callback when a nav link is clicked; parent decides what switching page means
  * @param {HeaderNavItem[]|null|undefined} headerNavItems - Optional top-level nav links (pageId or custom url order). When omitted, uses pages with `inMenu`.
+ * @param {{ label: string, icon?: object, onClick: function }[]} documentOptions - Optional document menu actions.
  */
 function PreviewCanvas({
   page,
@@ -56,6 +62,7 @@ function PreviewCanvas({
   editLabel = 'Edit',
   documentLabel,
   scopeNotice,
+  documentOptions = [],
 }) {
   const { selectedDevice, setSelectedDevice, siteTitle, pages } = useAppState();
 
@@ -71,6 +78,7 @@ function PreviewCanvas({
       : page.isLive ? 'Page is published' : 'Page is a draft';
   const documentName = documentLabel || page.name;
   const documentStatusLabel = scopeNotice || statusLabel;
+  const documentOptionsLabel = getDocumentOptionsLabel(page);
   const documentNameElement = (
     <span
       className={`ct-btn preview-bar-doc-name${scopeNotice ? ' preview-bar-doc-name--has-scope' : ''}`}
@@ -364,6 +372,39 @@ function PreviewCanvas({
             </Tooltip>
           ) : (
             documentNameElement
+          )}
+          {documentOptions.length > 0 && (
+            <span className="preview-bar-doc-options">
+              <Dropdown
+                renderToggle={({ isOpen, onToggle }) => (
+                  <Button
+                    className="ct-icon-btn"
+                    onClick={onToggle}
+                    aria-expanded={isOpen}
+                    label={documentOptionsLabel}
+                    icon={chevronDown}
+                    iconSize={20}
+                  />
+                )}
+                renderContent={({ onClose }) => (
+                  <MenuGroup label={documentOptionsLabel}>
+                    {documentOptions.map((option) => (
+                      <MenuItem
+                        key={option.label}
+                        icon={option.icon}
+                        iconPosition="left"
+                        onClick={() => {
+                          option.onClick();
+                          onClose();
+                        }}
+                      >
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </MenuGroup>
+                )}
+              />
+            </span>
           )}
           <Tooltip
             text={documentStatusLabel}

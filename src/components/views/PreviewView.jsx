@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { settings } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
 import { useAppState } from '../../hooks/useAppState';
 import { resolveHomepagePreviewTarget } from '../../utils/homepagePreviewTarget';
@@ -15,6 +16,7 @@ function PreviewView() {
     homepageDisplayMode,
     pageDesigns,
     pages,
+    openConfigureHomepageModal,
     selectPage,
     setCurrentPage,
   } = useAppState();
@@ -56,6 +58,17 @@ function PreviewView() {
     setCurrentPage(page);
   };
 
+  const documentOptions = useMemo(
+    () => [
+      {
+        label: 'Configure Homepage',
+        icon: settings,
+        onClick: openConfigureHomepageModal,
+      },
+    ],
+    [openConfigureHomepageModal],
+  );
+
   return (
     <Stack direction="column" className="cs-stack">
       <div className="cs-stack-canvas preview-body">
@@ -66,6 +79,7 @@ function PreviewView() {
             onPageChange={handlePageChange}
             editLabel="Edit"
             documentLabel={previewTarget?.previewLabel}
+            documentOptions={documentOptions}
             scopeNotice={previewTarget?.isPageDesign ? previewTarget.scopeNotice : undefined}
           />
         </div>
