@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { settings } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
@@ -36,6 +36,10 @@ function PreviewView() {
   const resolvedHomeKey = resolvedHome?.id ?? null;
   const resetKey = location.key;
   const [previewOverride, setPreviewOverride] = useState(null);
+  const [previewHistory, setPreviewHistory] = useState({
+    entries: [],
+    index: -1,
+  });
   const previewTarget =
     previewOverride?.resetKey === resetKey &&
     previewOverride.homeKey === resolvedHomeKey &&
@@ -55,8 +59,47 @@ function PreviewView() {
 
   const handlePageChange = (page) => {
     setPreviewOverride({ resetKey, homeKey: resolvedHomeKey, target: page });
+    setPreviewHistory((prev) => {
+      const currentEntry = previewTarget
+        ? {
+            homeKey: resolvedHomeKey,
+            resetKey,
+            target: previewTarget,
+          }
+        : null;
+      const nextEntry = {
+        homeKey: resolvedHomeKey,
+        resetKey,
+        target: page,
+      };
+      const baseEntries =
+        prev.index >= 0 ? prev.entries.slice(0, prev.index + 1) : prev.entries;
+      const currentTail = baseEntries[baseEntries.length - 1];
+      const entries =
+        currentEntry && currentTail?.target?.id !== currentEntry.target.id
+          ? [...baseEntries, currentEntry, nextEntry]
+          : [...baseEntries, nextEntry];
+      return {
+        entries,
+        index: entries.length - 1,
+      };
+    });
     setCurrentPage(page);
   };
+
+  const handlePreviewHistoryChange = useCallback(
+    (nextIndex) => {
+      const entry = previewHistory.entries[nextIndex];
+      if (!entry) return;
+      setPreviewHistory((prev) => ({
+        ...prev,
+        index: nextIndex,
+      }));
+      setPreviewOverride(entry);
+      setCurrentPage(entry.target);
+    },
+    [previewHistory.entries, setCurrentPage],
+  );
 
   const documentOptions = useMemo(
     () =>
@@ -72,6 +115,18 @@ function PreviewView() {
     [openConfigureHomepageModal, previewTarget?.id, resolvedHomeKey],
   );
 
+  const previewHistoryControls = useMemo(
+    () => ({
+      canGoBack: previewHistory.index > 0,
+      canGoForward:
+        previewHistory.index >= 0 &&
+        previewHistory.index < previewHistory.entries.length - 1,
+      onBack: () => handlePreviewHistoryChange(previewHistory.index - 1),
+      onForward: () => handlePreviewHistoryChange(previewHistory.index + 1),
+    }),
+    [handlePreviewHistoryChange, previewHistory],
+  );
+
   return (
     <Stack direction="column" className="cs-stack">
       <div className="cs-stack-canvas preview-body">
@@ -83,6 +138,7 @@ function PreviewView() {
             editLabel="Edit"
             documentLabel={previewTarget?.previewLabel}
             documentOptions={documentOptions}
+            previewHistory={previewHistoryControls}
             scopeNotice={previewTarget?.isPageDesign ? previewTarget.scopeNotice : undefined}
           />
         </div>

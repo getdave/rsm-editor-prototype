@@ -9,6 +9,8 @@ import {
 } from '@wordpress/components';
 import {
   chevronDown,
+  chevronLeft,
+  chevronRight,
   desktop,
   tablet,
   mobile,
@@ -53,6 +55,7 @@ function docTypeIcon(p) {
  * @param {function} onPageChange - Callback when a nav link is clicked; parent decides what switching page means
  * @param {HeaderNavItem[]|null|undefined} headerNavItems - Optional top-level nav links (pageId or custom url order). When omitted, uses pages with `inMenu`.
  * @param {{ label: string, icon?: object, onClick: function }[]} documentOptions - Optional document menu actions.
+ * @param {{ canGoBack: boolean, canGoForward: boolean, onBack: function, onForward: function }|null} previewHistory - Optional in-preview navigation controls.
  */
 function PreviewCanvas({
   page,
@@ -63,6 +66,7 @@ function PreviewCanvas({
   documentLabel,
   scopeNotice,
   documentOptions = [],
+  previewHistory = null,
 }) {
   const { selectedDevice, setSelectedDevice, siteTitle, pages } = useAppState();
 
@@ -357,6 +361,26 @@ function PreviewCanvas({
         <Button variant="primary" onClick={onEdit}>
           {editLabel}
         </Button>
+        {previewHistory && (
+          <div className="preview-history-controls" aria-label="Preview history">
+            <Button
+              className="preview-history-btn"
+              label="Back in preview"
+              icon={chevronLeft}
+              iconSize={18}
+              onClick={previewHistory.onBack}
+              disabled={!previewHistory.canGoBack}
+            />
+            <Button
+              className="preview-history-btn"
+              label="Forward in preview"
+              icon={chevronRight}
+              iconSize={18}
+              onClick={previewHistory.onForward}
+              disabled={!previewHistory.canGoForward}
+            />
+          </div>
+        )}
 
         <div className="ct-space"></div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

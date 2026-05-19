@@ -168,6 +168,32 @@
   flex-shrink: 0;
 }
 
+.preview-history-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  margin-left: 2px;
+}
+
+.preview-history-btn.components-button {
+  width: 26px;
+  min-width: 26px;
+  height: 28px;
+  padding: 0;
+  color: #757575;
+  opacity: 0.72;
+}
+
+.preview-history-btn.components-button:hover:not(:disabled) {
+  color: #1e1e1e;
+  background: #f6f7f7;
+  opacity: 1;
+}
+
+.preview-history-btn.components-button:disabled {
+  opacity: 0.24;
+}
+
 /* Document cluster (icon + name + status dot) sitting between the Edit
    button and the device switcher. */
 .preview-bar-doc-icon {
