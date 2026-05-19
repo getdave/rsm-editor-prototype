@@ -12,9 +12,9 @@ import {
 import {
   contentRecords,
   contentTypes,
-  HOMEPAGE_DISPLAY_LATEST,
 } from '../../data/mockData';
 import { useAppState } from '../../hooks/useAppState';
+import { resolveHomepagePreviewTarget } from '../../utils/homepagePreviewTarget';
 import { showPrototypeNotImplementedAlert } from '../../utils/prototypeNotImplemented';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import PrototypeNotImplementedButton from '../shared/PrototypeNotImplemented';
@@ -472,12 +472,17 @@ function ContentView() {
   );
   const isDrilldown = Boolean(contentTypeId && selectedContentType);
 
-  const resolvedHome = useMemo(() => {
-    if (homepageDisplayMode === HOMEPAGE_DISPLAY_LATEST) {
-      return pageDesigns.find((design) => design.id === 'blog-home-root');
-    }
-    return pages.find((page) => page.id === frontPageId) || currentPage;
-  }, [currentPage, frontPageId, homepageDisplayMode, pageDesigns, pages]);
+  const resolvedHome = useMemo(
+    () =>
+      resolveHomepagePreviewTarget({
+        homepageDisplayMode,
+        frontPageId,
+        pages,
+        pageDesigns,
+        currentPage,
+      }),
+    [currentPage, frontPageId, homepageDisplayMode, pageDesigns, pages],
+  );
 
   const addRecordAction = isDrilldown ? (
     <PrototypeNotImplementedButton

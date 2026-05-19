@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppState, READING_DISPLAY_LATEST } from '../hooks/useAppState';
 import { Tooltip } from '@wordpress/components';
@@ -145,6 +145,7 @@ function Sidebar() {
     isEditCanvas && editorReferrer ? editorReferrer : location.pathname;
   const [collapsedGroups, setCollapsedGroups] = useState({});
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
+  const homePreviewResetCountRef = useRef(0);
 
   const sidebarNestedNavHidden = isEditCanvas
     ? sidebarCollapsed && !menuExpanded
@@ -180,6 +181,13 @@ function Sidebar() {
 
   // Direct navigation. RootLayout's route effect resets menuExpanded.
   const navigateSmooth = (target) => {
+    if (target === '/') {
+      homePreviewResetCountRef.current += 1;
+      navigate('/', {
+        state: { homePreviewResetCount: homePreviewResetCountRef.current },
+      });
+      return;
+    }
     navigate(target);
   };
 
@@ -214,7 +222,7 @@ function Sidebar() {
             variant="minimal"
             size="compact"
             className="ni"
-            onClick={() => navigate(item.path)}
+            onClick={() => navigateSmooth(item.path)}
           >
             <span className="ni-ico">{item.icon}</span>
             <span className="ni-label">{item.label}</span>
@@ -258,7 +266,7 @@ function Sidebar() {
             size="compact"
             aria-pressed={isItemActive(item.path)}
             className={`ni ${item.chevron ? 'ni-with-chevron' : ''}`}
-            onClick={() => navigate(item.path)}
+            onClick={() => navigateSmooth(item.path)}
           >
             <span className="ni-ico">{item.icon}</span>
             <span className="ni-label">{item.label}</span>

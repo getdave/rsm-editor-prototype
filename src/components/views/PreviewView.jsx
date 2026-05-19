@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Stack } from '@wordpress/ui';
 import { useAppState } from '../../hooks/useAppState';
-import { HOMEPAGE_DISPLAY_LATEST } from '../../data/mockData';
+import { resolveHomepagePreviewTarget } from '../../utils/homepagePreviewTarget';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import ContentSuggestions from './ContentSuggestions';
 
 function PreviewView() {
+  const location = useLocation();
   const navigate = useNavigate();
   const {
     currentPage,
@@ -18,21 +19,26 @@ function PreviewView() {
     setCurrentPage,
   } = useAppState();
 
-  const resolvedHome = useMemo(() => {
-    if (homepageDisplayMode === HOMEPAGE_DISPLAY_LATEST) {
-      return pageDesigns.find((design) => design.id === 'blog-home-root');
-    }
-    return pages.find((page) => page.id === frontPageId) || currentPage;
-  }, [currentPage, frontPageId, homepageDisplayMode, pageDesigns, pages]);
+  const resolvedHome = useMemo(
+    () =>
+      resolveHomepagePreviewTarget({
+        homepageDisplayMode,
+        frontPageId,
+        pages,
+        pageDesigns,
+        currentPage,
+      }),
+    [currentPage, frontPageId, homepageDisplayMode, pageDesigns, pages],
+  );
 
   const resolvedHomeKey = resolvedHome?.id ?? null;
-  const [previewState, setPreviewState] = useState({
-    homeKey: resolvedHomeKey,
-    target: resolvedHome,
-  });
+  const resetKey = location.key;
+  const [previewOverride, setPreviewOverride] = useState(null);
   const previewTarget =
-    previewState.homeKey === resolvedHomeKey && previewState.target
-      ? previewState.target
+    previewOverride?.resetKey === resetKey &&
+    previewOverride.homeKey === resolvedHomeKey &&
+    previewOverride.target
+      ? previewOverride.target
       : resolvedHome;
 
   const handleEdit = () => {
@@ -46,7 +52,7 @@ function PreviewView() {
   };
 
   const handlePageChange = (page) => {
-    setPreviewState({ homeKey: resolvedHomeKey, target: page });
+    setPreviewOverride({ resetKey, homeKey: resolvedHomeKey, target: page });
     setCurrentPage(page);
   };
 
