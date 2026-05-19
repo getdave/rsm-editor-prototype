@@ -25,12 +25,14 @@ function docTypeIcon(page) {
  * - `documentLabelOverride`: optional label shown instead of the current title
  *   when a global template part is selected with peer spotlight.
  * - `isTemplate`: switches the header into template-editing presentation.
+ * - `templateTitle`: optional template label shown in template-editing mode.
  */
 export default function DocumentActions({
   document: documentProp = null,
   canRename = true,
   documentLabelOverride = null,
   isTemplate = false,
+  templateTitle = null,
 }) {
   const { currentPage, setCurrentPageName } = useAppState();
   const activeDocument = documentProp || currentPage;
@@ -56,7 +58,7 @@ export default function DocumentActions({
   const displayName = isGlobalOverride
     ? documentLabelOverride
     : isTemplate
-      ? documentLabelOverride ?? 'Template title'
+      ? templateTitle ?? documentName
       : documentName;
 
   const commit = () => {
@@ -82,7 +84,7 @@ export default function DocumentActions({
   const nameTooltipText = isGlobalOverride
     ? 'Global template part'
     : isTemplate
-      ? 'Template title'
+      ? displayName
       : renameEnabled ? 'Rename page' : documentName;
 
   const docIcon = isTemplate ? layout : docTypeIcon(activeDocument);

@@ -557,6 +557,9 @@ function EditingView() {
   const pageInspectorTitle = isPageDesignEdit
     ? pageDesignTarget.name
     : content.title || currentPage?.name || 'Untitled';
+  const templateTitle = content.isTemplate
+    ? editTarget?.templateLabel ?? content.templateName ?? editTarget?.name ?? 'Template'
+    : null;
 
   const leftPanelMode = listViewOpen ? 'list' : isInserterOpen ? 'inserter' : null;
 
@@ -611,6 +614,7 @@ function EditingView() {
             canRename={!isPageDesignEdit}
             documentLabelOverride={spotlightGlobalDocLabel}
             isTemplate={content.isTemplate}
+            templateTitle={templateTitle}
           />
           <div className="ct-space"></div>
 
