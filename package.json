@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "vite",
     "dev:port": "vite --port",
+    "workspace:setup": "npm ci && npm run worktree:setup",
+    "workspace:teardown": "node scripts/worktree.mjs teardown",
     "worktree:cleanup": "node scripts/worktree.mjs cleanup",
     "worktree:create": "node scripts/worktree.mjs create",
     "worktree:setup": "node scripts/worktree.mjs setup",
