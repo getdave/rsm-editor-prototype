@@ -289,27 +289,6 @@
   width: 100%;
 }
 
-/* Edit button in preview bar */
-.ct-edit {
-  padding: 8px 16px;
-  background: #3858e9;
-  color: #fff;
-  border: 1px solid #3858e9;
-  border-radius: 4px;
-  font: 500 12px var(--wp-font-family);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: background 0.12s;
-  height: 36px;
-}
-
-.ct-edit:hover {
-  background: #2a47d4;
-  border-color: #2a47d4;
-}
-
 /* ── GUTENBERG CANVAS TOOLBAR (full width; side panels sit below) ── */
 .canvas-toolbar {
   height: 64px;
@@ -359,40 +338,6 @@
 .ct-label {
   font-size: 11px;
   color: #757575;
-}
-
-/* Device switcher inside the preview bar (PreviewCanvas only — the
- * Block Editor uses ToggleGroupControl instead). */
-.preview-bar .ct-view-modes {
-  display: flex;
-  gap: 0;
-  background: #f0f0f0;
-  border-radius: 4px;
-  padding: 2px;
-}
-
-.preview-bar .ct-view-btn {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  color: #757575;
-  border-radius: 3px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.12s;
-}
-
-.preview-bar .ct-view-btn:hover {
-  color: #1e1e1e;
-}
-
-.preview-bar .ct-view-btn.active {
-  background: #fff;
-  color: #1e1e1e;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Icon buttons */
