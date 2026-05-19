@@ -14,7 +14,6 @@ import {
   moreVertical,
   plus,
   redo,
-  symbolFilled,
   tablet,
   undo,
 } from '@wordpress/icons';
@@ -122,11 +121,15 @@ function AddSectionInserterButton({ variant, onAdd }) {
   );
 }
 
-function TemplatePartSyncBadge({ label }) {
+/** Hover indicator for sync content (pattern sections + template parts).
+ * The icon mirrors the content type (HEADER_META.icon, FOOTER_META.icon, or
+ * the section's pattern icon) so it doubles as both a "this is synced" hint
+ * and a content-type label before the block toolbar appears on selection. */
+function SyncContentBadge({ label, icon }) {
   return (
     <span className="tp-sync-badge" aria-label={`${label} is synced across the site`}>
       <span className="tp-sync-badge-icon" aria-hidden>
-        {symbolFilled}
+        {icon}
       </span>
     </span>
   );
@@ -167,6 +170,7 @@ function EditableSectionGroup({
         {selected && (
           <BlockToolbar toolbarKey={blockId} meta={meta} {...blockToolbarBindings} />
         )}
+        <SyncContentBadge label={meta.label} icon={meta.icon} />
         {renderSectionContent(section)}
       </div>
       <AddSectionInserterButton variant="bottom" onAdd={openInserter} />
@@ -702,7 +706,7 @@ function BlockEditor() {
                   onGlobalPartEditExit={handleGlobalPartToolbarExit}
                 />
               )}
-              <TemplatePartSyncBadge label={HEADER_META.label} />
+              <SyncContentBadge label={HEADER_META.label} icon={HEADER_META.icon} />
               <PreviewSiteNavCluster
                 siteTitle={siteTitle}
                 navEntries={editNavEntries}
@@ -750,7 +754,7 @@ function BlockEditor() {
                   onGlobalPartEditExit={handleGlobalPartToolbarExit}
                 />
               )}
-              <TemplatePartSyncBadge label={FOOTER_META.label} />
+              <SyncContentBadge label={FOOTER_META.label} icon={FOOTER_META.icon} />
               <span className="p-ft">© 2026 {siteTitle}</span>
               <span className="p-ft">Privacy Policy</span>
             </div>

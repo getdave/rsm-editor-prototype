@@ -663,10 +663,23 @@
   fill: currentColor;
 }
 
-.g-el.e-block.tp-part:not(.sel):hover .tp-sync-badge {
+.g-el.e-block.tp-part:not(.sel):hover .tp-sync-badge,
+.e-sec:not(.sel):hover .tp-sync-badge {
   opacity: 1;
 }
 
+/* Pattern-section sync badge sits at the top-left of the section card —
+ * a "this is sync content" hint that previews the section's toolbar
+ * location. Same visual treatment as the template-part badge. */
+.e-sec .tp-sync-badge {
+  top: 8px;
+  left: 8px;
+  border-radius: 4px;
+}
+
+/* BlockToolbar positioning wrapper — the WP <Toolbar> inside owns the
+ * chrome (background, border, shadow). This element only handles the
+ * floating placement above (or, on flip, below) the selected block. */
 .sec-bar.block-toolbar {
   position: absolute;
   bottom: 100%;
@@ -674,15 +687,6 @@
   margin-bottom: 10px;
   top: auto;
   display: none;
-  align-items: stretch;
-  flex-wrap: wrap;
-  gap: 2px;
-  min-height: 40px;
-  padding: 4px 6px;
-  background: var(--wp-bg-card);
-  border: 1px solid var(--wp-gray-900);
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   z-index: 30;
 }
 
@@ -694,146 +698,16 @@
   margin-bottom: 0;
 }
 
-.sec-bar.block-toolbar > .bt-pill,
-.sec-bar.block-toolbar > .bt-move-stack,
-.sec-bar.block-toolbar > .components-button {
-  align-self: center;
-}
-
-.sec-bar.block-toolbar.block-toolbar--pattern-section {
-  border-left: 3px solid #007cba;
-  padding-left: 8px;
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part {
-  border: 1px solid var(--edit-global-accent);
-  border-left-width: 3px;
-  padding-left: 8px;
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-sep {
-  background: var(--edit-global-accent);
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-pill-label {
-  color: var(--edit-global-accent);
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .components-button.bt-pill-icon {
-  color: var(--edit-global-accent);
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .components-button.bt-pill-icon svg {
-  fill: currentColor;
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button {
-  background: var(--edit-global-accent);
-  border-color: transparent;
-  color: var(--wp-bg-card);
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button:hover:not(:disabled) {
-  background: var(--wp-block-synced-color-hover);
-  color: var(--wp-bg-card);
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button:focus:not(:disabled) {
-  box-shadow: 0 0 0 2px var(--wp-bg-card), 0 0 0 4px var(--edit-global-accent);
-}
-
 .e-sec.sel .sec-bar.block-toolbar,
 .template-edit-root.sel .sec-bar.block-toolbar,
 .g-el.e-block.sel .sec-bar.block-toolbar {
-  display: flex;
+  display: block;
 }
 
-.bt-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 280px;
-  padding-right: 6px;
-}
-
-.bt-pill-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--wp-gray-900);
+/* Block-name label rendered alongside the icon in the first ToolbarGroup;
+ * matches Gutenberg's "block name" affordance. */
+.sec-bar .block-toolbar-bar .components-toolbar-button {
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.bt-pill .components-button.bt-pill-icon {
-  min-width: 36px;
-  height: 32px;
-  padding: 0;
-  color: var(--wp-gray-900);
-}
-
-.bt-sep {
-  width: 1px;
-  align-self: stretch;
-  margin: -4px 4px;
-  background: var(--wp-gray-900);
-  flex-shrink: 0;
-}
-
-.bt-tb-btn.components-button {
-  min-width: 36px;
-  height: 32px;
-  padding: 0;
-  color: var(--wp-gray-900);
-  box-shadow: none;
-}
-
-.bt-tb-btn.components-button:hover {
-  background: var(--wp-light-gray-50);
-}
-
-.bt-tb-edit.components-button {
-  height: 32px;
-  min-height: 32px;
-  padding: 0 10px;
-  font-family: var(--wp-font-family, inherit);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.2;
-  color: var(--wp-gray-900);
-  box-shadow: none;
-  text-decoration: none;
-}
-
-.bt-tb-edit.components-button:hover {
-  background: var(--wp-light-gray-50);
-}
-
-/* Stacked move up / down — no border, mirrors WP block editor */
-.bt-move-stack {
-  display: flex;
-  flex-direction: column;
-  width: 24px;
-  height: 32px;
-  flex-shrink: 0;
-}
-
-.bt-move-btn.components-button {
-  flex: 1;
-  min-height: 0;
-  height: auto;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border-radius: 2px;
-  color: var(--wp-gray-900);
 }
 
 .sec-group {
