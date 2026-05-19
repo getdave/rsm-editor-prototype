@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "setup": "npm run workspace:setup",
+    "run": "npm run dev",
+    "teardown": "npm run workspace:teardown"
+  }
+}
