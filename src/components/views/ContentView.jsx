@@ -785,6 +785,7 @@ function ContentView() {
         isDrilldown ? canvasTarget.previewLabel : canvasTarget.previewLabel || 'Homepage'
       }
       scopeNotice={isDrilldown ? canvasTarget.scopeNotice : undefined}
+      isTemplatePreview={isDrilldown}
     />
   ) : null;
 
