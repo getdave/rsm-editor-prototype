@@ -667,11 +667,13 @@
   opacity: 1;
 }
 
-/* Template-part toolbars (header/footer) wear the prototype's
- * "sync content" color. Rebind WPDS theme tokens so focus rings and
- * pressed states use sync purple, and paint the toolbar surface itself
- * with the sync color (matching Gutenberg's treatment for synced
- * patterns / template parts). */
+/* Template-part toolbars (header/footer) keep the default WP Toolbar
+ * surface, typography, and interactive states — the only difference
+ * from a pattern-section toolbar is:
+ *   1. The block-label icon (Header / Footer) renders in the sync color.
+ *   2. The WP accent token (--wp-components-color-accent /
+ *      --wp-admin-theme-color, normally #3858e9) is rebound to the sync
+ *      color so focus rings and pressed-state highlights match. */
 .tp-part .sec-bar.block-toolbar {
   --wp-admin-theme-color: var(--wp-block-synced-color);
   --wp-admin-theme-color-darker-10: var(--wp-block-synced-color-hover);
@@ -681,33 +683,8 @@
   --wp-components-color-accent-darker-20: var(--wp-block-synced-color-hover);
 }
 
-.tp-part .sec-bar.block-toolbar .components-accessible-toolbar {
-  background: var(--wp-block-synced-color);
-  border-color: var(--wp-block-synced-color);
-  color: var(--wp-bg-card);
-}
-
-.tp-part .sec-bar.block-toolbar .components-toolbar-group {
-  background: transparent;
-  border-color: var(--wp-block-synced-color);
-}
-
-.tp-part .sec-bar.block-toolbar .components-toolbar-button {
-  color: var(--wp-bg-card);
-}
-
-.tp-part .sec-bar.block-toolbar .components-toolbar-button:hover:not(:disabled) {
-  background: var(--wp-block-synced-color-hover);
-  color: var(--wp-bg-card);
-}
-
-.tp-part .sec-bar.block-toolbar .components-toolbar-button.is-pressed {
-  background: rgba(255, 255, 255, 0.18);
-  color: var(--wp-bg-card);
-}
-
-.tp-part .sec-bar.block-toolbar .components-toolbar-group + .components-toolbar-group {
-  border-left-color: rgba(255, 255, 255, 0.25);
+.tp-part .sec-bar.block-toolbar .components-toolbar-group:first-child .components-toolbar-button svg {
+  fill: var(--wp-block-synced-color);
 }
 
 /* BlockToolbar positioning wrapper — the WP <Toolbar> inside owns the
