@@ -208,6 +208,7 @@ function Sidebar() {
           <Button
             tone="neutral"
             variant="minimal"
+            size="compact"
             className="ni"
             onClick={() => navigate(item.path)}
           >
@@ -234,6 +235,7 @@ function Sidebar() {
             <Button
               tone="neutral"
               variant="minimal"
+              size="compact"
               className="ni ni-child"
               nativeButton={false}
               render={<a href={item.href} />}
@@ -249,6 +251,7 @@ function Sidebar() {
           <Button
             tone="neutral"
             variant="minimal"
+            size="compact"
             aria-pressed={isItemActive(item.path)}
             className={`ni ${item.chevron ? 'ni-with-chevron' : ''}`}
             onClick={() => navigate(item.path)}
@@ -275,6 +278,7 @@ function Sidebar() {
         <Button
           tone="neutral"
           variant="minimal"
+          size="compact"
           aria-pressed={isOn}
           className="ni ni-child"
           nativeButton={false}
@@ -297,6 +301,7 @@ function Sidebar() {
               <Button
                 tone="neutral"
                 variant="minimal"
+                size="compact"
                 aria-expanded={!isCollapsed}
                 className="ni ni-with-chevron ni-group-parent"
                 onClick={() => toggleGroup(item.id)}
@@ -327,6 +332,7 @@ function Sidebar() {
           <Button
             tone="neutral"
             variant="minimal"
+            size="compact"
             aria-pressed={isAdvancedChildRouteActive}
             aria-expanded={showChildren}
             className="ni ni-with-chevron ni-group-parent sb-advanced-parent"
@@ -347,6 +353,7 @@ function Sidebar() {
                 <Button
                   tone="neutral"
                   variant="minimal"
+                  size="compact"
                   aria-pressed={isOn}
                   className="ni ni-child sb-advanced-sub"
                   nativeButton={false}
@@ -384,6 +391,7 @@ function Sidebar() {
               <Button
                 tone="neutral"
                 variant="minimal"
+                size="compact"
                 className="ni"
                 onClick={toggleMenuExpanded}
               >
@@ -420,6 +428,7 @@ function Sidebar() {
               <Button
                 tone="neutral"
                 variant="minimal"
+                size="compact"
                 aria-pressed={isItemActive(item.path)}
                 className="ni"
                 onClick={() => navigateSmooth(item.path)}
@@ -448,6 +457,7 @@ function Sidebar() {
               <Button
                 tone="neutral"
                 variant="minimal"
+                size="compact"
                 className="ni"
                 onClick={() => {
                   selectPage(p);
@@ -508,6 +518,7 @@ function Sidebar() {
             <Button
               tone="neutral"
               variant="minimal"
+              size="compact"
               className="ni ni-with-chevron sb-advanced-parent"
               onClick={() => navigate('/templates')}
             >

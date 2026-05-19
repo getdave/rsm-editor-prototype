@@ -57,7 +57,6 @@
    parent) because Button sets these vars on the element itself, which
    blocks inheritance from `.admin-root-nav`. */
 .admin-root-nav .ni {
-  --wp-ui-button-height: 28px;
   --wp-ui-button-min-width: 0;
   --wp-ui-button-padding-inline: 8px;
   justify-content: flex-start;
@@ -90,6 +89,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: left;
 }
 
 /* Advanced — expandable second tier (Posts, Templates, Patterns) */
