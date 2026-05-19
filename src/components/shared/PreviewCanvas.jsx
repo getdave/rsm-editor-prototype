@@ -11,6 +11,7 @@ import {
   home,
   page as pageIcon,
   postList,
+  store,
   styles,
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
@@ -18,9 +19,10 @@ import { getPageContent } from '../../services/pageContentService';
 import { PreviewTemplateFrame } from './PreviewSiteChrome';
 
 function docTypeIcon(p) {
-  if (p?.isPageDesign) return styles;
   if (p?.isFrontPage) return home;
   if (p?.isPostsPage) return postList;
+  if (p?.isShopPage || p?.collectionKind === 'shop') return store;
+  if (p?.isPageDesign) return styles;
   return pageIcon;
 }
 
