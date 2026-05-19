@@ -236,7 +236,12 @@
   min-width: 0;
 }
 
-.sidebar-bottom .sb-customize {
+.sidebar-bottom .sb-customize,
+.editor-sidebar-hamburger .sb-customize {
+  /* WPDS-native way to render an icon-only Button as a square: keep the
+     compact 32px height, lock width via aspect-ratio, drop inline padding. */
+  --wp-ui-button-aspect-ratio: 1;
+  padding-inline: 0;
   flex: 0 0 auto;
   justify-content: center;
 }
