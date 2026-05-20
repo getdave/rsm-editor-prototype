@@ -37,6 +37,11 @@ const DEFAULT_VIEW = {
   layout: { previewSize: GRID_PREVIEW_SIZE },
 };
 
+const TEMPLATE_TABLE_VIEW = {
+  type: 'table',
+  mediaField: undefined,
+};
+
 const DEFAULT_LAYOUTS = {
   grid: {
     badgeFields: ['statusLabel'],
@@ -313,7 +318,7 @@ function Badge({ children, variant = 'neutral' }) {
   return <span className={`adv-badge adv-badge--${variant}`}>{children}</span>;
 }
 
-function createFields({ metaLabel }) {
+function createFields() {
   return [
     {
       id: 'preview',
@@ -350,28 +355,39 @@ function createFields({ metaLabel }) {
       ),
     },
     {
-      id: 'meta',
+      id: 'author',
       type: 'text',
-      label: metaLabel,
+      label: 'Author',
       enableSorting: false,
       enableHiding: true,
-      enableGlobalSearch: false,
-      getValue: ({ item }) =>
-        [item.authorDisplay, item.areaLabel, item.source]
-          .filter(Boolean)
-          .join(' '),
+      enableGlobalSearch: true,
+      getValue: ({ item }) => item.authorDisplay ?? '',
       render: ({ item }) => (
-        <span className="adv-meta-cell">
-          {item.authorDisplay ? (
-            <span className="adv-meta-muted">{item.authorDisplay}</span>
-          ) : null}
-          {item.areaLabel ? (
-            <Badge variant="area">{item.areaLabel}</Badge>
-          ) : null}
-          {item.source ? (
-            <span className="adv-source-pill">{item.source}</span>
-          ) : null}
-        </span>
+        <span className="adv-meta-muted">{item.authorDisplay}</span>
+      ),
+    },
+    {
+      id: 'theme',
+      type: 'text',
+      label: 'Theme',
+      enableSorting: true,
+      enableHiding: true,
+      enableGlobalSearch: true,
+      getValue: ({ item }) => item.source ?? '',
+      render: ({ item }) => (
+        <span className="adv-source-pill">{item.source}</span>
+      ),
+    },
+    {
+      id: 'area',
+      type: 'text',
+      label: 'Area',
+      enableSorting: true,
+      enableHiding: true,
+      enableGlobalSearch: true,
+      getValue: ({ item }) => item.areaLabel ?? item.area ?? '',
+      render: ({ item }) => (
+        <Badge variant="area">{item.areaLabel ?? item.area}</Badge>
       ),
     },
     {
@@ -424,17 +440,22 @@ function AdvancedCatalogView({
   categoryKey,
   categoryAllLabel,
   categoryTitle,
-  metaLabel = 'Source',
   fields: visibleFields,
+  initialView,
   onOpenItem,
   onAction,
 }) {
-  const [view, setView] = useState({
+  const [view, setView] = useState(() => ({
     ...DEFAULT_VIEW,
+    ...initialView,
     fields: visibleFields,
-  });
+    layout: {
+      ...DEFAULT_VIEW.layout,
+      ...initialView?.layout,
+    },
+  }));
   const [activeCategory, setActiveCategory] = useState('all');
-  const fields = useMemo(() => createFields({ metaLabel }), [metaLabel]);
+  const fields = useMemo(() => createFields(), []);
   const categories = useMemo(
     () => buildCategories(items, categoryKey, categoryAllLabel),
     [items, categoryKey, categoryAllLabel],
@@ -562,8 +583,8 @@ export function TemplatesView() {
       description="Create new templates, or reset any customizations made to the templates supplied by your theme."
       items={advancedTemplates}
       actionLabel="Add Template"
-      metaLabel="Theme"
-      fields={['description', 'meta']}
+      fields={['description', 'author', 'theme']}
+      initialView={TEMPLATE_TABLE_VIEW}
       onOpenItem={(item) => navigate(`/templates/${item.editPageId ?? item.id}/edit`)}
       onAction={handleAction}
     />
@@ -602,8 +623,7 @@ export function PatternsView() {
       categoryKey="category"
       categoryAllLabel="All patterns"
       categoryTitle="Categories"
-      metaLabel="Theme"
-      fields={['statusLabel', 'meta']}
+      fields={['statusLabel', 'theme']}
       onOpenItem={handleOpenItem}
       onAction={handleAction}
     />
@@ -631,8 +651,7 @@ export function TemplatePartsView() {
       categoryKey="areaLabel"
       categoryAllLabel="All parts"
       categoryTitle="Areas"
-      metaLabel="Used in"
-      fields={['description', 'usedIn', 'meta']}
+      fields={['description', 'usedIn', 'area', 'theme']}
       onOpenItem={(item) =>
         navigate(`/templates/${item.editTemplateId ?? 'index'}/edit?part=${item.id}`)
       }
