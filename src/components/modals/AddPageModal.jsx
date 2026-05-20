@@ -400,7 +400,7 @@ function AddPageModalContent() {
                     <div className="apm-checkbox-group">
                       <div className="apm-checkbox-item">
                         <CheckboxControl
-                          label="Live immediately"
+                          label="Publish immediately"
                           checked={showLive}
                           onChange={setShowLive}
                         />

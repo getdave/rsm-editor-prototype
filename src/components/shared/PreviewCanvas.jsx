@@ -66,7 +66,7 @@ function PreviewCanvas({
     ? `Inactive. Using ${page.defaultTemplateLabel}.`
     : page.isPageDesign
       ? 'Design is active'
-      : page.isLive ? 'Page is live' : 'Page is a draft';
+      : page.isLive ? 'Page is published' : 'Page is a draft';
   const documentName = documentLabel || page.name;
   const documentStatusLabel = scopeNotice || statusLabel;
   const documentNameElement = (

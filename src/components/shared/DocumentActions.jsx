@@ -77,7 +77,7 @@ export default function DocumentActions({
   const isLive = activeDocument?.isLive;
   const statusLabel = activeDocument?.isPageDesign
     ? 'Design is active'
-    : isLive ? 'Page is live' : 'Page is a draft';
+    : isLive ? 'Page is published' : 'Page is a draft';
 
   const nameTooltipText = isGlobalOverride
     ? 'Global template part'
