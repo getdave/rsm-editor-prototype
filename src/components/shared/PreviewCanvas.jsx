@@ -342,7 +342,7 @@ function PreviewCanvas({
   );
 
   return (
-    <div className="canvas" style={{ flexDirection: 'column', padding: 0, width: '100%' }}>
+    <div className="preview-canvas-root canvas">
       <div className="preview-bar">
         <Button variant="primary" onClick={onEdit}>
           {editLabel}
@@ -406,7 +406,7 @@ function PreviewCanvas({
       </div>
       <div className="preview-canvas-area">
         <div className="preview-canvas-stack">
-          <div className="site-card">
+          <div className={`site-card preview-device-${selectedDevice}`}>
             {renderContent()}
           </div>
         </div>
