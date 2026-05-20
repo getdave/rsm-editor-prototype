@@ -17,6 +17,7 @@ import {
   templateParts,
 } from '../../data/mockData';
 import { useAppState } from '../../hooks/useAppState';
+import PrototypeNotImplementedButton from '../shared/PrototypeNotImplemented';
 
 const GRID_PREVIEW_SIZE = 280;
 
@@ -483,9 +484,9 @@ function AdvancedCatalogView({
         className="pages-panel__grid pages-content-frame advanced-catalog-frame"
         title={title}
         actions={
-          <Button variant="primary" onClick={() => onAction(actionLabel)}>
+          <PrototypeNotImplementedButton variant="primary">
             {actionLabel}
-          </Button>
+          </PrototypeNotImplementedButton>
         }
         showSidebarToggle={false}
       >
