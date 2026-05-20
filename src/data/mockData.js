@@ -1055,6 +1055,7 @@ export const navigationAdvancedTargets = [
     typeLabel: "Post",
     url: "/behind-the-scenes-dawn-shoot/",
     sourceType: "post",
+    status: "live",
   },
   {
     id: "post-choosing-locations",
@@ -1064,6 +1065,7 @@ export const navigationAdvancedTargets = [
     typeLabel: "Post",
     url: "/choosing-portrait-locations/",
     sourceType: "post",
+    status: "draft",
   },
   {
     id: "product-print-pack",
@@ -1073,6 +1075,7 @@ export const navigationAdvancedTargets = [
     typeLabel: "Product",
     url: "/product/landscape-print-pack/",
     sourceType: "product",
+    status: "live",
   },
   {
     id: "product-session-voucher",
@@ -1082,6 +1085,7 @@ export const navigationAdvancedTargets = [
     typeLabel: "Product",
     url: "/product/portrait-session-voucher/",
     sourceType: "product",
+    status: "draft",
   },
   {
     id: "category-tutorials",
@@ -1091,6 +1095,7 @@ export const navigationAdvancedTargets = [
     typeLabel: "Category",
     url: "/category/tutorials/",
     sourceType: "category",
+    status: "live",
   },
   {
     id: "category-field-notes",
@@ -1184,6 +1189,7 @@ export const navigationAdvancedTargets = [
     url: "/wp-content/uploads/homepage-hero.jpg",
     sourceType: "media-image",
     thumbnail: "hero",
+    status: "live",
   },
   {
     id: "media-studio-interior",
@@ -1203,6 +1209,7 @@ export const navigationAdvancedTargets = [
     typeLabel: "PDF",
     url: "/wp-content/uploads/pricing-guide.pdf",
     sourceType: "media-document",
+    status: "live",
   },
   {
     id: "media-session-checklist",
@@ -1635,7 +1642,6 @@ export const navigationMenus = [
   {
     id: "main-menu",
     name: "Main menu",
-    isPrimary: true,
     items: [
       {
         id: "nav-1",
@@ -1660,6 +1666,12 @@ export const navigationMenus = [
             label: "Our Team",
             children: [],
           },
+          {
+            id: "nav-2c",
+            pageId: "contact",
+            label: "Contact",
+            children: [],
+          },
         ],
       },
       {
@@ -1672,7 +1684,28 @@ export const navigationMenus = [
         id: "nav-4",
         pageId: "blog",
         label: "Blog",
-        children: [],
+        children: [
+          {
+            id: "nav-4a",
+            label: "Behind the scenes",
+            targetName: "Behind the scenes: Dawn shoot",
+            typeLabel: "Post",
+            url: "/behind-the-scenes-dawn-shoot/",
+            sourceType: "post",
+            status: "live",
+            children: [],
+          },
+          {
+            id: "nav-4b",
+            label: "Choosing locations",
+            targetName: "Choosing portrait locations",
+            typeLabel: "Post",
+            url: "/choosing-portrait-locations/",
+            sourceType: "post",
+            status: "draft",
+            children: [],
+          },
+        ],
       },
     ],
     usedIn: ["header-main", "header-promo"],
