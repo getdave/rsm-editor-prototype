@@ -563,6 +563,7 @@ export function TemplatesView() {
   return (
     <AdvancedCatalogView
       title="Templates"
+      description="Create new templates, or reset any customizations made to the templates supplied by your theme."
       items={advancedTemplates}
       actionLabel="Add Template"
       metaLabel="Theme"
@@ -598,8 +599,8 @@ export function PatternsView() {
 
   return (
     <AdvancedCatalogView
-      title="All patterns"
-      description="A small sample of block patterns from the active theme."
+      title="Patterns"
+      description="Manage what patterns are available when editing the site."
       items={advancedPatterns}
       actionLabel="Add Pattern"
       categoryKey="category"
@@ -628,7 +629,7 @@ export function TemplatePartsView() {
   return (
     <AdvancedCatalogView
       title="Template Parts"
-      description="Reusable site areas such as headers, footers, and general template sections."
+      description="Includes every template part defined for any area."
       items={templateParts}
       actionLabel="Add Template Part"
       categoryKey="areaLabel"
