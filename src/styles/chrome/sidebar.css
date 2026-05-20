@@ -442,28 +442,73 @@
   fill: currentColor;
 }
 
-/* Item rows: drag handle + ToggleControl. Flip the control so the item label
-   sits on the left and the switch is pinned to the right edge. */
+/* Item rows: drag handle + ToggleControl. ToggleControl lays out
+   [switch][label] inside an inner HStack; reverse it so the label sits on the
+   left and the switch is pinned to the right edge of the row. */
 .snc-item-toggle.components-base-control {
   flex: 1 1 auto;
   min-width: 0;
 }
 .snc-item-toggle .components-base-control__field {
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
   width: 100%;
   margin: 0;
 }
+.snc-item-toggle .components-h-stack {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  width: 100%;
+}
 .snc-item-toggle .components-toggle-control__label {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
   color: #bbb;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Section container — a soft-bordered box that holds the heading row and its
+   member items. The whole box is a drop zone for dragging items in. */
+.snc-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0;
+  padding: 4px;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+/* Dragging an item over the section: subtle blueberry (theme color) tint. */
+.snc-section.is-drop-into {
+  background: color-mix(in srgb, var(--wp-blue, #3858e9) 16%, transparent);
+  border-color: color-mix(in srgb, var(--wp-blue, #3858e9) 50%, #3a3a3a);
+}
+
+/* Dragging the section itself dims the whole box (heading + items move together). */
+.snc-section.is-dragging {
+  opacity: 0.4;
+}
+
+.snc-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Empty-section hint — does nothing, replaced by the first dropped item. */
+.snc-section-placeholder.snc-section-placeholder {
+  margin: 0;
+  padding: 8px 4px 8px 32px;
+  color: #777;
+  font-style: italic;
+}
+
+/* Member rows sit indented under the heading. */
+.snc-row--member {
+  padding-left: 4px;
 }
 
 /* Section rows: editable heading input + delete action. */
@@ -497,7 +542,21 @@
 }
 .snc-delete-section.components-button svg { fill: currentColor; }
 
-/* Footer: Add section + Done, pinned below the scrolling list. */
+/* Add section — sits below the nav items inside the scrolling list. */
+.snc-add-section.components-button {
+  justify-content: center;
+  width: 100%;
+  margin-top: 8px;
+}
+.snc-add-section.components-button.is-secondary {
+  color: #c5d0ff;
+  box-shadow: inset 0 0 0 1px #3a3a3a;
+}
+.snc-add-section.components-button.is-secondary:hover:not(:disabled) {
+  box-shadow: inset 0 0 0 1px var(--wp-blue, #3858e9);
+}
+
+/* Footer: Done only, pinned below the scrolling list. */
 .snc-footer {
   flex: 0 0 auto;
   padding: 12px;
@@ -506,13 +565,6 @@
 .snc-footer .components-button {
   justify-content: center;
   width: 100%;
-}
-.snc-footer .snc-add-section.components-button.is-secondary {
-  color: #c5d0ff;
-  box-shadow: inset 0 0 0 1px #3a3a3a;
-}
-.snc-footer .snc-add-section.components-button.is-secondary:hover:not(:disabled) {
-  box-shadow: inset 0 0 0 1px var(--wp-blue, #3858e9);
 }
 
 /* Drag ghost — dark pill following the cursor. */
