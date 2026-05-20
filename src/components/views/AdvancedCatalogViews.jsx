@@ -492,6 +492,7 @@ function AdvancedCatalogView({
       <Page
         className="pages-panel__grid pages-content-frame advanced-catalog-frame"
         title={title}
+        subTitle={description}
         actions={
           <PrototypeNotImplementedButton variant="primary">
             {actionLabel}
@@ -507,11 +508,6 @@ function AdvancedCatalogView({
             title={categoryTitle}
           />
           <div className="pp-inner pp-dataviews advanced-catalog">
-            {description ? (
-              <Text variant="body-md" className="advanced-catalog-description">
-                {description}
-              </Text>
-            ) : null}
             <DataViews
               data={processedData}
               fields={fields}

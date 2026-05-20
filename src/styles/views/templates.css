@@ -10,6 +10,7 @@
   flex: 1;
   min-height: 0;
   background: #fff;
+  border-top: 1px solid #e0e0e0;
 }
 
 .adv-category-rail {
@@ -83,15 +84,8 @@
   min-width: 0;
 }
 
-.advanced-catalog-description {
-  display: block;
-  padding: 0 20px 14px;
-  margin: 0;
-  color: #757575;
-}
-
 .advanced-catalog-toolbar {
-  border-top: 1px solid #e0e0e0;
+  border-top: 0;
 }
 
 .advanced-catalog-scroll {
