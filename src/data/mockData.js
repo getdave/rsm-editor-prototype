@@ -1879,6 +1879,18 @@ export const templateParts = [
     previewKind: "footer-columns",
   },
   {
+    id: "navigation-overlay-main",
+    name: "Navigation overlay",
+    area: "navigation-overlay",
+    areaLabel: "Navigation Overlay",
+    description: "Full-screen mobile menu overlay assigned to the Navigation block.",
+    source: "Twenty Twenty-Five",
+    statusLabel: "Theme",
+    usedIn: ["Main menu"],
+    editTemplateId: "index",
+    previewKind: "navigation-overlay",
+  },
+  {
     id: "comments",
     name: "Comments",
     area: "general",

@@ -148,7 +148,9 @@
 .adv-preview-search-pill,
 .adv-preview-error-code,
 .adv-preview-cover-title,
-.adv-preview-promo {
+.adv-preview-promo,
+.adv-preview-overlay-close,
+.adv-preview-overlay-cta {
   display: block;
   box-sizing: border-box;
 }
@@ -346,6 +348,56 @@
 
 .adv-preview--footer-columns .adv-preview-footer-row span {
   height: 42px;
+}
+
+.adv-preview--navigation-overlay {
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: #1e1e1e;
+}
+
+.adv-preview--navigation-overlay .adv-preview-stack {
+  align-items: center;
+  width: 68%;
+}
+
+.adv-preview--navigation-overlay .adv-preview-bar {
+  background: #fff;
+}
+
+.adv-preview-overlay-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 18px;
+  height: 18px;
+}
+
+.adv-preview-overlay-close::before,
+.adv-preview-overlay-close::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: 18px;
+  height: 2px;
+  background: #fff;
+}
+
+.adv-preview-overlay-close::before {
+  transform: rotate(45deg);
+}
+
+.adv-preview-overlay-close::after {
+  transform: rotate(-45deg);
+}
+
+.adv-preview-overlay-cta {
+  width: 46%;
+  height: 20px;
+  border: 1px solid #fff;
+  border-radius: 2px;
 }
 
 .adv-preview-comments {

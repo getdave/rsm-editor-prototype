@@ -199,6 +199,20 @@ function CatalogPreview({ item }) {
     );
   }
 
+  if (kind === 'navigation-overlay') {
+    return (
+      <div className="adv-preview adv-preview--navigation-overlay">
+        <span className="adv-preview-overlay-close" aria-hidden="true" />
+        <div className="adv-preview-stack">
+          <Bar wide />
+          <Bar />
+          <Bar narrow />
+        </div>
+        <span className="adv-preview-overlay-cta" aria-hidden="true" />
+      </div>
+    );
+  }
+
   if (kind === 'text-media' || kind === 'columns') {
     return (
       <div className={`adv-preview adv-preview--${kind}`}>
