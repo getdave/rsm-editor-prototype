@@ -1,4 +1,5 @@
-import { chevronDown } from '@wordpress/icons';
+import { useState } from 'react';
+import { chevronDown, menu } from '@wordpress/icons';
 
 /**
  * Front-of-site chrome: mirrors a block theme template framing
@@ -24,7 +25,7 @@ import { chevronDown } from '@wordpress/icons';
  * }} NavEntry
  */
 
-function NavEntryControl({ entry, onNavClick, className }) {
+function NavEntryControl({ entry, onNavClick, className, onNavigate }) {
   const isUrl = entry.kind === 'url';
 
   if (entry.kind === 'label') {
@@ -41,6 +42,7 @@ function NavEntryControl({ entry, onNavClick, className }) {
         if (!isUrl && entry.page) {
           onNavClick(entry.page);
         }
+        onNavigate?.();
       }}
     >
       {entry.label}
@@ -48,10 +50,46 @@ function NavEntryControl({ entry, onNavClick, className }) {
   );
 }
 
+function MobileNavEntry({ entry, onNavClick, onNavigate, isChild = false }) {
+  const children = entry.children || [];
+
+  return (
+    <div className={`p-mobile-nav-item${isChild ? ' is-child' : ''}`}>
+      <NavEntryControl
+        entry={entry}
+        onNavClick={onNavClick}
+        onNavigate={onNavigate}
+        className={entry.kind === 'label' ? 'p-mobile-nav-label' : 'p-mobile-nav-link'}
+      />
+      {children.length ? (
+        <div className="p-mobile-subnav">
+          {children.map((child) => (
+            <MobileNavEntry
+              key={child.key}
+              entry={child}
+              onNavClick={onNavClick}
+              onNavigate={onNavigate}
+              isChild
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 /**
  * Sitename + primary nav (inside `.p-header` or alone for editor header row).
  */
-export function PreviewSiteNavCluster({ siteTitle, navEntries, onNavClick }) {
+export function PreviewSiteNavCluster({
+  siteTitle,
+  navEntries,
+  onNavClick,
+  mobileMenuInteractive = true,
+}) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
+
   return (
     <>
       <span className="p-sitename">{siteTitle}</span>
@@ -85,6 +123,38 @@ export function PreviewSiteNavCluster({ siteTitle, navEntries, onNavClick }) {
             </div>
           );
         })}
+      </div>
+      <div className="p-mobile-nav">
+        {mobileMenuInteractive ? (
+          <button
+            type="button"
+            className="p-mobile-nav-toggle"
+            aria-label="Open navigation menu"
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((open) => !open)}
+          >
+            {menu}
+          </button>
+        ) : (
+          <span
+            className="p-mobile-nav-toggle p-mobile-nav-toggle--static"
+            aria-hidden="true"
+          >
+            {menu}
+          </span>
+        )}
+        {mobileMenuInteractive && mobileMenuOpen ? (
+          <div className="p-mobile-nav-overlay" aria-label="Navigation menu">
+            {navEntries.map((entry) => (
+              <MobileNavEntry
+                key={entry.key}
+                entry={entry}
+                onNavClick={onNavClick}
+                onNavigate={closeMobileMenu}
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
     </>
   );
