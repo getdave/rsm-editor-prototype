@@ -355,6 +355,18 @@
   overflow-y: auto;
 }
 
+/* Applied sidebar — a customized section groups its heading with its nav
+   items. Spacing uses @wordpress/theme design tokens. */
+.sidebar-nav-section-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wpds-dimension-gap-xs); /* 4px */
+  margin-block: var(--wpds-dimension-gap-md); /* 12px */
+}
+.sidebar-nav-section-label.sidebar-nav-section-label {
+  padding-block: var(--wpds-dimension-padding-xs); /* 4px */
+}
+
 /* ── SIDEBAR CUSTOMIZER (edit mode) ── */
 /* In-place editor for the main admin nav. Lives on the dark chrome surface,
    so all colors mirror the .ni treatment above (#bbb idle, #fff active,
