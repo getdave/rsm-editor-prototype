@@ -354,3 +354,193 @@
   flex: 1 0 0;
   overflow-y: auto;
 }
+
+/* ── SIDEBAR CUSTOMIZER (edit mode) ── */
+/* In-place editor for the main admin nav. Lives on the dark chrome surface,
+   so all colors mirror the .ni treatment above (#bbb idle, #fff active,
+   #2a2a2a hover/divider) rather than the light --wpds surfaces. */
+.sidebar-customizing {
+  overflow: visible;
+}
+
+.snc {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.snc-header {
+  flex: 0 0 auto;
+  padding: 16px 16px 8px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.snc-title.snc-title {
+  margin: 0;
+  color: #fff;
+  font-weight: 600;
+}
+
+.snc-list {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.snc-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.snc-row:hover {
+  background: #2a2a2a;
+}
+
+.snc-row.is-dragging {
+  opacity: 0.4;
+}
+
+/* Insertion line marking the drop position. */
+.snc-row.is-drop-above::before,
+.snc-row.is-drop-below::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: var(--wp-blue, #3858e9);
+  border-radius: 2px;
+}
+.snc-row.is-drop-above::before { top: -1px; }
+.snc-row.is-drop-below::after { bottom: -1px; }
+
+.snc-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  color: #777;
+  cursor: grab;
+  touch-action: none;
+}
+.snc-drag-handle:hover { color: #bbb; }
+.snc-row.is-dragging .snc-drag-handle { cursor: grabbing; }
+.snc-drag-handle svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* Item rows: drag handle + ToggleControl. Flip the control so the item label
+   sits on the left and the switch is pinned to the right edge. */
+.snc-item-toggle.components-base-control {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.snc-item-toggle .components-base-control__field {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+}
+.snc-item-toggle .components-toggle-control__label {
+  flex: 1;
+  min-width: 0;
+  color: #bbb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Section rows: editable heading input + delete action. */
+.snc-section-input.components-base-control {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.snc-section-input .components-base-control__field { margin: 0; }
+.snc-section-input .components-text-control__input {
+  background: #2a2a2a;
+  color: #fff;
+  border: 1px solid #3a3a3a;
+  box-shadow: none;
+  min-height: 32px;
+}
+.snc-section-input .components-text-control__input::placeholder {
+  color: #777;
+}
+.snc-section-input .components-text-control__input:focus {
+  border-color: var(--wp-blue, #3858e9);
+  box-shadow: 0 0 0 1px var(--wp-blue, #3858e9);
+}
+
+.snc-delete-section.components-button {
+  flex: 0 0 auto;
+  color: #bbb;
+}
+.snc-delete-section.components-button:hover:not(:disabled) {
+  color: var(--wp-red, #f87171);
+  background: #2a2a2a;
+}
+.snc-delete-section.components-button svg { fill: currentColor; }
+
+/* Footer: Add section + Done, pinned below the scrolling list. */
+.snc-footer {
+  flex: 0 0 auto;
+  padding: 12px;
+  border-top: 1px solid #2a2a2a;
+}
+.snc-footer .components-button {
+  justify-content: center;
+  width: 100%;
+}
+.snc-footer .snc-add-section.components-button.is-secondary {
+  color: #c5d0ff;
+  box-shadow: inset 0 0 0 1px #3a3a3a;
+}
+.snc-footer .snc-add-section.components-button.is-secondary:hover:not(:disabled) {
+  box-shadow: inset 0 0 0 1px var(--wp-blue, #3858e9);
+}
+
+/* Drag ghost — dark pill following the cursor. */
+.snc-drag-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 200px;
+  padding: 6px 10px;
+  background: #2a2a2a;
+  color: #fff;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+.snc-drag-ghost__icon {
+  display: inline-flex;
+  color: #777;
+}
+.snc-drag-ghost__icon svg { width: 18px; height: 18px; fill: currentColor; }
+.snc-drag-ghost__label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+}
