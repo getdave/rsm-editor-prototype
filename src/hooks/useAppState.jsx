@@ -22,19 +22,41 @@ export const READING_DISPLAY_STATIC = 'static';
 
 const AppStateContext = createContext(null);
 
+// navLayout is an ordered array of top-level entries:
+//   { kind: 'item', id, hidden }
+//   { kind: 'section', id, label, items: [ { kind: 'item', id, hidden }, ... ] }
+// Sections are containers that own their items; nesting sections is not allowed.
+
+/** Collect every nav item id present in the layout (top level + inside sections). */
+function collectItemIds(layout) {
+  const ids = new Set();
+  for (const entry of layout) {
+    if (entry.kind === 'item') {
+      ids.add(entry.id);
+    } else if (entry.kind === 'section') {
+      for (const item of entry.items ?? []) {
+        ids.add(item.id);
+      }
+    }
+  }
+  return ids;
+}
+
 /**
  * Reconcile a nav layout against the current base item set: drop item entries
- * no longer in the base set, append base items missing from the layout. Section
- * headings are always preserved.
+ * (top level or inside sections) no longer in the base set, append base items
+ * missing from the layout. Sections themselves are always preserved.
  */
 function reconcileNavLayout(layout, baseIds) {
-  const presentIds = new Set(
-    layout.filter((entry) => entry.kind === 'item').map((entry) => entry.id),
-  );
-  const filtered = layout.filter(
-    (entry) => entry.kind === 'section' || baseIds.has(entry.id),
-  );
-  const missing = [...baseIds].filter((id) => !presentIds.has(id));
+  const present = collectItemIds(layout);
+  const filtered = layout
+    .map((entry) =>
+      entry.kind === 'section'
+        ? { ...entry, items: (entry.items ?? []).filter((it) => baseIds.has(it.id)) }
+        : entry,
+    )
+    .filter((entry) => entry.kind === 'section' || baseIds.has(entry.id));
+  const missing = [...baseIds].filter((id) => !present.has(id));
   if (missing.length === 0 && filtered.length === layout.length) {
     return layout;
   }
@@ -44,27 +66,109 @@ function reconcileNavLayout(layout, baseIds) {
   ];
 }
 
-/** Move a layout entry from one index to another (flat reorder). */
-function moveLayoutEntry(layout, fromIndex, toIndex) {
-  if (
-    fromIndex === toIndex ||
-    fromIndex < 0 ||
-    toIndex < 0 ||
-    fromIndex >= layout.length ||
-    toIndex >= layout.length
-  ) {
-    return layout;
+/** Remove an entry (item or section) from anywhere in the layout. */
+function removeEntryDeep(layout, id) {
+  const topIdx = layout.findIndex((entry) => entry.id === id);
+  if (topIdx >= 0) {
+    return {
+      removed: layout[topIdx],
+      layout: [...layout.slice(0, topIdx), ...layout.slice(topIdx + 1)],
+    };
   }
-  const next = [...layout];
-  const [moved] = next.splice(fromIndex, 1);
-  next.splice(toIndex, 0, moved);
-  return next;
+  let removed = null;
+  const next = layout.map((entry) => {
+    if (
+      entry.kind === 'section' &&
+      (entry.items ?? []).some((it) => it.id === id)
+    ) {
+      removed = entry.items.find((it) => it.id === id);
+      return { ...entry, items: entry.items.filter((it) => it.id !== id) };
+    }
+    return entry;
+  });
+  return { removed, layout: removed ? next : layout };
+}
+
+/** Append an item entry to a section's items. */
+function insertIntoSection(layout, sectionId, entry) {
+  let inserted = false;
+  const next = layout.map((e) => {
+    if (e.kind === 'section' && e.id === sectionId) {
+      inserted = true;
+      return { ...e, items: [...(e.items ?? []), entry] };
+    }
+    return e;
+  });
+  return { layout: next, inserted };
+}
+
+/** Insert an entry above/below a target that may live at top level or in a section. */
+function insertRelativeDeep(layout, targetId, entry, position) {
+  const topIdx = layout.findIndex((e) => e.id === targetId);
+  if (topIdx >= 0) {
+    const at = position === 'below' ? topIdx + 1 : topIdx;
+    const next = [...layout];
+    next.splice(at, 0, entry);
+    return { layout: next, inserted: true };
+  }
+  let inserted = false;
+  const next = layout.map((e) => {
+    if (
+      e.kind === 'section' &&
+      (e.items ?? []).some((it) => it.id === targetId)
+    ) {
+      const idx = e.items.findIndex((it) => it.id === targetId);
+      const at = position === 'below' ? idx + 1 : idx;
+      const items = [...e.items];
+      items.splice(at, 0, entry);
+      inserted = true;
+      return { ...e, items };
+    }
+    return e;
+  });
+  return { layout: next, inserted };
 }
 
 /**
- * Delete a section heading. Its member items (the contiguous item entries that
- * follow it until the next heading) are released back to their default-order
- * positions among the remaining items.
+ * Move an entry relative to a target. `position` is 'above' | 'below' | 'inside'
+ * ('inside' drops an item into the section identified by targetId). Sections can
+ * only be reordered at the top level and never nested.
+ */
+function moveNavEntry(layout, draggedId, targetId, position) {
+  if (!draggedId || !targetId || draggedId === targetId) {
+    return layout;
+  }
+  const { removed, layout: pruned } = removeEntryDeep(layout, draggedId);
+  if (!removed) {
+    return layout;
+  }
+
+  if (position === 'inside') {
+    if (removed.kind === 'section') {
+      return layout;
+    }
+    const result = insertIntoSection(pruned, targetId, removed);
+    return result.inserted ? result.layout : layout;
+  }
+
+  if (removed.kind === 'section') {
+    const topIdx = pruned.findIndex((e) => e.id === targetId);
+    if (topIdx === -1) {
+      return layout;
+    }
+    const at = position === 'below' ? topIdx + 1 : topIdx;
+    const next = [...pruned];
+    next.splice(at, 0, removed);
+    return next;
+  }
+
+  const result = insertRelativeDeep(pruned, targetId, removed, position);
+  return result.inserted ? result.layout : layout;
+}
+
+/**
+ * Delete a section. Its member items are released back to their default-order
+ * positions among the remaining top-level items.
  */
 function deleteSectionFromLayout(layout, sectionId, defaultLayout) {
   const idx = layout.findIndex(
@@ -73,12 +177,8 @@ function deleteSectionFromLayout(layout, sectionId, defaultLayout) {
   if (idx === -1) {
     return layout;
   }
-  let end = idx + 1;
-  while (end < layout.length && layout[end].kind === 'item') {
-    end += 1;
-  }
-  const members = layout.slice(idx + 1, end);
-  const without = [...layout.slice(0, idx), ...layout.slice(end)];
+  const members = layout[idx].items ?? [];
+  const without = [...layout.slice(0, idx), ...layout.slice(idx + 1)];
 
   const defaultOrder = new Map(defaultLayout.map((entry, i) => [entry.id, i]));
   for (const member of members) {
@@ -104,9 +204,10 @@ export function AppStateProvider({ children }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Sidebar customizer — in-place edit mode for the main admin nav. `navLayout`
-  // is a flat, ordered array of { kind: 'item', id, hidden } and
-  // { kind: 'section', id, label } entries that drives both the normal sidebar
-  // render and the editor. In-memory only (resets on reload).
+  // is an ordered array of { kind: 'item', id, hidden } and
+  // { kind: 'section', id, label, items: [...] } entries (sections are
+  // containers that own their items). Drives both the normal sidebar render and
+  // the editor. In-memory only (resets on reload).
   const [navEditMode, setNavEditMode] = useState(false);
   const [navLayout, setNavLayout] = useState(() =>
     buildDefaultNavLayout(initialReadingSettings.homepageDisplayMode),
@@ -227,22 +328,31 @@ export function AppStateProvider({ children }) {
 
   const toggleNavItemVisibility = (id) => {
     setNavLayout((prev) =>
-      prev.map((entry) =>
-        entry.kind === 'item' && entry.id === id
-          ? { ...entry, hidden: !entry.hidden }
-          : entry,
-      ),
+      prev.map((entry) => {
+        if (entry.kind === 'item' && entry.id === id) {
+          return { ...entry, hidden: !entry.hidden };
+        }
+        if (entry.kind === 'section') {
+          return {
+            ...entry,
+            items: (entry.items ?? []).map((it) =>
+              it.id === id ? { ...it, hidden: !it.hidden } : it,
+            ),
+          };
+        }
+        return entry;
+      }),
     );
   };
 
-  const reorderNavLayout = (fromIndex, toIndex) => {
-    setNavLayout((prev) => moveLayoutEntry(prev, fromIndex, toIndex));
+  const moveNavLayoutEntry = (draggedId, targetId, position) => {
+    setNavLayout((prev) => moveNavEntry(prev, draggedId, targetId, position));
   };
 
   const addNavSection = () => {
     setNavLayout((prev) => [
       ...prev,
-      { kind: 'section', id: `section-${Date.now()}`, label: 'New section' },
+      { kind: 'section', id: `section-${Date.now()}`, label: 'New section', items: [] },
     ]);
   };
 
@@ -463,7 +573,7 @@ export function AppStateProvider({ children }) {
     exitNavEditMode,
     navLayout,
     toggleNavItemVisibility,
-    reorderNavLayout,
+    moveNavLayoutEntry,
     addNavSection,
     renameNavSection,
     deleteNavSection,
