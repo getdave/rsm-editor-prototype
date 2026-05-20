@@ -14,7 +14,7 @@ import { useAppState } from '../../hooks/useAppState';
 const REFERRER_META = [
   { prefix: '/pages',      label: 'Pages',      icon: pageIcon },
   { prefix: '/content',    label: 'Content',    icon: postList },
-  { prefix: '/navigation', label: 'Navigation', icon: navigation },
+  { prefix: '/navigation', label: 'Navigation Menus', icon: navigation },
   { prefix: '/design',     label: 'Design',     icon: styles },
 ];
 

@@ -55,7 +55,7 @@ function CommandPaletteContent() {
       },
     ];
     navigateCommands.push(
-      { id: 'navigation', label: 'Go to Navigation', group: 'Navigate', perform: () => navigate('/navigation') },
+      { id: 'navigation', label: 'Go to Navigation Menus', group: 'Navigate', perform: () => navigate('/navigation') },
       { id: 'design', label: 'Go to Design', group: 'Navigate', perform: () => navigate('/design') },
     );
     return [
