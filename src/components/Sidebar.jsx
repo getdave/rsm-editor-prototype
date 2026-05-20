@@ -1,14 +1,11 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAppState, READING_DISPLAY_LATEST } from '../hooks/useAppState';
+import { useAppState } from '../hooks/useAppState';
 import { Tooltip } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Sidebar nav depends on WP UI Button CSS vars; swapping components would be a visual refactor.
 import { Button, Stack, Text } from '@wordpress/ui';
 import {
-  home,
   page as pageIcon,
-  postList,
-  navigation,
   styles,
   settings,
   menu,
@@ -26,37 +23,11 @@ import {
   addTemplate,
   symbolFilled,
 } from '@wordpress/icons';
-
-/** Root admin nav — Posts inserted after Pages only when homepage shows latest posts */
-const ADMIN_NAV_ITEM_POSTS = Object.freeze({
-  kind: 'item',
-  id: 'posts',
-  icon: postList,
-  label: 'Posts',
-  path: '/posts',
-  tip: 'Manage Posts on your site',
-});
-
-const ADMIN_NAV_ITEMS_BASE = [
-  { kind: 'item', id: 'home', icon: home, label: 'Home', path: '/', tip: "View your site's home page" },
-  { kind: 'item', id: 'pages', icon: pageIcon, label: 'Pages', path: '/pages', tip: "View your site's Pages" },
-  { kind: 'item', id: 'content', icon: postList, label: 'Content', path: '/content', tip: 'Manage content and page designs' },
-  { kind: 'item', id: 'navigation', icon: navigation, label: 'Navigation', path: '/navigation', tip: 'Assign pages to your Main Menu and manage other menus' },
-  { kind: 'item', id: 'design', icon: styles, label: 'Design', path: '/design', tip: 'Modify your site design and styling', chevron: true },
-];
-
-function buildVisibleAdminNavItems(homepageDisplayMode) {
-  if (homepageDisplayMode === READING_DISPLAY_LATEST) {
-    return [
-      ADMIN_NAV_ITEMS_BASE[0],
-      ADMIN_NAV_ITEMS_BASE[1],
-      ADMIN_NAV_ITEM_POSTS,
-      ADMIN_NAV_ITEMS_BASE[2],
-      ADMIN_NAV_ITEMS_BASE[3],
-    ];
-  }
-  return [...ADMIN_NAV_ITEMS_BASE];
-}
+import {
+  buildVisibleAdminNavItems,
+  getAdminNavItemById,
+} from '../constants/adminNav';
+import SidebarNavCustomizer from './sidebar/SidebarNavCustomizer';
 
 /** Sub-links under Advanced — icons + indent (no tree-line connectors).
     Used by the Block Editor sidebar variant which keeps inline expand/collapse. */
@@ -130,6 +101,9 @@ function Sidebar() {
     selectPage,
     homepageDisplayMode,
     editorReferrer,
+    navEditMode,
+    enterNavEditMode,
+    navLayout,
   } = useAppState();
   const visibleAdminNavItems = useMemo(
     () => buildVisibleAdminNavItems(homepageDisplayMode),
@@ -381,6 +355,16 @@ function Sidebar() {
   // button (top, 64px), the root nav (middle), and recent documents
   // (bottom, flex-grow). Reuses the same .sidebar / .sidebar.collapsed
   // / .admin-root-nav / .ni / .sb-customize classes.
+  // Sidebar customizer edit mode — only reachable from the root admin view.
+  // Replaces the whole sidebar body with the editable list + footer controls.
+  if (navEditMode && !isEditCanvas) {
+    return (
+      <div className="sidebar sidebar-customizing">
+        <SidebarNavCustomizer />
+      </div>
+    );
+  }
+
   if (isEditCanvas) {
     const isCollapsed = sidebarCollapsed && !menuExpanded;
     return (
@@ -499,9 +483,23 @@ function Sidebar() {
         }`}
       >
         <nav className="admin-root-nav sidebar-nav-pane sidebar-nav-pane-admin">
-          {visibleAdminNavItems.map((item) => (
-            <Fragment key={item.id}>{renderItem(item)}</Fragment>
-          ))}
+          {navLayout.map((entry) => {
+            if (entry.kind === 'section') {
+              return (
+                <Text
+                  key={entry.id}
+                  variant="body-sm"
+                  className="components-menu-group__label sidebar-nav-section-label"
+                >
+                  {entry.label}
+                </Text>
+              );
+            }
+            if (entry.hidden) return null;
+            const item = getAdminNavItemById(entry.id, homepageDisplayMode);
+            if (!item) return null;
+            return <Fragment key={entry.id}>{renderItem(item)}</Fragment>;
+          })}
         </nav>
         <nav className="admin-root-nav design-nav sidebar-nav-pane sidebar-nav-pane-design">
           {DESIGN_NAV_ITEMS.map((item) => (
@@ -567,6 +565,7 @@ function Sidebar() {
             size="compact"
             className="ni sb-customize"
             aria-label="Customize navigation"
+            onClick={enterNavEditMode}
           >
             <span className="ni-ico">{settings}</span>
           </Button>
