@@ -7,10 +7,8 @@
  * so every `@wordpress/components` button, focus ring, and selection
  * state inside the skin automatically picks it up.
  *
- * The editable canvas area (`.edit-scroll`) explicitly resets these
- * variables back to the default blue so block selection / hover and
- * any in-canvas controls stay consistent with the default editing
- * experience across all content types.
+ * The editable canvas area also receives sync-color canvas variables so
+ * block selection / hover and in-canvas controls match template context.
  */
 
 /* ── Theme-layer rebind ─────────────────────────────────────────
@@ -34,10 +32,18 @@
   --wpds-color-bg-interactive-brand-strong-active: var(--wp-block-synced-color-hover);
   --wpds-color-bg-interactive-brand-weak-active: var(--wp-block-synced-color-tint-bg);
   --wpds-color-stroke-focus-brand: var(--wp-block-synced-color);
+  --edit-canvas-accent: var(--wp-block-synced-color);
+  --edit-canvas-accent-hover: var(--wp-block-synced-color-hover);
+  --edit-canvas-accent-wash: color-mix(in srgb, transparent 94%, var(--wp-block-synced-color));
+  --edit-canvas-accent-line: color-mix(in srgb, transparent 65%, var(--wp-block-synced-color));
+  --edit-canvas-accent-line-strong: color-mix(in srgb, transparent 50%, var(--wp-block-synced-color));
+  --edit-canvas-accent-shadow: color-mix(in srgb, transparent 65%, var(--wp-block-synced-color));
+  --edit-canvas-accent-shadow-strong: color-mix(in srgb, transparent 60%, var(--wp-block-synced-color));
+  --edit-global-accent: var(--wp-block-synced-color);
 }
 
-/* Restore the default blue inside the editable canvas so block
- * selection, hover, and toolbars match the rest of the editor. */
+/* Keep generic WP component tokens blue inside the editable canvas;
+ * canvas block selection itself uses the scoped canvas variables above. */
 .is-template-context .edit-scroll {
   --wp-admin-theme-color: #3858e9;
   --wp-admin-theme-color-darker-10: #2145e6;
@@ -75,7 +81,7 @@
   color: var(--wp-block-synced-color);
 }
 
-/* Doc-actions layout icon (next to "Template title") picks up the
+/* Doc-actions layout icon (next to the template title) picks up the
  * sync color. The WP icon SVGs ship without a `fill` attribute, so
  * we force `fill: currentColor` to make the wrapper `color` apply. */
 .is-template-context .preview-bar-doc-icon {
