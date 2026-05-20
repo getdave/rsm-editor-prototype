@@ -413,15 +413,19 @@ export default function SettingsSidebar({
     if (flashSignal <= 0 || !isOpen) {
       return undefined;
     }
-    setFlashHighlight(false);
-    const raf = window.requestAnimationFrame(() => {
-      setFlashHighlight(true);
+    let highlightRaf;
+    const resetRaf = window.requestAnimationFrame(() => {
+      setFlashHighlight(false);
+      highlightRaf = window.requestAnimationFrame(() => {
+        setFlashHighlight(true);
+      });
     });
     const t = window.setTimeout(() => {
       setFlashHighlight(false);
     }, 920);
     return () => {
-      window.cancelAnimationFrame(raf);
+      window.cancelAnimationFrame(resetRaf);
+      window.cancelAnimationFrame(highlightRaf);
       window.clearTimeout(t);
     };
   }, [flashSignal, isOpen]);
