@@ -741,6 +741,7 @@ function BlockEditor() {
                 siteTitle={siteTitle}
                 navEntries={editNavEntries}
                 onNavClick={() => {}}
+                mobileMenuInteractive={false}
               />
             </div>
 
