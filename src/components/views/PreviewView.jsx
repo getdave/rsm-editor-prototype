@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { settings } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
@@ -35,11 +35,22 @@ function PreviewView() {
 
   const resolvedHomeKey = resolvedHome?.id ?? null;
   const resetKey = location.key;
+  const previousResolvedHomeKeyRef = useRef(resolvedHomeKey);
   const [previewOverride, setPreviewOverride] = useState(null);
   const [previewHistory, setPreviewHistory] = useState({
     entries: [],
     index: -1,
   });
+
+  useEffect(() => {
+    if (previousResolvedHomeKeyRef.current === resolvedHomeKey) {
+      return;
+    }
+    previousResolvedHomeKeyRef.current = resolvedHomeKey;
+    setPreviewOverride(null);
+    setPreviewHistory({ entries: [], index: -1 });
+  }, [resolvedHomeKey]);
+
   const previewTarget =
     previewOverride?.resetKey === resetKey &&
     previewOverride.homeKey === resolvedHomeKey &&
@@ -135,7 +146,6 @@ function PreviewView() {
             page={previewTarget}
             onEdit={handleEdit}
             onPageChange={handlePageChange}
-            editLabel="Edit"
             documentLabel={previewTarget?.previewLabel}
             documentOptions={documentOptions}
             previewHistory={previewHistoryControls}

@@ -559,7 +559,6 @@ function ContentView() {
         navigate(`/pages/${canvasTarget.id}/edit?inserter=patterns`);
       }}
       onPageChange={() => {}}
-      editLabel="Edit"
       documentLabel={canvasTarget.previewLabel || 'Homepage'}
     />
   ) : null;

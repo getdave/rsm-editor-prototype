@@ -576,9 +576,9 @@ export const pageDesigns = [
   {
     id: "blog-home-root",
     slug: "",
-    name: "Homepage latest posts design",
-    shortName: "Homepage",
-    type: "Page Design",
+    name: "Latest posts",
+    shortName: "Latest posts",
+    type: "Template",
     contentTypeId: "posts",
     provider: "WordPress",
     status: "active",
@@ -588,10 +588,11 @@ export const pageDesigns = [
     isHomepageDesign: true,
     isFrontPage: true,
     layoutKind: "listing",
-    actionLabel: "Edit",
+    templateLabel: "Latest posts",
+    actionLabel: "Edit template",
     description: "Change how latest posts appear when they are used as your homepage.",
-    scopeNotice: "Changes how your latest posts appear on the homepage.",
-    previewLabel: "Homepage",
+    scopeNotice: "Edits sync to the Latest posts homepage template.",
+    previewLabel: "Latest posts",
   },
 ];
 

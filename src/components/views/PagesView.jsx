@@ -1298,7 +1298,6 @@ function PagesView() {
         editPageOrDesign(displayedPreviewPage);
       }}
       onPageChange={setPreviewPage}
-      editLabel="Edit"
     />
   );
 

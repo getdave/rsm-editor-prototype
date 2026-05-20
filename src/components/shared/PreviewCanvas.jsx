@@ -62,7 +62,7 @@ function PreviewCanvas({
   onEdit,
   onPageChange = () => {},
   headerNavItems,
-  editLabel = 'Edit',
+  editLabel,
   documentLabel,
   scopeNotice,
   documentOptions = [],
@@ -72,12 +72,16 @@ function PreviewCanvas({
 
   // Get WordPress-appropriate content for this page
   const content = getPageContent(page);
+  const isTemplatePreview = content.wordpressContext?.type === 'template';
+  const effectiveEditLabel = editLabel ?? (isTemplatePreview ? 'Edit template' : 'Edit page');
 
   const defaultMenuPages = pages.filter((p) => p.inMenu);
   const isInactiveTemplate = page.templateState === 'inactive';
   const statusLabel = isInactiveTemplate
     ? `Inactive. Using ${page.defaultTemplateLabel}.`
-    : page.isPageDesign
+    : isTemplatePreview
+      ? 'Template is active'
+      : page.isPageDesign
       ? 'Design is active'
       : page.isLive ? 'Page is published' : 'Page is a draft';
   const documentName = documentLabel || page.name;
@@ -356,10 +360,10 @@ function PreviewCanvas({
   );
 
   return (
-    <div className="preview-canvas-root canvas">
+    <div className={`preview-canvas-root canvas${isTemplatePreview ? ' is-template-context preview-canvas-root--template' : ''}`}>
       <div className="preview-bar">
         <Button variant="primary" onClick={onEdit}>
-          {editLabel}
+          {effectiveEditLabel}
         </Button>
         {previewHistory && (
           <div className="preview-history-controls" aria-label="Preview history">

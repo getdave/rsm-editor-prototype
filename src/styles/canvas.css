@@ -168,6 +168,25 @@
   flex-shrink: 0;
 }
 
+.preview-canvas-root--template .preview-bar > .components-button.is-primary {
+  background: var(--wp-block-synced-color);
+  border-color: var(--wp-block-synced-color);
+  color: #fff;
+}
+
+.preview-canvas-root--template .preview-bar > .components-button.is-primary:hover:not(:disabled) {
+  background: var(--wp-block-synced-color-hover);
+  border-color: var(--wp-block-synced-color-hover);
+}
+
+.preview-canvas-root--template .preview-bar-doc-icon {
+  color: var(--wp-block-synced-color);
+}
+
+.preview-canvas-root--template .preview-bar-doc-icon svg {
+  fill: currentColor;
+}
+
 .preview-history-controls {
   display: inline-flex;
   align-items: center;
