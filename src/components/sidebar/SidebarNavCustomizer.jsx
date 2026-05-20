@@ -5,28 +5,12 @@ import { dragHandle, plus, trash } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { getAdminNavItemById } from '../../constants/adminNav';
 
-/**
- * Final splice index for moveLayoutEntry given a drop relative to a target row.
- * `position` is 'above' | 'below'. Accounts for the dragged entry being removed
- * before re-insertion.
- */
-function computeToIndex(layout, draggedId, targetId, position) {
-  const fromIndex = layout.findIndex((entry) => entry.id === draggedId);
-  const targetIndex = layout.findIndex((entry) => entry.id === targetId);
-  if (fromIndex === -1 || targetIndex === -1) {
-    return null;
-  }
-  const desiredIndex = position === 'below' ? targetIndex + 1 : targetIndex;
-  const toIndex = fromIndex < desiredIndex ? desiredIndex - 1 : desiredIndex;
-  return { fromIndex, toIndex };
-}
-
 function SidebarNavCustomizer() {
   const {
     navLayout,
     homepageDisplayMode,
     toggleNavItemVisibility,
-    reorderNavLayout,
+    moveNavLayoutEntry,
     addNavSection,
     renameNavSection,
     deleteNavSection,
@@ -40,39 +24,102 @@ function SidebarNavCustomizer() {
 
   const setDropTarget = useCallback((next) => {
     setDropTargetState((prev) => {
-      if (prev?.id === next?.id && prev?.position === next?.position) {
+      if (
+        prev?.targetId === next?.targetId &&
+        prev?.position === next?.position &&
+        prev?.sectionId === next?.sectionId
+      ) {
         return prev;
       }
       return next;
     });
   }, []);
 
-  const labelForEntry = useCallback(
-    (entry) =>
-      entry.kind === 'section'
-        ? entry.label
-        : getAdminNavItemById(entry.id, homepageDisplayMode)?.label ?? entry.id,
-    [homepageDisplayMode],
+  // Map every member item id to the section it lives in (for drop highlighting).
+  const memberSectionMap = useMemo(() => {
+    const map = new Map();
+    for (const entry of navLayout) {
+      if (entry.kind === 'section') {
+        for (const item of entry.items ?? []) {
+          map.set(item.id, entry.id);
+        }
+      }
+    }
+    return map;
+  }, [navLayout]);
+
+  const isDraggingSection = useMemo(
+    () => navLayout.some((e) => e.kind === 'section' && e.id === draggingId),
+    [navLayout, draggingId],
   );
 
-  const draggingLabel = useMemo(() => {
-    if (!draggingId) return '';
-    const entry = navLayout.find((e) => e.id === draggingId);
-    return entry ? labelForEntry(entry) : '';
-  }, [draggingId, navLayout, labelForEntry]);
+  const getEntryLabel = useCallback(
+    (id) => {
+      const top = navLayout.find((e) => e.id === id);
+      if (top) {
+        return top.kind === 'section'
+          ? top.label
+          : getAdminNavItemById(top.id, homepageDisplayMode)?.label ?? top.id;
+      }
+      return getAdminNavItemById(id, homepageDisplayMode)?.label ?? id;
+    },
+    [navLayout, homepageDisplayMode],
+  );
 
-  const resolveDrop = useCallback((clientX, clientY) => {
-    const draggedId = dragStateRef.current.id;
-    if (!draggedId) return null;
-    const element = document.elementFromPoint(clientX, clientY);
-    const row = element?.closest?.('[data-nav-entry-id]');
-    if (!row) return null;
-    const targetId = row.dataset.navEntryId;
-    if (targetId === draggedId) return null;
-    const rect = row.getBoundingClientRect();
-    const position = clientY - rect.top < rect.height / 2 ? 'above' : 'below';
-    return { id: targetId, position };
-  }, []);
+  const draggingLabel = draggingId ? getEntryLabel(draggingId) : '';
+
+  const resolveDrop = useCallback(
+    (clientX, clientY) => {
+      const draggedId = dragStateRef.current.id;
+      if (!draggedId) return null;
+      const el = document.elementFromPoint(clientX, clientY);
+      if (!el) return null;
+
+      const draggingSec = navLayout.some(
+        (e) => e.kind === 'section' && e.id === draggedId,
+      );
+
+      if (draggingSec) {
+        // Sections reorder only among top-level entries.
+        const row = el.closest('[data-nav-toplevel]');
+        if (!row) return null;
+        const targetId = row.dataset.navEntryId;
+        if (targetId === draggedId) return null;
+        const rect = row.getBoundingClientRect();
+        const position =
+          clientY - rect.top < rect.height / 2 ? 'above' : 'below';
+        return { targetId, position, sectionId: null };
+      }
+
+      const row = el.closest('[data-nav-entry-id]');
+      if (row) {
+        const targetId = row.dataset.navEntryId;
+        if (targetId === draggedId) return null;
+        const rect = row.getBoundingClientRect();
+        const firstHalf = clientY - rect.top < rect.height / 2;
+        if (row.dataset.sectionHeader != null) {
+          // Section header: top half drops above the section at top level,
+          // bottom half drops the item into the section.
+          return firstHalf
+            ? { targetId, position: 'above', sectionId: null }
+            : { targetId, position: 'inside', sectionId: targetId };
+        }
+        return {
+          targetId,
+          position: firstHalf ? 'above' : 'below',
+          sectionId: memberSectionMap.get(targetId) ?? null,
+        };
+      }
+
+      const sectionBox = el.closest('[data-section-dropzone]');
+      if (sectionBox) {
+        const sid = sectionBox.dataset.sectionDropzone;
+        return { targetId: sid, position: 'inside', sectionId: sid };
+      }
+      return null;
+    },
+    [navLayout, memberSectionMap],
+  );
 
   useEffect(() => {
     if (!draggingId) return undefined;
@@ -88,15 +135,7 @@ function SidebarNavCustomizer() {
       const target = resolveDrop(event.clientX, event.clientY);
       const draggedId = dragStateRef.current.id;
       if (draggedId && target) {
-        const indices = computeToIndex(
-          navLayout,
-          draggedId,
-          target.id,
-          target.position,
-        );
-        if (indices) {
-          reorderNavLayout(indices.fromIndex, indices.toIndex);
-        }
+        moveNavLayoutEntry(draggedId, target.targetId, target.position);
       }
       dragStateRef.current.id = null;
       setDraggingId(null);
@@ -120,7 +159,7 @@ function SidebarNavCustomizer() {
       window.removeEventListener('pointerup', finishDrag);
       window.removeEventListener('keydown', cancelDrag);
     };
-  }, [draggingId, navLayout, reorderNavLayout, resolveDrop, setDropTarget]);
+  }, [draggingId, moveNavLayoutEntry, resolveDrop, setDropTarget]);
 
   const startDrag = (event, id) => {
     if (event.button !== 0) return;
@@ -131,61 +170,45 @@ function SidebarNavCustomizer() {
     setDropTarget(null);
   };
 
-  const renderRow = (entry) => {
-    const dropPosition =
-      dropTarget?.id === entry.id ? dropTarget.position : null;
+  const dragHandleFor = (id) => (
+    <span
+      className="snc-drag-handle"
+      aria-label="Drag to reorder"
+      role="button"
+      tabIndex={-1}
+      onPointerDown={(event) => startDrag(event, id)}
+    >
+      {dragHandle}
+    </span>
+  );
+
+  const dropLineClass = (id) =>
+    dropTarget?.targetId === id &&
+    (dropTarget.position === 'above' || dropTarget.position === 'below')
+      ? `is-drop-${dropTarget.position}`
+      : '';
+
+  const renderItemRow = (entry, { isTopLevel }) => {
+    const item = getAdminNavItemById(entry.id, homepageDisplayMode);
+    if (!item) return null;
+    const isLocked = entry.id === 'home';
     const rowClass = [
       'snc-row',
-      `snc-row--${entry.kind}`,
+      'snc-row--item',
+      isTopLevel ? '' : 'snc-row--member',
       draggingId === entry.id ? 'is-dragging' : '',
-      dropPosition ? `is-drop-${dropPosition}` : '',
+      dropLineClass(entry.id),
     ]
       .filter(Boolean)
       .join(' ');
-
-    const handle = (
-      <span
-        className="snc-drag-handle"
-        aria-label="Drag to reorder"
-        role="button"
-        tabIndex={-1}
-        onPointerDown={(event) => startDrag(event, entry.id)}
-      >
-        {dragHandle}
-      </span>
-    );
-
-    if (entry.kind === 'section') {
-      return (
-        <div key={entry.id} className={rowClass} data-nav-entry-id={entry.id}>
-          {handle}
-          <TextControl
-            className="snc-section-input"
-            label="Section name"
-            hideLabelFromVision
-            value={entry.label}
-            placeholder="Section name"
-            onChange={(value) => renameNavSection(entry.id, value)}
-            __nextHasNoMarginBottom
-          />
-          <Button
-            className="snc-delete-section"
-            icon={trash}
-            label="Delete section"
-            size="small"
-            onClick={() => deleteNavSection(entry.id)}
-          />
-        </div>
-      );
-    }
-
-    const item = getAdminNavItemById(entry.id, homepageDisplayMode);
-    if (!item) return null;
-    // Home is the admin landing surface — always visible, toggle locked on.
-    const isLocked = entry.id === 'home';
     return (
-      <div key={entry.id} className={rowClass} data-nav-entry-id={entry.id}>
-        {handle}
+      <div
+        key={entry.id}
+        className={rowClass}
+        data-nav-entry-id={entry.id}
+        {...(isTopLevel ? { 'data-nav-toplevel': '' } : {})}
+      >
+        {dragHandleFor(entry.id)}
         <ToggleControl
           className="snc-item-toggle"
           label={item.label}
@@ -194,6 +217,63 @@ function SidebarNavCustomizer() {
           onChange={() => toggleNavItemVisibility(entry.id)}
           __nextHasNoMarginBottom
         />
+      </div>
+    );
+  };
+
+  const renderSection = (section) => {
+    const items = section.items ?? [];
+    const sectionClass = [
+      'snc-section',
+      draggingId === section.id ? 'is-dragging' : '',
+      dropTarget?.sectionId === section.id && !isDraggingSection
+        ? 'is-drop-into'
+        : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
+    const headerClass = ['snc-row', 'snc-row--section', dropLineClass(section.id)]
+      .filter(Boolean)
+      .join(' ');
+    return (
+      <div
+        key={section.id}
+        className={sectionClass}
+        data-section-dropzone={section.id}
+      >
+        <div
+          className={headerClass}
+          data-nav-entry-id={section.id}
+          data-nav-toplevel=""
+          data-section-header=""
+        >
+          {dragHandleFor(section.id)}
+          <TextControl
+            className="snc-section-input"
+            label="Section name"
+            hideLabelFromVision
+            value={section.label}
+            placeholder="Section name"
+            onChange={(value) => renameNavSection(section.id, value)}
+            __nextHasNoMarginBottom
+          />
+          <Button
+            className="snc-delete-section"
+            icon={trash}
+            label="Delete section"
+            size="small"
+            onClick={() => deleteNavSection(section.id)}
+          />
+        </div>
+        <div className="snc-section-body">
+          {items.length === 0 ? (
+            <Text variant="body-sm" className="snc-section-placeholder">
+              Drag and drop items
+            </Text>
+          ) : (
+            items.map((item) => renderItemRow(item, { isTopLevel: false }))
+          )}
+        </div>
       </div>
     );
   };
@@ -211,9 +291,12 @@ function SidebarNavCustomizer() {
         </Text>
       </Stack>
 
-      <div className="snc-list">{navLayout.map(renderRow)}</div>
-
-      <Stack direction="column" gap="sm" className="snc-footer">
+      <div className="snc-list">
+        {navLayout.map((entry) =>
+          entry.kind === 'section'
+            ? renderSection(entry)
+            : renderItemRow(entry, { isTopLevel: true }),
+        )}
         <Button
           className="snc-add-section"
           icon={plus}
@@ -222,6 +305,9 @@ function SidebarNavCustomizer() {
         >
           Add section
         </Button>
+      </div>
+
+      <Stack direction="column" gap="sm" className="snc-footer">
         <Button
           className="snc-done"
           variant="primary"
