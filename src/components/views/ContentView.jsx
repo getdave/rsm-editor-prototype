@@ -487,8 +487,8 @@ function CustomizeTemplateModal({
       <div className="content-customize-template-modal-body">
         <p>
           {design.shortName} is using the site&apos;s{' '}
-          {defaultLayoutName}. Customize it to create a version you can edit
-          without changing other content types.
+          {defaultLayoutName}. Customize this template without changing other
+          content types.
         </p>
       </div>
       <div className="content-customize-template-modal-actions">
