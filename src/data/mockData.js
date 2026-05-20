@@ -1644,12 +1644,6 @@ export const navigationMenus = [
     name: "Main menu",
     items: [
       {
-        id: "nav-1",
-        pageId: "home",
-        label: "Home",
-        children: [],
-      },
-      {
         id: "nav-2",
         pageId: "about",
         label: "About",
@@ -1664,12 +1658,6 @@ export const navigationMenus = [
             id: "nav-2b",
             pageId: "about-our-team",
             label: "Our Team",
-            children: [],
-          },
-          {
-            id: "nav-2c",
-            pageId: "contact",
-            label: "Contact",
             children: [],
           },
         ],
@@ -1706,6 +1694,12 @@ export const navigationMenus = [
             children: [],
           },
         ],
+      },
+      {
+        id: "nav-5",
+        pageId: "contact",
+        label: "Contact",
+        children: [],
       },
     ],
     usedIn: ["header-main", "header-promo"],
