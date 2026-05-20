@@ -7,6 +7,10 @@ import {
 } from '../data/mockData';
 import { MAIN_MENU_ID } from '../constants/navigation';
 import {
+  buildDefaultNavLayout,
+  buildVisibleAdminNavItems,
+} from '../constants/adminNav';
+import {
   appendTopLevelPageIfMissing,
   removeItemsByPageId,
   removePageFromAllMenus,
@@ -18,9 +22,95 @@ export const READING_DISPLAY_STATIC = 'static';
 
 const AppStateContext = createContext(null);
 
+/**
+ * Reconcile a nav layout against the current base item set: drop item entries
+ * no longer in the base set, append base items missing from the layout. Section
+ * headings are always preserved.
+ */
+function reconcileNavLayout(layout, baseIds) {
+  const presentIds = new Set(
+    layout.filter((entry) => entry.kind === 'item').map((entry) => entry.id),
+  );
+  const filtered = layout.filter(
+    (entry) => entry.kind === 'section' || baseIds.has(entry.id),
+  );
+  const missing = [...baseIds].filter((id) => !presentIds.has(id));
+  if (missing.length === 0 && filtered.length === layout.length) {
+    return layout;
+  }
+  return [
+    ...filtered,
+    ...missing.map((id) => ({ kind: 'item', id, hidden: false })),
+  ];
+}
+
+/** Move a layout entry from one index to another (flat reorder). */
+function moveLayoutEntry(layout, fromIndex, toIndex) {
+  if (
+    fromIndex === toIndex ||
+    fromIndex < 0 ||
+    toIndex < 0 ||
+    fromIndex >= layout.length ||
+    toIndex >= layout.length
+  ) {
+    return layout;
+  }
+  const next = [...layout];
+  const [moved] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, moved);
+  return next;
+}
+
+/**
+ * Delete a section heading. Its member items (the contiguous item entries that
+ * follow it until the next heading) are released back to their default-order
+ * positions among the remaining items.
+ */
+function deleteSectionFromLayout(layout, sectionId, defaultLayout) {
+  const idx = layout.findIndex(
+    (entry) => entry.kind === 'section' && entry.id === sectionId,
+  );
+  if (idx === -1) {
+    return layout;
+  }
+  let end = idx + 1;
+  while (end < layout.length && layout[end].kind === 'item') {
+    end += 1;
+  }
+  const members = layout.slice(idx + 1, end);
+  const without = [...layout.slice(0, idx), ...layout.slice(end)];
+
+  const defaultOrder = new Map(defaultLayout.map((entry, i) => [entry.id, i]));
+  for (const member of members) {
+    const memberRank = defaultOrder.get(member.id) ?? Infinity;
+    let insertAt = without.length;
+    for (let i = 0; i < without.length; i += 1) {
+      const entry = without[i];
+      if (
+        entry.kind === 'item' &&
+        (defaultOrder.get(entry.id) ?? Infinity) > memberRank
+      ) {
+        insertAt = i;
+        break;
+      }
+    }
+    without.splice(insertAt, 0, member);
+  }
+  return without;
+}
+
 export function AppStateProvider({ children }) {
   // Sidebar state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Sidebar customizer — in-place edit mode for the main admin nav. `navLayout`
+  // is a flat, ordered array of { kind: 'item', id, hidden } and
+  // { kind: 'section', id, label } entries that drives both the normal sidebar
+  // render and the editor. In-memory only (resets on reload).
+  const [navEditMode, setNavEditMode] = useState(false);
+  const [navLayout, setNavLayout] = useState(() =>
+    buildDefaultNavLayout(initialReadingSettings.homepageDisplayMode),
+  );
 
   // Pages state (mutable for adding new pages and renames in the editor)
   const [pages, setPages] = useState(pagesData);
@@ -36,7 +126,7 @@ export function AppStateProvider({ children }) {
 
   // Homepage configuration. Kept global so Home, Pages, and Content all resolve
   // the same front-page/posts-page state.
-  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
+  const [homepageDisplayMode, setHomepageDisplayModeRaw] = useState(
     initialReadingSettings.homepageDisplayMode,
   );
   const [frontPageId, setFrontPageId] = useState(
@@ -114,6 +204,66 @@ export function AppStateProvider({ children }) {
 
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => !prev);
+  };
+
+  // Setting the homepage display mode can change the base nav set (Posts
+  // appears/disappears), so reconcile navLayout in the same handler: drop
+  // entries no longer in the base set and append newly-available base items.
+  // Sections are always preserved. Done at event time (not in an effect).
+  const setHomepageDisplayMode = useCallback((next) => {
+    setHomepageDisplayModeRaw(next);
+    const resolved = typeof next === 'function' ? null : next;
+    if (resolved == null) {
+      return;
+    }
+    const baseIds = new Set(
+      buildVisibleAdminNavItems(resolved).map((item) => item.id),
+    );
+    setNavLayout((prev) => reconcileNavLayout(prev, baseIds));
+  }, []);
+
+  const enterNavEditMode = () => setNavEditMode(true);
+  const exitNavEditMode = () => setNavEditMode(false);
+
+  const toggleNavItemVisibility = (id) => {
+    setNavLayout((prev) =>
+      prev.map((entry) =>
+        entry.kind === 'item' && entry.id === id
+          ? { ...entry, hidden: !entry.hidden }
+          : entry,
+      ),
+    );
+  };
+
+  const reorderNavLayout = (fromIndex, toIndex) => {
+    setNavLayout((prev) => moveLayoutEntry(prev, fromIndex, toIndex));
+  };
+
+  const addNavSection = () => {
+    setNavLayout((prev) => [
+      ...prev,
+      { kind: 'section', id: `section-${Date.now()}`, label: 'New section' },
+    ]);
+  };
+
+  const renameNavSection = (id, label) => {
+    setNavLayout((prev) =>
+      prev.map((entry) =>
+        entry.kind === 'section' && entry.id === id
+          ? { ...entry, label }
+          : entry,
+      ),
+    );
+  };
+
+  const deleteNavSection = (id) => {
+    setNavLayout((prev) =>
+      deleteSectionFromLayout(
+        prev,
+        id,
+        buildDefaultNavLayout(homepageDisplayMode),
+      ),
+    );
   };
 
   const openSiteIdentityModal = () => {
@@ -306,6 +456,17 @@ export function AppStateProvider({ children }) {
     sidebarCollapsed,
     setSidebarCollapsed,
     toggleSidebar,
+
+    // Sidebar customizer
+    navEditMode,
+    enterNavEditMode,
+    exitNavEditMode,
+    navLayout,
+    toggleNavItemVisibility,
+    reorderNavLayout,
+    addNavSection,
+    renameNavSection,
+    deleteNavSection,
 
     // Pages state
     pages,
