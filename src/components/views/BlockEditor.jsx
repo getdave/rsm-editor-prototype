@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
-import { Button } from '@wordpress/components';
+import {
+  Button,
+  __experimentalToggleGroupControl as ToggleGroupControl,
+  __experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+} from '@wordpress/components';
 import {
   desktop,
   drawerRight,
@@ -10,7 +14,6 @@ import {
   moreVertical,
   plus,
   redo,
-  symbolFilled,
   tablet,
   undo,
 } from '@wordpress/icons';
@@ -30,7 +33,8 @@ import {
   HEADER_META,
   shouldIsolateEditPeers,
   TEMPLATE_ROOT_META,
-} from '../../utils/editCanvasBlockMeta';
+} from '../../utils/blockEditorMeta';
+import { EDITOR_MODES, getEditorMode } from '../../services/blockEditorMode';
 import { PreviewSiteNavCluster } from '../shared/PreviewSiteChrome';
 import { pages } from '../../data/mockData';
 import GlobalTemplatePartEditWarningModal from '../modals/GlobalTemplatePartEditWarningModal';
@@ -117,11 +121,15 @@ function AddSectionInserterButton({ variant, onAdd }) {
   );
 }
 
-function TemplatePartSyncBadge({ label }) {
+/** Hover indicator for sync content (pattern sections + template parts).
+ * The icon mirrors the content type (HEADER_META.icon, FOOTER_META.icon, or
+ * the section's pattern icon) so it doubles as both a "this is synced" hint
+ * and a content-type label before the block toolbar appears on selection. */
+function SyncContentBadge({ label, icon }) {
   return (
     <span className="tp-sync-badge" aria-label={`${label} is synced across the site`}>
       <span className="tp-sync-badge-icon" aria-hidden>
-        {symbolFilled}
+        {icon}
       </span>
     </span>
   );
@@ -169,8 +177,8 @@ function EditableSectionGroup({
   );
 }
 
-function EditingView() {
-  const { designId } = useParams();
+function BlockEditor() {
+  const { designId, templateId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     currentPage,
@@ -191,7 +199,10 @@ function EditingView() {
   const pageDesignTarget = designId
     ? pageDesigns.find((design) => design.id === designId)
     : null;
-  const editTarget = pageDesignTarget || currentPage;
+  const templateTarget = templateId
+    ? pages.find((page) => page.id === templateId)
+    : null;
+  const editTarget = pageDesignTarget || templateTarget || currentPage;
   const isPageDesignEdit = Boolean(pageDesignTarget);
   const [selectedBlockId, setSelectedBlockId] = useState('section-0');
   /** Second acknowledgment for Header/Footer before peer spotlight + global doc-actions label apply. */
@@ -206,6 +217,10 @@ function EditingView() {
 
   // Get page-specific content for editing
   const content = getEditModeContent(editTarget);
+  // The Block Editor switches to its template mode automatically based on what
+  // the user is editing; `blockEditorMode` is the single source of truth.
+  const mode = getEditorMode(content);
+  const isTemplate = mode === EDITOR_MODES.TEMPLATE;
 
   const editNavEntries = useMemo(
     () => pages.filter((p) => p.inMenu).map((p) => ({ key: p.id, label: p.name, page: p })),
@@ -214,9 +229,9 @@ function EditingView() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reset selection when switching edited documents.
-    setSelectedBlockId(content.isTemplate ? 'template' : 'section-0');
+    setSelectedBlockId(isTemplate ? 'template' : 'section-0');
     setSectionStylesByIndex({});
-  }, [editTarget?.id, content.isTemplate]);
+  }, [editTarget?.id, isTemplate]);
 
   const handleSectionStyleChange = (sectionIndex, styleId) => {
     setSectionStylesByIndex((prev) => ({ ...prev, [sectionIndex]: styleId }));
@@ -316,10 +331,10 @@ function EditingView() {
   const isolatePeersForSelection = useMemo(
     () =>
       shouldIsolateEditPeers(selectedBlockId, {
-        isTemplate: Boolean(content.isTemplate),
+        isTemplate,
         sections: content.sections,
       }),
-    [selectedBlockId, content.isTemplate, content.sections],
+    [selectedBlockId, isTemplate, content.sections],
   );
 
   const spotlightOn = useMemo(() => {
@@ -583,35 +598,32 @@ function EditingView() {
         transition: 'width 280ms cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
-      <div className={`editor-col${content.isTemplate ? ' is-template-context' : ''}`}>
+      <div className={`editor-col${isTemplate ? ' is-template-context' : ''}`}>
         {/* Canvas toolbar — full width; panels sit below this */}
         <div className="canvas-toolbar">
           {/* Left zone */}
           <ExitSplitButton />
           <Button
             variant="primary"
-            className="ct-btn primary"
+            className="ct-icon-btn"
             onClick={toggleInserter}
             icon={plus}
-            iconSize={20}
           />
           <Button
-            className="ct-btn"
+            className="ct-icon-btn"
             label="Undo"
             icon={undo}
-            iconSize={20}
           />
           <Button
-            className="ct-btn"
+            className="ct-icon-btn"
             label="Redo"
             icon={redo}
-            iconSize={20}
           />
           <Button
-            className={`ct-btn ${listViewOpen ? 'active' : ''}`}
+            className="ct-icon-btn"
             label="Document Overview"
             icon={listView}
-            iconSize={20}
+            isPressed={listViewOpen}
             onClick={handleToggleListView}
           />
 
@@ -621,41 +633,31 @@ function EditingView() {
             document={editTarget}
             canRename={!isPageDesignEdit}
             documentLabelOverride={spotlightGlobalDocLabel}
-            isTemplate={content.isTemplate}
+            mode={mode}
             templateTitle={templateTitle}
           />
           <div className="ct-space"></div>
 
           {/* Right zone */}
-          <div className="ct-view-modes">
-            <Button
-              className={`ct-view-btn ${selectedDevice === 'desktop' ? 'active' : ''}`}
-              onClick={() => setSelectedDevice('desktop')}
-              label="Desktop view"
-              icon={desktop}
-              iconSize={20}
-            />
-            <Button
-              className={`ct-view-btn ${selectedDevice === 'tablet' ? 'active' : ''}`}
-              onClick={() => setSelectedDevice('tablet')}
-              label="Tablet view"
-              icon={tablet}
-              iconSize={20}
-            />
-            <Button
-              className={`ct-view-btn ${selectedDevice === 'mobile' ? 'active' : ''}`}
-              onClick={() => setSelectedDevice('mobile')}
-              label="Mobile view"
-              icon={mobile}
-              iconSize={20}
-            />
-          </div>
+          <ToggleGroupControl
+            className="ct-view-modes"
+            label="Device preview"
+            hideLabelFromVision
+            value={selectedDevice}
+            onChange={setSelectedDevice}
+            isBlock
+            __nextHasNoMarginBottom
+          >
+            <ToggleGroupControlOptionIcon value="desktop" icon={desktop} label="Desktop view" />
+            <ToggleGroupControlOptionIcon value="tablet" icon={tablet} label="Tablet view" />
+            <ToggleGroupControlOptionIcon value="mobile" icon={mobile} label="Mobile view" />
+          </ToggleGroupControl>
 
           <Button
-            className={`ct-icon-btn ${settingsSidebarOpen ? 'active' : ''}`}
+            className="ct-icon-btn ct-icon-btn--after-tgc"
             label="Toggle settings sidebar"
             icon={drawerRight}
-            iconSize={20}
+            isPressed={settingsSidebarOpen}
             onClick={toggleSettingsSidebar}
           />
 
@@ -663,12 +665,10 @@ function EditingView() {
             className="ct-icon-btn"
             label="More options"
             icon={moreVertical}
-            iconSize={20}
           />
 
           <Button
             variant="primary"
-            className="ct-save show"
             onClick={openUnsavedChangesModal}
             disabled={!hasUnsavedChanges}
           >
@@ -682,7 +682,7 @@ function EditingView() {
             listViewProps={{
               onClose: () => setListViewOpen(false),
               sections: content.sections,
-              isTemplate: Boolean(content.isTemplate),
+              mode,
               selectedBlockId,
               onSelectBlock: selectCanvasBlock,
               pageTitle: pageInspectorTitle,
@@ -717,7 +717,7 @@ function EditingView() {
                   onGlobalPartEditExit={handleGlobalPartToolbarExit}
                 />
               )}
-              <TemplatePartSyncBadge label={HEADER_META.label} />
+              <SyncContentBadge label={HEADER_META.label} icon={HEADER_META.icon} />
               <PreviewSiteNavCluster
                 siteTitle={siteTitle}
                 navEntries={editNavEntries}
@@ -726,7 +726,7 @@ function EditingView() {
             </div>
 
             {/* Document sections based on the current edit target */}
-            {content.isTemplate ? (
+            {isTemplate ? (
               <div
                 className={`template-edit-root e-block ${selectedBlockId === 'template' ? 'sel' : ''}${
                   spotlightOn && selectedBlockId === 'template' ? ' edit-spotlight-focus' : ''
@@ -765,7 +765,7 @@ function EditingView() {
                   onGlobalPartEditExit={handleGlobalPartToolbarExit}
                 />
               )}
-              <TemplatePartSyncBadge label={FOOTER_META.label} />
+              <SyncContentBadge label={FOOTER_META.label} icon={FOOTER_META.icon} />
               <span className="p-ft">© 2026 {siteTitle}</span>
               <span className="p-ft">Privacy Policy</span>
             </div>
@@ -779,7 +779,7 @@ function EditingView() {
             pageTitle={pageInspectorTitle}
             selectedBlockId={selectedBlockId}
             sections={content.sections}
-            isTemplate={Boolean(content.isTemplate)}
+            mode={mode}
             focusBlockTabSignal={inspectorBlockTabSignal}
             flashSignal={inspectorFlashSignal}
             sectionStyles={sectionStylesByIndex}
@@ -800,4 +800,4 @@ function EditingView() {
   );
 }
 
-export default EditingView;
+export default BlockEditor;

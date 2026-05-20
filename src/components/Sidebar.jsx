@@ -59,7 +59,7 @@ function buildVisibleAdminNavItems(homepageDisplayMode) {
 }
 
 /** Sub-links under Advanced — icons + indent (no tree-line connectors).
-    Used by the editor-canvas sidebar variant which keeps inline expand/collapse. */
+    Used by the Block Editor sidebar variant which keeps inline expand/collapse. */
 const ADVANCED_SUB_NAV_ITEMS = Object.freeze([
   {
     id: 'advanced-templates',
@@ -115,7 +115,7 @@ const ADVANCED_NAV_ITEMS = [
   },
 ];
 
-const EDIT_ROUTE_PATTERN = /^\/(?:pages|page-designs)\/[^/]+\/edit$|^\/template-editing$/;
+const EDIT_ROUTE_PATTERN = /^\/(?:pages|page-designs|templates)\/[^/]+\/edit$/;
 
 function Sidebar() {
   const navigate = useNavigate();

@@ -115,24 +115,24 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #00a32a;
+  background: var(--wp-green);
   margin: 0 5px 0 8px;
   flex-shrink: 0;
 }
 
 .url-status {
-  color: #00a32a;
+  color: var(--wp-green);
   font-size: 10px;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .url-draft-dot {
-  background: #888;
+  background: var(--wp-gray-200);
 }
 
 .url-draft {
-  color: #888;
+  color: var(--wp-gray-200);
 }
 
 /* Preview canvas wrapper — stacks the toolbar on top of the scrollable
@@ -155,11 +155,12 @@
   border-radius: 0;
 }
 
-/* Browse bar — preview state */
+/* Browse bar — preview state. Height matches `.canvas-toolbar` so the
+ * admin and editing chrome share the same vertical rhythm. */
 .preview-bar {
-  height: 69px;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+  height: 64px;
+  background: var(--wp-bg-card);
+  border-bottom: 1px solid var(--wp-border-light);
   display: flex;
   align-items: center;
   padding: 0 12px;
@@ -173,7 +174,7 @@
   display: inline-flex;
   width: 24px;
   height: 24px;
-  color: #1e1e1e;
+  color: var(--wp-gray-900);
 }
 
 .preview-bar-doc-name {
@@ -288,32 +289,11 @@
   width: 100%;
 }
 
-/* Edit button in preview bar */
-.ct-edit {
-  padding: 8px 16px;
-  background: #3858e9;
-  color: #fff;
-  border: 1px solid #3858e9;
-  border-radius: 4px;
-  font: 500 12px var(--wp-font-family);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: background 0.12s;
-  height: 36px;
-}
-
-.ct-edit:hover {
-  background: #2a47d4;
-  border-color: #2a47d4;
-}
-
 /* ── GUTENBERG CANVAS TOOLBAR (full width; side panels sit below) ── */
 .canvas-toolbar {
   height: 64px;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--wp-bg-card);
+  border-bottom: 1px solid var(--wp-border-light);
   display: flex;
   align-items: center;
   padding: 0 12px;
@@ -327,12 +307,12 @@
   min-width: 36px;
   border: none;
   background: transparent;
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #1e1e1e;
+  color: var(--wp-gray-900);
   font-size: 13px;
   padding: 0 8px;
   gap: 5px;
@@ -340,28 +320,13 @@
 }
 
 .ct-btn:hover {
-  background: #f0f0f0;
-}
-
-.ct-btn.primary {
-  background: #3858e9;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 400;
-  width: 36px;
-  height: 36px;
-  border-radius: 4px;
-  padding: 0;
-}
-
-.ct-btn.primary:hover {
-  background: #2a47d4;
+  background: var(--wp-light-gray-50);
 }
 
 .ct-sep {
   width: 1px;
   height: 20px;
-  background: #e0e0e0;
+  background: var(--wp-border-light);
   margin: 0 4px;
   flex-shrink: 0;
 }
@@ -375,47 +340,14 @@
   color: #757575;
 }
 
-/* View mode switcher */
-.ct-view-modes {
-  display: flex;
-  gap: 0;
-  background: #f0f0f0;
-  border-radius: 4px;
-  padding: 2px;
-}
-
-.ct-view-btn {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  color: #757575;
-  border-radius: 3px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.12s;
-}
-
-.ct-view-btn:hover {
-  color: #1e1e1e;
-}
-
-.ct-view-btn.active {
-  background: #fff;
-  color: #1e1e1e;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
 /* Icon buttons */
 .ct-icon-btn {
   width: 36px;
   height: 36px;
   border: none;
   background: transparent;
-  color: #1e1e1e;
-  border-radius: 4px;
+  color: var(--wp-gray-900);
+  border-radius: 2px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -423,66 +355,15 @@
   transition: background 0.12s;
 }
 
+/* Add a wider visual gap between the device ToggleGroupControl and the
+ * right-side action buttons (settings sidebar, more options, save).
+ * Adds 10px to the toolbar's baseline 6px gap = 16px total. */
+.canvas-toolbar .ct-icon-btn--after-tgc {
+  margin-left: 10px;
+}
+
 .ct-icon-btn:hover {
-  background: #f0f0f0;
-}
-
-/* Save status and button */
-.ct-saved {
-  color: #00a32a;
-  font-size: 11px;
-  padding: 0 8px;
-  font-weight: 500;
-}
-
-/* Save and Exit button group */
-.ct-save {
-  padding: 8px 16px;
-  background: #3858e9;
-  color: #fff;
-  border: 1px solid #3858e9;
-  border-radius: 4px;
-  font: 500 12px var(--wp-font-family);
-  cursor: pointer;
-  display: none;
-  transition: background 0.12s;
-  height: 36px;
-}
-
-.ct-save:hover {
-  background: #2a47d4;
-  border-color: #2a47d4;
-}
-
-.ct-save.show {
-  display: block;
-  border-radius: 4px;
-}
-
-.ct-exit {
-  padding: 8px 16px;
-  background: transparent;
-  color: #1e1e1e;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font: 500 12px var(--wp-font-family);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.12s;
-  height: 36px;
-}
-
-.ct-exit:hover {
-  border-color: #999;
-  background: #f9f9f9;
-}
-
-/* When Save is shown, Exit button connects to it */
-.ct-save.show + .ct-exit {
-  border-radius: 0 4px 4px 0;
-  border-left: none;
+  background: var(--wp-light-gray-50);
 }
 
 /* Editing canvas — header full width; side panels sit in a row beneath it */
@@ -544,7 +425,7 @@
 .edit-card {
   width: 100%;
   max-width: 100%;
-  background: #fff;
+  background: var(--wp-bg-card);
   /* border-radius / box-shadow: match `.preview-canvas-area .site-card` via grouped rule */
   overflow: visible;
   box-sizing: border-box;
@@ -702,7 +583,7 @@
   width: 36px;
   height: 36px;
   color: var(--edit-global-accent);
-  background: #fff;
+  background: var(--wp-bg-card);
   border: 2px solid var(--edit-global-accent);
   opacity: 0;
   pointer-events: none;
@@ -737,6 +618,34 @@
   opacity: 1;
 }
 
+/* Template-part toolbars (header/footer) keep the default WP Toolbar
+ * surface, typography, and interactive states — the only difference
+ * from a pattern-section toolbar is:
+ *   1. The block-label icon (Header / Footer) renders in the sync color.
+ *   2. The WP accent token (--wp-components-color-accent /
+ *      --wp-admin-theme-color, normally #3858e9) is rebound to the sync
+ *      color so focus rings and pressed-state highlights match. */
+.tp-part .sec-bar.block-toolbar {
+  --wp-admin-theme-color: var(--wp-block-synced-color);
+  --wp-admin-theme-color-darker-10: var(--wp-block-synced-color-hover);
+  --wp-admin-theme-color-darker-20: var(--wp-block-synced-color-hover);
+  --wp-components-color-accent: var(--wp-block-synced-color);
+  --wp-components-color-accent-darker-10: var(--wp-block-synced-color-hover);
+  --wp-components-color-accent-darker-20: var(--wp-block-synced-color-hover);
+}
+
+.tp-part .sec-bar.block-toolbar .components-toolbar-group:first-child .components-toolbar-button svg {
+  fill: var(--wp-block-synced-color);
+}
+
+/* BlockToolbar positioning wrapper — the WP <Toolbar> inside owns the
+ * chrome (background, border, shadow). This element only handles the
+ * floating placement above (or, on flip, below) the selected block.
+ *
+ * Force the WP UI font so the toolbar isn't dragged into the host
+ * site's serif content font when it's rendered inside `.p-header` /
+ * `.p-footer` (which set `font-family: var(--wp-content-font)` to
+ * differentiate rendered site content from editor chrome). */
 .sec-bar.block-toolbar {
   position: absolute;
   bottom: 100%;
@@ -744,16 +653,8 @@
   margin-bottom: 10px;
   top: auto;
   display: none;
-  align-items: stretch;
-  flex-wrap: wrap;
-  gap: 2px;
-  min-height: 40px;
-  padding: 4px 6px;
-  background: #fff;
-  border: 1px solid #1e1e1e;
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   z-index: 30;
+  font-family: var(--wp-font-family);
 }
 
 /* When floating above would clip the canvas top, open below the block */
@@ -764,168 +665,16 @@
   margin-bottom: 0;
 }
 
-.sec-bar.block-toolbar > .bt-pill,
-.sec-bar.block-toolbar > .bt-move-stack,
-.sec-bar.block-toolbar > .components-button {
-  align-self: center;
-}
-
-.sec-bar.block-toolbar.block-toolbar--pattern-section {
-  border-left: 3px solid var(--edit-canvas-accent);
-  padding-left: 8px;
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part {
-  border: 1px solid var(--edit-global-accent);
-  border-left-width: 3px;
-  padding-left: 8px;
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-sep {
-  background: var(--edit-global-accent);
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-pill-label {
-  color: var(--edit-global-accent);
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .components-button.bt-pill-icon {
-  color: var(--edit-global-accent);
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .components-button.bt-pill-icon svg {
-  fill: currentColor;
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button {
-  background: var(--edit-global-accent);
-  border-color: transparent;
-  color: #fff;
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button:hover:not(:disabled) {
-  background: #6120c1;
-  color: #fff;
-}
-
-.sec-bar.block-toolbar.block-toolbar--template-part .bt-global-part-exit.components-button:focus:not(:disabled) {
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--edit-global-accent);
-}
-
 .e-sec.sel .sec-bar.block-toolbar,
 .template-edit-root.sel .sec-bar.block-toolbar,
 .g-el.e-block.sel .sec-bar.block-toolbar {
-  display: flex;
+  display: block;
 }
 
-.bt-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 280px;
-  padding-right: 6px;
-}
-
-.bt-pill-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: #1e1e1e;
+/* Block-name label rendered alongside the icon in the first ToolbarGroup;
+ * matches Gutenberg's "block name" affordance. */
+.sec-bar .block-toolbar-bar .components-toolbar-button {
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.bt-pill .components-button.bt-pill-icon {
-  min-width: 36px;
-  height: 32px;
-  padding: 0;
-  color: #1e1e1e;
-}
-
-.bt-sep {
-  width: 1px;
-  align-self: stretch;
-  margin: -4px 4px;
-  background: #1e1e1e;
-  flex-shrink: 0;
-}
-
-.bt-tb-btn.components-button {
-  min-width: 36px;
-  height: 32px;
-  padding: 0;
-  color: #1e1e1e;
-  box-shadow: none;
-}
-
-.bt-tb-btn.components-button:hover {
-  background: #f0f0f0;
-}
-
-.bt-tb-edit.components-button {
-  height: 32px;
-  min-height: 32px;
-  padding: 0 10px;
-  font-family: var(--wp-font-family, inherit);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.2;
-  color: #1e1e1e;
-  box-shadow: none;
-  text-decoration: none;
-}
-
-.bt-tb-edit.components-button:hover {
-  background: #f0f0f0;
-}
-
-/* Stacked move up / down — no border, mirrors WP block editor */
-.bt-move-stack {
-  display: flex;
-  flex-direction: column;
-  width: 24px;
-  height: 32px;
-  flex-shrink: 0;
-}
-
-.bt-move-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 0;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: none;
-  border-radius: 2px;
-  background: transparent;
-  color: #1e1e1e;
-  cursor: pointer;
-  line-height: 0;
-}
-
-.bt-move-btn:hover {
-  background: #f0f0f0;
-}
-
-.bt-move-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.bt-move-icon svg {
-  width: 14px;
-  height: 14px;
-  fill: currentColor;
 }
 
 .sec-group {
@@ -1029,12 +778,6 @@
 .sec-group[data-inserter='both'] .add-sec {
   opacity: 1;
   pointer-events: auto;
-}
-
-.ct-btn.active,
-.ct-icon-btn.active {
-  background: #e0e0e0;
-  color: #1e1e1e;
 }
 
 /* ── List View + Inserter shared shell (inside .edit-left-panel) ──
@@ -1162,22 +905,18 @@
   white-space: nowrap;
 }
 
+/* Position the WPDS Badge at the row's right edge; Badge owns its own
+ * sizing / typography. State overrides (selected, hover) re-color it to
+ * keep contrast on the dark selected row background. */
 .lv-row-badge {
   flex-shrink: 0;
   margin-left: auto;
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 1.2;
-  padding: 2px 7px;
-  border-radius: var(--wpds-border-radius-sm);
-  background: var(--wpds-color-bg-surface-neutral-weak);
-  color: var(--wpds-color-fg-content-neutral-weak);
-  letter-spacing: 0.02em;
 }
 
 .lv-row.sel .lv-row-badge {
   background: rgba(255, 255, 255, 0.22);
   color: rgba(255, 255, 255, 0.95);
+  border-color: transparent;
 }
 
 .lv-row:not(.sel):hover .lv-row-badge {
@@ -1563,41 +1302,16 @@
   font-weight: 600;
 }
 
-/* Style preview flyout — anchored with its right edge left of the sidebar; never overlaps the panel */
-.ss-style-preview-flyout {
-  position: fixed;
-  z-index: 100040;
-  pointer-events: none;
-  padding: 10px 12px 12px;
-  box-sizing: border-box;
-  transform-origin: right center;
-  border: 1px solid #c3c4c7;
-  border-right: none;
-  border-radius: 8px 0 0 8px;
-  background: #fff;
-  box-shadow: -10px 6px 28px rgba(0, 0, 0, 0.12);
-  animation: ss-style-flyout-enter 0.16s ease-out;
-}
-
-@keyframes ss-style-flyout-enter {
-  from {
-    opacity: 0;
-    transform: translateX(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.ss-style-preview-flyout .ss-style-preview-mock {
+/* Style preview popover content (anchored to the styles grid, matching
+ * the Layout panel pattern). Padding / shadows come from WP Popover. */
+.ss-style-preview .ss-style-preview-mock {
   box-shadow: none;
   border: none;
   border-radius: 6px;
   padding: 10px 10px 12px;
 }
 
-.ss-style-preview-flyout .ss-style-preview-caption {
+.ss-style-preview .ss-style-preview-caption {
   margin-top: 8px;
   padding-left: 2px;
 }

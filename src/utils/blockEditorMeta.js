@@ -33,7 +33,7 @@ function getPatternInfoForSectionType(sectionType) {
   return { patternId, patternName: catalog.name };
 }
 
-/** Per-type icon for canvas sections (icons are React elements from @wordpress/icons). */
+/** Per-type icon for Block Editor sections (icons are React elements from @wordpress/icons). */
 export const SECTION_TYPE_META = {
   hero: { icon: cover, label: 'Cover' },
   text: { icon: paragraph, label: 'Paragraph' },
@@ -98,7 +98,7 @@ export function getSectionMeta(section) {
 }
 
 /**
- * When true, the edit canvas dims every other top-level region (opacity) for the focused block.
+ * When true, the Block Editor dims every other top-level region (opacity) for the focused block.
  * Per-block opt-in lives on HEADER_META / FOOTER_META / TEMPLATE_ROOT_META / getSectionMeta(section).
  *
  * Later: optionally read editSpotlightForceBlockId from app state instead of/alongside selectedBlockId.

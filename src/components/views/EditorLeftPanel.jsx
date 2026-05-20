@@ -2,8 +2,8 @@ import BlockInserterContent from './BlockInserter';
 import ListViewPanel from './ListViewPanel';
 
 /**
- * Single sliding left panel for the edit canvas: block inserter or List View.
- * Same width animation as the former inserter sidebar; sits beside the editor column (pushes canvas).
+ * Single sliding left panel for the Block Editor: block inserter or List View.
+ * Same width animation as the former inserter sidebar; sits beside the editor column (pushes the Block Editor area).
  *
  * @param {object} props
  * @param {'inserter' | 'list' | null} props.mode — which panel is shown; null is collapsed

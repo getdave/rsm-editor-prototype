@@ -1,7 +1,10 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { Button } from '@wordpress/components';
-import { Text } from '@wordpress/ui';
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarGroup,
+} from '@wordpress/components';
 import {
   chevronDown,
   chevronUp,
@@ -111,85 +114,75 @@ export default function BlockToolbar({
     <div
       ref={ref}
       className={`sec-bar block-toolbar${isPatternSection ? ' block-toolbar--pattern-section' : ''}${isTemplatePart ? ' block-toolbar--template-part' : ''}${flipBelow ? ' block-toolbar--flip-below' : ''}`}
-      role="toolbar"
       style={translateX ? { transform: `translateX(${translateX}px)` } : undefined}
       onClick={(e) => e.stopPropagation()}
       onKeyDown={(e) => e.stopPropagation()}
     >
-      <div className="bt-pill">
-        <Button
-          className="bt-pill-icon"
-          label={`${meta.label} — toggle document overview`}
-          icon={Icon}
-          iconSize={24}
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleListView();
-          }}
-        />
-        <Text variant="body-sm" className="bt-pill-label">{meta.label}</Text>
-      </div>
-      <span className="bt-sep" aria-hidden />
-      <Button className="bt-tb-btn" label="Drag" icon={dragHandle} iconSize={24} />
-      <div className="bt-move-stack" role="group" aria-label="Reorder">
-        <button type="button" className="bt-move-btn" aria-label="Move up">
-          <span className="bt-move-icon" aria-hidden>{chevronUp}</span>
-        </button>
-        <button type="button" className="bt-move-btn" aria-label="Move down">
-          <span className="bt-move-icon" aria-hidden>{chevronDown}</span>
-        </button>
-      </div>
-      <span className="bt-sep" aria-hidden />
-      {isPatternSection ? (
-        <>
-          <Button
-            className="bt-tb-edit"
-            variant="tertiary"
-            icon={styles}
-            label="Change Design"
+      <Toolbar label={`${meta.label} block tools`} className="block-toolbar-bar">
+        <ToolbarGroup>
+          <ToolbarButton
+            icon={Icon}
+            text={meta.label}
+            label={`${meta.label} — toggle document overview`}
             onClick={(e) => {
               e.stopPropagation();
-              if (settingsSidebarOpen) {
-                setInspectorFlashSignal((n) => n + 1);
-              }
-              setInspectorBlockTabSignal((n) => n + 1);
-              setSettingsSidebarOpen(true);
+              onToggleListView();
             }}
           />
-          <span className="bt-sep" aria-hidden />
-        </>
-      ) : null}
-      {isTemplatePart && onGlobalPartEdit ? (
-        <>
-          {globalPartEditActive ? (
-            <div className="bt-global-part-actions" role="group" aria-label="Editing global template part">
-              <Button
-                variant="primary"
-                className="bt-tb-edit bt-global-part-exit"
+        </ToolbarGroup>
+
+        <ToolbarGroup>
+          <ToolbarButton icon={dragHandle} label="Drag" />
+          <ToolbarButton icon={chevronUp} label="Move up" />
+          <ToolbarButton icon={chevronDown} label="Move down" />
+        </ToolbarGroup>
+
+        {isPatternSection ? (
+          <ToolbarGroup>
+            <ToolbarButton
+              icon={styles}
+              label="Change Design"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (settingsSidebarOpen) {
+                  setInspectorFlashSignal((n) => n + 1);
+                }
+                setInspectorBlockTabSignal((n) => n + 1);
+                setSettingsSidebarOpen(true);
+              }}
+            />
+          </ToolbarGroup>
+        ) : null}
+
+        {isTemplatePart && onGlobalPartEdit ? (
+          <ToolbarGroup>
+            {globalPartEditActive ? (
+              <ToolbarButton
+                isPressed
                 onClick={(e) => {
                   e.stopPropagation();
                   onGlobalPartEditExit();
                 }}
               >
                 Exit
-              </Button>
-            </div>
-          ) : (
-            <Button
-              variant="tertiary"
-              className="bt-tb-edit"
-              onClick={(e) => {
-                e.stopPropagation();
-                onGlobalPartEdit();
-              }}
-            >
-              Edit
-            </Button>
-          )}
-          <span className="bt-sep" aria-hidden />
-        </>
-      ) : null}
-      <Button className="bt-tb-btn" label="Options" icon={moreVertical} iconSize={24} />
+              </ToolbarButton>
+            ) : (
+              <ToolbarButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onGlobalPartEdit();
+                }}
+              >
+                Edit
+              </ToolbarButton>
+            )}
+          </ToolbarGroup>
+        ) : null}
+
+        <ToolbarGroup>
+          <ToolbarButton icon={moreVertical} label="Options" />
+        </ToolbarGroup>
+      </Toolbar>
     </div>
   );
 }

@@ -1,4 +1,9 @@
-import { Button, Tooltip } from '@wordpress/components';
+import {
+  Button,
+  Tooltip,
+  __experimentalToggleGroupControl as ToggleGroupControl,
+  __experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+} from '@wordpress/components';
 import {
   desktop,
   tablet,
@@ -339,11 +344,7 @@ function PreviewCanvas({
   return (
     <div className="canvas" style={{ flexDirection: 'column', padding: 0, width: '100%' }}>
       <div className="preview-bar">
-        <Button
-          variant="primary"
-          className="ct-edit"
-          onClick={onEdit}
-        >
+        <Button variant="primary" onClick={onEdit}>
           {editLabel}
         </Button>
 
@@ -351,7 +352,7 @@ function PreviewCanvas({
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <span
             aria-hidden="true"
-            style={{ display: 'inline-flex', width: 24, height: 24, color: '#1e1e1e' }}
+            style={{ display: 'inline-flex', width: 24, height: 24, color: 'var(--wp-gray-900)' }}
           >
             {docTypeIcon(page)}
           </span>
@@ -374,7 +375,7 @@ function PreviewCanvas({
                 width: 16,
                 height: 16,
                 borderRadius: 2,
-                background: '#fff',
+                background: 'var(--wp-bg-card)',
                 flexShrink: 0,
               }}
             >
@@ -389,29 +390,19 @@ function PreviewCanvas({
         </div>
         <div className="ct-space"></div>
 
-        <div className="ct-view-modes">
-          <Button
-            className={`ct-view-btn ${selectedDevice === 'desktop' ? 'active' : ''}`}
-            onClick={() => setSelectedDevice('desktop')}
-            label="Desktop view"
-            icon={desktop}
-            iconSize={20}
-          />
-          <Button
-            className={`ct-view-btn ${selectedDevice === 'tablet' ? 'active' : ''}`}
-            onClick={() => setSelectedDevice('tablet')}
-            label="Tablet view"
-            icon={tablet}
-            iconSize={20}
-          />
-          <Button
-            className={`ct-view-btn ${selectedDevice === 'mobile' ? 'active' : ''}`}
-            onClick={() => setSelectedDevice('mobile')}
-            label="Mobile view"
-            icon={mobile}
-            iconSize={20}
-          />
-        </div>
+        <ToggleGroupControl
+          className="ct-view-modes"
+          label="Device preview"
+          hideLabelFromVision
+          value={selectedDevice}
+          onChange={setSelectedDevice}
+          isBlock
+          __nextHasNoMarginBottom
+        >
+          <ToggleGroupControlOptionIcon value="desktop" icon={desktop} label="Desktop view" />
+          <ToggleGroupControlOptionIcon value="tablet" icon={tablet} label="Tablet view" />
+          <ToggleGroupControlOptionIcon value="mobile" icon={mobile} label="Mobile view" />
+        </ToggleGroupControl>
       </div>
       <div className="preview-canvas-area">
         <div className="preview-canvas-stack">

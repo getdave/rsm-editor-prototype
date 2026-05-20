@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Dropdown, MenuGroup, MenuItem, Tooltip } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Badge, Stack } from '@wordpress/ui';
 import {
   chevronDown,
   home,
@@ -10,6 +10,7 @@ import {
   styles,
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
+import { EDITOR_MODES } from '../../services/blockEditorMode';
 
 function docTypeIcon(page) {
   if (page?.isPageDesign) return styles;
@@ -24,16 +25,18 @@ function docTypeIcon(page) {
  * - `canRename`: disables inline rename for read-only contextual documents.
  * - `documentLabelOverride`: optional label shown instead of the current title
  *   when a global template part is selected with peer spotlight.
- * - `isTemplate`: switches the header into template-editing presentation.
- * - `templateTitle`: optional template label shown in template-editing mode.
+ * - `mode`: Block Editor mode (`'page' | 'template'`). The template mode swaps
+ *   icon, badge, and disables rename.
+ * - `templateTitle`: optional template label shown in template mode.
  */
 export default function DocumentActions({
   document: documentProp = null,
   canRename = true,
   documentLabelOverride = null,
-  isTemplate = false,
+  mode = EDITOR_MODES.PAGE,
   templateTitle = null,
 }) {
+  const isTemplate = mode === EDITOR_MODES.TEMPLATE;
   const { currentPage, setCurrentPageName } = useAppState();
   const activeDocument = documentProp || currentPage;
   const isGlobalOverride = documentLabelOverride != null;
@@ -96,13 +99,7 @@ export default function DocumentActions({
       gap="xs"
       className={`doc-actions${isGlobalOverride ? ' doc-actions--global' : ''}`}
     >
-      {isTemplate && (
-        <span className="components-badge is-default">
-          <span className="components-badge__flex-wrapper">
-            <span className="components-badge__content">Template</span>
-          </span>
-        </span>
-      )}
+      {isTemplate && <Badge className="doc-template-badge">Template</Badge>}
       <Tooltip text={nameTooltipText} placement="bottom">
         <span
           className={`ct-btn doc-actions-name${isEditing ? ' is-editing' : ''}${isReadonly ? ' doc-actions-name--readonly' : ''}`}
@@ -165,7 +162,6 @@ export default function DocumentActions({
             aria-expanded={isOpen}
             label="Document options"
             icon={chevronDown}
-            iconSize={20}
           />
         )}
         renderContent={() => (
