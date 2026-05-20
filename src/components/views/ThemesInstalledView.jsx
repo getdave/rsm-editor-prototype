@@ -36,7 +36,7 @@ function ThemesInstalledView() {
               <Text variant="body-md" className="themes-active-description">{active.description}</Text>
               {/* Per spec: NO Customize button. */}
               <Stack direction="row" gap="sm" className="themes-active-actions">
-                <Button variant="secondary">Live Preview</Button>
+                <Button variant="secondary">Preview theme</Button>
                 <Button variant="tertiary">Theme Details</Button>
                 <Button variant="tertiary" isDestructive>Delete</Button>
               </Stack>
@@ -68,7 +68,7 @@ function ThemesInstalledView() {
                   <Text variant="body-md" className="pp-card-name">{t.name}</Text>
                   <Stack direction="row" wrap gap="sm" className="theme-card-actions">
                     <Button variant="primary">Activate</Button>
-                    <Button variant="secondary">Live Preview</Button>
+                    <Button variant="secondary">Preview theme</Button>
                   </Stack>
                 </Stack>
               </Card.Content>

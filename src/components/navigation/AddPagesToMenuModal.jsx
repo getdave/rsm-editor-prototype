@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import {
   Button,
   Modal,
+  Tooltip,
   privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
@@ -599,6 +600,7 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
                 ? store
                 : fallbackIcon;
           const isLive = item.status !== 'draft';
+          const statusLabel = isLive ? 'Page is published' : 'Page is a draft';
           return (
             <span className="pp-title-cell-inner">
               <span
@@ -619,11 +621,13 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
                 {docIcon}
               </span>
               <span className="pp-title-cell-name">{item.name}</span>
-              <span
-                className={`url-dot${isLive ? '' : ' url-draft-dot'}`}
-                role="status"
-                aria-label={isLive ? 'Page is live' : 'Page is a draft'}
-              />
+              <Tooltip text={statusLabel} placement="top">
+                <span
+                  className={`url-dot${isLive ? '' : ' url-draft-dot'}`}
+                  role="status"
+                  aria-label={statusLabel}
+                />
+              </Tooltip>
             </span>
           );
         },

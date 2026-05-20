@@ -69,8 +69,8 @@ const PAGE_TYPE_TABS = [
     label: "Dynamic",
     description: (
       <>
-        Generated pages for groups of content and special site views. Their
-        layouts are controlled by{" "}
+        Templates for groups of content and special site views. Their layouts
+        are controlled by{" "}
         <Link className="pp-desc-link" to="/templates">
           Templates
         </Link>
@@ -199,7 +199,7 @@ const postsIndexTemplateRow = Object.freeze({
   id: "posts-index-template",
   slug: "posts-index",
   name: "Posts listing",
-  type: "Collection Page",
+  type: "Template",
   isLive: true,
   inMenu: false,
   isSystem: false,
@@ -225,7 +225,7 @@ const productCatalogTemplateRow = Object.freeze({
   id: "product-catalog-template",
   slug: "product-catalog",
   name: "Product listing",
-  type: "Collection Page",
+  type: "Template",
   isLive: true,
   inMenu: false,
   isSystem: false,
@@ -283,7 +283,7 @@ function createPostsCollectionRow(postsPage) {
   }
   return {
     ...postsPage,
-    type: "Collection Page",
+    type: "Template",
     isLive: true,
     inMenu: Boolean(postsPage.inMenu),
     isSystem: false,
@@ -337,6 +337,7 @@ function asCollectionRow(row, collectionGroup) {
   return {
     ...row,
     ...display,
+    type: "Template",
     level: 0,
     isCollection: true,
     category: "collection",
@@ -382,7 +383,7 @@ function ConfigureHomepageReadingModal({
   if (mode === READING_DISPLAY_STATIC) {
     if (homePageId && !homePageResolved) {
       homepageWarning =
-        "That page isn't listed here (for example if it isn't Live yet). Pick a Live page—the one visitors should see when they open your site's main web address.";
+        "That page isn't listed here (for example if it isn't published yet). Pick a published page—the one visitors should see when they open your site's main web address.";
     } else if (!homePageId) {
       homepageWarning =
         "No homepage chosen. Pick which page should open at your site's main web address. Until then, people visiting that will usually see a blog-style list of your newest posts.";
@@ -819,11 +820,13 @@ function PagesView() {
           const isLive = item.status !== "draft";
           const statusLabel = isInactive
             ? "Template is inactive"
-            : isLive
-              ? "Page is live"
+            : item.isCollection
+              ? "Template is active"
+              : isLive
+                ? "Page is published"
               : "Page is a draft";
-          const title = (
-            <span className="pp-title-cell-inner">
+          const titleMain = (
+            <>
               <span
                 className={`pp-title-glyph-icon${isSyncedPageRow(item) ? " pp-title-glyph-icon--sync" : ""}`}
                 aria-hidden="true"
@@ -840,21 +843,29 @@ function PagesView() {
               <Text variant="body-md" className="pp-title-cell-name">
                 {item.name}
               </Text>
-              <span
-                className={`url-dot${isLive && !isInactive ? "" : " url-draft-dot"}`}
-                role="status"
-                aria-label={statusLabel}
-              />
+            </>
+          );
+          const title = (
+            <span className="pp-title-cell-inner">
+              {item.titleTooltip ? (
+                <Tooltip text={item.titleTooltip} delay={400} placement="top">
+                  <span className="pp-title-cell-tooltip-wrap">
+                    {titleMain}
+                  </span>
+                </Tooltip>
+              ) : (
+                titleMain
+              )}
+              <Tooltip text={statusLabel} placement="top">
+                <span
+                  className={`url-dot${isLive && !isInactive ? "" : " url-draft-dot"}`}
+                  role="status"
+                  aria-label={statusLabel}
+                />
+              </Tooltip>
             </span>
           );
-          if (!item.titleTooltip) {
-            return title;
-          }
-          return (
-            <Tooltip text={item.titleTooltip} delay={400} placement="top">
-              <span className="pp-title-cell-tooltip-wrap">{title}</span>
-            </Tooltip>
-          );
+          return title;
         },
       },
       {
@@ -1026,9 +1037,9 @@ function PagesView() {
       },
       {
         id: "view-live",
-        label: "View live",
+        label: "View published page",
         icon: external,
-        callback: (items) => console.log("View live:", items[0].slug),
+        callback: (items) => console.log("View published page:", items[0].slug),
       },
       {
         id: "duplicate",
@@ -1688,7 +1699,7 @@ function PagesView() {
           confirmButtonText="Publish"
           cancelButtonText="Cancel"
         >
-          {`Publish “${publishConfirmPage.name}”? It will go live on your site.`}
+          {`Publish “${publishConfirmPage.name}”? It will be published on your site.`}
         </ConfirmDialog>
       ) : null}
       {deleteConfirm?.page?.isFrontPage ? (
