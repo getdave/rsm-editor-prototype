@@ -475,8 +475,8 @@ function CustomizeTemplateModal({
 
   const defaultLayoutName =
     design.layoutKind === 'listing'
-      ? 'default listing layout'
-      : 'default item layout';
+      ? 'default listing template'
+      : 'default single item template';
 
   return (
     <Modal
