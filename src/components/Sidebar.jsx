@@ -491,7 +491,12 @@ function Sidebar() {
                 .filter(Boolean);
               if (visibleItems.length === 0) return null;
               return (
-                <Fragment key={entry.id}>
+                <div
+                  key={entry.id}
+                  className="sidebar-nav-section-group"
+                  role="group"
+                  aria-label={entry.label}
+                >
                   <Text
                     variant="body-sm"
                     className="components-menu-group__label sidebar-nav-section-label"
@@ -501,7 +506,7 @@ function Sidebar() {
                   {visibleItems.map((item) => (
                     <Fragment key={item.id}>{renderItem(item)}</Fragment>
                   ))}
-                </Fragment>
+                </div>
               );
             }
             if (entry.hidden) return null;
