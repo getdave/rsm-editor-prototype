@@ -825,8 +825,13 @@ function PagesView() {
               : isLive
                 ? "Page is published"
               : "Page is a draft";
-          const titleMain = (
-            <>
+          const titleName = (
+            <Text variant="body-md" className="pp-title-cell-name">
+              {item.name}
+            </Text>
+          );
+          const title = (
+            <span className="pp-title-cell-inner">
               <span
                 className={`pp-title-glyph-icon${isSyncedPageRow(item) ? " pp-title-glyph-icon--sync" : ""}`}
                 aria-hidden="true"
@@ -840,29 +845,24 @@ function PagesView() {
               >
                 {docIcon}
               </span>
-              <Text variant="body-md" className="pp-title-cell-name">
-                {item.name}
-              </Text>
-            </>
-          );
-          const title = (
-            <span className="pp-title-cell-inner">
-              {item.titleTooltip ? (
-                <Tooltip text={item.titleTooltip} delay={400} placement="top">
-                  <span className="pp-title-cell-tooltip-wrap">
-                    {titleMain}
-                  </span>
+              <span className="pp-title-cell-copy">
+                {item.titleTooltip ? (
+                  <Tooltip text={item.titleTooltip} delay={400} placement="top">
+                    <span className="pp-title-cell-tooltip-wrap">
+                      {titleName}
+                    </span>
+                  </Tooltip>
+                ) : (
+                  titleName
+                )}
+                <Tooltip text={statusLabel} placement="top">
+                  <span
+                    className={`url-dot${isLive && !isInactive ? "" : " url-draft-dot"}`}
+                    role="status"
+                    aria-label={statusLabel}
+                  />
                 </Tooltip>
-              ) : (
-                titleMain
-              )}
-              <Tooltip text={statusLabel} placement="top">
-                <span
-                  className={`url-dot${isLive && !isInactive ? "" : " url-draft-dot"}`}
-                  role="status"
-                  aria-label={statusLabel}
-                />
-              </Tooltip>
+              </span>
             </span>
           );
           return title;
