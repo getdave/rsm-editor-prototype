@@ -427,28 +427,6 @@
   font-weight: 500;
 }
 
-.adv-lock-mark {
-  position: relative;
-  width: 14px;
-  height: 12px;
-  flex: 0 0 auto;
-  border: 2px solid #1e1e1e;
-  border-radius: 2px;
-}
-
-.adv-lock-mark::before {
-  content: "";
-  position: absolute;
-  left: 2px;
-  top: -8px;
-  width: 6px;
-  height: 8px;
-  border: 2px solid #1e1e1e;
-  border-bottom: 0;
-  border-radius: 8px 8px 0 0;
-  background: #fff;
-}
-
 .adv-description-cell {
   color: #50575e;
   line-height: 1.45;

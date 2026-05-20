@@ -313,10 +313,6 @@ function Badge({ children, variant = 'neutral' }) {
   return <span className={`adv-badge adv-badge--${variant}`}>{children}</span>;
 }
 
-function LockMark() {
-  return <span className="adv-lock-mark" aria-label="Locked pattern" role="img" />;
-}
-
 function createFields({ metaLabel }) {
   return [
     {
@@ -338,7 +334,6 @@ function createFields({ metaLabel }) {
       render: ({ item }) => (
         <span className="adv-title-cell">
           <span className="adv-title-cell-name">{item.name}</span>
-          {item.isLocked ? <LockMark /> : null}
         </span>
       ),
     },
