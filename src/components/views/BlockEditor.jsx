@@ -35,6 +35,7 @@ import {
   TEMPLATE_ROOT_META,
 } from '../../utils/blockEditorMeta';
 import { EDITOR_MODES, getEditorMode } from '../../services/blockEditorMode';
+import { docTypeIcon } from '../../utils/docTypeIcon';
 import { PreviewSiteNavCluster } from '../shared/PreviewSiteChrome';
 import { pages } from '../../data/mockData';
 import GlobalTemplatePartEditWarningModal from '../modals/GlobalTemplatePartEditWarningModal';
@@ -345,10 +346,26 @@ function BlockEditor() {
 
   const spotlightGlobalDocLabel = useMemo(() => {
     if (!spotlightOn) return null;
-    if (selectedBlockId === 'header') return `${HEADER_META.label} (Global)`;
-    if (selectedBlockId === 'footer') return `${FOOTER_META.label} (Global)`;
+    if (selectedBlockId === 'header') return HEADER_META.label;
+    if (selectedBlockId === 'footer') return FOOTER_META.label;
     return null;
   }, [spotlightOn, selectedBlockId]);
+
+  const spotlightGlobalDocIcon = useMemo(() => {
+    if (!spotlightOn) return null;
+    if (selectedBlockId === 'header') return HEADER_META.icon;
+    if (selectedBlockId === 'footer') return FOOTER_META.icon;
+    return null;
+  }, [spotlightOn, selectedBlockId]);
+
+  const spotlightBreadcrumbParent = useMemo(() => {
+    if (!spotlightOn) return null;
+    return {
+      icon: docTypeIcon(editTarget, { isTemplate: Boolean(content.isTemplate) }),
+      label: editTarget?.name ?? 'Document',
+      onClick: handleGlobalPartToolbarExit,
+    };
+  }, [spotlightOn, editTarget, content.isTemplate, handleGlobalPartToolbarExit]);
 
   // Render section content based on type
   const renderSectionContent = (section) => {
@@ -633,6 +650,8 @@ function BlockEditor() {
             document={editTarget}
             canRename={!isPageDesignEdit}
             documentLabelOverride={spotlightGlobalDocLabel}
+            documentIconOverride={spotlightGlobalDocIcon}
+            breadcrumbParent={spotlightBreadcrumbParent}
             mode={mode}
             templateTitle={templateTitle}
           />
