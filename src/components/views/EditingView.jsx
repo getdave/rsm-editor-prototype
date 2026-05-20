@@ -222,10 +222,10 @@ function EditingView() {
     setSectionStylesByIndex((prev) => ({ ...prev, [sectionIndex]: styleId }));
   };
 
-  useEffect(() => {
+  const resetGlobalTemplatePartEditState = useCallback(() => {
     setConfirmedGlobalSpotlightBlockId(null);
     setGlobalEditWarnForId(null);
-  }, [selectedBlockId]);
+  }, []);
 
   const isInserterOpen = searchParams.get('inserter') != null;
   
@@ -281,12 +281,20 @@ function EditingView() {
           beginGlobalTemplatePartIsolation(id);
           return;
         }
+        resetGlobalTemplatePartEditState();
         setSelectedBlockId(id);
         return;
       }
+      if (selectedBlockId !== id) {
+        resetGlobalTemplatePartEditState();
+      }
       setSelectedBlockId(id);
     },
-    [selectedBlockId, beginGlobalTemplatePartIsolation],
+    [
+      selectedBlockId,
+      beginGlobalTemplatePartIsolation,
+      resetGlobalTemplatePartEditState,
+    ],
   );
 
   const handleGlobalPartToolbarExit = useCallback(() => {

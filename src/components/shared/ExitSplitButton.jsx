@@ -34,14 +34,11 @@ function ExitSplitButton() {
     editorReferrer,
     recentPages,
     selectPage,
-    menuExpanded,
-    setMenuExpanded,
   } = useAppState();
   const referrer = metaForReferrer(editorReferrer);
 
   const goToWpAdmin = () => {
     // Silly placeholder — wp-admin doesn't exist in this prototype.
-    // eslint-disable-next-line no-alert
     alert("🎉 Pretend you're back in WP Admin! (This is a prototype.)");
   };
 
