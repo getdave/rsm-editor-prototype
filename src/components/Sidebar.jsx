@@ -485,14 +485,23 @@ function Sidebar() {
         <nav className="admin-root-nav sidebar-nav-pane sidebar-nav-pane-admin">
           {navLayout.map((entry) => {
             if (entry.kind === 'section') {
+              const visibleItems = (entry.items ?? [])
+                .filter((it) => !it.hidden)
+                .map((it) => getAdminNavItemById(it.id, homepageDisplayMode))
+                .filter(Boolean);
+              if (visibleItems.length === 0) return null;
               return (
-                <Text
-                  key={entry.id}
-                  variant="body-sm"
-                  className="components-menu-group__label sidebar-nav-section-label"
-                >
-                  {entry.label}
-                </Text>
+                <Fragment key={entry.id}>
+                  <Text
+                    variant="body-sm"
+                    className="components-menu-group__label sidebar-nav-section-label"
+                  >
+                    {entry.label}
+                  </Text>
+                  {visibleItems.map((item) => (
+                    <Fragment key={item.id}>{renderItem(item)}</Fragment>
+                  ))}
+                </Fragment>
               );
             }
             if (entry.hidden) return null;
