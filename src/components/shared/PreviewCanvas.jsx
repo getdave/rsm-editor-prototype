@@ -198,6 +198,33 @@ function PreviewCanvas({
           </div>
         );
       }
+      if (section.type === 'page-title') {
+        return (
+          <div key={index} className="p-section p-template-page-title">
+            <h1>{section.label || 'Page Title'}</h1>
+          </div>
+        );
+      }
+      if (section.type === 'featured-image') {
+        return (
+          <div key={index} className="p-section p-template-featured-image">
+            <div className="p-featured-image-placeholder">
+              {section.label || 'Featured Image'}
+            </div>
+          </div>
+        );
+      }
+      if (section.type === 'page-content') {
+        return (
+          <div key={index} className="p-section p-template-page-content">
+            <div className="wp-block-post-content p-template-post-content-placeholder">
+              {(section.placeholder || []).map((text) => (
+                <p key={text}>{text}</p>
+              ))}
+            </div>
+          </div>
+        );
+      }
       return null;
     });
 

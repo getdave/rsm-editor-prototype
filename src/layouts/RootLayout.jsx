@@ -16,6 +16,10 @@ import DevBranchIndicator from '../components/shared/DevBranchIndicator';
 
 const EDIT_ROUTE_PATTERN = /^\/(?:pages|page-designs|templates)\/[^/]+\/edit$/;
 
+function getFullPath(location) {
+  return `${location.pathname}${location.search}`;
+}
+
 function RootLayout() {
   const location = useLocation();
   const {
@@ -29,7 +33,8 @@ function RootLayout() {
   } = useAppState();
 
   const isEditCanvas = EDIT_ROUTE_PATTERN.test(location.pathname);
-  const prevPathRef = useRef(location.pathname);
+  const currentFullPath = getFullPath(location);
+  const prevPathRef = useRef(currentFullPath);
 
   // Collapse the chrome sidebar to its narrow 48px form when entering the
   // editor; expand it back when leaving. Idempotent so React StrictMode's
@@ -48,15 +53,16 @@ function RootLayout() {
   // user is about to make changes, which enables both Save buttons.
   useEffect(() => {
     const isEdit = EDIT_ROUTE_PATTERN.test(location.pathname);
-    const wasEdit = EDIT_ROUTE_PATTERN.test(prevPathRef.current);
+    const previousPathname = prevPathRef.current.split('?')[0];
+    const wasEdit = EDIT_ROUTE_PATTERN.test(previousPathname);
     if (isEdit && !wasEdit) {
       setEditorReferrer(prevPathRef.current);
       markDirty();
     } else if (!isEdit) {
       setEditorReferrer(null);
     }
-    prevPathRef.current = location.pathname;
-  }, [location.pathname, markDirty, setEditorReferrer]);
+    prevPathRef.current = currentFullPath;
+  }, [currentFullPath, location.pathname, markDirty, setEditorReferrer]);
 
   return (
     <>

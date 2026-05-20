@@ -22,7 +22,7 @@ function metaForReferrer(referrer) {
   if (!referrer) return { label: 'Home', icon: home, target: '/' };
   for (const meta of REFERRER_META) {
     if (referrer.startsWith(meta.prefix)) {
-      return { label: meta.label, icon: meta.icon, target: meta.prefix };
+      return { label: meta.label, icon: meta.icon, target: referrer };
     }
   }
   return { label: 'Home', icon: home, target: '/' };

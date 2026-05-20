@@ -343,8 +343,8 @@
   min-height: 0;
 }
 
-/* Dynamic Pages tab — no row-level DataViews actions; hide … menu slot (including disabled mobile trigger). */
-.pp-dataviews.pp-dataviews--dynamic-pages .dataviews-item-actions {
+/* Page Templates tab — no row-level DataViews actions; hide … menu slot (including disabled mobile trigger). */
+.pp-dataviews.pp-dataviews--template-pages .dataviews-item-actions {
   display: none;
 }
 

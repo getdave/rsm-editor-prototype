@@ -409,6 +409,21 @@ export const initialReadingSettings = {
   postsPageId: "blog",
 };
 
+export const pageTemplateOptions = [
+  {
+    value: "page-default",
+    label: "Page (default)",
+    description: "Includes the site header, page content, and footer.",
+    templateLabel: "Page",
+  },
+  {
+    value: "page-with-header",
+    label: "Page (with header)",
+    description: "Includes page title and featured image above the page content.",
+    templateLabel: "Page with header",
+  },
+];
+
 export const contentTypes = [
   {
     id: "posts",
@@ -446,6 +461,44 @@ export const contentTypes = [
 ];
 
 export const pageDesigns = [
+  {
+    id: "page-default",
+    slug: "page",
+    name: "Page template",
+    shortName: "Page (default)",
+    type: "Template",
+    provider: "Theme",
+    status: "active",
+    templateState: "active",
+    isLive: true,
+    isPageDesign: true,
+    isPageTemplate: true,
+    layoutKind: "page",
+    actionLabel: "Edit",
+    description: "Includes the site header, page content, and footer.",
+    scopeNotice: "Changes apply to pages using the default Page template.",
+    previewLabel: "Page (default)",
+    templateLabel: "Page",
+  },
+  {
+    id: "page-with-header",
+    slug: "page-with-header",
+    name: "Page with header template",
+    shortName: "Page (with header)",
+    type: "Template",
+    provider: "Theme",
+    status: "active",
+    templateState: "active",
+    isLive: true,
+    isPageDesign: true,
+    isPageTemplate: true,
+    layoutKind: "page",
+    actionLabel: "Edit",
+    description: "Includes page title and featured image above the page content.",
+    scopeNotice: "Changes apply to pages using the Page with header template.",
+    previewLabel: "Page (with header)",
+    templateLabel: "Page with header",
+  },
   {
     id: "template-archive",
     slug: "archive",
