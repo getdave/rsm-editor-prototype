@@ -366,7 +366,6 @@
   background: var(--wp-light-gray-50);
 }
 
-
 /* Editing canvas — header full width; side panels sit in a row beneath it */
 .edit-canvas {
   display: none;
@@ -383,6 +382,13 @@
 
 /* Editor column (toolbar + workspace row) */
 .editor-col {
+  --edit-canvas-accent: #007cba;
+  --edit-canvas-accent-hover: #006099;
+  --edit-canvas-accent-wash: rgba(0, 124, 186, 0.04);
+  --edit-canvas-accent-line: rgba(0, 124, 186, 0.35);
+  --edit-canvas-accent-line-strong: rgba(0, 124, 186, 0.5);
+  --edit-canvas-accent-shadow: rgba(0, 124, 186, 0.35);
+  --edit-canvas-accent-shadow-strong: rgba(0, 124, 186, 0.4);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -478,7 +484,7 @@
   opacity: 1;
 }
 
-/* Canvas blocks — WordPress block hover / selection (blue outline) */
+/* Canvas blocks — WordPress block hover / selection */
 .e-sec,
 .template-edit-root,
 .g-el.e-block {
@@ -492,14 +498,14 @@
 .e-sec:hover,
 .template-edit-root:hover,
 .g-el.e-block:hover {
-  border-color: #007cba;
+  border-color: var(--edit-canvas-accent);
 }
 
 /* Selection wash on page/template root blocks; Header/Footer template parts (.tp-part) use purple accents below */
 .e-sec.sel,
 .template-edit-root.sel {
-  border-color: #007cba;
-  background: rgba(0, 124, 186, 0.04);
+  border-color: var(--edit-canvas-accent);
+  background: var(--edit-canvas-accent-wash);
 }
 
 /* Rough canvas stubs when a section "block style" is chosen in the inspector */
@@ -552,7 +558,7 @@
 }
 
 .g-el.e-block.sel {
-  border-color: #007cba;
+  border-color: var(--edit-canvas-accent);
   opacity: 1;
 }
 
@@ -688,10 +694,10 @@
   margin: 0;
   border: none;
   border-radius: 20px;
-  background: #007cba;
+  background: var(--edit-canvas-accent);
   color: #fff;
   font: 500 11px var(--wp-font-family);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 124, 186, 0.35);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06), 0 2px 8px var(--edit-canvas-accent-shadow);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -720,7 +726,7 @@
   left: 50%;
   width: min(100%, 200px);
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(0, 124, 186, 0.35), transparent);
+  background: linear-gradient(to right, transparent, var(--edit-canvas-accent-line), transparent);
   transform: translateX(-50%);
   z-index: -1;
 }
@@ -736,9 +742,9 @@
 }
 
 .add-sec:hover {
-  background: #006099;
+  background: var(--edit-canvas-accent-hover);
   color: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(0, 124, 186, 0.5), 0 4px 14px rgba(0, 124, 186, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14), 0 0 0 1px var(--edit-canvas-accent-line-strong), 0 4px 14px var(--edit-canvas-accent-shadow-strong);
 }
 
 .add-sec-plus {

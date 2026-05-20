@@ -2,6 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppState, READING_DISPLAY_LATEST } from '../hooks/useAppState';
 import { Tooltip } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Sidebar nav depends on WP UI Button CSS vars; swapping components would be a visual refactor.
 import { Button, Stack, Text } from '@wordpress/ui';
 import {
   home,
@@ -151,8 +152,12 @@ function Sidebar() {
 
   useEffect(() => {
     if (sidebarNestedNavHidden) {
-      setAdvancedExpanded(false);
+      const raf = window.requestAnimationFrame(() => {
+        setAdvancedExpanded(false);
+      });
+      return () => window.cancelAnimationFrame(raf);
     }
+    return undefined;
   }, [sidebarNestedNavHidden]);
 
   /** Collapsed chrome: first interaction expands the sidebar/menu and opens Advanced */

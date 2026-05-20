@@ -232,9 +232,9 @@ export function AppStateProvider({ children }) {
     );
   };
 
-  const markDirty = () => {
+  const markDirty = useCallback(() => {
     setHasUnsavedChanges(true);
-  };
+  }, []);
 
   const save = () => {
     setHasUnsavedChanges(false);

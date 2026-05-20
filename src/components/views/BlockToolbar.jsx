@@ -75,11 +75,8 @@ export default function BlockToolbar({
   }, []);
 
   useLayoutEffect(() => {
-    clampToCanvas();
-
     const el = ref.current;
     const scrollEl = el?.closest('.edit-scroll');
-    if (!scrollEl || !el) return undefined;
 
     const scheduleClamp = () => {
       cancelAnimationFrame(rafIdRef.current);
@@ -88,6 +85,12 @@ export default function BlockToolbar({
         clampToCanvas();
       });
     };
+
+    scheduleClamp();
+
+    if (!scrollEl || !el) {
+      return () => cancelAnimationFrame(rafIdRef.current);
+    }
 
     scrollEl.addEventListener('scroll', scheduleClamp, { passive: true });
     window.addEventListener('resize', scheduleClamp);

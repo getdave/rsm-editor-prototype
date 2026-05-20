@@ -237,10 +237,10 @@ function BlockEditor() {
     setSectionStylesByIndex((prev) => ({ ...prev, [sectionIndex]: styleId }));
   };
 
-  useEffect(() => {
+  const resetGlobalTemplatePartEditState = useCallback(() => {
     setConfirmedGlobalSpotlightBlockId(null);
     setGlobalEditWarnForId(null);
-  }, [selectedBlockId]);
+  }, []);
 
   const isInserterOpen = searchParams.get('inserter') != null;
   
@@ -296,12 +296,20 @@ function BlockEditor() {
           beginGlobalTemplatePartIsolation(id);
           return;
         }
+        resetGlobalTemplatePartEditState();
         setSelectedBlockId(id);
         return;
       }
+      if (selectedBlockId !== id) {
+        resetGlobalTemplatePartEditState();
+      }
       setSelectedBlockId(id);
     },
-    [selectedBlockId, beginGlobalTemplatePartIsolation],
+    [
+      selectedBlockId,
+      beginGlobalTemplatePartIsolation,
+      resetGlobalTemplatePartEditState,
+    ],
   );
 
   const handleGlobalPartToolbarExit = useCallback(() => {
@@ -572,6 +580,9 @@ function BlockEditor() {
   const pageInspectorTitle = isPageDesignEdit
     ? pageDesignTarget.name
     : content.title || currentPage?.name || 'Untitled';
+  const templateTitle = content.isTemplate
+    ? editTarget?.templateLabel ?? content.templateName ?? editTarget?.name ?? 'Template'
+    : null;
 
   const leftPanelMode = listViewOpen ? 'list' : isInserterOpen ? 'inserter' : null;
 
@@ -623,6 +634,7 @@ function BlockEditor() {
             canRename={!isPageDesignEdit}
             documentLabelOverride={spotlightGlobalDocLabel}
             mode={mode}
+            templateTitle={templateTitle}
           />
           <div className="ct-space"></div>
 

@@ -27,12 +27,14 @@ function docTypeIcon(page) {
  *   when a global template part is selected with peer spotlight.
  * - `mode`: Block Editor mode (`'page' | 'template'`). The template mode swaps
  *   icon, badge, and disables rename.
+ * - `templateTitle`: optional template label shown in template mode.
  */
 export default function DocumentActions({
   document: documentProp = null,
   canRename = true,
   documentLabelOverride = null,
   mode = EDITOR_MODES.PAGE,
+  templateTitle = null,
 }) {
   const isTemplate = mode === EDITOR_MODES.TEMPLATE;
   const { currentPage, setCurrentPageName } = useAppState();
@@ -59,7 +61,7 @@ export default function DocumentActions({
   const displayName = isGlobalOverride
     ? documentLabelOverride
     : isTemplate
-      ? documentLabelOverride ?? 'Template title'
+      ? templateTitle ?? documentName
       : documentName;
 
   const commit = () => {
@@ -85,7 +87,7 @@ export default function DocumentActions({
   const nameTooltipText = isGlobalOverride
     ? 'Global template part'
     : isTemplate
-      ? 'Template title'
+      ? displayName
       : renameEnabled ? 'Rename page' : documentName;
 
   const docIcon = isTemplate ? layout : docTypeIcon(activeDocument);
