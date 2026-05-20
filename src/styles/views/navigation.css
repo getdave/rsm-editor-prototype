@@ -266,6 +266,17 @@
   color: #d63638;
 }
 
+.nav-highlight-menus-toggle.components-base-control,
+.nav-highlight-menus-toggle .components-base-control__field {
+  margin-bottom: 0;
+}
+
+.nav-highlight-menus-toggle .components-toggle-control__label {
+  color: #1e1e1e;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 /* Menu item rows */
 .nav-menu-item-wrapper {
   position: relative;

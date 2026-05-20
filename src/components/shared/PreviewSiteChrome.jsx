@@ -86,6 +86,7 @@ export function PreviewSiteNavCluster({
   navEntries,
   onNavClick,
   mobileMenuInteractive = true,
+  spotlightNavigation = false,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const closeMobileMenu = () => setMobileMenuOpen(false);
@@ -93,7 +94,7 @@ export function PreviewSiteNavCluster({
   return (
     <>
       <span className="p-sitename">{siteTitle}</span>
-      <div className="p-nav">
+      <div className={`p-nav${spotlightNavigation ? ' is-spotlighted' : ''}`}>
         {navEntries.map((entry) => {
           const children = entry.children || [];
           const hasChildren = children.length > 0;
@@ -161,24 +162,47 @@ export function PreviewSiteNavCluster({
 }
 
 /** Header template part — site chrome above main content */
-export function PreviewSiteChromeHeader({ siteTitle, navEntries, onNavClick }) {
+export function PreviewSiteChromeHeader({
+  siteTitle,
+  navEntries,
+  onNavClick,
+  spotlightNavigation = false,
+}) {
   return (
     <div className="p-header">
       <PreviewSiteNavCluster
         siteTitle={siteTitle}
         navEntries={navEntries}
         onNavClick={onNavClick}
+        spotlightNavigation={spotlightNavigation}
       />
     </div>
   );
 }
 
 /** Footer template part */
-export function PreviewSiteChromeFooter({ siteTitle }) {
+export function PreviewSiteChromeFooter({
+  siteTitle,
+  navEntries,
+  onNavClick,
+  spotlightNavigation = false,
+}) {
   return (
     <div className="p-footer">
-      <span className="p-ft">© 2026 {siteTitle}</span>
-      <span className="p-ft">Privacy Policy</span>
+      <span className="p-ft p-footer-copyright">© 2026 {siteTitle}</span>
+      <nav
+        className={`p-footer-nav${spotlightNavigation ? ' is-spotlighted' : ''}`}
+        aria-label="Footer navigation"
+      >
+        {navEntries.map((entry) => (
+          <NavEntryControl
+            key={entry.key}
+            entry={entry}
+            onNavClick={onNavClick}
+            className="p-footer-nav-link"
+          />
+        ))}
+      </nav>
     </div>
   );
 }
@@ -194,6 +218,7 @@ export function PreviewTemplateFrame({
   children,
   header = null,
   footer = null,
+  spotlightHeaderNavigation = false,
 }) {
   return (
     <>
@@ -202,10 +227,18 @@ export function PreviewTemplateFrame({
           siteTitle={siteTitle}
           navEntries={navEntries}
           onNavClick={onNavClick}
+          spotlightNavigation={spotlightHeaderNavigation}
         />
       )}
       {children}
-      {footer ?? <PreviewSiteChromeFooter siteTitle={siteTitle} />}
+      {footer ?? (
+        <PreviewSiteChromeFooter
+          siteTitle={siteTitle}
+          navEntries={navEntries}
+          onNavClick={onNavClick}
+          spotlightNavigation={spotlightHeaderNavigation}
+        />
+      )}
     </>
   );
 }

@@ -255,6 +255,13 @@
   margin: 0;
 }
 
+.preview-bar-extra-controls {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
 /* DocumentActions — rename affordance inside the canvas toolbar. The
    .ct-btn class supplies the flex layout, padding, and hover; this rule
    only handles the cursor flip between view (pointer) and edit (text)
