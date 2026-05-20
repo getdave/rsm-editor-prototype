@@ -210,31 +210,76 @@
 .doc-actions-name.is-editing { cursor: text; }
 .doc-actions-name-text { outline: none; }
 
-.doc-actions.doc-actions--global .preview-bar-doc-icon {
+.doc-actions-current {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.doc-actions-current--global .preview-bar-doc-icon {
   color: var(--edit-global-accent);
 }
 
-.doc-actions.doc-actions--global .preview-bar-doc-icon svg {
+.doc-actions-current--global .preview-bar-doc-icon svg {
   fill: currentColor;
 }
 
-.doc-actions.doc-actions--global .doc-actions-name-text {
+.doc-actions-current--global .doc-actions-name-text {
   color: var(--edit-global-accent);
 }
 
-.doc-actions.doc-actions--global .doc-actions-name:hover {
+.doc-actions-current--global .doc-actions-name:hover {
   background: rgba(117, 39, 231, 0.09);
 }
 
-.doc-actions.doc-actions--global .ct-icon-btn.components-button {
+.doc-actions-current--global .ct-icon-btn.components-button {
   color: var(--edit-global-accent);
 }
 
-.doc-actions.doc-actions--global .ct-icon-btn.components-button:hover {
+.doc-actions-current--global .ct-icon-btn.components-button:hover {
   background: rgba(117, 39, 231, 0.1);
 }
 
-.doc-actions.doc-actions--global .ct-icon-btn.components-button svg {
+.doc-actions-current--global .ct-icon-btn.components-button svg {
+  fill: currentColor;
+}
+
+.doc-actions-breadcrumb-parent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+  color: #1e1e1e;
+}
+
+.doc-actions-breadcrumb-parent:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.doc-actions-breadcrumb-parent:focus-visible {
+  outline: 2px solid var(--wp-admin-theme-color, #3858e9);
+  outline-offset: 1px;
+}
+
+.doc-actions-breadcrumb-sep {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: #757575;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.doc-actions-breadcrumb-sep svg {
+  width: 16px;
+  height: 16px;
   fill: currentColor;
 }
 
