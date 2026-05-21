@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Modal, Button, TextControl, Flex, FlexItem } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { useAppState } from '../../hooks/useAppState';
 
@@ -20,12 +21,6 @@ function SiteIdentityModalContent() {
   } = useAppState();
   const [draftTitle, setDraftTitle] = useState(siteTitle);
 
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      closeSiteIdentityModal();
-    }
-  };
-
   const handleSave = () => {
     const trimmed = draftTitle.trim();
     if (trimmed && trimmed !== siteTitle) {
@@ -40,64 +35,49 @@ function SiteIdentityModalContent() {
   };
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-        <Stack
-          direction="row"
-          align="center"
-          justify="space-between"
-          className="modal-hd"
-        >
-          <Text variant="heading-md" className="modal-title">Edit site identity</Text>
-          <button className="modal-close" onClick={closeSiteIdentityModal}>
-            ✕
-          </button>
-        </Stack>
-        <div className="modal-body">
-          <div className="m-field">
-            <label className="m-lbl" htmlFor="site-identity-title">Site title</label>
-            <input
-              id="site-identity-title"
-              type="text"
-              className="m-input"
-              value={draftTitle}
-              onChange={(e) => setDraftTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSave();
-                if (e.key === 'Escape') handleCancel();
-              }}
-              autoFocus
-            />
-          </div>
-          <div className="m-field">
-            <label className="m-lbl">Site logo</label>
-            <Stack direction="row" align="center" gap="md" className="m-logo-area">
-              <div className="m-logo-preview">
-                <div className="m-logo-placeholder" />
-              </div>
-              <Stack direction="column" gap="sm" className="m-logo-actions">
-                <button className="m-logo-btn primary">Upload image</button>
-                <button className="m-logo-btn">Choose from library</button>
-              </Stack>
+    <Modal
+      title="Edit site identity"
+      onRequestClose={closeSiteIdentityModal}
+      className="site-identity-modal"
+    >
+      <Stack direction="column" gap="lg" className="site-identity-modal__body">
+        <TextControl
+          label="Site title"
+          value={draftTitle}
+          onChange={setDraftTitle}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSave();
+            if (e.key === 'Escape') handleCancel();
+          }}
+          __next40pxDefaultSize
+          autoFocus
+        />
+        <Stack direction="column" gap="sm">
+          <Text variant="body-sm" className="site-identity-modal__logo-label">Site logo</Text>
+          <Stack direction="row" align="center" gap="md" className="site-identity-modal__logo-area">
+            <div className="site-identity-modal__logo-preview">
+              <div className="site-identity-modal__logo-placeholder" />
+            </div>
+            <Stack direction="column" gap="sm">
+              <Button variant="primary">Upload image</Button>
+              <Button variant="secondary">Choose from library</Button>
             </Stack>
-          </div>
-        </div>
-        <Stack
-          direction="row"
-          align="center"
-          justify="flex-end"
-          gap="sm"
-          className="modal-footer"
-        >
-          <button className="m-cancel" onClick={handleCancel}>
-            Cancel
-          </button>
-          <button className="m-ok" onClick={handleSave}>
-            Save changes
-          </button>
+          </Stack>
         </Stack>
-      </div>
-    </div>
+      </Stack>
+      <Flex justify="flex-end" gap={2} className="site-identity-modal__actions">
+        <FlexItem>
+          <Button variant="tertiary" onClick={handleCancel}>
+            Cancel
+          </Button>
+        </FlexItem>
+        <FlexItem>
+          <Button variant="primary" onClick={handleSave}>
+            Save changes
+          </Button>
+        </FlexItem>
+      </Flex>
+    </Modal>
   );
 }
 

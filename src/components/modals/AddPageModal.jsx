@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, DropdownMenu, MenuItem, CheckboxControl, Tooltip, PanelBody, SelectControl } from '@wordpress/components';
-import { Stack, Text } from '@wordpress/ui';
+import { Modal, Button, TextControl, DropdownMenu, MenuItem, CheckboxControl, Tooltip, PanelBody, SelectControl } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 import { createInterpolateElement } from '@wordpress/element';
 import { chevronDown, plus } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
@@ -58,12 +58,6 @@ function AddPageModalContent() {
   ];
 
   const layouts = showAllLayouts ? allLayouts : starterLayouts;
-
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      closeAddPageModal();
-    }
-  };
 
   const handleSelectPath = (path) => {
     setSelectedPath(path);
@@ -156,36 +150,26 @@ function AddPageModalContent() {
   const canCreate = pageTitle.trim().length > 0;
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-box apm-modal" onClick={(e) => e.stopPropagation()}>
-        <Stack
-          direction="row"
-          align="flex-start"
-          justify="space-between"
-          className="modal-hd"
-        >
-          <Stack direction="column" gap="xs">
-            <Text variant="heading-md" className="modal-title">Add a new page</Text>
-            {selectedPath === 'layout' && !selectedLayout && (
-              <Text variant="body-sm" className="modal-subtitle">
-                {createInterpolateElement(
-                  'Choose from predefined layouts built using <term>patterns</term> that you can customize.',
-                  {
-                    term: (
-                      <DefinedTerm definition="Reusable design blocks you can combine and customize to build pages." />
-                    ),
-                  },
-                )}
-              </Text>
+    <Modal
+      title="Add a new page"
+      onRequestClose={closeAddPageModal}
+      className="apm-modal"
+      size="large"
+    >
+      <div className="apm-modal-body">
+        {selectedPath === 'layout' && !selectedLayout && (
+          <Text variant="body-sm" className="modal-subtitle apm-modal-subtitle">
+            {createInterpolateElement(
+              'Choose from predefined layouts built using <term>patterns</term> that you can customize.',
+              {
+                term: (
+                  <DefinedTerm definition="Reusable design blocks you can combine and customize to build pages." />
+                ),
+              },
             )}
-          </Stack>
-          <button className="modal-close" onClick={closeAddPageModal}>
-            ✕
-          </button>
-        </Stack>
-
-        <div className="modal-body">
-          {!selectedPath ? (
+          </Text>
+        )}
+        {!selectedPath ? (
             <>
               <div className="apm-options">
                 <button
@@ -378,20 +362,16 @@ function AddPageModalContent() {
               ) : (
                 <>
                   <div className="apm-form">
-                    <div className="m-field">
-                      <label className="m-lbl" htmlFor="page-title">
-                        Page title *
-                      </label>
-                      <input
-                        id="page-title"
-                        type="text"
-                        className="m-input"
-                        value={pageTitle}
-                        onChange={(e) => setPageTitle(e.target.value)}
-                        placeholder="Enter page title"
-                        autoFocus
-                      />
-                    </div>
+                    <TextControl
+                      label="Page title"
+                      value={pageTitle}
+                      onChange={setPageTitle}
+                      placeholder="Enter page title"
+                      required
+                      __next40pxDefaultSize
+                      className="apm-page-title"
+                      autoFocus
+                    />
 
                     <div className="apm-checkbox-group">
                       <div className="apm-checkbox-item">
@@ -431,10 +411,10 @@ function AddPageModalContent() {
               )}
             </>
           )}
-        </div>
+      </div>
 
-        {selectedPath && (
-          <div className="modal-footer apm-modal-footer">
+      {selectedPath && (
+        <div className="modal-footer apm-modal-footer">
             <Button variant="tertiary" onClick={handleFooterBack}>
               ← Back to options
             </Button>
@@ -482,8 +462,7 @@ function AddPageModalContent() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 }
 
