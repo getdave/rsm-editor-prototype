@@ -9,18 +9,13 @@
   max-height: 85vh;
 }
 
+/* Let the WordPress modal content be the single scroll region. Short steps
+   (the path picker, the details form) fit and never scroll; only the long
+   layout grid overflows and scrolls. Driving the scroll here — instead of a
+   forced flex:1 body — avoids a phantom scrollbar when content fits exactly. */
 .apm-modal .components-modal__content {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.apm-modal-body {
-  flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  min-height: 0;
 }
 
 .apm-modal-subtitle {
@@ -34,7 +29,6 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--wpds-dimension-gap-md);
-  flex: 0 0 auto;
   padding-left: 0;
   padding-right: 0;
 }
