@@ -168,6 +168,51 @@
   flex-shrink: 0;
 }
 
+.preview-canvas-root--template .preview-bar > .components-button.is-primary {
+  background: var(--wp-block-synced-color);
+  border-color: var(--wp-block-synced-color);
+  color: #fff;
+}
+
+.preview-canvas-root--template .preview-bar > .components-button.is-primary:hover:not(:disabled) {
+  background: var(--wp-block-synced-color-hover);
+  border-color: var(--wp-block-synced-color-hover);
+}
+
+.preview-canvas-root--template .preview-bar-doc-icon {
+  color: var(--wp-block-synced-color);
+}
+
+.preview-canvas-root--template .preview-bar-doc-icon svg {
+  fill: currentColor;
+}
+
+.preview-history-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  margin-left: 2px;
+}
+
+.preview-history-btn.components-button {
+  width: 26px;
+  min-width: 26px;
+  height: 28px;
+  padding: 0;
+  color: #757575;
+  opacity: 0.72;
+}
+
+.preview-history-btn.components-button:hover:not(:disabled) {
+  color: #1e1e1e;
+  background: #f6f7f7;
+  opacity: 1;
+}
+
+.preview-history-btn.components-button:disabled {
+  opacity: 0.24;
+}
+
 /* Document cluster (icon + name + status dot) sitting between the Edit
    button and the device switcher. */
 .preview-bar-doc-icon {
@@ -179,6 +224,15 @@
 
 .preview-bar-doc-name {
   cursor: default;
+}
+
+.preview-bar-doc-name.ct-btn:hover {
+  background: transparent;
+}
+
+.preview-bar-doc-options {
+  display: inline-flex;
+  margin-left: -7px;
 }
 
 .preview-bar-doc-name--has-scope {

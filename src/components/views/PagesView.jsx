@@ -3,15 +3,12 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Button,
   DropdownMenu,
-  RadioControl,
-  SelectControl,
   ToggleControl,
   Tooltip,
   __experimentalConfirmDialog as ConfirmDialog,
 } from "@wordpress/components";
 import { Stack, Text, VisuallyHidden } from "@wordpress/ui";
 import { DataViews, filterSortAndPaginate } from "@wordpress/dataviews";
-import { createInterpolateElement } from "@wordpress/element";
 import {
   plus,
   copy,
@@ -24,7 +21,6 @@ import {
   chevronDown,
   chevronUp,
   moreVertical,
-  help,
   trash,
   navigation,
   closeSmall,
@@ -37,17 +33,9 @@ import {
 } from "../../hooks/useAppState";
 import PageLayoutWireframeThumb from "../shared/PageLayoutWireframeThumb";
 import PreviewCanvas from "../shared/PreviewCanvas";
-import DefinedTerm from "../shared/DefinedTerm";
 import DeleteHomepagePageModal from "../modals/DeleteHomepagePageModal";
 import DeletePostsPageModal from "../modals/DeletePostsPageModal";
 import DeletePageConfirmModal from "../modals/DeletePageConfirmModal";
-
-/** Tooltip primer (concept from WP template hierarchy) */
-const WP_TEMPLATE_TERM_DEFINITION =
-  "A design WordPress applies automatically to a type of content — e.g. all blog posts, all search results. You edit the template once; WordPress uses it everywhere that type appears.";
-
-const POSTS_PAGE_SELECT_HELP_TOOLTIP =
-  "Optional. The Page you pick here sets the URL for your Posts listing (e.g. /blog). Its own content is never shown — WordPress displays Posts there using your Posts Template.";
 
 const BADGE_STYLES = {
   WordPress: { background: "rgba(33,117,155,.12)", color: "#21759b" },
@@ -345,234 +333,6 @@ function asCollectionRow(row, collectionGroup) {
   };
 }
 
-function readingPageOptionLabel(p) {
-  const prefix = p.level > 0 ? `${"— ".repeat(p.level)}` : "";
-  return `${prefix}${p.name}`;
-}
-
-function ConfigureHomepageReadingModal({
-  onClose,
-  onApply,
-  initialHomepageDisplayMode,
-  initialFrontPageId,
-  initialPostsPageId,
-  readingSelectPages,
-}) {
-  const [mode, setMode] = useState(initialHomepageDisplayMode);
-  const [homePageId, setHomePageId] = useState(initialFrontPageId);
-  const [postsPageIdDraft, setPostsPageIdDraft] = useState(initialPostsPageId);
-
-  const homepageOptions = useMemo(() => {
-    const rows = readingSelectPages.map((p) => ({
-      label: readingPageOptionLabel(p),
-      value: p.id,
-    }));
-    const out = [{ label: "— Select —", value: "" }, ...rows];
-    if (homePageId && !readingSelectPages.some((p) => p.id === homePageId)) {
-      out.push({
-        label: `Unavailable (${homePageId})`,
-        value: homePageId,
-      });
-    }
-    return out;
-  }, [readingSelectPages, homePageId]);
-
-  const homePageResolved =
-    homePageId && readingSelectPages.some((p) => p.id === homePageId);
-  let homepageWarning = null;
-  if (mode === READING_DISPLAY_STATIC) {
-    if (homePageId && !homePageResolved) {
-      homepageWarning =
-        "That page isn't listed here (for example if it isn't published yet). Pick a published page—the one visitors should see when they open your site's main web address.";
-    } else if (!homePageId) {
-      homepageWarning =
-        "No homepage chosen. Pick which page should open at your site's main web address. Until then, people visiting that will usually see a blog-style list of your newest posts.";
-    }
-  }
-
-  const postsPageUnset = mode === READING_DISPLAY_STATIC && !postsPageIdDraft;
-
-  const postsPageWarning = postsPageUnset
-    ? "No posts Page set. There’s no bookmarkable URL dedicated to listing recent posts; posts still surface through archives, category links, and similar views."
-    : null;
-  const postsPageOptions = useMemo(() => {
-    const rows = readingSelectPages
-      .filter((p) => p.id !== homePageId)
-      .map((p) => ({ label: readingPageOptionLabel(p), value: p.id }));
-    return [{ label: "— Select —", value: "" }, ...rows];
-  }, [readingSelectPages, homePageId]);
-
-  const handleDisplayModeChange = (next) => {
-    if (next === READING_DISPLAY_LATEST) {
-      setMode(READING_DISPLAY_LATEST);
-      setHomePageId("");
-      setPostsPageIdDraft("");
-    } else {
-      setMode(READING_DISPLAY_STATIC);
-      setHomePageId((prev) => prev || "home");
-      setPostsPageIdDraft((prev) => prev || "blog");
-    }
-  };
-
-  const handleHomepageSelect = (id) => {
-    setHomePageId(id);
-    if (id === postsPageIdDraft) {
-      setPostsPageIdDraft("");
-    }
-  };
-
-  const handleDone = () => {
-    onApply({
-      homepageDisplayMode: mode,
-      frontPageId: homePageId,
-      postsPageId: postsPageIdDraft,
-    });
-  };
-
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="configure-homepage-modal-title"
-      className="modal-box ch-reading-modal"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <Stack
-        direction="row"
-        align="center"
-        justify="space-between"
-        className="modal-hd"
-      >
-        <Text
-          id="configure-homepage-modal-title"
-          variant="heading-md"
-          className="modal-title"
-        >
-          Configure site homepage
-        </Text>
-        <button
-          type="button"
-          className="modal-close"
-          aria-label="Close dialog"
-          onClick={onClose}
-        >
-          ×
-        </button>
-      </Stack>
-      <div className="modal-body ch-reading-body">
-        <Text variant="body-sm" className="ch-reading-intro">
-          Controls what visitors see at your site&apos;s main address
-          (https://example.com).
-        </Text>
-
-        <RadioControl
-          className="ch-reading-radio"
-          hideLabelFromVision
-          label="Your homepage displays"
-          selected={mode}
-          options={[
-            {
-              label: "Your latest posts",
-              value: READING_DISPLAY_LATEST,
-              description: createInterpolateElement(
-                "Visitors see a list of your Posts. This works well for a blog-style site. WordPress generates this Page automatically using a <term>Template</term>.",
-                {
-                  term: (
-                    <DefinedTerm definition={WP_TEMPLATE_TERM_DEFINITION} />
-                  ),
-                },
-              ),
-            },
-            {
-              label: "Your chosen content Page",
-              value: READING_DISPLAY_STATIC,
-              description: `Visitors land on one page you create and manage (often labeled "Home"). You can choose that page below.`,
-            },
-          ]}
-          onChange={handleDisplayModeChange}
-        />
-
-        {mode === READING_DISPLAY_STATIC && (
-          <div className="ch-reading-static">
-            <div className="ch-reading-field">
-              <SelectControl
-                __next40pxDefaultSize
-                label="Homepage"
-                value={homePageId || ""}
-                options={homepageOptions}
-                onChange={handleHomepageSelect}
-              />
-              {homepageWarning ? (
-                <Text
-                  variant="body-sm"
-                  className="ch-reading-field-warning"
-                  role="note"
-                >
-                  {homepageWarning}
-                </Text>
-              ) : null}
-            </div>
-            <div className="ch-reading-field">
-              <SelectControl
-                __next40pxDefaultSize
-                label={
-                  <span className="ch-reading-label-with-help">
-                    Posts page
-                    <Tooltip
-                      text={POSTS_PAGE_SELECT_HELP_TOOLTIP}
-                      delay={400}
-                      placement="top"
-                    >
-                      <button
-                        type="button"
-                        className="ch-reading-field-help-trigger"
-                        aria-label="Help: Posts page"
-                      >
-                        <span
-                          className="ch-reading-field-help-trigger-icon"
-                          aria-hidden
-                        >
-                          {help}
-                        </span>
-                      </button>
-                    </Tooltip>
-                  </span>
-                }
-                value={postsPageIdDraft || ""}
-                options={postsPageOptions}
-                onChange={(v) => setPostsPageIdDraft(v || "")}
-              />
-              {postsPageWarning ? (
-                <Text
-                  variant="body-sm"
-                  className="ch-reading-field-warning"
-                  role="note"
-                >
-                  {postsPageWarning}
-                </Text>
-              ) : null}
-            </div>
-          </div>
-        )}
-      </div>
-      <Stack
-        direction="row"
-        align="center"
-        justify="flex-end"
-        gap="sm"
-        className="modal-footer ch-reading-footer"
-      >
-        <Button variant="tertiary" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={handleDone}>
-          Done
-        </Button>
-      </Stack>
-    </div>
-  );
-}
-
 function InactiveCollectionTemplateModal({ item, onClose, onCreate }) {
   const pageLabel = getCustomTemplatePageLabel(item);
 
@@ -669,6 +429,7 @@ function PagesView() {
     showSnackbar,
     addPageToMainMenu,
     removePageFromMainMenu,
+    openConfigureHomepageModal,
   } = useAppState();
   const [previewPage, setPreviewPage] = useState(currentPage);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -678,7 +439,6 @@ function PagesView() {
     createPagesDataViewState(pagesViewMode),
   );
   const [viewOptionsOpen, setViewOptionsOpen] = useState(false);
-  const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
   const [publishConfirmPage, setPublishConfirmPage] = useState(null);
   const [inactiveTemplateNoticePage, setInactiveTemplateNoticePage] =
     useState(null);
@@ -717,19 +477,6 @@ function PagesView() {
   }, [homepageDisplayMode, frontPageId, postsPageId, readingSelectPages]);
 
   const isGridLayout = activeView.type === "grid";
-
-  useEffect(() => {
-    if (!configureHomepageOpen) {
-      return;
-    }
-    const onKeyDown = (e) => {
-      if (e.key === "Escape") {
-        setConfigureHomepageOpen(false);
-      }
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [configureHomepageOpen]);
 
   useEffect(() => {
     const front =
@@ -1346,23 +1093,6 @@ function PagesView() {
     categoryPages[0] ??
     previewPage;
 
-  const handleReadingModalApply = (draft) => {
-    if (draft.homepageDisplayMode === READING_DISPLAY_LATEST) {
-      setHomepageDisplayMode(READING_DISPLAY_LATEST);
-      setFrontPageId("");
-      setPostsPageId("");
-    } else {
-      setHomepageDisplayMode(READING_DISPLAY_STATIC);
-      setFrontPageId(draft.frontPageId || "");
-      setPostsPageId(draft.postsPageId || "");
-    }
-    setConfigureHomepageOpen(false);
-  };
-
-  const handleReadingModalClose = () => {
-    setConfigureHomepageOpen(false);
-  };
-
   const handleCreateInactiveTemplate = (item) => {
     if (!item) {
       return;
@@ -1568,7 +1298,6 @@ function PagesView() {
         editPageOrDesign(displayedPreviewPage);
       }}
       onPageChange={setPreviewPage}
-      editLabel="Edit"
     />
   );
 
@@ -1613,7 +1342,7 @@ function PagesView() {
           controls={[
             {
               title: "Configure Homepage",
-              onClick: () => setConfigureHomepageOpen(true),
+              onClick: openConfigureHomepageModal,
             },
           ]}
         />
@@ -1653,22 +1382,6 @@ function PagesView() {
           </Page>
         )}
       </div>
-      {configureHomepageOpen && (
-        <div
-          className="modal-overlay"
-          role="presentation"
-          onClick={handleReadingModalClose}
-        >
-          <ConfigureHomepageReadingModal
-            onClose={handleReadingModalClose}
-            onApply={handleReadingModalApply}
-            initialHomepageDisplayMode={homepageDisplayMode}
-            initialFrontPageId={frontPageId}
-            initialPostsPageId={postsPageId}
-            readingSelectPages={readingSelectPages}
-          />
-        </div>
-      )}
       {inactiveTemplateNoticePage && (
         <div
           className="modal-overlay"

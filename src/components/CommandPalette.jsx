@@ -34,6 +34,7 @@ function CommandPaletteContent() {
     closeCommandPalette,
     openSiteIdentityModal,
     openSettingsModal,
+    openConfigureHomepageModal,
   } = useAppState();
 
   const [query, setQuery] = useState('');
@@ -60,9 +61,20 @@ function CommandPaletteContent() {
     return [
       ...navigateCommands,
       { id: 'identity', label: 'Edit site identity', group: 'Action', perform: openSiteIdentityModal },
+      {
+        id: 'configure-homepage',
+        label: 'Configure Homepage',
+        group: 'Action',
+        perform: openConfigureHomepageModal,
+      },
       { id: 'settings', label: 'Open settings', group: 'Action', perform: openSettingsModal },
     ];
-  }, [navigate, openSiteIdentityModal, openSettingsModal]);
+  }, [
+    navigate,
+    openConfigureHomepageModal,
+    openSiteIdentityModal,
+    openSettingsModal,
+  ]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

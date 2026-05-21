@@ -5,6 +5,7 @@ import { chevronDown, chevronRight } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { EDITOR_MODES } from '../../services/blockEditorMode';
 import { docTypeIcon } from '../../utils/docTypeIcon';
+import { getDocumentOptionsLabel } from '../../utils/documentOptionsLabel';
 
 /**
  * Props:
@@ -21,6 +22,7 @@ import { docTypeIcon } from '../../utils/docTypeIcon';
  * - `mode`: Block Editor mode (`'page' | 'template'`). The template mode swaps
  *   icon, badge, and disables rename.
  * - `templateTitle`: optional template label shown in template mode.
+ * - `documentOptions`: optional document menu actions; no dropdown renders when empty.
  */
 export default function DocumentActions({
   document: documentProp = null,
@@ -30,6 +32,7 @@ export default function DocumentActions({
   breadcrumbParent = null,
   mode = EDITOR_MODES.PAGE,
   templateTitle = null,
+  documentOptions = [],
 }) {
   const isTemplate = mode === EDITOR_MODES.TEMPLATE;
   const { currentPage, setCurrentPageName } = useAppState();
@@ -89,6 +92,10 @@ export default function DocumentActions({
     ?? docTypeIcon(activeDocument, { isTemplate });
 
   const showStatusDot = !isTemplate && !isGlobalOverride;
+  const documentOptionsLabel = getDocumentOptionsLabel(activeDocument, {
+    isGlobalOverride,
+    isTemplate,
+  });
 
   return (
     <Stack
@@ -177,22 +184,36 @@ export default function DocumentActions({
           </Tooltip>
         )}
 
-        <Dropdown
-          renderToggle={({ isOpen, onToggle }) => (
-            <Button
-              className="ct-icon-btn"
-              onClick={onToggle}
-              aria-expanded={isOpen}
-              label="Document options"
-              icon={chevronDown}
-            />
-          )}
-          renderContent={() => (
-            <MenuGroup label="Document">
-              <MenuItem disabled>Coming soon</MenuItem>
-            </MenuGroup>
-          )}
-        />
+        {documentOptions.length > 0 && (
+          <Dropdown
+            renderToggle={({ isOpen, onToggle }) => (
+              <Button
+                className="ct-icon-btn"
+                onClick={onToggle}
+                aria-expanded={isOpen}
+                label={documentOptionsLabel}
+                icon={chevronDown}
+              />
+            )}
+            renderContent={({ onClose }) => (
+              <MenuGroup label={documentOptionsLabel}>
+                {documentOptions.map((option) => (
+                  <MenuItem
+                    key={option.label}
+                    icon={option.icon}
+                    iconPosition="left"
+                    onClick={() => {
+                      option.onClick();
+                      onClose();
+                    }}
+                  >
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </MenuGroup>
+            )}
+          />
+        )}
       </div>
     </Stack>
   );

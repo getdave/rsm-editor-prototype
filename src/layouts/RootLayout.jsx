@@ -8,6 +8,7 @@ import CommandPalette from '../components/CommandPalette';
 import SiteIdentityModal from '../components/modals/SiteIdentityModal';
 import SettingsModal from '../components/modals/SettingsModal';
 import AddPageModal from '../components/modals/AddPageModal';
+import ConfigureHomepageModal from '../components/modals/ConfigureHomepageModal';
 import PagesFloatingPanel from '../components/modals/PagesFloatingPanel';
 import UnsavedChangesModal from '../components/modals/UnsavedChangesModal';
 import DevBranchIndicator from '../components/shared/DevBranchIndicator';
@@ -70,6 +71,7 @@ function RootLayout() {
       <SiteIdentityModal />
       <SettingsModal />
       <AddPageModal />
+      <ConfigureHomepageModal />
       <PagesFloatingPanel />
       <UnsavedChangesModal />
       <CommandPalette />

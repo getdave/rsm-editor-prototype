@@ -1,26 +1,35 @@
 import {
   Button,
+  Dropdown,
+  MenuGroup,
+  MenuItem,
   Tooltip,
   __experimentalToggleGroupControl as ToggleGroupControl,
   __experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
 import {
+  chevronDown,
+  chevronLeft,
+  chevronRight,
   desktop,
   tablet,
   mobile,
   home,
   page as pageIcon,
   postList,
+  store,
   styles,
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { getPageContent } from '../../services/pageContentService';
+import { getDocumentOptionsLabel } from '../../utils/documentOptionsLabel';
 import { PreviewTemplateFrame } from './PreviewSiteChrome';
 
 function docTypeIcon(p) {
-  if (p?.isPageDesign) return styles;
   if (p?.isFrontPage) return home;
   if (p?.isPostsPage) return postList;
+  if (p?.isShopPage || p?.collectionKind === 'shop') return store;
+  if (p?.isPageDesign) return styles;
   return pageIcon;
 }
 
@@ -45,30 +54,39 @@ function docTypeIcon(p) {
  * @param {function} onEdit - Callback when Edit button is clicked
  * @param {function} onPageChange - Callback when a nav link is clicked; parent decides what switching page means
  * @param {HeaderNavItem[]|null|undefined} headerNavItems - Optional top-level nav links (pageId or custom url order). When omitted, uses pages with `inMenu`.
+ * @param {{ label: string, icon?: object, onClick: function }[]} documentOptions - Optional document menu actions.
+ * @param {{ canGoBack: boolean, canGoForward: boolean, onBack: function, onForward: function }|null} previewHistory - Optional in-preview navigation controls.
  */
 function PreviewCanvas({
   page,
   onEdit,
   onPageChange = () => {},
   headerNavItems,
-  editLabel = 'Edit',
+  editLabel,
   documentLabel,
   scopeNotice,
+  documentOptions = [],
+  previewHistory = null,
 }) {
   const { selectedDevice, setSelectedDevice, siteTitle, pages } = useAppState();
 
   // Get WordPress-appropriate content for this page
   const content = getPageContent(page);
+  const isTemplatePreview = content.wordpressContext?.type === 'template';
+  const effectiveEditLabel = editLabel ?? (isTemplatePreview ? 'Edit template' : 'Edit page');
 
   const defaultMenuPages = pages.filter((p) => p.inMenu);
   const isInactiveTemplate = page.templateState === 'inactive';
   const statusLabel = isInactiveTemplate
     ? `Inactive. Using ${page.defaultTemplateLabel}.`
-    : page.isPageDesign
+    : isTemplatePreview
+      ? 'Template is active'
+      : page.isPageDesign
       ? 'Design is active'
       : page.isLive ? 'Page is published' : 'Page is a draft';
   const documentName = documentLabel || page.name;
   const documentStatusLabel = scopeNotice || statusLabel;
+  const documentOptionsLabel = getDocumentOptionsLabel(page);
   const documentNameElement = (
     <span
       className={`ct-btn preview-bar-doc-name${scopeNotice ? ' preview-bar-doc-name--has-scope' : ''}`}
@@ -342,11 +360,31 @@ function PreviewCanvas({
   );
 
   return (
-    <div className="preview-canvas-root canvas">
+    <div className={`preview-canvas-root canvas${isTemplatePreview ? ' is-template-context preview-canvas-root--template' : ''}`}>
       <div className="preview-bar">
         <Button variant="primary" onClick={onEdit}>
-          {editLabel}
+          {effectiveEditLabel}
         </Button>
+        {previewHistory && (
+          <div className="preview-history-controls" aria-label="Preview history">
+            <Button
+              className="preview-history-btn"
+              label="Back in preview"
+              icon={chevronLeft}
+              iconSize={18}
+              onClick={previewHistory.onBack}
+              disabled={!previewHistory.canGoBack}
+            />
+            <Button
+              className="preview-history-btn"
+              label="Forward in preview"
+              icon={chevronRight}
+              iconSize={18}
+              onClick={previewHistory.onForward}
+              disabled={!previewHistory.canGoForward}
+            />
+          </div>
+        )}
 
         <div className="ct-space"></div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -362,6 +400,39 @@ function PreviewCanvas({
             </Tooltip>
           ) : (
             documentNameElement
+          )}
+          {documentOptions.length > 0 && (
+            <span className="preview-bar-doc-options">
+              <Dropdown
+                renderToggle={({ isOpen, onToggle }) => (
+                  <Button
+                    className="ct-icon-btn"
+                    onClick={onToggle}
+                    aria-expanded={isOpen}
+                    label={documentOptionsLabel}
+                    icon={chevronDown}
+                    iconSize={20}
+                  />
+                )}
+                renderContent={({ onClose }) => (
+                  <MenuGroup label={documentOptionsLabel}>
+                    {documentOptions.map((option) => (
+                      <MenuItem
+                        key={option.label}
+                        icon={option.icon}
+                        iconPosition="left"
+                        onClick={() => {
+                          option.onClick();
+                          onClose();
+                        }}
+                      >
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </MenuGroup>
+                )}
+              />
+            </span>
           )}
           <Tooltip
             text={documentStatusLabel}
