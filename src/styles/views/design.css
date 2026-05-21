@@ -79,26 +79,10 @@
    as raised cards on top. */
 .pages-panel.design-panel { background: #1e1e1e; }
 
-/* Outer split-view layout for the design section: a fixed-width stage panel
-   and a flex-grow canvas, framed with the shared page-area tokens so the pair
-   matches the Navigation section exactly (size, spacing, border + shadow). */
-.design-panel .split-view.list {
-  flex-direction: row;
-  gap: var(--wp-page-area-gap, 12px);
-  padding: var(--wp-page-area-gap, 12px);
-  box-sizing: border-box;
-}
-.design-panel .split-view-stage {
-  width: 380px;
-  min-width: 380px;
-  flex: 0 0 380px;
-  border-right: none;
-  background: var(--wp-page-area-surface, #fff);
-  border: var(--wp-page-area-border, 1px solid #949494);
-  border-radius: var(--wp-page-area-radius, 8px);
-  box-shadow: var(--wp-page-area-shadow);
-  overflow: hidden;
-}
+/* The split-view layout, gutter, and stage frame are inherited from the shared
+   `.pages-panel` rules (pages.css) so the panel pair matches Navigation exactly
+   in size and absolute position. Only the canvas needs framing here, since the
+   design canvas isn't a `.pages-preview-frame`. */
 .design-panel .split-view-canvas {
   background: var(--wp-page-area-surface, #fff);
   border: var(--wp-page-area-border, 1px solid #949494);
