@@ -325,9 +325,12 @@
   --cs-card-text: #e8e8eb;
   --cs-card-text-muted: #a7abb4;
   --cs-card-link: #6b86f5;
+  /* Lighter sibling of the .cs-area border (--wp-gray-600 / #3c3c3c),
+     mixed toward white so each card edge stays visible on the dark area. */
+  --cs-card-border: color-mix(in srgb, var(--wp-gray-600, #3c3c3c) 75%, #fff);
 
   appearance: none;
-  border: 1px solid #c3c4c7;
+  border: 1px solid var(--cs-card-border);
   background: var(--cs-card-bg);
   border-radius: 6px;
   color: var(--cs-card-text);
