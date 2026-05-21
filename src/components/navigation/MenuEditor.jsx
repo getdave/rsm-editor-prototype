@@ -103,6 +103,19 @@ function roleLabelForPage(page) {
   return null;
 }
 
+function tooltipLabelForPage(page, typeLabel) {
+  if (page?.isFrontPage) {
+    return `${page.name} (Homepage)`;
+  }
+  if (page?.isPostsPage) {
+    return `${typeLabel} (Posts page)`;
+  }
+  if (page?.isShopPage) {
+    return `${typeLabel} (Shop page)`;
+  }
+  return typeLabel;
+}
+
 function sourceTypeForPage(page) {
   if (page?.isFrontPage) {
     return 'page';
@@ -182,6 +195,7 @@ function resolveMenuItemTarget(item, pages, advancedTargetsByUrl) {
         ? postList
         : SOURCE_TYPE_META[sourceType]?.icon ?? pageIcon,
       roleLabel: item.roleLabel || roleLabelForPage(linkedPage),
+      tooltipLabel: tooltipLabelForPage(linkedPage, typeLabel),
       targetName: linkedPage.name,
       status,
       statusLabel: statusLabelForTarget(status),
@@ -209,6 +223,10 @@ function resolveMenuItemTarget(item, pages, advancedTargetsByUrl) {
     typeLabel,
     icon: SOURCE_TYPE_META[sourceType]?.icon ?? linkIconGlyph,
     roleLabel: item.roleLabel || advancedTarget?.roleLabel || null,
+    tooltipLabel:
+      item.roleLabel || advancedTarget?.roleLabel
+        ? `${typeLabel} (${item.roleLabel || advancedTarget.roleLabel})`
+        : typeLabel,
     targetName: item.targetName || advancedTarget?.name || item.label,
     status,
     statusLabel: statusLabelForTarget(status),
@@ -1070,7 +1088,9 @@ function MenuEditor({ menu, onUpdateMenu, onBack, onPreviewItem }) {
           >
             {dragHandle}
           </button>
-          <span className="nav-item-icon">{rowIcon}</span>
+          <Tooltip text={targetMeta.tooltipLabel} placement="top">
+            <span className="nav-item-icon">{rowIcon}</span>
+          </Tooltip>
           <span className="nav-item-main">
             <span className="nav-item-label">{item.label}</span>
             {targetMeta.roleLabel ? (
