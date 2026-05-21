@@ -428,11 +428,22 @@
 }
 
 .cs-banner {
+  /* Card palette — dark for now. A future light variant overrides these
+     tokens via a scoping selector (e.g. .cs-banner.is-light). */
+  --cs-card-bg: #2a2d36;
+  --cs-card-bg-hover: #32353f;
+  --cs-card-text: #e8e8eb;
+  --cs-card-text-muted: #a7abb4;
+  --cs-card-link: #6b86f5;
+  /* Lighter sibling of the .cs-area border (--wp-gray-600 / #3c3c3c),
+     mixed toward white so each card edge stays visible on the dark area. */
+  --cs-card-border: color-mix(in srgb, var(--wp-gray-600, #3c3c3c) 95%, #fff);
+
   appearance: none;
-  border: 1px solid #c3c4c7;
-  background: #f6f7f7;
+  border: 1px solid var(--cs-card-border);
+  background: var(--cs-card-bg);
   border-radius: 6px;
-  color: #1e1e1e;
+  color: var(--cs-card-text);
   cursor: pointer;
   display: grid;
   grid-template-columns: 92px minmax(0, 1fr);
@@ -448,7 +459,7 @@
 }
 
 .cs-banner:hover {
-  background: #fff;
+  background: var(--cs-card-bg-hover);
   border-color: #3858e9;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
   transform: translateY(-1px);
@@ -460,14 +471,29 @@
 }
 
 .cs-banner-visual {
+  /* Visual palette — dark for now. A future light variant overrides these
+     tokens via a scoping selector (e.g. .cs-banner-visual.is-light). */
+  --cs-vis-surface: #2a2d36;            /* inner preview card surface */
+  --cs-vis-border: rgba(255, 255, 255, 0.12);
+  --cs-vis-line: rgba(255, 255, 255, 0.22);
+  --cs-vis-text: #e8e8eb;
+  --cs-vis-icon-bg: rgba(255, 255, 255, 0.14);
+  --cs-vis-icon-fg: #fff;
+  --cs-vis-blue: #6b86f5;               /* brighter blue for dark surfaces */
+  --cs-vis-blue-strong: #3858e9;        /* accent badge keeps brand blue */
+  --cs-vis-blue-soft: #2c3563;          /* page content block */
+  --cs-vis-green: #4ab866;              /* brighter green for dark surfaces */
+  --cs-vis-green-soft: #2d4a3a;         /* inactive nav rows */
+  --cs-vis-amber: #f0b849;
+
   position: relative;
   display: flex;
   min-width: 0;
   min-height: 112px;
   border-radius: 5px;
   overflow: hidden;
-  background: #fff;
-  border: 1px solid rgba(30, 30, 30, 0.1);
+  background: var(--cs-vis-grad, linear-gradient(180deg, #23262e 0%, #1c1e24 60%));
+  border: 1px solid var(--cs-vis-border);
 }
 
 .cs-banner-icon {
@@ -481,8 +507,8 @@
   width: 28px;
   height: 28px;
   border-radius: 4px;
-  background: #1e1e1e;
-  color: #fff;
+  background: var(--cs-vis-icon-bg);
+  color: var(--cs-vis-icon-fg);
 }
 
 .cs-banner-icon svg {
@@ -499,15 +525,15 @@
 }
 
 .cs-banner--page .cs-banner-visual {
-  background: linear-gradient(180deg, #eef3ff 0%, #fff 54%);
+  --cs-vis-grad: linear-gradient(180deg, #1d2547 0%, #1b1d24 58%);
 }
 
 .cs-banner--navigation .cs-banner-visual {
-  background: linear-gradient(180deg, #edf7f1 0%, #fff 56%);
+  --cs-vis-grad: linear-gradient(180deg, #16382a 0%, #1b1d24 58%);
 }
 
 .cs-banner--design .cs-banner-visual {
-  background: linear-gradient(180deg, #fff4e5 0%, #fff 56%);
+  --cs-vis-grad: linear-gradient(180deg, #3a2c14 0%, #1b1d24 58%);
 }
 
 .cs-page-preview,
@@ -524,10 +550,10 @@
   gap: 7px;
   padding: 10px;
   border-radius: 4px 4px 0 0;
-  background: #fff;
-  border: 1px solid #dcdcde;
+  background: var(--cs-vis-surface);
+  border: 1px solid var(--cs-vis-border);
   border-bottom: 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
 }
 
 .cs-page-plus {
@@ -540,7 +566,7 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #3858e9;
+  background: var(--cs-vis-blue-strong);
   color: #fff;
   font-size: 16px;
   line-height: 1;
@@ -551,13 +577,13 @@
 .cs-page-block {
   display: block;
   border-radius: 2px;
-  background: #c3c4c7;
+  background: var(--cs-vis-line);
 }
 
 .cs-page-line { height: 5px; width: 100%; }
-.cs-page-line--title { width: 72%; height: 7px; background: #3858e9; }
+.cs-page-line--title { width: 72%; height: 7px; background: var(--cs-vis-blue); }
 .cs-page-line--short { width: 54%; }
-.cs-page-block { height: 22px; background: #e9eefc; }
+.cs-page-block { height: 22px; background: var(--cs-vis-blue-soft); }
 
 .cs-nav-preview {
   gap: 8px;
@@ -568,12 +594,12 @@
   display: block;
   height: 12px;
   border-radius: 999px;
-  background: #d6e6dc;
+  background: var(--cs-vis-green-soft);
 }
 
 .cs-nav-row:nth-child(2) { width: 78%; }
 .cs-nav-row:nth-child(3) { width: 62%; }
-.cs-nav-row.is-active { width: 88%; background: #008a20; }
+.cs-nav-row.is-active { width: 88%; background: var(--cs-vis-green); }
 
 .cs-nav-route {
   position: absolute;
@@ -581,8 +607,8 @@
   bottom: 0;
   width: 28px;
   height: 42px;
-  border-right: 2px solid #008a20;
-  border-bottom: 2px solid #008a20;
+  border-right: 2px solid var(--cs-vis-green);
+  border-bottom: 2px solid var(--cs-vis-green);
   border-radius: 0 0 12px 0;
 }
 
@@ -592,7 +618,7 @@
 
 .cs-design-aa {
   display: block;
-  color: #1e1e1e;
+  color: var(--cs-vis-text);
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 34px;
   line-height: 1;
@@ -608,12 +634,12 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 1px solid rgba(30, 30, 30, 0.14);
+  border: 1px solid var(--cs-vis-border);
 }
 
-.cs-design-swatches span:nth-child(1) { background: #1e1e1e; }
-.cs-design-swatches span:nth-child(2) { background: #f0b849; }
-.cs-design-swatches span:nth-child(3) { background: #3858e9; }
+.cs-design-swatches span:nth-child(1) { background: #e0e0e2; }
+.cs-design-swatches span:nth-child(2) { background: var(--cs-vis-amber); }
+.cs-design-swatches span:nth-child(3) { background: var(--cs-vis-blue-strong); }
 
 .cs-banner-copy {
   display: flex;
@@ -624,14 +650,14 @@
 }
 
 .cs-banner-title {
-  color: #1e1e1e;
+  color: var(--cs-card-text);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.35;
 }
 
 .cs-banner-description {
-  color: #555;
+  color: var(--cs-card-text-muted);
   font-size: 13px;
   line-height: 1.4;
 }
@@ -640,7 +666,7 @@
   display: inline-flex;
   align-items: center;
   margin-top: auto;
-  color: #3858e9;
+  color: var(--cs-card-link);
   font-size: 13px;
   font-weight: 500;
 }
