@@ -1,0 +1,509 @@
+.tt5-pattern-preview {
+  --tt5-bg: #dae7bd;
+  --tt5-bg-light: #e9f4cf;
+  --tt5-text: #516028;
+  --tt5-dark: #303d10;
+  --tt5-accent: #c7f642;
+  --tt5-rule: rgba(81, 96, 40, 0.22);
+
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: var(--tt5-bg);
+  color: var(--tt5-text);
+  font-family: "Ysabeau Office", sans-serif;
+  font-size: 8px;
+  line-height: 1.2;
+}
+
+.tt5-pattern-preview *,
+.tt5-pattern-preview *::before,
+.tt5-pattern-preview *::after {
+  box-sizing: border-box;
+}
+
+.tt5-pattern-preview h3,
+.tt5-pattern-preview p {
+  margin: 0;
+}
+
+.tt5-pattern-preview h3,
+.tt5-display-title,
+.tt5-product-title,
+.tt5-poster-title {
+  font-family: Platypi, serif;
+  letter-spacing: -0.02em;
+}
+
+.tt5-preview-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: cover;
+}
+
+.tt5-preview-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.75em;
+}
+
+.tt5-preview-copy h3 {
+  font-size: 2.3em;
+  line-height: 1.05;
+  color: var(--tt5-dark);
+}
+
+.tt5-preview-copy p {
+  font-size: 1.15em;
+}
+
+.tt5-eyebrow {
+  width: fit-content;
+  padding: 0.25em 0.65em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.9em;
+}
+
+.tt5-preview-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 6.6em;
+  min-height: 2.2em;
+  padding: 0.55em 1.1em;
+  background: var(--tt5-text);
+  color: var(--tt5-bg-light);
+  font-size: 0.8em;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bi-pattern-preview--tt5 {
+  height: 108px;
+  padding: 0;
+  background: transparent;
+}
+
+.bi-pattern-preview--tt5 .tt5-pattern-preview {
+  font-size: 3.2px;
+}
+
+.advanced-catalog .dataviews-view-grid__media .tt5-pattern-preview {
+  font-size: 8px;
+}
+
+.tt5-pattern-preview--cover-big-heading {
+  grid-template-rows: 2.35fr 1fr;
+  gap: 1.8em;
+  padding: 1.9em;
+  background: var(--tt5-accent);
+}
+
+.tt5-pattern-preview--cover-big-heading .tt5-preview-image {
+  border: 0.15em solid rgba(48, 61, 16, 0.15);
+}
+
+.tt5-display-title {
+  align-self: end;
+  color: var(--tt5-text);
+  font-size: 9em;
+  font-weight: 700;
+  line-height: 0.78;
+}
+
+.tt5-pattern-preview--poster {
+  align-items: stretch;
+  padding: 2.2em;
+  background: var(--tt5-dark);
+}
+
+.tt5-pattern-preview--poster .tt5-preview-image {
+  position: absolute;
+  inset: 0;
+  filter: grayscale(0.75) contrast(0.95);
+  opacity: 0.62;
+}
+
+.tt5-poster-title,
+.tt5-poster-meta {
+  position: relative;
+  z-index: 1;
+}
+
+.tt5-poster-title {
+  align-self: start;
+  width: 70%;
+  color: var(--tt5-accent);
+  font-size: 5.7em;
+  font-weight: 500;
+  line-height: 0.86;
+}
+
+.tt5-poster-meta {
+  justify-self: end;
+  align-self: start;
+  max-width: 22%;
+  color: var(--tt5-accent);
+  font-size: 1.1em;
+  text-align: right;
+}
+
+.tt5-pattern-preview--about-book {
+  grid-template-columns: 1fr 0.9fr;
+  gap: 3em;
+  align-items: center;
+  padding: 3em;
+}
+
+.tt5-pattern-preview--about-book .tt5-preview-image {
+  aspect-ratio: 1;
+  height: auto;
+  box-shadow: 1.2em 1.6em 2.5em rgba(48, 61, 16, 0.22);
+}
+
+.tt5-pattern-preview--description-images-grid {
+  grid-template-columns: 1fr 0.85fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2em;
+  padding: 2.4em;
+  background: var(--tt5-bg-light);
+}
+
+.tt5-pattern-preview--description-images-grid .tt5-preview-copy {
+  justify-content: space-between;
+}
+
+.tt5-pattern-preview--description-images-grid .tt5-preview-image:first-of-type {
+  align-self: end;
+  height: 82%;
+}
+
+.tt5-pattern-preview--description-images-grid .tt5-preview-image:last-of-type {
+  grid-column: 2;
+  grid-row: 1 / 3;
+}
+
+.tt5-pattern-preview--overlapped-images {
+  grid-template-columns: 1fr 1.08fr;
+  gap: 3em;
+  align-items: center;
+  padding: 3em;
+  background: var(--tt5-bg-light);
+}
+
+.tt5-overlap-stack {
+  position: relative;
+  min-height: 16em;
+}
+
+.tt5-overlap-stack .tt5-preview-image:first-child {
+  width: 78%;
+  height: 70%;
+}
+
+.tt5-overlap-stack .tt5-preview-image:last-child {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 42%;
+  height: 55%;
+  filter: grayscale(1);
+}
+
+.tt5-pattern-preview--instagram-grid {
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 1.2em;
+  padding: 2.2em;
+}
+
+.tt5-social-tile {
+  display: grid;
+  place-items: center;
+  background: var(--tt5-accent);
+  color: var(--tt5-text);
+  font-family: Platypi, serif;
+  font-size: 1.4em;
+  text-align: center;
+}
+
+.tt5-social-tile small {
+  display: block;
+  margin-top: 0.4em;
+  font-family: "Ysabeau Office", sans-serif;
+  font-size: 0.65em;
+  text-decoration: underline;
+}
+
+.tt5-pattern-preview--product-grid {
+  grid-template-rows: auto 1fr auto;
+  gap: 1.2em;
+  padding: 2em;
+}
+
+.tt5-product-title {
+  color: var(--tt5-text);
+  font-size: 5.5em;
+  font-weight: 700;
+  line-height: 0.9;
+}
+
+.tt5-product-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75em;
+  min-height: 0;
+}
+
+.tt5-product-cell {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--tt5-bg-light);
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.tt5-product-cell.is-dark {
+  background: var(--tt5-dark);
+}
+
+.tt5-product-cell.is-bright {
+  background: var(--tt5-accent);
+}
+
+.tt5-product-cell strong {
+  font-size: 1.7em;
+  font-weight: 400;
+}
+
+.tt5-pattern-preview--events-list {
+  align-content: start;
+  gap: 1.2em;
+  padding: 2.4em;
+}
+
+.tt5-pattern-preview--events-list h3,
+.tt5-pattern-preview--pricing h3,
+.tt5-pattern-preview--services h3 {
+  color: var(--tt5-dark);
+  font-family: Platypi, serif;
+  font-size: 2.2em;
+}
+
+.tt5-event-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1.2em;
+  align-items: center;
+  padding-top: 1em;
+  border-top: 1px solid var(--tt5-rule);
+}
+
+.tt5-event-row span:nth-child(2) {
+  text-transform: uppercase;
+}
+
+.tt5-pattern-preview--event-rsvp {
+  grid-template-rows: 1fr 1.1fr;
+}
+
+.tt5-rsvp-top {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1em;
+  align-items: start;
+  padding: 2em;
+}
+
+.tt5-rsvp-top span {
+  max-width: 70%;
+  font-family: Platypi, serif;
+  font-size: 3.5em;
+  line-height: 0.95;
+}
+
+.tt5-rsvp-top small {
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+}
+
+.tt5-rsvp-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr auto;
+  gap: 1.4em;
+  padding: 2em;
+  background: var(--tt5-dark);
+  color: var(--tt5-bg-light);
+}
+
+.tt5-rsvp-bottom strong {
+  align-self: end;
+  color: var(--tt5-accent);
+  font-family: Platypi, serif;
+  font-size: 2.1em;
+  text-decoration: underline;
+}
+
+.tt5-rsvp-bottom .tt5-preview-image {
+  grid-column: 2;
+  grid-row: 1 / 3;
+}
+
+.tt5-pattern-preview--pricing,
+.tt5-pattern-preview--services {
+  gap: 2em;
+  align-content: start;
+  padding: 2.4em;
+}
+
+.tt5-pricing-grid,
+.tt5-services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4em;
+}
+
+.tt5-price-card {
+  display: grid;
+  gap: 0.9em;
+  min-height: 12em;
+  padding: 1.4em;
+  border: 1px solid var(--tt5-rule);
+  border-radius: 0.7em;
+}
+
+.tt5-price-card strong,
+.tt5-price-card em {
+  font-style: normal;
+}
+
+.tt5-price-card em {
+  justify-self: end;
+}
+
+.tt5-service-card {
+  display: grid;
+  gap: 0.8em;
+}
+
+.tt5-service-card .tt5-preview-image {
+  aspect-ratio: 4 / 3;
+  height: auto;
+  filter: grayscale(0.55);
+}
+
+.tt5-service-card strong {
+  font-family: Platypi, serif;
+  font-size: 1.3em;
+}
+
+.tt5-service-card em {
+  font-size: 0.85em;
+  font-style: normal;
+}
+
+.tt5-pattern-preview--hero-podcast {
+  grid-template-columns: 0.75fr 1.25fr;
+  gap: 3em;
+  align-items: center;
+  padding: 2.4em;
+  background: var(--tt5-dark);
+  color: var(--tt5-accent);
+}
+
+.tt5-pattern-preview--hero-podcast .tt5-preview-image {
+  aspect-ratio: 1;
+  height: auto;
+  filter: grayscale(1);
+}
+
+.tt5-pattern-preview--hero-podcast h3 {
+  color: var(--tt5-accent);
+}
+
+.tt5-platforms {
+  font-size: 0.8em;
+  text-transform: uppercase;
+}
+
+.tt5-pattern-preview--contact-location {
+  grid-template-columns: 1fr 0.9fr;
+  gap: 2.4em;
+  align-items: start;
+  padding: 2.4em;
+  background: var(--tt5-accent);
+}
+
+.tt5-pattern-preview--contact-location p {
+  font-size: 2em;
+}
+
+.tt5-pattern-preview--contact-location span {
+  text-transform: uppercase;
+  text-decoration: underline;
+}
+
+.tt5-pattern-preview--contact-location .tt5-preview-image {
+  aspect-ratio: 1;
+  height: auto;
+  filter: grayscale(1);
+}
+
+.tt5-pattern-preview--contact-info {
+  align-content: start;
+  gap: 2em;
+  padding: 2.4em;
+}
+
+.tt5-pattern-preview--contact-info h3 {
+  padding-bottom: 0.8em;
+  border-bottom: 1px solid var(--tt5-rule);
+  color: var(--tt5-dark);
+  font-family: Platypi, serif;
+  font-size: 2em;
+}
+
+.tt5-contact-grid {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(3, 1fr);
+  gap: 1.4em;
+  font-size: 0.95em;
+}
+
+.tt5-pattern-preview--centered-heading {
+  place-content: center;
+  justify-items: center;
+  gap: 1.4em;
+  padding: 3em;
+  text-align: center;
+}
+
+.tt5-pattern-preview--centered-heading h3 {
+  color: var(--tt5-dark);
+  font-family: Platypi, serif;
+  font-size: 2.8em;
+}
+
+.tt5-pattern-preview--centered-heading p {
+  max-width: 28em;
+}
+
+@media (max-width: 900px) {
+  .advanced-catalog .dataviews-view-grid__media .tt5-pattern-preview {
+    font-size: 6.8px;
+  }
+}

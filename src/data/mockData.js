@@ -1,3 +1,8 @@
+import {
+  tt5AdvancedPatterns,
+  tt5InserterPatterns,
+} from './tt5Patterns';
+
 export const pages = [
   {
     id: "home",
@@ -1341,13 +1346,7 @@ export const inserterBlockCategories = [
   { id: "theme", label: "Theme" },
 ];
 
-export const inserterPatterns = [
-  { id: "pat-hero", name: "Hero with image", previewKind: "hero" },
-  { id: "pat-twocol", name: "Two-column intro", previewKind: "twoCol" },
-  { id: "pat-gallery", name: "Gallery grid", previewKind: "gallery" },
-  { id: "pat-cta", name: "Call to action", previewKind: "cta" },
-  { id: "pat-feature", name: "Feature list", previewKind: "features" },
-];
+export const inserterPatterns = tt5InserterPatterns;
 
 // ── Design section mock data ──────────────────────────────────────────
 const cssGradient = (a, b) => `linear-gradient(135deg, ${a} 0%, ${b} 100%)`;
@@ -1779,123 +1778,7 @@ export const advancedTemplates = [
   },
 ];
 
-export const advancedPatterns = [
-  {
-    id: "pattern-book-description",
-    name: "Banner with book description",
-    category: "Banners",
-    description: "A compact intro banner with copy and a small media block.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    isLocked: true,
-    previewKind: "text-media",
-  },
-  {
-    id: "pattern-big-heading-cover",
-    name: "Cover with big heading",
-    category: "Banners",
-    description: "A bold cover section with image, background color, and oversized heading.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    isLocked: true,
-    previewKind: "cover",
-  },
-  {
-    id: "pattern-short-heading",
-    name: "Short heading and paragraph",
-    category: "Text",
-    description: "A simple content section for short introductions.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    isLocked: true,
-    previewKind: "text",
-  },
-  {
-    id: "pattern-about-studio",
-    name: "About the studio",
-    category: "About",
-    description: "Two-column about copy with a supporting image.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    previewKind: "text-media",
-  },
-  {
-    id: "pattern-services-grid",
-    name: "Services cards",
-    category: "Services",
-    description: "Three cards for services, packages, or offerings.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    previewKind: "cards",
-  },
-  {
-    id: "pattern-gallery-strip",
-    name: "Gallery strip",
-    category: "Gallery",
-    description: "A horizontal strip of image placeholders with caption space.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    previewKind: "gallery",
-  },
-  {
-    id: "pattern-contact-info",
-    name: "Contact, info and locations",
-    category: "Contact",
-    description: "Contact details arranged with business hours and location columns.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    isLocked: true,
-    previewKind: "columns",
-  },
-  {
-    id: "pattern-contact-map",
-    name: "Contact location and link",
-    category: "Contact",
-    description: "Location callout with map-style media and a contact link.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    isLocked: true,
-    previewKind: "map",
-  },
-  {
-    id: "pattern-testimonial",
-    name: "Pull quote testimonial",
-    category: "Testimonials",
-    description: "Large quote treatment with attribution.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    previewKind: "quote",
-  },
-  {
-    id: "pattern-featured-posts",
-    name: "Featured posts",
-    category: "Posts",
-    description: "A small post list with featured story emphasis.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    previewKind: "posts",
-  },
-  {
-    id: "pattern-page-intro",
-    name: "Intro with left-aligned description",
-    category: "Pages",
-    description: "A page intro pattern with concise copy and generous whitespace.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    isLocked: true,
-    previewKind: "intro",
-  },
-  {
-    id: "pattern-shop-cta",
-    name: "Call to action with book links",
-    category: "Call to action",
-    description: "A compact CTA with a heading, supporting copy, and grouped links.",
-    source: "Twenty Twenty-Five",
-    syncStatus: "Not synced",
-    isLocked: true,
-    previewKind: "cta",
-  },
-];
+export const advancedPatterns = tt5AdvancedPatterns;
 
 export const templateParts = [
   {

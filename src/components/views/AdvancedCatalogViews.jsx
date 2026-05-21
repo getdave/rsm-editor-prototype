@@ -18,6 +18,7 @@ import {
 } from '../../data/mockData';
 import { useAppState } from '../../hooks/useAppState';
 import PrototypeNotImplementedButton from '../shared/PrototypeNotImplemented';
+import TT5PatternPreview from '../shared/TT5PatternPreview';
 
 const GRID_PREVIEW_SIZE = 280;
 
@@ -65,6 +66,10 @@ function Bar({ wide, narrow, short }) {
 }
 
 function CatalogPreview({ item }) {
+  if (item.isTT5Pattern) {
+    return <TT5PatternPreview pattern={item} />;
+  }
+
   const kind = item.previewKind;
 
   if (kind === 'cover') {

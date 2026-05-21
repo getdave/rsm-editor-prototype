@@ -10,6 +10,7 @@ import {
   inserterBlockCategories,
   inserterPatterns,
 } from '../../data/mockData';
+import TT5PatternPreview from '../shared/TT5PatternPreview';
 
 const TABS = [
   { name: 'blocks', title: 'Blocks' },
@@ -96,8 +97,12 @@ function BlockCard({ block, onInsert }) {
 function PatternCard({ pattern, onInsert }) {
   return (
     <button type="button" className="bi-pattern" onClick={onInsert}>
-      <div className="bi-pattern-preview">
-        <PatternPreview kind={pattern.previewKind} />
+      <div className={`bi-pattern-preview${pattern.isTT5Pattern ? ' bi-pattern-preview--tt5' : ''}`}>
+        {pattern.isTT5Pattern ? (
+          <TT5PatternPreview pattern={pattern} />
+        ) : (
+          <PatternPreview kind={pattern.previewKind} />
+        )}
       </div>
       <Text variant="body-sm" className="bi-pattern-label">{pattern.name}</Text>
     </button>
