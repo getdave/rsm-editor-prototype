@@ -294,6 +294,11 @@
   pointer-events: auto;
 }
 
+/* Menu drilldown pane title gets breathing room above/below. */
+.sidebar-nav-pane-menu .ni-section-title {
+  margin-block: var(--wpds-dimension-gap-lg); /* 16px */
+}
+
 /* Folder heading: type icon next to the section label. */
 .sidebar-nav-section-label {
   display: flex;
