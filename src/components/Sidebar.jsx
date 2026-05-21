@@ -8,7 +8,6 @@ import {
   page as pageIcon,
   settings,
   menu,
-  file,
   chevronLeft,
   chevronRight,
   chevronUp,
@@ -425,9 +424,6 @@ function Sidebar() {
             variant="body-sm"
             className="components-menu-group__label sidebar-nav-section-label"
           >
-            <span className="sidebar-nav-section-icon" aria-hidden="true">
-              {file}
-            </span>
             {name}
           </Text>
           {items.map((item) => (
