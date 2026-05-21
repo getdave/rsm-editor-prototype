@@ -41,7 +41,7 @@ const ADMIN_NAV_ITEMS_BASE = [
   { kind: 'item', id: 'home', icon: home, label: 'Home', path: '/', tip: "View your site's home page" },
   { kind: 'item', id: 'pages', icon: pageIcon, label: 'Pages', path: '/pages', tip: "View your site's Pages" },
   { kind: 'item', id: 'content', icon: postList, label: 'Content', path: '/content', tip: 'Manage content and page designs' },
-  { kind: 'item', id: 'navigation', icon: navigation, label: 'Navigation', path: '/navigation', tip: 'Assign pages to your Main Menu and manage other menus' },
+  { kind: 'item', id: 'navigation', icon: navigation, label: 'Navigation Menus', path: '/navigation', tip: 'Manage the menus used around your site' },
   { kind: 'item', id: 'design', icon: styles, label: 'Design', path: '/design', tip: 'Modify your site design and styling', chevron: true },
 ];
 

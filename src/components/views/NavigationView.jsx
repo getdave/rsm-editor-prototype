@@ -1,14 +1,16 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { Tooltip, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
 import { Page } from '@wordpress/admin-ui';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import MenuEditor from '../navigation/MenuEditor';
 import AddMenuModal from '../navigation/AddMenuModal';
+import RenameMenuModal from '../navigation/RenameMenuModal';
 import DeleteMenuConfirmModal from '../modals/DeleteMenuConfirmModal';
 import { useAppState } from '../../hooks/useAppState';
+import { MAIN_MENU_ID } from '../../constants/navigation';
 
 function NavigationView() {
   const navigate = useNavigate();
@@ -18,8 +20,8 @@ function NavigationView() {
     pages: appPages,
   } = useAppState();
   const [selectedMenuId, setSelectedMenuId] = useState(null);
-  const [forceShowList, setForceShowList] = useState(false);
   const [showAddMenuModal, setShowAddMenuModal] = useState(false);
+  const [menuPendingRename, setMenuPendingRename] = useState(null);
   const [menuPendingDelete, setMenuPendingDelete] = useState(null);
   const [previewPage, setPreviewPage] = useState(
     () => appPages.find((p) => p.isFrontPage) ?? appPages[0] ?? null,
@@ -39,14 +41,9 @@ function NavigationView() {
     layout: { density: 'compact' },
   });
 
-  const resolvedMenuId =
-    menus.length === 1 && menus[0] && !forceShowList
-      ? menus[0].id
-      : selectedMenuId;
-
   const selectedMenu =
-    resolvedMenuId != null
-      ? menus.find((menu) => menu.id === resolvedMenuId)
+    selectedMenuId != null
+      ? menus.find((menu) => menu.id === selectedMenuId)
       : null;
 
   const updateMenu = (menuId, updates) => {
@@ -59,21 +56,22 @@ function NavigationView() {
     const newMenu = {
       id: `menu-${Date.now()}`,
       name: menuName,
-      isPrimary: false,
       items: [],
       usedIn: [],
     };
     setNavigationMenus(prev => [...prev, newMenu]);
     setSelectedMenuId(newMenu.id);
-    setForceShowList(false);
   };
 
   const deleteMenu = (menuId) => {
     setNavigationMenus((prev) => prev.filter((m) => m.id !== menuId));
     if (selectedMenuId === menuId) {
       setSelectedMenuId(null);
-      setForceShowList(true);
     }
+  };
+
+  const renameMenu = (menuId, menuName) => {
+    updateMenu(menuId, { name: menuName });
   };
 
   const fields = useMemo(
@@ -82,22 +80,13 @@ function NavigationView() {
         id: 'name',
         header: 'Menu name',
         getValue: ({ item }) => item.name,
-        render: ({ item }) => (
-          <span>
-            {item.name}
-            {item.isPrimary && (
-              <Tooltip text="The menu that is currently assigned to the Header template part">
-                <span className="nav-menu-badge">Primary</span>
-              </Tooltip>
-            )}
-          </span>
-        ),
+        render: ({ item }) => <span>{item.name}</span>,
         enableSorting: true,
         enableGlobalSearch: false,
       },
       {
         id: 'locations',
-        header: 'Locations',
+        header: 'Used in',
         getValue: ({ item }) => item.usedIn.length,
         render: ({ item }) => {
           const count = item.usedIn.length;
@@ -117,17 +106,17 @@ function NavigationView() {
   const actions = useMemo(
     () => [
       {
-        id: 'view',
-        label: 'Edit',
-        isPrimary: true,
+        id: 'rename-menu',
+        label: 'Rename',
         callback: (items) => {
-          setSelectedMenuId(items[0].id);
-          setForceShowList(false);
+          setMenuPendingRename(items[0]);
         },
       },
       {
         id: 'delete-menu',
-        label: 'Delete',
+        label: () => (
+          <span className="nav-dataviews-action-delete">Delete</span>
+        ),
         icon: trash,
         callback: (items) => {
           setMenuPendingDelete(items[0]);
@@ -145,7 +134,7 @@ function NavigationView() {
   /** Menu rows — matches editor order and labels; drives preview header nav. */
   const previewHeaderNavItems = useMemo(() => {
     const menuForPreview =
-      selectedMenu ?? menus.find((m) => m.isPrimary) ?? menus[0];
+      selectedMenu ?? menus.find((m) => m.id === MAIN_MENU_ID) ?? menus[0];
     if (!menuForPreview?.items?.length) {
       return [];
     }
@@ -170,9 +159,22 @@ function NavigationView() {
         onChangeView={setView}
         actions={actions}
         paginationInfo={paginationInfo}
-        defaultLayouts={{ list: {}, table: {} }}
+        onChangeSelection={(ids) => {
+          if (ids.length === 1) {
+            setSelectedMenuId(ids[0]);
+          }
+        }}
+        defaultLayouts={{ list: {} }}
+        isItemClickable={() => true}
+        onClickItem={(item) => {
+          setSelectedMenuId(item.id);
+        }}
+        getItemId={(item) => item.id}
       >
-        <DataViews.Layout />
+        <div className="nav-dv-scroll">
+          <DataViews.Layout />
+          <DataViews.Pagination />
+        </div>
       </DataViews>
     </div>
   );
@@ -205,7 +207,7 @@ function NavigationView() {
           <div className="split-view list">
             <Page
               className="split-view-stage nav-content-frame"
-              title="Navigation"
+              title="Navigation Menus"
               actions={pageActions}
               showSidebarToggle={false}
             >
@@ -223,10 +225,10 @@ function NavigationView() {
           <div className="split-view list">
             <MenuEditor
               menu={selectedMenu}
-              onUpdateMenu={(updates) => updateMenu(resolvedMenuId, updates)}
+              onUpdateMenu={(updates) => updateMenu(selectedMenuId, updates)}
+              onPreviewItem={setPreviewPage}
               onBack={() => {
                 setSelectedMenuId(null);
-                setForceShowList(true);
               }}
             />
             <div
@@ -245,6 +247,16 @@ function NavigationView() {
           onAddMenu={addMenu}
         />
       )}
+      {menuPendingRename ? (
+        <RenameMenuModal
+          menu={menuPendingRename}
+          onClose={() => setMenuPendingRename(null)}
+          onSave={(menuName) => {
+            renameMenu(menuPendingRename.id, menuName);
+            setMenuPendingRename(null);
+          }}
+        />
+      ) : null}
       {menuPendingDelete ? (
         <DeleteMenuConfirmModal
           menu={menuPendingDelete}

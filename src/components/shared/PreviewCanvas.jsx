@@ -354,7 +354,11 @@ function PreviewCanvas({
   };
 
   const renderContent = () => (
-    <PreviewTemplateFrame siteTitle={siteTitle} navEntries={navEntries} onNavClick={handleNavClick}>
+    <PreviewTemplateFrame
+      siteTitle={siteTitle}
+      navEntries={navEntries}
+      onNavClick={handleNavClick}
+    >
       {renderMain()}
     </PreviewTemplateFrame>
   );
@@ -460,7 +464,6 @@ function PreviewCanvas({
           </Tooltip>
         </div>
         <div className="ct-space"></div>
-
         <ToggleGroupControl
           className="ct-view-modes"
           label="Device preview"

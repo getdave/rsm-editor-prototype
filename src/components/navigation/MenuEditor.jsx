@@ -1,25 +1,254 @@
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Button,
+  CheckboxControl,
   DropdownMenu,
   MenuGroup,
   MenuItem,
+  TextControl,
+  Tooltip,
 } from '@wordpress/components';
 import { Page } from '@wordpress/admin-ui';
 import {
+  archive,
+  category,
   chevronDown,
   chevronRight,
+  customLink,
+  dragHandle,
+  file,
+  home,
+  image,
   moreVertical,
   page as pageIcon,
   plus,
   link as linkIconGlyph,
+  postList,
+  store,
+  tag,
 } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
+import { navigationAdvancedTargets } from '../../data/mockData';
 import RenameMenuItemModal from './RenameMenuItemModal';
 import DeleteMenuItemConfirmModal from '../modals/DeleteMenuItemConfirmModal';
 import AddPagesToMenuModal from './AddPagesToMenuModal';
 
 const MAX_MENU_LEVEL = 1;
+const CONTROL_SELECTOR = 'button, a, input, select, textarea, [role="menuitem"]';
+const LONG_PRESS_DRAG_DELAY_MS = 500;
+const LONG_PRESS_MOVE_TOLERANCE = 6;
+
+const SOURCE_TYPE_META = {
+  page: { label: 'Page', icon: pageIcon },
+  post: { label: 'Post', icon: postList },
+  product: { label: 'Product', icon: store },
+  category: { label: 'Category', icon: category },
+  tag: { label: 'Tag', icon: tag },
+  brand: { label: 'Brand', icon: store },
+  'product-category': { label: 'Product category', icon: category },
+  'product-tag': { label: 'Product tag', icon: tag },
+  'post-type-archive': { label: 'Archive', icon: archive },
+  'media-image': { label: 'Image', icon: image },
+  'media-document': { label: 'File', icon: file },
+  media: { label: 'Media', icon: image },
+  'custom-url': { label: 'Custom link', icon: customLink },
+  email: { label: 'Email', icon: customLink },
+  phone: { label: 'Phone', icon: customLink },
+  anchor: { label: 'Anchor', icon: customLink },
+  url: { label: 'Link', icon: linkIconGlyph },
+};
+
+function urlForPageSlug(slug) {
+  if (!slug) {
+    return '';
+  }
+  if (slug === 'home') {
+    return '/';
+  }
+  return `/${slug.replace(/^\/+|\/+$/g, '')}/`;
+}
+
+function sourceTypeForUrl(url) {
+  if (!url) return 'url';
+  if (url.startsWith('mailto:')) return 'email';
+  if (url.startsWith('tel:')) return 'phone';
+  if (url.startsWith('#')) return 'anchor';
+  return 'custom-url';
+}
+
+function slugFromUrl(url) {
+  if (!url) {
+    return '';
+  }
+
+  try {
+    const parsedUrl = new URL(url, 'https://example.com');
+    return parsedUrl.pathname.replace(/^\/+|\/+$/g, '') || parsedUrl.hostname;
+  } catch {
+    return url.replace(/^\/+|\/+$/g, '');
+  }
+}
+
+function typeLabelForPage(page) {
+  if (page?.isDynamic || page?.isCollection) {
+    return page.collectionBadge || page.type || 'Archive';
+  }
+  return 'Page';
+}
+
+function roleLabelForPage(page) {
+  if (page?.isFrontPage) {
+    return 'Homepage';
+  }
+  return null;
+}
+
+function tooltipLabelForPage(page, typeLabel) {
+  if (page?.isFrontPage) {
+    return `${page.name} (Homepage)`;
+  }
+  if (page?.isPostsPage) {
+    return `${typeLabel} (Posts page)`;
+  }
+  if (page?.isShopPage) {
+    return `${typeLabel} (Shop page)`;
+  }
+  return typeLabel;
+}
+
+function sourceTypeForPage(page) {
+  if (page?.isFrontPage) {
+    return 'page';
+  }
+  if (page?.isPostsPage || page?.isShopPage || page?.isArchiveListing) {
+    return 'post-type-archive';
+  }
+  return 'page';
+}
+
+function statusLabelForTarget(status) {
+  if (status === 'draft') {
+    return 'Draft';
+  }
+  if (status === 'private') {
+    return 'Private';
+  }
+  if (status === 'pending') {
+    return 'Pending';
+  }
+  if (status === 'active') {
+    return 'Active';
+  }
+  return 'Published';
+}
+
+function isLiveTarget(status) {
+  return status === 'live' || status === 'published';
+}
+
+function isExternalUrl(url) {
+  return /^https?:\/\//i.test(url);
+}
+
+function isMediaUrl(url) {
+  return /\.(pdf|doc|docx|jpg|jpeg|png|gif|webp|svg|mp4|mov|mp3|wav)$/i.test(
+    url,
+  );
+}
+
+function isPreviewableTarget(sourceType, url) {
+  if (!url) {
+    return false;
+  }
+  if (isExternalUrl(url) || isMediaUrl(url)) {
+    return false;
+  }
+  if (
+    sourceType.startsWith('media') ||
+    sourceType === 'custom-url' ||
+    sourceType === 'email' ||
+    sourceType === 'phone' ||
+    sourceType === 'anchor'
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function resolveMenuItemTarget(item, pages, advancedTargetsByUrl) {
+  const linkedPage = item.pageId
+    ? pages.find((page) => page.id === item.pageId)
+    : null;
+
+  if (linkedPage) {
+    const sourceType = item.sourceType || sourceTypeForPage(linkedPage);
+    const typeLabel = item.typeLabel || typeLabelForPage(linkedPage);
+    const url = item.url || item.linkLabel || urlForPageSlug(linkedPage.slug);
+    const status = linkedPage.status || item.status || 'live';
+    return {
+      sourceType,
+      typeLabel,
+      icon: linkedPage.isFrontPage
+        ? home
+        : linkedPage.isPostsPage
+        ? postList
+        : SOURCE_TYPE_META[sourceType]?.icon ?? pageIcon,
+      roleLabel: item.roleLabel || roleLabelForPage(linkedPage),
+      tooltipLabel: tooltipLabelForPage(linkedPage, typeLabel),
+      targetName: linkedPage.name,
+      status,
+      statusLabel: statusLabelForTarget(status),
+      url,
+      isLive: isLiveTarget(status),
+      canPreview: true,
+      previewPage: linkedPage,
+    };
+  }
+
+  const advancedTarget = item.url ? advancedTargetsByUrl.get(item.url) : null;
+  const sourceType =
+    item.sourceType || advancedTarget?.sourceType || sourceTypeForUrl(item.url);
+  const typeLabel =
+    item.typeLabel ||
+    advancedTarget?.typeLabel ||
+    SOURCE_TYPE_META[sourceType]?.label ||
+    'Link';
+  const status = item.status || advancedTarget?.status || 'live';
+  const url = item.url || item.linkLabel || '';
+  const canPreview = isPreviewableTarget(sourceType, url);
+
+  return {
+    sourceType,
+    typeLabel,
+    icon: SOURCE_TYPE_META[sourceType]?.icon ?? linkIconGlyph,
+    roleLabel: item.roleLabel || advancedTarget?.roleLabel || null,
+    tooltipLabel:
+      item.roleLabel || advancedTarget?.roleLabel
+        ? `${typeLabel} (${item.roleLabel || advancedTarget.roleLabel})`
+        : typeLabel,
+    targetName: item.targetName || advancedTarget?.name || item.label,
+    status,
+    statusLabel: statusLabelForTarget(status),
+    url,
+    isLive: isLiveTarget(status),
+    canPreview,
+    previewPage: canPreview
+      ? {
+          id: item.pageId || advancedTarget?.pageId || item.id || url || item.label,
+          slug: slugFromUrl(url),
+          name: item.targetName || advancedTarget?.name || item.label,
+          type: typeLabel,
+          isLive: isLiveTarget(status),
+          isSystem: false,
+          isDynamic: true,
+          category: 'content',
+          status,
+          sourceType,
+        }
+      : null,
+  };
+}
 
 function getSubtreeDepth(item) {
   if (!item.children?.length) {
@@ -193,7 +422,7 @@ function moveMenuItem(items, draggedId, targetId, position) {
   return result.inserted ? result.items : items;
 }
 
-function MenuEditor({ menu, onUpdateMenu, onBack }) {
+function MenuEditor({ menu, onUpdateMenu, onBack, onPreviewItem }) {
   const { pages: allPages, showSnackbar } = useAppState();
   const [expandedItems, setExpandedItems] = useState(new Set());
   /** When set, rename modal is open for this menu tree item (by reference shape). */
@@ -205,10 +434,24 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
   const [addPagesModalKey, setAddPagesModalKey] = useState(0);
   /** Nav item row ids that should play the attention flash (newly added links). */
   const [flashNavItemIds, setFlashNavItemIds] = useState([]);
+  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [detailsAnchor, setDetailsAnchor] = useState(null);
+  const [openInNewTab, setOpenInNewTab] = useState(false);
   const [draggingItemId, setDraggingItemId] = useState(null);
   const [dropTarget, setDropTargetState] = useState(null);
   const [dragGhostPosition, setDragGhostPosition] = useState(null);
   const dragStateRef = useRef({ itemId: null });
+  const didDragRef = useRef(false);
+  const pendingPressRef = useRef(null);
+  const clickCancelledRef = useRef(false);
+  const detailsPopoverRef = useRef(null);
+
+  const advancedTargetsByUrl = useMemo(() => {
+    const entries = navigationAdvancedTargets
+      .filter((target) => target.url)
+      .map((target) => [target.url, target]);
+    return new Map(entries);
+  }, []);
 
   const setDropTarget = useCallback((nextTarget) => {
     setDropTargetState((prevTarget) => {
@@ -221,6 +464,38 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
       return nextTarget;
     });
   }, []);
+
+  const clearPendingPress = useCallback(() => {
+    const press = pendingPressRef.current;
+    if (!press) {
+      return;
+    }
+
+    window.clearTimeout(press.timerId);
+    window.removeEventListener('pointermove', press.handleMove);
+    window.removeEventListener('pointerup', press.handleUp);
+    window.removeEventListener('pointercancel', press.handleCancel);
+    pendingPressRef.current = null;
+  }, []);
+
+  const activatePendingDrag = useCallback(
+    (press) => {
+      if (pendingPressRef.current !== press) {
+        return;
+      }
+
+      clearPendingPress();
+      clickCancelledRef.current = true;
+      didDragRef.current = true;
+      dragStateRef.current.itemId = press.itemId;
+      setSelectedItemId(null);
+      setDetailsAnchor(null);
+      setDraggingItemId(press.itemId);
+      setDragGhostPosition({ x: press.lastX, y: press.lastY });
+      setDropTarget(null);
+    },
+    [clearPendingPress, setDropTarget],
+  );
 
   const openAddPagesModal = useCallback(() => {
     setAddPagesModalKey((k) => k + 1);
@@ -238,6 +513,11 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
       const newItems = selectedRows.map((row, index) => ({
         id: `nav-${row.id}-${ts}-${index}`,
         label: row.navLabel ?? row.name,
+        targetName: row.name,
+        ...(row.typeLabel ? { typeLabel: row.typeLabel } : {}),
+        ...(row.status ? { status: row.status } : {}),
+        ...(row.isLive !== undefined ? { isLive: row.isLive } : {}),
+        ...(row.linkLabel ? { linkLabel: row.linkLabel } : {}),
         ...(row.navPageId || row.pageId || row.category === 'content'
           ? { pageId: row.navPageId ?? row.pageId ?? row.id }
           : {}),
@@ -292,6 +572,10 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
 
   const removeItem = (itemId) => {
     onUpdateMenu({ items: removeMenuItem(menu.items, itemId).items });
+    if (selectedItemId === itemId) {
+      setSelectedItemId(null);
+      setDetailsAnchor(null);
+    }
   };
 
   const moveItem = (itemId, direction) => {
@@ -357,6 +641,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
 
     const handlePointerMove = (event) => {
       event.preventDefault();
+      didDragRef.current = true;
       setDragGhostPosition({ x: event.clientX, y: event.clientY });
       setDropTarget(resolveDropTarget(event.clientX, event.clientY));
     };
@@ -383,6 +668,8 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
       }
 
       dragStateRef.current.itemId = null;
+      didDragRef.current = false;
+      clickCancelledRef.current = false;
       setDraggingItemId(null);
       setDragGhostPosition(null);
       setDropTarget(null);
@@ -393,6 +680,8 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
         return;
       }
       dragStateRef.current.itemId = null;
+      didDragRef.current = false;
+      clickCancelledRef.current = false;
       setDraggingItemId(null);
       setDragGhostPosition(null);
       setDropTarget(null);
@@ -415,19 +704,209 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     setDropTarget,
   ]);
 
-  const startDraggingItem = (event, itemId) => {
+  useEffect(() => () => clearPendingPress(), [clearPendingPress]);
+
+  useEffect(() => {
+    if (!selectedItemId) {
+      return undefined;
+    }
+
+    const closeDetailsOnOutsidePointerDown = (event) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (detailsPopoverRef.current?.contains(target)) {
+        return;
+      }
+
+      if (target.closest('[data-nav-menu-item-id]')) {
+        return;
+      }
+
+      setSelectedItemId(null);
+      setDetailsAnchor(null);
+    };
+
+    document.addEventListener(
+      'pointerdown',
+      closeDetailsOnOutsidePointerDown,
+      true,
+    );
+
+    return () => {
+      document.removeEventListener(
+        'pointerdown',
+        closeDetailsOnOutsidePointerDown,
+        true,
+      );
+    };
+  }, [selectedItemId]);
+
+  const beginItemPress = (event, itemId) => {
     if (event.button !== 0) {
       return;
     }
-    if (event.target.closest('button, a, input, select, textarea')) {
+    if (event.target.closest(CONTROL_SELECTOR)) {
       return;
     }
 
     event.preventDefault();
+    clearPendingPress();
+    clickCancelledRef.current = false;
+    didDragRef.current = false;
+
+    const rowRect = event.currentTarget.getBoundingClientRect();
+    const press = {
+      itemId,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      lastX: event.clientX,
+      lastY: event.clientY,
+      rowRect: {
+        top: rowRect.top,
+        left: rowRect.left,
+        width: rowRect.width,
+        height: rowRect.height,
+      },
+      timerId: null,
+      handleMove: null,
+      handleUp: null,
+      handleCancel: null,
+    };
+
+    press.handleMove = (moveEvent) => {
+      if (moveEvent.pointerId !== press.pointerId) {
+        return;
+      }
+
+      const deltaX = moveEvent.clientX - press.startX;
+      const deltaY = moveEvent.clientY - press.startY;
+      const distance = Math.hypot(deltaX, deltaY);
+
+      if (distance > LONG_PRESS_MOVE_TOLERANCE) {
+        clickCancelledRef.current = true;
+        clearPendingPress();
+        return;
+      }
+
+      press.lastX = moveEvent.clientX;
+      press.lastY = moveEvent.clientY;
+    };
+
+    press.handleUp = (upEvent) => {
+      if (upEvent.pointerId !== press.pointerId) {
+        return;
+      }
+      clearPendingPress();
+    };
+
+    press.handleCancel = (cancelEvent) => {
+      if (cancelEvent.pointerId !== press.pointerId) {
+        return;
+      }
+      clickCancelledRef.current = true;
+      clearPendingPress();
+    };
+
+    press.timerId = window.setTimeout(() => {
+      activatePendingDrag(press);
+    }, LONG_PRESS_DRAG_DELAY_MS);
+
+    pendingPressRef.current = press;
+    window.addEventListener('pointermove', press.handleMove);
+    window.addEventListener('pointerup', press.handleUp);
+    window.addEventListener('pointercancel', press.handleCancel);
+  };
+
+  const beginHandleDrag = (event, itemId) => {
+    if (event.button !== 0) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    clearPendingPress();
+    clickCancelledRef.current = true;
+    didDragRef.current = true;
     dragStateRef.current.itemId = itemId;
+    setSelectedItemId(null);
+    setDetailsAnchor(null);
     setDraggingItemId(itemId);
     setDragGhostPosition({ x: event.clientX, y: event.clientY });
     setDropTarget(null);
+  };
+
+  const openItemDetails = (itemId, anchorElement) => {
+    if (selectedItemId === itemId) {
+      setSelectedItemId(null);
+      setDetailsAnchor(null);
+      return;
+    }
+
+    if (anchorElement) {
+      const rect = anchorElement.getBoundingClientRect();
+      const flyoutWidth = 284;
+      const gutter = 12;
+      const left = Math.min(
+        rect.right + gutter,
+        window.innerWidth - flyoutWidth - gutter,
+      );
+
+      setDetailsAnchor({
+        top: Math.max(gutter, rect.top),
+        left: Math.max(gutter, left),
+      });
+    }
+
+    setSelectedItemId(itemId);
+  };
+
+  const handleItemPointerUp = (event, itemId) => {
+    if (event.button !== 0) {
+      return;
+    }
+    if (event.target.closest(CONTROL_SELECTOR)) {
+      return;
+    }
+
+    const pendingPress = pendingPressRef.current;
+    if (pendingPress?.itemId === itemId && pendingPress.pointerId === event.pointerId) {
+      const shouldOpen = !clickCancelledRef.current;
+      clearPendingPress();
+      if (shouldOpen) {
+        event.preventDefault();
+        openItemDetails(itemId, event.currentTarget);
+      }
+      clickCancelledRef.current = false;
+      return;
+    }
+
+    if (clickCancelledRef.current) {
+      clickCancelledRef.current = false;
+      return;
+    }
+
+    if (dragStateRef.current.itemId === itemId && !didDragRef.current) {
+      event.preventDefault();
+      openItemDetails(itemId, event.currentTarget);
+    }
+  };
+
+  const handleItemKeyDown = (event, itemId) => {
+    if (
+      event.target !== event.currentTarget &&
+      event.target.closest(CONTROL_SELECTOR)
+    ) {
+      return;
+    }
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+    event.preventDefault();
+    openItemDetails(itemId, event.currentTarget);
   };
 
   const renameItemLabel = (itemId, newLabel) => {
@@ -450,16 +929,126 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
     onUpdateMenu({ items: updateInTree([...menu.items]) });
   };
 
+  const previewItemTarget = (targetMeta) => {
+    if (!targetMeta.canPreview || !targetMeta.previewPage) {
+      return;
+    }
+
+    onPreviewItem?.(targetMeta.previewPage);
+    setSelectedItemId(null);
+    setDetailsAnchor(null);
+  };
+
+  const renderTargetDetailsPopover = (item, targetMeta) => (
+    <div
+      ref={detailsPopoverRef}
+      className="nav-item-details-popover"
+      role="dialog"
+      aria-label={`${item.label} link details`}
+      style={detailsAnchor ?? undefined}
+      onPointerDown={(event) => event.stopPropagation()}
+    >
+      <TextControl
+        __nextHasNoMarginBottom
+        __next40pxDefaultSize
+        className="nav-item-details-popover__text-control"
+        label="Text"
+        value={item.label}
+        readOnly
+        onChange={() => {}}
+      />
+
+      <div className="nav-item-details-popover__section">
+        <label className="nav-item-details-popover__label">Link to</label>
+        <button
+          type="button"
+          className="nav-item-details-popover__target-card"
+          onClick={() => {
+            window.alert('Changing the linked target is not implemented in this prototype.');
+          }}
+        >
+          <div className="nav-item-details-popover__target-head">
+            <strong>{targetMeta.targetName}</strong>
+            <span
+              className="nav-item-details-popover__chevron"
+              aria-hidden="true"
+            >
+              {chevronDown}
+            </span>
+          </div>
+          {targetMeta.url ? (
+            <div className="nav-item-details-popover__path">
+              {targetMeta.url}
+            </div>
+          ) : null}
+          <div className="nav-item-details-popover__meta">
+            <span className="nav-item-details-popover__meta-row">
+              <span className="nav-item-details-popover__meta-label">
+                Type
+              </span>
+              <span>{targetMeta.typeLabel}</span>
+            </span>
+            <span className="nav-item-details-popover__meta-row">
+              <span className="nav-item-details-popover__meta-label">
+                Status
+              </span>
+              <span className="nav-item-details-popover__status">
+                <span
+                  className={`url-dot${targetMeta.isLive ? '' : ' url-draft-dot'}`}
+                  role="status"
+                  aria-label={targetMeta.statusLabel}
+                />
+                {targetMeta.statusLabel}
+              </span>
+            </span>
+          </div>
+        </button>
+      </div>
+
+      <CheckboxControl
+        __nextHasNoMarginBottom
+        className="nav-item-details-popover__checkbox"
+        label="Open in new tab"
+        checked={openInNewTab}
+        onChange={setOpenInNewTab}
+      />
+
+      <div className="nav-item-details-popover__footer">
+        <Button
+          variant="secondary"
+          className="nav-item-details-popover__button"
+        >
+          Edit
+        </Button>
+        <Button
+          variant="secondary"
+          className="nav-item-details-popover__button"
+          disabled={!targetMeta.canPreview}
+          onClick={() => previewItemTarget(targetMeta)}
+        >
+          Preview
+        </Button>
+      </div>
+    </div>
+  );
+
   const renderMenuItem = (item, level = 0, siblings = [], index = 0) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.has(item.id);
     const canMoveUp = index > 0;
     const canMoveDown = index < siblings.length - 1;
-    const rowIcon = item.url ? linkIconGlyph : pageIcon;
+    const targetMeta = resolveMenuItemTarget(
+      item,
+      allPages,
+      advancedTargetsByUrl,
+    );
+    const rowIcon = targetMeta.icon;
+    const isSelected = selectedItemId === item.id;
     const activeDropPosition =
       dropTarget?.itemId === item.id ? dropTarget.position : null;
     const rowClasses = [
       'nav-menu-editor-item',
+      isSelected ? 'is-selected' : '',
       flashNavItemIdSet.has(item.id) ? 'flash-highlight' : '',
       draggingItemId === item.id ? 'is-dragging' : '',
       activeDropPosition ? `is-drop-${activeDropPosition}` : '',
@@ -473,7 +1062,12 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           className={rowClasses}
           data-nav-menu-item-id={item.id}
           style={{ paddingLeft: `${level * 24 + 12}px` }}
-          onPointerDown={(event) => startDraggingItem(event, item.id)}
+          role="button"
+          tabIndex={0}
+          aria-expanded={isSelected}
+          onPointerDown={(event) => beginItemPress(event, item.id)}
+          onPointerUp={(event) => handleItemPointerUp(event, item.id)}
+          onKeyDown={(event) => handleItemKeyDown(event, item.id)}
         >
           {hasChildren && (
             <button
@@ -486,8 +1080,34 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
           )}
           {!hasChildren && <span className="nav-item-spacer" />}
 
-          <span className="nav-item-icon">{rowIcon}</span>
-          <span className="nav-item-label">{item.label}</span>
+          <button
+            type="button"
+            className="nav-item-drag-handle"
+            aria-label={`Drag ${item.label}`}
+            onPointerDown={(event) => beginHandleDrag(event, item.id)}
+          >
+            {dragHandle}
+          </button>
+          <Tooltip text={targetMeta.tooltipLabel} placement="top">
+            <span className="nav-item-icon">{rowIcon}</span>
+          </Tooltip>
+          <span className="nav-item-main">
+            <span className="nav-item-label">{item.label}</span>
+            {targetMeta.roleLabel ? (
+              <span className="nav-item-role-label">
+                {targetMeta.roleLabel}
+              </span>
+            ) : null}
+            <Tooltip text={targetMeta.statusLabel} placement="top">
+              <span className="nav-item-status-dot">
+                <span
+                  className={`url-dot${targetMeta.isLive ? '' : ' url-draft-dot'}`}
+                  role="status"
+                  aria-label={targetMeta.statusLabel}
+                />
+              </span>
+            </Tooltip>
+          </span>
 
           <div className="nav-item-actions">
             <DropdownMenu
@@ -561,6 +1181,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
             </DropdownMenu>
           </div>
         </div>
+        {isSelected ? renderTargetDetailsPopover(item, targetMeta) : null}
 
         {hasChildren && isExpanded && (
           <div className="nav-menu-children">
@@ -582,7 +1203,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack }) {
             className="nav-editor-breadcrumbs__parent"
             onClick={onBack}
           >
-            Navigation
+            Navigation Menus
           </button>
           <span className="nav-editor-breadcrumbs__sep" aria-hidden="true">
             /

@@ -161,7 +161,11 @@ export function PreviewSiteNavCluster({
 }
 
 /** Header template part — site chrome above main content */
-export function PreviewSiteChromeHeader({ siteTitle, navEntries, onNavClick }) {
+export function PreviewSiteChromeHeader({
+  siteTitle,
+  navEntries,
+  onNavClick,
+}) {
   return (
     <div className="p-header">
       <PreviewSiteNavCluster
@@ -174,11 +178,24 @@ export function PreviewSiteChromeHeader({ siteTitle, navEntries, onNavClick }) {
 }
 
 /** Footer template part */
-export function PreviewSiteChromeFooter({ siteTitle }) {
+export function PreviewSiteChromeFooter({
+  siteTitle,
+  navEntries,
+  onNavClick,
+}) {
   return (
     <div className="p-footer">
-      <span className="p-ft">© 2026 {siteTitle}</span>
-      <span className="p-ft">Privacy Policy</span>
+      <span className="p-ft p-footer-copyright">© 2026 {siteTitle}</span>
+      <nav className="p-footer-nav" aria-label="Footer navigation">
+        {navEntries.map((entry) => (
+          <NavEntryControl
+            key={entry.key}
+            entry={entry}
+            onNavClick={onNavClick}
+            className="p-footer-nav-link"
+          />
+        ))}
+      </nav>
     </div>
   );
 }
@@ -205,7 +222,13 @@ export function PreviewTemplateFrame({
         />
       )}
       {children}
-      {footer ?? <PreviewSiteChromeFooter siteTitle={siteTitle} />}
+      {footer ?? (
+        <PreviewSiteChromeFooter
+          siteTitle={siteTitle}
+          navEntries={navEntries}
+          onNavClick={onNavClick}
+        />
+      )}
     </>
   );
 }

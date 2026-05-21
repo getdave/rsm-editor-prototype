@@ -344,6 +344,8 @@
   background: #f8f8f8;
   padding: 32px 60px;
   display: flex;
+  align-items: center;
+  gap: 24px;
   justify-content: space-between;
   font-family: var(--wp-content-font);
 }
@@ -352,6 +354,26 @@
   font-size: 14px;
   color: #888;
   font-weight: 400;
+}
+
+.p-footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px 18px;
+}
+
+.p-footer-nav-link {
+  color: #666;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.p-footer-nav-link:hover {
+  color: #1e1e1e;
+  text-decoration: underline;
 }
 
 /* ── Content suggestion area (home view) ── */
