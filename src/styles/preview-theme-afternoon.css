@@ -1,0 +1,529 @@
+@font-face {
+  font-family: "Platypi";
+  src: url("../assets/fonts/twentytwentyfive/platypi/Platypi-VariableFont_wght.woff2") format("woff2");
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Platypi";
+  src: url("../assets/fonts/twentytwentyfive/platypi/Platypi-Italic-VariableFont_wght.woff2") format("woff2");
+  font-weight: 300 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ysabeau Office";
+  src: url("../assets/fonts/twentytwentyfive/ysabeau-office/YsabeauOffice-VariableFont_wght.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ysabeau Office";
+  src: url("../assets/fonts/twentytwentyfive/ysabeau-office/YsabeauOffice-Italic-VariableFont_wght.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+.site-card,
+.edit-card {
+  --tt5-afternoon-base: #dae7bd;
+  --tt5-afternoon-contrast: #516028;
+  --tt5-afternoon-accent-1: #c7f642;
+  --tt5-afternoon-accent-2: #ebf6d3;
+  --tt5-afternoon-accent-3: #303d10;
+  --tt5-afternoon-accent-5: #ebf6d3;
+  --tt5-afternoon-accent-6: #51602833;
+  --tt5-afternoon-placeholder: #c8d7a9;
+  --tt5-afternoon-line: #aabd82;
+  --tt5-afternoon-body-font: "Ysabeau Office", sans-serif;
+  --tt5-afternoon-heading-font: "Platypi", serif;
+  --tt5-afternoon-content-size: 645px;
+  --tt5-afternoon-wide-size: 1340px;
+  background: var(--tt5-afternoon-base);
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+  font-size: clamp(1rem, 0.94rem + 0.24vw, 1.125rem);
+  font-weight: 300;
+  letter-spacing: -0.22px;
+  line-height: 1.5;
+}
+
+.preview-canvas-area .site-card,
+.edit-canvas-area .edit-card {
+  flex: 0 0 auto;
+  min-height: 100%;
+}
+
+.edit-card .sec-bar.block-toolbar {
+  font-size: 13px;
+  letter-spacing: normal;
+  line-height: normal;
+}
+
+.site-card h1,
+.site-card h2,
+.site-card h3,
+.site-card h4,
+.site-card h5,
+.site-card h6,
+.edit-card h1,
+.edit-card h2,
+.edit-card h3,
+.edit-card h4,
+.edit-card h5,
+.edit-card h6 {
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-heading-font);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.site-card a,
+.edit-card a {
+  color: currentColor;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+
+.site-card a:hover,
+.edit-card a:hover {
+  text-decoration: none;
+}
+
+.site-card .p-header,
+.edit-card .p-header {
+  background: var(--tt5-afternoon-base);
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+  padding: clamp(20px, 3vw, 40px) 0;
+}
+
+.site-card .p-sitename,
+.edit-card .p-sitename {
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+  font-size: clamp(1.1rem, 0.7rem + 1vw, 1.38rem);
+  font-weight: 700;
+  letter-spacing: 1.44px;
+  line-height: 1.1;
+  padding-left: clamp(32px, 5vw, 80px);
+  text-transform: uppercase;
+}
+
+.site-card .p-nav,
+.edit-card .p-nav {
+  gap: clamp(20px, 3vw, 40px);
+  padding-right: clamp(32px, 5vw, 80px);
+}
+
+.site-card .p-nav a,
+.site-card .p-nav .p-nav-label,
+.site-card .p-nav-dropdown-indicator,
+.edit-card .p-nav a,
+.edit-card .p-nav .p-nav-label,
+.edit-card .p-nav-dropdown-indicator {
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+  font-size: clamp(1rem, 0.9rem + 0.25vw, 1.125rem);
+  font-weight: 300;
+}
+
+.site-card .p-nav a:hover,
+.edit-card .p-nav a:hover {
+  color: var(--tt5-afternoon-accent-3);
+  text-decoration: underline;
+}
+
+.site-card .p-subnav,
+.site-card .p-mobile-nav-overlay,
+.edit-card .p-subnav,
+.edit-card .p-mobile-nav-overlay {
+  background: var(--tt5-afternoon-accent-5);
+  border-color: var(--tt5-afternoon-accent-6);
+  border-radius: 0;
+  color: var(--tt5-afternoon-contrast);
+}
+
+.site-card .p-nav .p-subnav a,
+.site-card .p-nav .p-subnav .p-subnav-link,
+.site-card .p-mobile-nav-link,
+.site-card .p-mobile-nav-label,
+.edit-card .p-nav .p-subnav a,
+.edit-card .p-nav .p-subnav .p-subnav-link,
+.edit-card .p-mobile-nav-link,
+.edit-card .p-mobile-nav-label {
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+}
+
+.site-card .p-nav .p-subnav a:hover,
+.site-card .p-nav .p-subnav .p-subnav-link:hover,
+.site-card .p-mobile-nav-link:hover,
+.edit-card .p-nav .p-subnav a:hover,
+.edit-card .p-nav .p-subnav .p-subnav-link:hover,
+.edit-card .p-mobile-nav-link:hover {
+  background: var(--tt5-afternoon-base);
+  color: var(--tt5-afternoon-accent-3);
+}
+
+.site-card .p-mobile-nav-toggle,
+.edit-card .p-mobile-nav-toggle {
+  color: var(--tt5-afternoon-contrast);
+}
+
+.site-card .p-mobile-nav-toggle:hover,
+.edit-card .p-mobile-nav-toggle:hover {
+  background: var(--tt5-afternoon-accent-6);
+  color: var(--tt5-afternoon-accent-3);
+}
+
+.site-card .p-hero,
+.edit-card .p-hero {
+  background: var(--tt5-afternoon-base);
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+  justify-content: flex-start;
+  min-height: clamp(300px, 42vw, 620px);
+  padding: clamp(70px, 9vw, 150px) 0 clamp(80px, 12vw, 180px);
+}
+
+.site-card .p-hero > div,
+.edit-card .p-hero > div {
+  max-width: var(--tt5-afternoon-wide-size);
+  padding-left: clamp(40px, 7vw, 110px);
+  padding-right: clamp(40px, 7vw, 110px);
+}
+
+.site-card .p-hero h1,
+.edit-card .p-hero h1 {
+  color: var(--tt5-afternoon-contrast);
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-weight: 700;
+  margin: 0 0 1.2rem;
+  max-width: 11ch;
+}
+
+.site-card .p-hero p,
+.edit-card .p-hero p {
+  color: var(--tt5-afternoon-contrast);
+  font-size: clamp(1.125rem, 1.4vw, 1.6rem);
+  line-height: 1.5;
+  max-width: var(--tt5-afternoon-content-size);
+}
+
+.site-card .p-section,
+.edit-card .p-section {
+  align-items: stretch;
+  background: var(--tt5-afternoon-base);
+  border-bottom-color: var(--tt5-afternoon-accent-6);
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+  padding: clamp(60px, 7vw, 110px) 0;
+}
+
+.site-card .p-st,
+.edit-card .p-st {
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-heading-font);
+  font-size: clamp(2.1rem, 4vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  max-width: var(--tt5-afternoon-content-size);
+  padding-left: 0;
+  padding-right: 0;
+  width: min(var(--tt5-afternoon-content-size), calc(100% - 80px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.site-card .p-body,
+.edit-card .p-body {
+  color: var(--tt5-afternoon-contrast);
+  font-size: clamp(1.25rem, 1.6vw, 1.75rem);
+  font-weight: 300;
+  line-height: 1.5;
+  max-width: var(--tt5-afternoon-content-size);
+  padding-left: 0;
+  padding-right: 0;
+  width: min(var(--tt5-afternoon-content-size), calc(100% - 80px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.site-card .p-grid,
+.edit-card .p-grid {
+  max-width: var(--tt5-afternoon-wide-size);
+  padding-left: clamp(40px, 6vw, 90px);
+  padding-right: clamp(40px, 6vw, 90px);
+}
+
+.site-card .p-img,
+.site-card .p-featured-image-placeholder,
+.site-card .p-product-image,
+.site-card .p-product-detail-image,
+.edit-card .p-img,
+.edit-card .p-featured-image-placeholder,
+.edit-card .p-product-image,
+.edit-card .p-product-detail-image {
+  background:
+    linear-gradient(to top right, transparent calc(50% - 1px), var(--tt5-afternoon-line) 50%, transparent calc(50% + 1px)),
+    var(--tt5-afternoon-placeholder);
+  border: 0;
+  border-radius: 0;
+  color: var(--tt5-afternoon-contrast);
+}
+
+.site-card .p-img:nth-child(n),
+.edit-card .p-img:nth-child(n) {
+  background:
+    linear-gradient(to top right, transparent calc(50% - 1px), var(--tt5-afternoon-line) 50%, transparent calc(50% + 1px)),
+    var(--tt5-afternoon-placeholder);
+}
+
+.site-card .p-template-page-title,
+.edit-card .p-template-page-title {
+  align-items: stretch;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.site-card .p-template-page-title h1,
+.site-card .p-post-content h1,
+.site-card .p-archive-header h1,
+.site-card .p-ecommerce-header h1,
+.site-card .p-product-detail-content h1,
+.site-card .p-error-title,
+.edit-card .p-template-page-title h1,
+.edit-card .p-post-content h1,
+.edit-card .p-archive-header h1,
+.edit-card .p-ecommerce-header h1,
+.edit-card .p-product-detail-content h1,
+.edit-card .p-error-title {
+  color: var(--tt5-afternoon-contrast);
+  font-size: clamp(3rem, 6vw, 5.8rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.site-card .p-template-page-title h1,
+.edit-card .p-template-page-title h1 {
+  max-width: var(--tt5-afternoon-content-size);
+}
+
+.site-card .p-template-featured-image,
+.edit-card .p-template-featured-image {
+  padding-left: clamp(40px, 7vw, 110px);
+  padding-right: clamp(40px, 7vw, 110px);
+}
+
+.site-card .p-template-page-content,
+.edit-card .p-template-page-content {
+  background: var(--tt5-afternoon-base);
+}
+
+.site-card .p-template-post-content-placeholder,
+.edit-card .p-template-post-content-placeholder {
+  color: var(--tt5-afternoon-contrast);
+  font-size: clamp(1.25rem, 1.6vw, 1.75rem);
+  line-height: 1.5;
+  max-width: var(--tt5-afternoon-content-size);
+  padding-left: 0;
+  padding-right: 0;
+  width: min(var(--tt5-afternoon-content-size), calc(100% - 80px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.site-card .p-archive,
+.site-card .p-ecommerce,
+.site-card .p-single-product,
+.site-card .p-single-post,
+.site-card .p-error,
+.edit-card .p-archive,
+.edit-card .p-ecommerce,
+.edit-card .p-single-product,
+.edit-card .p-single-post,
+.edit-card .p-error {
+  background: var(--tt5-afternoon-base);
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+}
+
+.site-card .p-archive,
+.site-card .p-single-product,
+.edit-card .p-archive,
+.edit-card .p-single-product {
+  max-width: var(--tt5-afternoon-wide-size);
+}
+
+.site-card .p-single-post,
+.edit-card .p-single-post {
+  max-width: calc(var(--tt5-afternoon-content-size) + 120px);
+}
+
+.site-card .p-archive-header,
+.edit-card .p-archive-header {
+  text-align: left;
+}
+
+.site-card .p-archive-subtitle,
+.site-card .p-product-excerpt,
+.site-card .p-post-excerpt,
+.site-card .p-product-detail-description,
+.site-card .p-product-detail-features li,
+.site-card .p-post-body,
+.site-card .p-error-description,
+.site-card .p-cart-item-details,
+.site-card .p-checkout-step-name,
+.edit-card .p-archive-subtitle,
+.edit-card .p-product-excerpt,
+.edit-card .p-post-excerpt,
+.edit-card .p-product-detail-description,
+.edit-card .p-product-detail-features li,
+.edit-card .p-post-body,
+.edit-card .p-error-description,
+.edit-card .p-cart-item-details,
+.edit-card .p-checkout-step-name {
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+  font-weight: 300;
+}
+
+.site-card .p-product-card,
+.site-card .p-post-item,
+.site-card .p-cart-item,
+.site-card .p-cart-summary,
+.site-card .p-checkout-step,
+.edit-card .p-product-card,
+.edit-card .p-post-item,
+.edit-card .p-cart-item,
+.edit-card .p-cart-summary,
+.edit-card .p-checkout-step {
+  background: var(--tt5-afternoon-accent-5);
+  border-color: var(--tt5-afternoon-accent-6);
+  border-radius: 0;
+  color: var(--tt5-afternoon-contrast);
+}
+
+.site-card .p-product-card:hover,
+.edit-card .p-product-card:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+.site-card .p-product-name,
+.site-card .p-post-title,
+.site-card .p-cart-item-name,
+.edit-card .p-product-name,
+.edit-card .p-post-title,
+.edit-card .p-cart-item-name {
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-heading-font);
+}
+
+.site-card .p-post-meta,
+.site-card .p-post-content .p-post-meta,
+.edit-card .p-post-meta,
+.edit-card .p-post-content .p-post-meta {
+  border-bottom-color: var(--tt5-afternoon-accent-6);
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+}
+
+.site-card .p-product-price,
+.site-card .p-product-detail-price,
+.site-card .p-cart-total-amount,
+.site-card .p-post-link,
+.edit-card .p-product-price,
+.edit-card .p-product-detail-price,
+.edit-card .p-cart-total-amount,
+.edit-card .p-post-link {
+  color: var(--tt5-afternoon-accent-3);
+}
+
+.site-card .p-error-code,
+.edit-card .p-error-code {
+  color: var(--tt5-afternoon-placeholder);
+  font-family: var(--tt5-afternoon-heading-font);
+}
+
+.site-card .p-error-button,
+.site-card .p-cart-checkout-button,
+.site-card .p-checkout-step-number,
+.site-card .p-product-detail-button,
+.edit-card .p-error-button,
+.edit-card .p-cart-checkout-button,
+.edit-card .p-checkout-step-number,
+.edit-card .p-product-detail-button {
+  background: var(--tt5-afternoon-contrast);
+  border: 0;
+  border-radius: 0;
+  color: var(--tt5-afternoon-base);
+  font-family: var(--tt5-afternoon-body-font);
+  font-weight: 600;
+  letter-spacing: 1.44px;
+  text-transform: uppercase;
+}
+
+.site-card .p-error-button:hover,
+.site-card .p-cart-checkout-button:hover,
+.site-card .p-product-detail-button:hover,
+.edit-card .p-error-button:hover,
+.edit-card .p-cart-checkout-button:hover,
+.edit-card .p-product-detail-button:hover {
+  background: color-mix(in srgb, var(--tt5-afternoon-contrast) 85%, black);
+}
+
+.site-card .p-contact-form-placeholder,
+.edit-card .p-contact-form-placeholder {
+  background: var(--tt5-afternoon-accent-5);
+  border: 1px solid var(--tt5-afternoon-accent-6);
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+  font-weight: 300;
+  padding: 20px;
+  text-align: center;
+}
+
+.site-card .p-footer,
+.edit-card .p-footer {
+  background: var(--tt5-afternoon-base);
+  border-top: 1px solid var(--tt5-afternoon-accent-6);
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+  padding: clamp(40px, 6vw, 90px) clamp(32px, 5vw, 80px);
+}
+
+.site-card .p-ft,
+.site-card .p-footer-nav-link,
+.edit-card .p-ft,
+.edit-card .p-footer-nav-link {
+  color: var(--tt5-afternoon-contrast);
+  font-family: var(--tt5-afternoon-body-font);
+  font-size: clamp(0.875rem, 0.8rem + 0.2vw, 1rem);
+}
+
+.site-card .p-footer-nav-link:hover,
+.edit-card .p-footer-nav-link:hover {
+  color: var(--tt5-afternoon-accent-3);
+}
+
+@media (max-width: 640px) {
+  .site-card .p-st,
+  .site-card .p-body,
+  .site-card .p-template-post-content-placeholder,
+  .edit-card .p-st,
+  .edit-card .p-body,
+  .edit-card .p-template-post-content-placeholder {
+    width: calc(100% - 36px);
+  }
+}

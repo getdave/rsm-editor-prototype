@@ -1354,36 +1354,41 @@ const cssGradient = (a, b) => `linear-gradient(135deg, ${a} 0%, ${b} 100%)`;
 
 export const styleVariations = [
   {
+    id: "afternoon",
+    name: "Afternoon",
+    isDefault: true,
+    colors: { primary: "#516028", secondary: "#303D10", accent: "#C7F642", background: "#DAE7BD" },
+    typography: { headingFont: "Platypi", bodyFont: "Ysabeau Office" },
+  },
+  {
     id: "default",
     name: "Default",
-    isDefault: true,
-    colors: { primary: "#3858e9", secondary: "#1e1e1e", accent: "#00a32a", background: "#ffffff" },
-    typography: { headingFont: "DM Sans", bodyFont: "DM Sans" },
+    colors: { primary: "#111111", secondary: "#686868", accent: "#FFEE58", background: "#FFFFFF" },
+    typography: { headingFont: "Manrope", bodyFont: "Manrope" },
   },
   {
-    id: "minimal",
-    name: "Minimal",
-    colors: { primary: "#111827", secondary: "#6b7280", accent: "#9ca3af", background: "#ffffff" },
+    id: "evening",
+    name: "Evening",
+    colors: { primary: "#F9FF8F", secondary: "#111111", accent: "#FFEE58", background: "#111111" },
+    typography: { headingFont: "Manrope", bodyFont: "Manrope" },
   },
   {
-    id: "bold",
-    name: "Bold",
-    colors: { primary: "#ef4444", secondary: "#111827", accent: "#f59e0b", background: "#fffbeb" },
+    id: "dusk",
+    name: "Dusk",
+    colors: { primary: "#474047", secondary: "#2A222A", accent: "#CFCABE", background: "#F5F1EA" },
+    typography: { headingFont: "Platypi", bodyFont: "Ysabeau Office" },
   },
   {
-    id: "pastel",
-    name: "Pastel",
-    colors: { primary: "#a78bfa", secondary: "#ec4899", accent: "#34d399", background: "#fdf4ff" },
+    id: "twilight",
+    name: "Twilight",
+    colors: { primary: "#F5EDFF", secondary: "#1E1B25", accent: "#E7D7FF", background: "#1E1B25" },
+    typography: { headingFont: "Platypi", bodyFont: "Ysabeau Office" },
   },
   {
-    id: "editorial",
-    name: "Editorial",
-    colors: { primary: "#1f2937", secondary: "#7c2d12", accent: "#92400e", background: "#fef3c7" },
-  },
-  {
-    id: "newsletter",
-    name: "Newsletter",
-    colors: { primary: "#0f172a", secondary: "#334155", accent: "#0ea5e9", background: "#f8fafc" },
+    id: "sunrise",
+    name: "Sunrise",
+    colors: { primary: "#E7A8B8", secondary: "#4F1828", accent: "#F5C3D0", background: "#561B2C" },
+    typography: { headingFont: "Platypi", bodyFont: "Ysabeau Office" },
   },
 ];
 
@@ -1392,7 +1397,7 @@ export const installedThemes = [
     id: "twentytwentysix",
     slug: "twentytwentysix",
     name: "Twenty Twenty-Six",
-    isActive: true,
+    isActive: false,
     version: "1.0",
     author: "WordPress.org",
     authorUrl: "https://wordpress.org/",
@@ -1403,12 +1408,12 @@ export const installedThemes = [
     id: "twentytwentyfive",
     slug: "twentytwentyfive",
     name: "Twenty Twenty-Five",
-    isActive: false,
+    isActive: true,
     version: "1.4",
     author: "WordPress.org",
     authorUrl: "https://wordpress.org/",
     description: "Designed for longevity and adaptability.",
-    screenshot: cssGradient("#0ea5e9", "#1e1e1e"),
+    screenshot: cssGradient("#DAE7BD", "#C7F642"),
   },
   {
     id: "twentytwentyfour",
@@ -1610,53 +1615,53 @@ export const availableThemes = [
 // Color palette variations shown under the "COLOR VARIATIONS" section
 // of the Browse Styles panel.
 export const colorVariations = [
-  { id: "cv-1", name: "Sunshine", colors: ["#000000", "#ffffff", "#fde68a", "#f9c0e1"] },
-  { id: "cv-2", name: "Charcoal", colors: ["#1e1e1e", "#f5f5f5", "#e0e0e0", "#7c2d12"] },
-  { id: "cv-3", name: "Sandy",    colors: ["#f4ede4", "#1f2937", "#fbbf24", "#f97316"] },
-  { id: "cv-4", name: "Greenery", colors: ["#bbf7d0", "#365314", "#a3e635", "#d9f99d"] },
-  { id: "cv-5", name: "Ink",      colors: ["#000000", "#ffffff", "#3b82f6", "#fb923c"] },
-  { id: "cv-6", name: "Mist",     colors: ["#e2e8f0", "#1e1e1e", "#8b5cf6", "#fde68a"] },
-  { id: "cv-7", name: "Wine",     colors: ["#3b0a0a", "#fef2f2", "#fef9c3", "#f9a8d4"] },
-  { id: "cv-8", name: "Royal",    colors: ["#312e81", "#34d399", "#7c3aed", "#1e1e1e"] },
+  { id: "cv-1", name: "Afternoon", colors: ["#DAE7BD", "#516028", "#C7F642", "#EBF6D3"] },
+  { id: "cv-2", name: "Default",   colors: ["#FFFFFF", "#111111", "#FFEE58", "#F6CFF4"] },
+  { id: "cv-3", name: "Evening",   colors: ["#111111", "#F9FF8F", "#FFEE58", "#686868"] },
+  { id: "cv-4", name: "Dusk",      colors: ["#F5F1EA", "#2A222A", "#CFCABE", "#8B7F8A"] },
+  { id: "cv-5", name: "Twilight",  colors: ["#1E1B25", "#F5EDFF", "#E7D7FF", "#7D6B92"] },
+  { id: "cv-6", name: "Sunrise",   colors: ["#561B2C", "#E7A8B8", "#F5C3D0", "#FFE7D1"] },
 ];
 
 // Typography variations shown under the "TYPOGRAPHY" section.
 export const typographyVariations = [
-  { id: "tv-1", name: "Default", headingFont: "DM Sans", bodyFont: "DM Sans" },
-  { id: "tv-2", name: "Modern",  headingFont: "Inter",   bodyFont: "Inter" },
-  { id: "tv-3", name: "Serif",   headingFont: "Lora",    bodyFont: "Source Sans Pro" },
-  { id: "tv-4", name: "Compact", headingFont: "IBM Plex Sans", bodyFont: "IBM Plex Sans" },
-  { id: "tv-5", name: "Editorial", headingFont: "Playfair Display", bodyFont: "Lora" },
-  { id: "tv-6", name: "Mono",    headingFont: "JetBrains Mono", bodyFont: "JetBrains Mono" },
+  { id: "tv-1", name: "Platypi & Ysabeau Office", headingFont: "Platypi", bodyFont: "Ysabeau Office" },
+  { id: "tv-2", name: "Manrope", headingFont: "Manrope", bodyFont: "Manrope" },
+  { id: "tv-3", name: "Platypi", headingFont: "Platypi", bodyFont: "Platypi" },
+  { id: "tv-4", name: "Ysabeau Office", headingFont: "Ysabeau Office", bodyFont: "Ysabeau Office" },
+  { id: "tv-5", name: "Serif", headingFont: "Platypi", bodyFont: "Georgia" },
+  { id: "tv-6", name: "Sans", headingFont: "Ysabeau Office", bodyFont: "Ysabeau Office" },
 ];
 
 // Theme palette shown on the Colors panel (matches Gutenberg's "Palette" group).
 export const themePalette = [
-  { slug: "base",                color: "#ffffff", name: "Base" },
-  { slug: "contrast",            color: "#1e1e1e", name: "Contrast" },
-  { slug: "primary",             color: "#3858e9", name: "Primary" },
-  { slug: "secondary",           color: "#7f54b3", name: "Secondary" },
-  { slug: "accent",              color: "#00a32a", name: "Accent" },
-  { slug: "tertiary",            color: "#f59e0b", name: "Tertiary" },
+  { slug: "base",                color: "#DAE7BD", name: "Base" },
+  { slug: "contrast",            color: "#516028", name: "Contrast" },
+  { slug: "accent-1",            color: "#C7F642", name: "Accent 1" },
+  { slug: "accent-2",            color: "#EBF6D3", name: "Accent 2" },
+  { slug: "accent-3",            color: "#303D10", name: "Accent 3" },
+  { slug: "accent-4",            color: "#516028", name: "Accent 4" },
+  { slug: "accent-5",            color: "#EBF6D3", name: "Accent 5" },
+  { slug: "accent-6",            color: "#51602833", name: "Accent 6" },
 ];
 
 // Per-element colors shown on the Colors panel (Gutenberg "Elements" group).
 export const colorElements = [
-  { slug: "background", name: "Background", color: "#ffffff" },
-  { slug: "text",       name: "Text",       color: "#1e1e1e" },
-  { slug: "caption",    name: "Caption",    color: "#555555" },
-  { slug: "button",     name: "Button",     color: "#3858e9" },
-  { slug: "heading",    name: "Heading",    color: "#1e1e1e" },
-  { slug: "link",       name: "Link",       color: "#3858e9" },
+  { slug: "background", name: "Background", color: "#DAE7BD" },
+  { slug: "text",       name: "Text",       color: "#516028" },
+  { slug: "caption",    name: "Caption",    color: "#516028" },
+  { slug: "button",     name: "Button",     color: "#303D10" },
+  { slug: "heading",    name: "Heading",    color: "#516028" },
+  { slug: "link",       name: "Link",       color: "#516028" },
 ];
 
 // Typography "Elements" list shown on the Typography panel.
 export const typographyElements = [
-  { slug: "text",     name: "Text",     family: "DM Sans" },
-  { slug: "link",     name: "Link",     family: "DM Sans" },
-  { slug: "heading",  name: "Headings", family: "DM Sans" },
-  { slug: "caption",  name: "Captions", family: "DM Sans" },
-  { slug: "button",   name: "Buttons",  family: "DM Sans" },
+  { slug: "text",     name: "Text",     family: "Ysabeau Office" },
+  { slug: "link",     name: "Link",     family: "Ysabeau Office" },
+  { slug: "heading",  name: "Headings", family: "Platypi" },
+  { slug: "caption",  name: "Captions", family: "Ysabeau Office" },
+  { slug: "button",   name: "Buttons",  family: "Ysabeau Office" },
 ];
 
 // Shadow presets shown on the Shadows panel.

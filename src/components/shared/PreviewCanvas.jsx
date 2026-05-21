@@ -191,7 +191,7 @@ function PreviewCanvas({
           <div key={index} className="p-section">
             {section.title && <div className="p-st">{section.title}</div>}
             <div className="p-body">
-              <div style={{ padding: '20px', background: '#f5f5f5', borderRadius: '4px', textAlign: 'center' }}>
+              <div className="p-contact-form-placeholder">
                 Contact Form
               </div>
             </div>

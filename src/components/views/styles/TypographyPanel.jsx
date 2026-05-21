@@ -71,20 +71,24 @@ function TypographyPanel() {
             <Text
               variant="body-md"
               className="styles-row-name"
-              style={{ fontFamily: 'monospace' }}
+              style={{ fontFamily: 'Platypi' }}
             >
-              Fira Code
+              Platypi
             </Text>
             <Text variant="body-sm" className="styles-row-meta">
-              1 variant
+              2 variants
             </Text>
           </Card.Content>
           <Card.Content className="styles-row styles-row-clickable">
-            <Text variant="body-md" className="styles-row-name">
-              Manrope
+            <Text
+              variant="body-md"
+              className="styles-row-name"
+              style={{ fontFamily: 'Ysabeau Office' }}
+            >
+              Ysabeau Office
             </Text>
             <Text variant="body-sm" className="styles-row-meta">
-              1 variant
+              2 variants
             </Text>
           </Card.Content>
         </Card.Root>
@@ -104,10 +108,10 @@ function TypographyPanel() {
               ...(isLink ? { textDecoration: 'underline' } : {}),
               ...(isButton
                 ? {
-                    background: '#1e1e1e',
-                    color: '#fff',
+                    background: '#303D10',
+                    color: '#DAE7BD',
                     padding: '2px 6px',
-                    borderRadius: '2px',
+                    borderRadius: '0',
                   }
                 : {}),
             };
