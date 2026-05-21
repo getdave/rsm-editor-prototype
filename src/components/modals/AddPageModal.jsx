@@ -428,9 +428,6 @@ function AddPageModalContent() {
               </Button>
             )}
             <div className="apm-modal-footer-actions">
-              <Button variant="secondary" onClick={closeAddPageModal}>
-                Cancel
-              </Button>
               {selectedPath && (selectedPath !== 'layout' || selectedLayout) && (
                 <div className="split-button">
                   <Button

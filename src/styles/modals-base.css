@@ -255,6 +255,11 @@
 }
 
 /* ── SITE IDENTITY MODAL ── */
+.site-identity-modal.components-modal__frame {
+  width: 520px;
+  max-width: 90vw;
+}
+
 .site-identity-modal__logo-preview {
   width: 120px;
   height: 120px;
