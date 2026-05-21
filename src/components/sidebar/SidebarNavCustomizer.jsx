@@ -6,9 +6,13 @@ import {
   MenuItem,
   TextControl,
   ToggleControl,
+  Tooltip,
 } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
-import { dragHandle, plus, trash, file, menu } from '@wordpress/icons';
+import { dragHandle, plus, trash, file, menu, help } from '@wordpress/icons';
+
+const HOME_LOCKED_TIP =
+  "Home is always visible — it's the entry point to the editor, so it can't be turned off.";
 import { useAppState } from '../../hooks/useAppState';
 import { getAdminNavItemById } from '../../constants/adminNav';
 
@@ -226,14 +230,36 @@ function SidebarNavCustomizer() {
         {...(isTopLevel ? { 'data-nav-toplevel': '' } : {})}
       >
         {dragHandleFor(entry.id)}
-        <ToggleControl
-          className="snc-item-toggle"
-          label={item.label}
-          checked={isLocked ? true : !entry.hidden}
-          disabled={isLocked}
-          onChange={() => toggleNavItemVisibility(entry.id)}
-          __nextHasNoMarginBottom
-        />
+        {isLocked ? (
+          <>
+            <span className="snc-locked-name">{item.label}</span>
+            <Tooltip text={HOME_LOCKED_TIP} placement="top">
+              <Button
+                className="snc-help"
+                icon={help}
+                size="small"
+                showTooltip={false}
+                label="Why can't this be turned off?"
+              />
+            </Tooltip>
+            <ToggleControl
+              className="snc-item-toggle snc-item-toggle--end"
+              label={item.label}
+              hideLabelFromVision
+              checked
+              disabled
+              __nextHasNoMarginBottom
+            />
+          </>
+        ) : (
+          <ToggleControl
+            className="snc-item-toggle"
+            label={item.label}
+            checked={!entry.hidden}
+            onChange={() => toggleNavItemVisibility(entry.id)}
+            __nextHasNoMarginBottom
+          />
+        )}
       </div>
     );
   };
