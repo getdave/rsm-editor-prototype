@@ -608,9 +608,25 @@
   line-height: 1.4;
 }
 
-/* Advanced section — CollapsibleCard from @wordpress/ui handles its own card
-   chrome (header trigger, chevron, padding). We only normalize the select
-   control inside it. */
+/* Advanced section — CollapsibleCard from @wordpress/ui. The global
+   `* { padding: 0 }` reset in base.css is unlayered, so it beats the
+   component's @layer padding and leaves the card content flush. Re-apply a
+   balanced, consistent padding on the card header and content area; the
+   header's bottom padding provides the gap to the content, so the content
+   keeps a zero top padding to avoid doubling it. */
+.apm-panel {
+  --apm-card-padding: var(--wpds-dimension-padding-lg);
+}
+
+.apm-panel > [class*="__header"] {
+  padding: var(--apm-card-padding);
+}
+
+.apm-panel [class*="__content-inner"] {
+  padding: var(--apm-card-padding);
+  padding-block-start: 0;
+}
+
 .apm-page-template-select.components-base-control {
   margin-bottom: 0;
 }
