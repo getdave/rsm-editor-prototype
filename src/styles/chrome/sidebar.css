@@ -14,7 +14,7 @@
   align-self: stretch;
 }
 
-.sidebar:not(.is-design-section) {
+.sidebar:not(.is-menu-open) {
   overflow: visible;
 }
 
@@ -268,19 +268,9 @@
   color: #fff;
 }
 
-/* Design sidebar grouping: 24px between groups, 8px within a group. */
-.admin-root-nav.design-nav,
-.admin-root-nav.advanced-nav { gap: 24px; }
-.admin-root-nav.design-nav .ni-group,
-.admin-root-nav.advanced-nav .ni-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Sidebar nav slider — admin nav slides out to the left, design nav slides
-   in from the right. Both panes always render; .sidebar's overflow:hidden
-   clips off-screen content so it never bleeds outside the sidebar. */
+/* Sidebar nav slider — the root pane slides out to the left while the active
+   Menu's drilldown pane slides in from the right. Both panes always render;
+   .sidebar's overflow:hidden clips the off-screen pane. */
 .sidebar-nav-slider {
   flex: 1;
   position: relative;
@@ -291,27 +281,40 @@
   inset: 0;
   transition: transform 0.3s ease;
 }
-.sidebar-nav-pane-admin { transform: translateX(0); }
-.sidebar-nav-pane-design { transform: translateX(100%); }
-.sidebar-nav-pane-advanced { transform: translateX(100%); }
-.sidebar-nav-slider.is-design .sidebar-nav-pane-admin { transform: translateX(-100%); }
-.sidebar-nav-slider.is-design .sidebar-nav-pane-design { transform: translateX(0); }
-.sidebar-nav-slider.is-advanced .sidebar-nav-pane-admin { transform: translateX(-100%); }
-.sidebar-nav-slider.is-advanced .sidebar-nav-pane-advanced { transform: translateX(0); }
-.sidebar:not(.is-design-section) .sidebar-nav-pane-design {
+.sidebar-nav-pane-root { transform: translateX(0); }
+.sidebar-nav-pane-menu {
+  transform: translateX(100%);
   visibility: hidden;
   pointer-events: none;
 }
-.sidebar:not(.is-advanced-section) .sidebar-nav-pane-advanced {
-  visibility: hidden;
-  pointer-events: none;
+.sidebar-nav-slider.is-menu .sidebar-nav-pane-root { transform: translateX(-100%); }
+.sidebar-nav-slider.is-menu .sidebar-nav-pane-menu {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
 }
 
-/* Hide sidebar-bottom when the design or advanced section is active. Fade
-   matches the nav slider's 0.3s timing for a cohesive transition. */
+/* Folder heading: type icon next to the section label. */
+.sidebar-nav-section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sidebar-nav-section-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: #777;
+}
+.sidebar-nav-section-icon svg { width: 16px; height: 16px; fill: currentColor; }
+
+/* The unnamed main Group hugs the top (no heading, no extra block margin). */
+.sidebar-nav-section-group--plain { margin-block: 0; }
+
+/* Hide sidebar-bottom while a Menu drilldown is open. */
 .sidebar-bottom { transition: opacity 0.3s ease; }
-.sidebar.is-design-section .sidebar-bottom,
-.sidebar.is-advanced-section .sidebar-bottom {
+.sidebar.is-menu-open .sidebar-bottom {
   opacity: 0;
   pointer-events: none;
 }
@@ -520,6 +523,25 @@
   padding-left: 4px;
 }
 
+/* Container header: type icon (Folder/Menu) + static label (Group). */
+.snc-container-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  color: #777;
+}
+.snc-container-icon svg { width: 20px; height: 20px; fill: currentColor; }
+.snc-container-label.snc-container-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: #bbb;
+  font-weight: 500;
+}
+
 /* Section rows: editable heading input + delete action. */
 .snc-section-input.components-base-control {
   flex: 1 1 auto;
@@ -551,21 +573,23 @@
 }
 .snc-delete-section.components-button svg { fill: currentColor; }
 
-/* Add section — sits below the nav items inside the scrolling list. */
-.snc-add-section.components-button {
-  justify-content: center;
-  width: 100%;
+/* Add — a dropdown (Group / Folder / Menu) below the nav items. */
+.snc-add {
   margin-top: 8px;
 }
-.snc-add-section.components-button.is-secondary {
+.snc-add .components-button {
+  justify-content: center;
+  width: 100%;
+}
+.snc-add .components-button.is-secondary {
   color: #c5d0ff;
   box-shadow: inset 0 0 0 1px #3a3a3a;
 }
-.snc-add-section.components-button.is-secondary:hover:not(:disabled) {
+.snc-add .components-button.is-secondary:hover:not(:disabled) {
   box-shadow: inset 0 0 0 1px var(--wp-blue, #3858e9);
 }
 
-/* Footer: Done only, pinned below the scrolling list. */
+/* Footer: Reset + Done, pinned below the scrolling list. */
 .snc-footer {
   flex: 0 0 auto;
   padding: 12px;
@@ -574,6 +598,13 @@
 .snc-footer .components-button {
   justify-content: center;
   width: 100%;
+}
+.snc-footer .snc-reset.components-button {
+  color: #bbb;
+}
+.snc-footer .snc-reset.components-button:hover:not(:disabled) {
+  color: #fff;
+  background: #2a2a2a;
 }
 
 /* Drag ghost — dark pill following the cursor. */
