@@ -383,25 +383,29 @@ function Sidebar() {
       const menuIcon = entry.icon ?? menu;
       const items = visibleMemberItems(entry);
       const isOn = items.some((it) => isItemActive(it.path));
+      // Wrap in the section-group container so a Menu gets the same block
+      // spacing as Group/Folder containers.
       return (
-        <Tooltip key={entry.id} text={name} placement="right">
-          <Button
-            tone="neutral"
-            variant="minimal"
-            size="compact"
-            aria-pressed={isOn}
-            aria-expanded={effectiveMenuId === entry.id}
-            className="ni ni-with-chevron"
-            onClick={() => {
-              if (sidebarCollapsed) setSidebarCollapsed(false);
-              setActiveMenuId(entry.id);
-            }}
-          >
-            <span className="ni-ico">{menuIcon}</span>
-            <span className="ni-label">{name}</span>
-            <span className="ni-chevron">{chevronRight}</span>
-          </Button>
-        </Tooltip>
+        <div key={entry.id} className="sidebar-nav-section-group">
+          <Tooltip text={name} placement="right">
+            <Button
+              tone="neutral"
+              variant="minimal"
+              size="compact"
+              aria-pressed={isOn}
+              aria-expanded={effectiveMenuId === entry.id}
+              className="ni ni-with-chevron"
+              onClick={() => {
+                if (sidebarCollapsed) setSidebarCollapsed(false);
+                setActiveMenuId(entry.id);
+              }}
+            >
+              <span className="ni-ico">{menuIcon}</span>
+              <span className="ni-label">{name}</span>
+              <span className="ni-chevron">{chevronRight}</span>
+            </Button>
+          </Tooltip>
+        </div>
       );
     }
 
