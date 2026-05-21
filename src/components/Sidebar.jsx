@@ -468,7 +468,7 @@ function Sidebar() {
           </Button>
         </Tooltip>
         <Stack direction="column" gap="xs" className="ni-section-header">
-          <Text variant="heading-lg" className="ni-section-title">
+          <Text variant="heading-xl" className="ni-section-title">
             {name}
           </Text>
         </Stack>
