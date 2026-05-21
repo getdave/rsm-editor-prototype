@@ -373,10 +373,19 @@
 
 .cs-area {
   flex-shrink: 0;
-  background: #1e1e1e;
-  padding: 16px;
-  border-top: 1px solid #2a2a2a;
-  transition: padding .15s ease;
+  background: #242424;
+  padding: 16px 18px 18px;
+  border: 1px solid #3c3c3c;
+  border-radius: 8px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 10px 24px rgba(0, 0, 0, 0.22);
+  margin-top: 12px;
+  transition:
+    background-color .15s ease,
+    border-color .15s ease,
+    box-shadow .15s ease,
+    padding .15s ease;
 }
 
 .cs-head {
@@ -413,20 +422,296 @@
 
 .cs-banners {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
   margin-top: 16px;
 }
 
 .cs-banner {
-  background: #252525;
+  appearance: none;
+  border: 1px solid #c3c4c7;
+  background: #f6f7f7;
+  border-radius: 6px;
+  color: #1e1e1e;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 14px;
+  min-height: 148px;
+  padding: 14px;
+  text-align: left;
+  transition:
+    background-color .15s ease,
+    border-color .15s ease,
+    box-shadow .15s ease,
+    transform .15s ease;
+}
+
+.cs-banner:hover {
+  background: #fff;
+  border-color: #3858e9;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.cs-banner:focus-visible {
+  outline: 2px solid #3858e9;
+  outline-offset: 2px;
+}
+
+.cs-banner-visual {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 112px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(30, 30, 30, 0.1);
+}
+
+.cs-banner-icon {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   border-radius: 4px;
-  padding: 12px;
-  height: 88px;
+  background: #1e1e1e;
+  color: #fff;
+}
+
+.cs-banner-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.cs-banner-preview {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 44px 12px 12px;
+}
+
+.cs-banner--page .cs-banner-visual {
+  background: linear-gradient(180deg, #eef3ff 0%, #fff 54%);
+}
+
+.cs-banner--navigation .cs-banner-visual {
+  background: linear-gradient(180deg, #edf7f1 0%, #fff 56%);
+}
+
+.cs-banner--design .cs-banner-visual {
+  background: linear-gradient(180deg, #fff4e5 0%, #fff 56%);
+}
+
+.cs-page-preview,
+.cs-nav-preview,
+.cs-design-preview {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.cs-page-preview {
+  gap: 7px;
+  padding: 10px;
+  border-radius: 4px 4px 0 0;
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-bottom: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.cs-page-plus {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #3858e9;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.cs-page-line,
+.cs-page-block {
+  display: block;
+  border-radius: 2px;
+  background: #c3c4c7;
+}
+
+.cs-page-line { height: 5px; width: 100%; }
+.cs-page-line--title { width: 72%; height: 7px; background: #3858e9; }
+.cs-page-line--short { width: 54%; }
+.cs-page-block { height: 22px; background: #e9eefc; }
+
+.cs-nav-preview {
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.cs-nav-row {
+  display: block;
+  height: 12px;
+  border-radius: 999px;
+  background: #d6e6dc;
+}
+
+.cs-nav-row:nth-child(2) { width: 78%; }
+.cs-nav-row:nth-child(3) { width: 62%; }
+.cs-nav-row.is-active { width: 88%; background: #008a20; }
+
+.cs-nav-route {
+  position: absolute;
+  right: 2px;
+  bottom: 0;
+  width: 28px;
+  height: 42px;
+  border-right: 2px solid #008a20;
+  border-bottom: 2px solid #008a20;
+  border-radius: 0 0 12px 0;
+}
+
+.cs-design-preview {
+  justify-content: space-between;
+}
+
+.cs-design-aa {
+  display: block;
+  color: #1e1e1e;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.cs-design-swatches {
+  display: flex;
+  gap: 6px;
+}
+
+.cs-design-swatches span {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(30, 30, 30, 0.14);
+}
+
+.cs-design-swatches span:nth-child(1) { background: #1e1e1e; }
+.cs-design-swatches span:nth-child(2) { background: #f0b849; }
+.cs-design-swatches span:nth-child(3) { background: #3858e9; }
+
+.cs-banner-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  align-self: stretch;
+}
+
+.cs-banner-title {
+  color: #1e1e1e;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.cs-banner-description {
+  color: #555;
   font-size: 13px;
-  color: #e0e0e0;
+  line-height: 1.4;
+}
+
+.cs-banner-cta {
+  display: inline-flex;
+  align-items: center;
+  margin-top: auto;
+  color: #3858e9;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.cs-learn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 12px;
+  color: #c3c4c7;
+  font-size: 13px;
+  line-height: 20px;
+  text-decoration: none;
+}
+
+.cs-learn-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.cs-learn-link:focus-visible {
+  outline: 2px solid #f6f7f7;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.cs-learn-link-icon,
+.cs-learn-link-external {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: currentColor;
+}
+
+.cs-learn-link-icon svg,
+.cs-learn-link-external svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 .cs-area.collapsed .cs-banners {
   display: none;
+}
+
+@media (max-width: 1180px) {
+  .cs-banner {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .cs-banner-visual {
+    min-height: 86px;
+  }
+}
+
+@media (max-width: 760px) {
+  .cs-head {
+    align-items: flex-start;
+    height: auto;
+    gap: 12px;
+  }
+
+  .cs-banners {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-banner {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
 }
