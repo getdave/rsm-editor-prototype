@@ -380,6 +380,7 @@ function Sidebar() {
     // Menu — a drilldown row that opens the menu's pane. Shown even if empty.
     if (type === 'menu') {
       const name = entry.label || 'New Menu';
+      const menuIcon = entry.icon ?? menu;
       const items = visibleMemberItems(entry);
       const isOn = items.some((it) => isItemActive(it.path));
       return (
@@ -396,7 +397,7 @@ function Sidebar() {
               setActiveMenuId(entry.id);
             }}
           >
-            <span className="ni-ico">{menu}</span>
+            <span className="ni-ico">{menuIcon}</span>
             <span className="ni-label">{name}</span>
             <span className="ni-chevron">{chevronRight}</span>
           </Button>
