@@ -327,7 +327,7 @@
   --cs-card-link: #6b86f5;
   /* Lighter sibling of the .cs-area border (--wp-gray-600 / #3c3c3c),
      mixed toward white so each card edge stays visible on the dark area. */
-  --cs-card-border: color-mix(in srgb, var(--wp-gray-600, #3c3c3c) 75%, #fff);
+  --cs-card-border: color-mix(in srgb, var(--wp-gray-600, #3c3c3c) 95%, #fff);
 
   appearance: none;
   border: 1px solid var(--cs-card-border);
