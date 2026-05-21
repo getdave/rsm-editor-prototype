@@ -45,10 +45,19 @@ function collectItemIds(layout) {
   return ids;
 }
 
+/** Index of the container missing items should land in (prefer a Group). */
+function mainContainerIndex(layout) {
+  const groupIdx = layout.findIndex(
+    (e) => e.kind === 'section' && e.type === 'group',
+  );
+  if (groupIdx >= 0) return groupIdx;
+  return layout.findIndex((e) => e.kind === 'section');
+}
+
 /**
  * Reconcile a nav layout against the current base item set: drop item entries
- * (top level or inside sections) no longer in the base set, append base items
- * missing from the layout. Sections themselves are always preserved.
+ * no longer in the base set, and add base items missing from the layout into
+ * the main Group (items never live outside a container). Sections are preserved.
  */
 function reconcileNavLayout(layout, baseIds) {
   const present = collectItemIds(layout);
@@ -63,10 +72,23 @@ function reconcileNavLayout(layout, baseIds) {
   if (missing.length === 0 && filtered.length === layout.length) {
     return layout;
   }
-  return [
-    ...filtered,
-    ...missing.map((id) => ({ kind: 'item', id, hidden: false })),
-  ];
+  const missingItems = missing.map((id) => ({ kind: 'item', id, hidden: false }));
+  if (missingItems.length === 0) {
+    return filtered;
+  }
+  const destIdx = mainContainerIndex(filtered);
+  if (destIdx === -1) {
+    // No container to hold them — wrap in a fresh Group (defensive).
+    return [
+      { kind: 'section', type: 'group', id: `group-${Date.now()}`, label: '', items: missingItems },
+      ...filtered,
+    ];
+  }
+  return filtered.map((entry, i) =>
+    i === destIdx
+      ? { ...entry, items: [...(entry.items ?? []), ...missingItems] }
+      : entry,
+  );
 }
 
 /** Remove an entry (item or section) from anywhere in the layout. */
@@ -170,10 +192,11 @@ function moveNavEntry(layout, draggedId, targetId, position) {
 }
 
 /**
- * Delete a section. Its member items are released back to their default-order
- * positions among the remaining top-level items.
+ * Delete a section. Its member items move into the main container (the first
+ * Group, else the first remaining container) so items never become orphaned at
+ * the top level. If nothing remains, the section is kept (can't orphan items).
  */
-function deleteSectionFromLayout(layout, sectionId, defaultLayout) {
+function deleteSectionFromLayout(layout, sectionId) {
   const idx = layout.findIndex(
     (entry) => entry.kind === 'section' && entry.id === sectionId,
   );
@@ -183,23 +206,19 @@ function deleteSectionFromLayout(layout, sectionId, defaultLayout) {
   const members = layout[idx].items ?? [];
   const without = [...layout.slice(0, idx), ...layout.slice(idx + 1)];
 
-  const defaultOrder = new Map(defaultLayout.map((entry, i) => [entry.id, i]));
-  for (const member of members) {
-    const memberRank = defaultOrder.get(member.id) ?? Infinity;
-    let insertAt = without.length;
-    for (let i = 0; i < without.length; i += 1) {
-      const entry = without[i];
-      if (
-        entry.kind === 'item' &&
-        (defaultOrder.get(entry.id) ?? Infinity) > memberRank
-      ) {
-        insertAt = i;
-        break;
-      }
-    }
-    without.splice(insertAt, 0, member);
+  if (members.length === 0) {
+    return without;
   }
-  return without;
+  const destIdx = mainContainerIndex(without);
+  if (destIdx === -1) {
+    // Deleting the only container would orphan its items — keep it instead.
+    return layout;
+  }
+  return without.map((entry, i) =>
+    i === destIdx
+      ? { ...entry, items: [...(entry.items ?? []), ...members] }
+      : entry,
+  );
 }
 
 export function AppStateProvider({ children }) {
@@ -375,13 +394,7 @@ export function AppStateProvider({ children }) {
   };
 
   const deleteNavSection = (id) => {
-    setNavLayout((prev) =>
-      deleteSectionFromLayout(
-        prev,
-        id,
-        buildDefaultNavLayout(homepageDisplayMode),
-      ),
-    );
+    setNavLayout((prev) => deleteSectionFromLayout(prev, id));
   };
 
   const openSiteIdentityModal = () => {
