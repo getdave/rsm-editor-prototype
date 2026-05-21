@@ -608,14 +608,9 @@
   line-height: 1.4;
 }
 
-/* Advanced section — CollapsibleCard from @wordpress/ui. It has no `size`
-   prop; its scale is the `--wp-ui-card-padding` token (default padding-2xl).
-   Drop it to the smallest design-system step for a compact card. */
-.apm-panel {
-  --wp-ui-card-padding: var(--wpds-dimension-padding-sm);
-  --wp-ui-card-header-content-gap: var(--wpds-dimension-gap-sm);
-}
-
+/* Advanced section — CollapsibleCard from @wordpress/ui handles its own card
+   chrome (header trigger, chevron, padding). We only normalize the select
+   control inside it. */
 .apm-page-template-select.components-base-control {
   margin-bottom: 0;
 }

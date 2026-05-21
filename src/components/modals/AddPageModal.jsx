@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Button, TextControl, DropdownMenu, MenuItem, CheckboxControl, Tooltip, SelectControl } from '@wordpress/components';
-import { Text, CollapsibleCard } from '@wordpress/ui';
+import { Text, CollapsibleCard, Card } from '@wordpress/ui';
 import { createInterpolateElement } from '@wordpress/element';
 import { chevronDown, plus } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
@@ -400,7 +400,9 @@ function AddPageModalContent() {
                     </div>
 
                     <CollapsibleCard.Root defaultOpen={false} className="apm-panel">
-                      <CollapsibleCard.Header>Advanced</CollapsibleCard.Header>
+                      <CollapsibleCard.Header>
+                        <Card.Title>Advanced</Card.Title>
+                      </CollapsibleCard.Header>
                       <CollapsibleCard.Content>
                         <SelectControl
                           label="Page Template"
