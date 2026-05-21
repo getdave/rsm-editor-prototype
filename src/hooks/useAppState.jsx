@@ -46,7 +46,7 @@ export function AppStateProvider({ children }) {
     initialReadingSettings.postsPageId,
   );
 
-  // Where the user came from when entering the edit canvas — drives the
+  // Where the user came from when entering the Block Editor — drives the
   // split-Exit button label/destination. null when not inside the editor.
   const [editorReferrer, setEditorReferrer] = useState(null);
 
@@ -55,7 +55,7 @@ export function AppStateProvider({ children }) {
   const [recentPages, setRecentPages] = useState([]);
 
   // When true (only inside the editor), the chrome sidebar expands back to
-  // full width and the canvas slides off-screen to the right.
+  // full width and the Block Editor slides off-screen to the right.
   const [menuExpanded, setMenuExpanded] = useState(false);
   
   // Site identity
@@ -67,6 +67,7 @@ export function AppStateProvider({ children }) {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [addPageModalOpen, setAddPageModalOpen] = useState(false);
   const [unsavedChangesModalOpen, setUnsavedChangesModalOpen] = useState(false);
+  const [configureHomepageOpen, setConfigureHomepageOpen] = useState(false);
 
   // Site visibility status — drives the header indicator dot.
   const [siteStatus] = useState('live');
@@ -100,7 +101,7 @@ export function AppStateProvider({ children }) {
   // Pages view mode (list/grid)
   const [pagesViewMode, setPagesViewMode] = useState('grid');
 
-  // Edit canvas: List View panel and block inspector sidebar (WordPress-style)
+  // Block Editor: List View panel and block inspector sidebar (WordPress-style)
   const [listViewOpen, setListViewOpen] = useState(false);
   const [settingsSidebarOpen, setSettingsSidebarOpen] = useState(false);
 
@@ -154,6 +155,14 @@ export function AppStateProvider({ children }) {
 
   const closeUnsavedChangesModal = () => {
     setUnsavedChangesModalOpen(false);
+  };
+
+  const openConfigureHomepageModal = () => {
+    setConfigureHomepageOpen(true);
+  };
+
+  const closeConfigureHomepageModal = () => {
+    setConfigureHomepageOpen(false);
   };
 
   const showSnackbar = (message) => {
@@ -232,9 +241,9 @@ export function AppStateProvider({ children }) {
     );
   };
 
-  const markDirty = () => {
+  const markDirty = useCallback(() => {
     setHasUnsavedChanges(true);
-  };
+  }, []);
 
   const save = () => {
     setHasUnsavedChanges(false);
@@ -370,6 +379,9 @@ export function AppStateProvider({ children }) {
     unsavedChangesModalOpen,
     openUnsavedChangesModal,
     closeUnsavedChangesModal,
+    configureHomepageOpen,
+    openConfigureHomepageModal,
+    closeConfigureHomepageModal,
 
     // Site status
     siteStatus,
@@ -396,7 +408,7 @@ export function AppStateProvider({ children }) {
     pagesViewMode,
     setPagesViewMode,
 
-    // Edit canvas panels
+    // Block Editor panels
     listViewOpen,
     setListViewOpen,
     toggleListView,

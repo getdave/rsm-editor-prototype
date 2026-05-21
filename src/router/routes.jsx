@@ -3,8 +3,7 @@ import RootLayout from '../layouts/RootLayout';
 import PreviewView from '../components/views/PreviewView';
 import PagesView from '../components/views/PagesView';
 import ContentView from '../components/views/ContentView';
-import EditingView from '../components/views/EditingView';
-import TemplateEditingView from '../components/views/TemplateEditingView';
+import BlockEditor from '../components/views/BlockEditor';
 import StylesView from '../components/views/StylesView';
 import VariationsPanel from '../components/views/styles/VariationsPanel';
 import ColorsPanel from '../components/views/styles/ColorsPanel';
@@ -28,9 +27,9 @@ export const router = createBrowserRouter([
       { path: 'pages/dynamic', element: <PagesView /> },
       { path: 'pages/collections', element: <PagesView /> },
       { path: 'pages/:legacySegment', element: <Navigate to="/pages" replace /> },
-      { path: 'pages/:pageId/edit', element: <EditingView /> },
-      { path: 'template-editing', element: <TemplateEditingView /> },
-      { path: 'page-designs/:designId/edit', element: <EditingView /> },
+      { path: 'pages/:pageId/edit', element: <BlockEditor /> },
+      { path: 'page-designs/:designId/edit', element: <BlockEditor /> },
+      { path: 'templates/:templateId/edit', element: <BlockEditor /> },
       {
         path: 'templates',
         element: (

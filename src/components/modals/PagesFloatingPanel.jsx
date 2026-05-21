@@ -13,8 +13,10 @@ function PagesFloatingPanel() {
 
   useEffect(() => {
     if (!sidebarCollapsed) {
-      setIsVisible(false);
-      return;
+      const raf = window.requestAnimationFrame(() => {
+        setIsVisible(false);
+      });
+      return () => window.cancelAnimationFrame(raf);
     }
 
     const pagesCollapsed = document.querySelector('.pages-collapsed');

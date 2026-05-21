@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, DropdownMenu, MenuItem, CheckboxControl, Tooltip, PanelBody, SelectControl } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
@@ -20,6 +20,7 @@ function AddPageModalContent() {
     addPage,
     addPageToMainMenu,
     showSnackbar,
+    pages,
   } = useAppState();
   const navigate = useNavigate();
 
@@ -30,6 +31,7 @@ function AddPageModalContent() {
   const [addToMenu, setAddToMenu] = useState(false);
   const [showAllLayouts, setShowAllLayouts] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState('page-default');
+  const generatedPageIdRef = useRef(0);
 
   const pageTemplateOptions = [
     { value: 'page-default', label: 'Page (default)' },
@@ -107,10 +109,11 @@ function AddPageModalContent() {
       .replace(/^-+|-+$/g, '');
   };
 
-  const createPageObject = () => {
+  const createPageObject = (fallbackId) => {
+    const slug = slugify(pageTitle);
     return {
-      id: slugify(pageTitle) || `page-${Date.now()}`,
-      slug: slugify(pageTitle),
+      id: slug || fallbackId,
+      slug,
       name: pageTitle,
       type: 'Page',
       status: showLive ? 'live' : 'draft',
@@ -123,9 +126,14 @@ function AddPageModalContent() {
     };
   };
 
+  const createNextFallbackPageId = () => {
+    generatedPageIdRef.current += 1;
+    return `page-${pages.length + generatedPageIdRef.current}`;
+  };
+
   const handleCreateAndEdit = () => {
     if (!pageTitle.trim()) return;
-    const newPage = createPageObject();
+    const newPage = createPageObject(createNextFallbackPageId());
     addPage(newPage);
     if (newPage.inMenu) {
       addPageToMainMenu(newPage);
@@ -140,7 +148,7 @@ function AddPageModalContent() {
 
   const handleCreate = () => {
     if (!pageTitle.trim()) return;
-    const newPage = createPageObject();
+    const newPage = createPageObject(createNextFallbackPageId());
     addPage(newPage);
     if (newPage.inMenu) {
       addPageToMainMenu(newPage);
@@ -392,7 +400,7 @@ function AddPageModalContent() {
                     <div className="apm-checkbox-group">
                       <div className="apm-checkbox-item">
                         <CheckboxControl
-                          label="Live immediately"
+                          label="Publish immediately"
                           checked={showLive}
                           onChange={setShowLive}
                         />

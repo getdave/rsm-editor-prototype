@@ -34,6 +34,7 @@ function CommandPaletteContent() {
     closeCommandPalette,
     openSiteIdentityModal,
     openSettingsModal,
+    openConfigureHomepageModal,
   } = useAppState();
 
   const [query, setQuery] = useState('');
@@ -60,9 +61,20 @@ function CommandPaletteContent() {
     return [
       ...navigateCommands,
       { id: 'identity', label: 'Edit site identity', group: 'Action', perform: openSiteIdentityModal },
+      {
+        id: 'configure-homepage',
+        label: 'Configure Homepage',
+        group: 'Action',
+        perform: openConfigureHomepageModal,
+      },
       { id: 'settings', label: 'Open settings', group: 'Action', perform: openSettingsModal },
     ];
-  }, [navigate, openSiteIdentityModal, openSettingsModal]);
+  }, [
+    navigate,
+    openConfigureHomepageModal,
+    openSiteIdentityModal,
+    openSettingsModal,
+  ]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -75,13 +87,14 @@ function CommandPaletteContent() {
   }, []);
 
   useEffect(() => {
-    setActive(0);
-  }, [query]);
-
-  useEffect(() => {
     const el = listRef.current?.querySelector('.cp-item.is-active');
     el?.scrollIntoView({ block: 'nearest' });
   }, [active]);
+
+  const handleQueryChange = (e) => {
+    setQuery(e.target.value);
+    setActive(0);
+  };
 
   const run = (cmd) => {
     closeCommandPalette();
@@ -125,7 +138,7 @@ function CommandPaletteContent() {
           type="text"
           className="cp-input"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={handleQueryChange}
           onKeyDown={onKeyDown}
           placeholder="Search anything…"
           aria-label="Search commands"

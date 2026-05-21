@@ -1,12 +1,14 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { settings } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
 import { useAppState } from '../../hooks/useAppState';
-import { HOMEPAGE_DISPLAY_LATEST } from '../../data/mockData';
+import { resolveHomepagePreviewTarget } from '../../utils/homepagePreviewTarget';
 import PreviewCanvas from '../shared/PreviewCanvas';
 import ContentSuggestions from './ContentSuggestions';
 
 function PreviewView() {
+  const location = useLocation();
   const navigate = useNavigate();
   const {
     currentPage,
@@ -14,25 +16,46 @@ function PreviewView() {
     homepageDisplayMode,
     pageDesigns,
     pages,
+    openConfigureHomepageModal,
     selectPage,
     setCurrentPage,
   } = useAppState();
 
-  const resolvedHome = useMemo(() => {
-    if (homepageDisplayMode === HOMEPAGE_DISPLAY_LATEST) {
-      return pageDesigns.find((design) => design.id === 'blog-home-root');
-    }
-    return pages.find((page) => page.id === frontPageId) || currentPage;
-  }, [currentPage, frontPageId, homepageDisplayMode, pageDesigns, pages]);
+  const resolvedHome = useMemo(
+    () =>
+      resolveHomepagePreviewTarget({
+        homepageDisplayMode,
+        frontPageId,
+        pages,
+        pageDesigns,
+        currentPage,
+      }),
+    [currentPage, frontPageId, homepageDisplayMode, pageDesigns, pages],
+  );
 
   const resolvedHomeKey = resolvedHome?.id ?? null;
-  const [previewState, setPreviewState] = useState({
-    homeKey: resolvedHomeKey,
-    target: resolvedHome,
+  const resetKey = location.key;
+  const previousResolvedHomeKeyRef = useRef(resolvedHomeKey);
+  const [previewOverride, setPreviewOverride] = useState(null);
+  const [previewHistory, setPreviewHistory] = useState({
+    entries: [],
+    index: -1,
   });
+
+  useEffect(() => {
+    if (previousResolvedHomeKeyRef.current === resolvedHomeKey) {
+      return;
+    }
+    previousResolvedHomeKeyRef.current = resolvedHomeKey;
+    setPreviewOverride(null);
+    setPreviewHistory({ entries: [], index: -1 });
+  }, [resolvedHomeKey]);
+
   const previewTarget =
-    previewState.homeKey === resolvedHomeKey && previewState.target
-      ? previewState.target
+    previewOverride?.resetKey === resetKey &&
+    previewOverride.homeKey === resolvedHomeKey &&
+    previewOverride.target
+      ? previewOverride.target
       : resolvedHome;
 
   const handleEdit = () => {
@@ -46,9 +69,74 @@ function PreviewView() {
   };
 
   const handlePageChange = (page) => {
-    setPreviewState({ homeKey: resolvedHomeKey, target: page });
+    setPreviewOverride({ resetKey, homeKey: resolvedHomeKey, target: page });
+    setPreviewHistory((prev) => {
+      const currentEntry = previewTarget
+        ? {
+            homeKey: resolvedHomeKey,
+            resetKey,
+            target: previewTarget,
+          }
+        : null;
+      const nextEntry = {
+        homeKey: resolvedHomeKey,
+        resetKey,
+        target: page,
+      };
+      const baseEntries =
+        prev.index >= 0 ? prev.entries.slice(0, prev.index + 1) : prev.entries;
+      const currentTail = baseEntries[baseEntries.length - 1];
+      const entries =
+        currentEntry && currentTail?.target?.id !== currentEntry.target.id
+          ? [...baseEntries, currentEntry, nextEntry]
+          : [...baseEntries, nextEntry];
+      return {
+        entries,
+        index: entries.length - 1,
+      };
+    });
     setCurrentPage(page);
   };
+
+  const handlePreviewHistoryChange = useCallback(
+    (nextIndex) => {
+      const entry = previewHistory.entries[nextIndex];
+      if (!entry) return;
+      setPreviewHistory((prev) => ({
+        ...prev,
+        index: nextIndex,
+      }));
+      setPreviewOverride(entry);
+      setCurrentPage(entry.target);
+    },
+    [previewHistory.entries, setCurrentPage],
+  );
+
+  const documentOptions = useMemo(
+    () =>
+      previewTarget?.id === resolvedHomeKey
+        ? [
+            {
+              label: 'Configure Homepage',
+              icon: settings,
+              onClick: openConfigureHomepageModal,
+            },
+          ]
+        : [],
+    [openConfigureHomepageModal, previewTarget?.id, resolvedHomeKey],
+  );
+
+  const previewHistoryControls = useMemo(
+    () => ({
+      canGoBack: previewHistory.index > 0,
+      canGoForward:
+        previewHistory.index >= 0 &&
+        previewHistory.index < previewHistory.entries.length - 1,
+      onBack: () => handlePreviewHistoryChange(previewHistory.index - 1),
+      onForward: () => handlePreviewHistoryChange(previewHistory.index + 1),
+    }),
+    [handlePreviewHistoryChange, previewHistory],
+  );
 
   return (
     <Stack direction="column" className="cs-stack">
@@ -58,8 +146,9 @@ function PreviewView() {
             page={previewTarget}
             onEdit={handleEdit}
             onPageChange={handlePageChange}
-            editLabel="Edit"
             documentLabel={previewTarget?.previewLabel}
+            documentOptions={documentOptions}
+            previewHistory={previewHistoryControls}
             scopeNotice={previewTarget?.isPageDesign ? previewTarget.scopeNotice : undefined}
           />
         </div>
