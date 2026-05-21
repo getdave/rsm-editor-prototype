@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useState } from 'react';
 import { Button, PanelBody, Popover, TabPanel, TextControl } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { closeSmall } from '@wordpress/icons';
@@ -12,15 +11,8 @@ import {
   getSectionMeta,
   HEADER_META,
   TEMPLATE_ROOT_META,
-} from '../../utils/editCanvasBlockMeta';
-
-const STYLE_PREVIEW_W = 232;
-const STYLE_PREVIEW_MIN_W = 200;
-const STYLE_PREVIEW_MAX_W = 280;
-/** Clear space between flyout’s right edge and the sidebar’s left edge — flyout must never overlap the sidebar. */
-const FLYOUT_SIDEBAR_GAP = 10;
-const STYLE_PREVIEW_HIDE_MS = 100;
-const FLYOUT_APPROX_HEIGHT = 200;
+} from '../../utils/blockEditorMeta';
+import { EDITOR_MODES } from '../../services/blockEditorMode';
 
 function parseSectionIndex(selectedBlockId) {
   if (!selectedBlockId?.startsWith('section-')) {
@@ -30,112 +22,25 @@ function parseSectionIndex(selectedBlockId) {
   return Number.isFinite(n) ? n : null;
 }
 
-/**
- * Flyout anchors to the viewport so its right edge is always to the left of the settings
- * sidebar (never obscures the panel). Width may shrink if the canvas area is narrow.
- */
-function placeStylePreviewFlyout(targetEl) {
-  const trigger = targetEl.getBoundingClientRect();
-  const sidebarEl = document.querySelector('.settings-sidebar.open');
-  const sidebarLeft = sidebarEl
-    ? sidebarEl.getBoundingClientRect().left
-    : window.innerWidth;
-  const rightEdge = Math.max(0, sidebarLeft - FLYOUT_SIDEBAR_GAP);
-
-  let width = STYLE_PREVIEW_W;
-  let left = rightEdge - width;
-
-  if (left < 8) {
-    left = 8;
-    width = Math.min(
-      STYLE_PREVIEW_MAX_W,
-      Math.max(STYLE_PREVIEW_MIN_W, rightEdge - left - 1)
-    );
-  }
-
-  const maxW = rightEdge - left - 1;
-  if (width > maxW && maxW >= STYLE_PREVIEW_MIN_W) {
-    width = maxW;
-  }
-
-  let top = trigger.top + trigger.height / 2 - FLYOUT_APPROX_HEIGHT / 2;
-  top = Math.max(
-    8,
-    Math.min(top, window.innerHeight - FLYOUT_APPROX_HEIGHT - 8)
-  );
-
-  return { left, top, width };
-}
-
-function StylePreviewPopover({ open, left, top, width, label, previewMod }) {
-  if (!open) {
-    return null;
-  }
-  return createPortal(
-    <div
-      className="ss-style-preview-flyout"
-      style={{ left, top, width }}
-      role="presentation"
-    >
-      <div className={`ss-style-preview-mock ss-style-preview-mock--${previewMod}`}>
-        <div className="ss-style-preview-mock-title">La Mancha</div>
-        <p className="ss-style-preview-mock-text">
-          In a village of La Mancha, the name of which I have no desire…”
-        </p>
-        <span className="ss-style-preview-mock-cta">Read more</span>
-      </div>
-      <Text variant="body-sm" className="ss-style-preview-caption">
-        {label}
-      </Text>
-    </div>,
-    document.body
-  );
-}
-
 function SectionStylesPanel({ sectionIndex, selectedStyleId, onStyleChange }) {
-  const hideTimerRef = useRef(null);
-  const [preview, setPreview] = useState(null);
+  // Mirrors the Layout panel pattern: the Popover stays anchored to the
+  // buttons grid and only its content swaps as the user moves across
+  // buttons (instead of following each individual trigger).
+  const [hoveredId, setHoveredId] = useState(null);
+  const [groupAnchor, setGroupAnchor] = useState(null);
 
-  const clearHideTimer = () => {
-    if (hideTimerRef.current != null) {
-      window.clearTimeout(hideTimerRef.current);
-      hideTimerRef.current = null;
-    }
-  };
+  const showPreview = hoveredId && hoveredId !== selectedStyleId;
+  const previewOption = showPreview
+    ? SECTION_STYLE_OPTIONS.find((o) => o.id === hoveredId)
+    : null;
 
-  useEffect(() => () => clearHideTimer(), []);
-
-  const showPreviewForTarget = (target, option) => {
-    clearHideTimer();
-    const { left, top, width } = placeStylePreviewFlyout(target);
-    setPreview({
-      left,
-      top,
-      width,
-      label: option.label,
-      previewMod: option.previewMod,
-    });
-  };
-
-  const scheduleHidePreview = () => {
-    clearHideTimer();
-    hideTimerRef.current = window.setTimeout(() => {
-      hideTimerRef.current = null;
-      setPreview(null);
-    }, STYLE_PREVIEW_HIDE_MS);
+  const handleLeave = (id) => {
+    setHoveredId((current) => (current === id ? null : current));
   };
 
   return (
     <div className="ss-style-picker-root">
-      <StylePreviewPopover
-        open={Boolean(preview)}
-        left={preview?.left ?? 0}
-        top={preview?.top ?? 0}
-        width={preview?.width ?? STYLE_PREVIEW_W}
-        label={preview?.label ?? ''}
-        previewMod={preview?.previewMod ?? 'default'}
-      />
-      <div className="ss-style-grid" role="list">
+      <div className="ss-style-grid" role="list" ref={setGroupAnchor}>
         {SECTION_STYLE_OPTIONS.map((option) => {
           const selected = option.id === selectedStyleId;
           return (
@@ -146,10 +51,10 @@ function SectionStylesPanel({ sectionIndex, selectedStyleId, onStyleChange }) {
                 className={`ss-style-btn${selected ? ' ss-style-btn--selected' : ''}`}
                 aria-pressed={selected}
                 onClick={() => onStyleChange(sectionIndex, option.id)}
-                onMouseEnter={(e) => showPreviewForTarget(e.currentTarget, option)}
-                onMouseLeave={scheduleHidePreview}
-                onFocus={(e) => showPreviewForTarget(e.currentTarget, option)}
-                onBlur={scheduleHidePreview}
+                onMouseEnter={() => setHoveredId(option.id)}
+                onMouseLeave={() => handleLeave(option.id)}
+                onFocus={() => setHoveredId(option.id)}
+                onBlur={() => handleLeave(option.id)}
               >
                 <Text variant="body-sm" className="ss-style-btn-label">
                   {option.label}
@@ -159,6 +64,26 @@ function SectionStylesPanel({ sectionIndex, selectedStyleId, onStyleChange }) {
           );
         })}
       </div>
+      {previewOption && groupAnchor ? (
+        <Popover
+          anchor={groupAnchor}
+          placement="left-start"
+          offset={12}
+          focusOnMount={false}
+          className="ss-style-preview"
+        >
+          <div className={`ss-style-preview-mock ss-style-preview-mock--${previewOption.previewMod}`}>
+            <div className="ss-style-preview-mock-title">La Mancha</div>
+            <p className="ss-style-preview-mock-text">
+              In a village of La Mancha, the name of which I have no desire…
+            </p>
+            <span className="ss-style-preview-mock-cta">Read more</span>
+          </div>
+          <Text variant="body-sm" className="ss-style-preview-caption">
+            {previewOption.label}
+          </Text>
+        </Popover>
+      ) : null}
     </div>
   );
 }
@@ -373,7 +298,7 @@ const BLOCK_DESCRIPTIONS = {
   Gallery: 'Display multiple images in a rich gallery.',
   'Contact Form': 'Collect information from visitors with a form.',
   Content: 'Content for this design.',
-  Block: 'Block settings for the selected canvas region.',
+  Block: 'Block settings for the selected region.',
 };
 
 function descriptionForLabel(label) {
@@ -391,12 +316,13 @@ export default function SettingsSidebar({
   pageTitle,
   selectedBlockId,
   sections = [],
-  isTemplate,
+  mode = EDITOR_MODES.PAGE,
   focusBlockTabSignal = 0,
   flashSignal = 0,
   sectionStyles = {},
   onSectionStyleChange = () => {},
 }) {
+  const isTemplate = mode === EDITOR_MODES.TEMPLATE;
   const [flashHighlight, setFlashHighlight] = useState(false);
 
   // Each time the parent increments `focusBlockTabSignal` (e.g. clicking
@@ -413,20 +339,22 @@ export default function SettingsSidebar({
     if (flashSignal <= 0 || !isOpen) {
       return undefined;
     }
-    setFlashHighlight(false);
-    const raf = window.requestAnimationFrame(() => {
-      setFlashHighlight(true);
+    let highlightRaf;
+    const resetRaf = window.requestAnimationFrame(() => {
+      setFlashHighlight(false);
+      highlightRaf = window.requestAnimationFrame(() => {
+        setFlashHighlight(true);
+      });
     });
     const t = window.setTimeout(() => {
       setFlashHighlight(false);
     }, 920);
     return () => {
-      window.cancelAnimationFrame(raf);
+      window.cancelAnimationFrame(resetRaf);
+      window.cancelAnimationFrame(highlightRaf);
       window.clearTimeout(t);
     };
   }, [flashSignal, isOpen]);
-
-  void isTemplate;
 
   let blockMeta = { icon: TEMPLATE_ROOT_META.icon, label: 'Block', isPatternSection: false };
   if (selectedBlockId === 'header') {
@@ -442,7 +370,7 @@ export default function SettingsSidebar({
   }
 
   const blockDescription = blockMeta.isPatternSection
-    ? 'Built from a ready-made section you can customise on the canvas.'
+    ? 'Built from a ready-made section you can customise in the Block Editor.'
     : descriptionForLabel(blockMeta.label);
 
   const inspectorTabLabel = blockMeta.isPatternSection ? 'Section' : 'Block';

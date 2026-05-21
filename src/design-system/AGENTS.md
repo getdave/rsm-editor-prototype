@@ -36,7 +36,7 @@ Always pick the WordPress package first. Author bespoke CSS only for layout glue
 
 | You need… | Use |
 |---|---|
-| Status pills / labels (e.g. "Draft", "Live") | `Badge` |
+| Status pills / labels (e.g. "Draft", "Published") | `Badge` |
 | Surface that groups related content | `Card.Root` + `Card.Content` (+ `Card.Header`, `Card.Title`, `Card.FullBleed`) |
 | Expand/collapse section | `Collapsible` or `CollapsibleCard` |
 | Zero state | `EmptyState` |

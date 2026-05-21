@@ -693,7 +693,7 @@ function getPlaceholderTitle(pageOrId, layout) {
   if (pageId === 'shop') return 'Store page title';
   if (pageId === 'product-catalog-template') return 'Product listing title';
   if (pageId === 'blog') return 'Blog page title';
-  if (pageId === 'blog-home-root') return 'Latest Posts Homepage';
+  if (pageId === 'blog-home-root') return 'Latest posts title';
   if (pageId === 'blog-list') return 'Posts Page Title';
   if (pageId === 'posts-index-template') {
     return pageName === 'Latest posts'

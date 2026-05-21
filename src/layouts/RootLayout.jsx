@@ -8,11 +8,12 @@ import CommandPalette from '../components/CommandPalette';
 import SiteIdentityModal from '../components/modals/SiteIdentityModal';
 import SettingsModal from '../components/modals/SettingsModal';
 import AddPageModal from '../components/modals/AddPageModal';
+import ConfigureHomepageModal from '../components/modals/ConfigureHomepageModal';
 import PagesFloatingPanel from '../components/modals/PagesFloatingPanel';
 import UnsavedChangesModal from '../components/modals/UnsavedChangesModal';
 import DevBranchIndicator from '../components/shared/DevBranchIndicator';
 
-const EDIT_ROUTE_PATTERN = /\/(?:pages|page-designs)\/[^/]+\/edit$|^\/template-editing$/;
+const EDIT_ROUTE_PATTERN = /^\/(?:pages|page-designs|templates)\/[^/]+\/edit$/;
 
 function RootLayout() {
   const location = useLocation();
@@ -38,7 +39,7 @@ function RootLayout() {
     const isEdit = EDIT_ROUTE_PATTERN.test(location.pathname);
     setSidebarCollapsed(isEdit);
     setMenuExpanded(false);
-  }, [location.pathname]);
+  }, [location.pathname, setMenuExpanded, setSidebarCollapsed]);
 
   // Capture the route the user was on before entering the edit canvas so the
   // split-Exit button knows where to take them back. Cleared on exit. Also
@@ -54,7 +55,7 @@ function RootLayout() {
       setEditorReferrer(null);
     }
     prevPathRef.current = location.pathname;
-  }, [location.pathname]);
+  }, [location.pathname, markDirty, setEditorReferrer]);
 
   return (
     <>
@@ -70,6 +71,7 @@ function RootLayout() {
       <SiteIdentityModal />
       <SettingsModal />
       <AddPageModal />
+      <ConfigureHomepageModal />
       <PagesFloatingPanel />
       <UnsavedChangesModal />
       <CommandPalette />

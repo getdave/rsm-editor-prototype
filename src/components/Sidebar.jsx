@@ -1,7 +1,8 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppState, READING_DISPLAY_LATEST } from '../hooks/useAppState';
 import { Tooltip } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Sidebar nav depends on WP UI Button CSS vars; swapping components would be a visual refactor.
 import { Button, Stack, Text } from '@wordpress/ui';
 import {
   home,
@@ -58,7 +59,7 @@ function buildVisibleAdminNavItems(homepageDisplayMode) {
 }
 
 /** Sub-links under Advanced — icons + indent (no tree-line connectors).
-    Used by the editor-canvas sidebar variant which keeps inline expand/collapse. */
+    Used by the Block Editor sidebar variant which keeps inline expand/collapse. */
 const ADVANCED_SUB_NAV_ITEMS = Object.freeze([
   {
     id: 'advanced-templates',
@@ -114,7 +115,7 @@ const ADVANCED_NAV_ITEMS = [
   },
 ];
 
-const EDIT_ROUTE_PATTERN = /^\/(?:pages|page-designs)\/[^/]+\/edit$|^\/template-editing$/;
+const EDIT_ROUTE_PATTERN = /^\/(?:pages|page-designs|templates)\/[^/]+\/edit$/;
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -144,6 +145,7 @@ function Sidebar() {
     isEditCanvas && editorReferrer ? editorReferrer : location.pathname;
   const [collapsedGroups, setCollapsedGroups] = useState({});
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
+  const homePreviewResetCountRef = useRef(0);
 
   const sidebarNestedNavHidden = isEditCanvas
     ? sidebarCollapsed && !menuExpanded
@@ -151,8 +153,12 @@ function Sidebar() {
 
   useEffect(() => {
     if (sidebarNestedNavHidden) {
-      setAdvancedExpanded(false);
+      const raf = window.requestAnimationFrame(() => {
+        setAdvancedExpanded(false);
+      });
+      return () => window.cancelAnimationFrame(raf);
     }
+    return undefined;
   }, [sidebarNestedNavHidden]);
 
   /** Collapsed chrome: first interaction expands the sidebar/menu and opens Advanced */
@@ -175,6 +181,13 @@ function Sidebar() {
 
   // Direct navigation. RootLayout's route effect resets menuExpanded.
   const navigateSmooth = (target) => {
+    if (target === '/') {
+      homePreviewResetCountRef.current += 1;
+      navigate('/', {
+        state: { homePreviewResetCount: homePreviewResetCountRef.current },
+      });
+      return;
+    }
     navigate(target);
   };
 
@@ -209,7 +222,7 @@ function Sidebar() {
             variant="minimal"
             size="compact"
             className="ni"
-            onClick={() => navigate(item.path)}
+            onClick={() => navigateSmooth(item.path)}
           >
             <span className="ni-ico">{item.icon}</span>
             <span className="ni-label">{item.label}</span>
@@ -253,7 +266,7 @@ function Sidebar() {
             size="compact"
             aria-pressed={isItemActive(item.path)}
             className={`ni ${item.chevron ? 'ni-with-chevron' : ''}`}
-            onClick={() => navigate(item.path)}
+            onClick={() => navigateSmooth(item.path)}
           >
             <span className="ni-ico">{item.icon}</span>
             <span className="ni-label">{item.label}</span>
