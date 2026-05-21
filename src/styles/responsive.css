@@ -104,11 +104,6 @@
     min-width: 280px;
   }
 
-  .design-panel .split-view.list {
-    gap: var(--wp-page-area-gap, 10px);
-    padding: var(--wp-page-area-gap, 10px);
-  }
-
   .canvas-toolbar,
   .preview-bar {
     gap: 4px;
