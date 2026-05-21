@@ -14,8 +14,13 @@ import { getAdminNavItemById } from '../../constants/adminNav';
 
 /** Display label per container type. Groups are never named. */
 const TYPE_LABEL = { group: 'Group', folder: 'Folder', menu: 'Menu' };
-const containerIconFor = (type) =>
-  type === 'folder' ? file : type === 'menu' ? menu : null;
+/** Folders use the file icon; menus use their own icon (default menus keep
+ *  their original icon), falling back to the generic menu icon. */
+const containerIconFor = (section) => {
+  if (section.type === 'folder') return file;
+  if (section.type === 'menu') return section.icon ?? menu;
+  return null;
+};
 
 function SidebarNavCustomizer() {
   const {
@@ -110,20 +115,17 @@ function SidebarNavCustomizer() {
       if (row) {
         const targetId = row.dataset.navEntryId;
         if (targetId === draggedId) return null;
+        // Dropping onto a container header drops the item inside that container.
+        if (row.dataset.sectionHeader != null) {
+          return { targetId, position: 'inside', sectionId: targetId };
+        }
+        // Otherwise it's a member item — reorder within its container only.
+        // Items never escape to the top level.
+        const sectionId = memberSectionMap.get(targetId);
+        if (!sectionId) return null;
         const rect = row.getBoundingClientRect();
         const firstHalf = clientY - rect.top < rect.height / 2;
-        if (row.dataset.sectionHeader != null) {
-          // Section header: top half drops above the section at top level,
-          // bottom half drops the item into the section.
-          return firstHalf
-            ? { targetId, position: 'above', sectionId: null }
-            : { targetId, position: 'inside', sectionId: targetId };
-        }
-        return {
-          targetId,
-          position: firstHalf ? 'above' : 'below',
-          sectionId: memberSectionMap.get(targetId) ?? null,
-        };
+        return { targetId, position: firstHalf ? 'above' : 'below', sectionId };
       }
 
       const sectionBox = el.closest('[data-section-dropzone]');
@@ -240,7 +242,7 @@ function SidebarNavCustomizer() {
     const items = section.items ?? [];
     const type = section.type ?? 'folder';
     const typeLabel = TYPE_LABEL[type] ?? 'Folder';
-    const icon = containerIconFor(type);
+    const icon = containerIconFor(section);
     const sectionClass = [
       'snc-section',
       `snc-section--${type}`,
@@ -366,7 +368,13 @@ function SidebarNavCustomizer() {
         </DropdownMenu>
       </div>
 
-      <Stack direction="column" gap="sm" className="snc-footer">
+      <Stack
+        direction="row"
+        align="center"
+        justify="space-between"
+        gap="sm"
+        className="snc-footer"
+      >
         <Button
           className="snc-reset"
           variant="tertiary"
