@@ -18,7 +18,10 @@
   overflow-x: hidden;
 }
 
+/* @wordpress/ui Text renders inline, so it needs display:block for the
+   bottom margin to actually create space before the layout grid. */
 .apm-modal-subtitle {
+  display: block;
   margin: 0 0 var(--wpds-dimension-gap-xl);
 }
 
@@ -29,8 +32,8 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--wpds-dimension-gap-md);
-  padding-left: 0;
-  padding-right: 0;
+  padding: var(--wpds-dimension-padding-xl) 0 0;
+  border-top: none;
 }
 
 .apm-modal-footer-actions {
@@ -222,8 +225,6 @@
 .apm-load-more {
   display: flex;
   justify-content: center;
-  padding: var(--wpds-dimension-gap-md) 0;
-  border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 .apm-load-more-btn.components-button {
