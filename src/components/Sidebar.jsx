@@ -6,18 +6,14 @@ import { Tooltip } from '@wordpress/components';
 import { Button, Stack, Text } from '@wordpress/ui';
 import {
   page as pageIcon,
-  styles,
   settings,
   menu,
+  file,
   chevronLeft,
   chevronRight,
   chevronUp,
   chevronDown,
   wordpress,
-  color,
-  typography,
-  background,
-  shadow,
   layout,
   tool,
   addTemplate,
@@ -28,6 +24,20 @@ import {
   getAdminNavItemById,
 } from '../constants/adminNav';
 import SidebarNavCustomizer from './sidebar/SidebarNavCustomizer';
+
+/** Id of the Menu container whose items own the given route, or null. */
+function findMenuIdForPath(layout, pathname, mode) {
+  const match = layout.find(
+    (e) =>
+      e.kind === 'section' &&
+      e.type === 'menu' &&
+      (e.items ?? []).some((it) => {
+        const def = getAdminNavItemById(it.id, mode);
+        return def && def.path !== '/' && pathname.startsWith(def.path);
+      }),
+  );
+  return match ? match.id : null;
+}
 
 /** Sub-links under Advanced — icons + indent (no tree-line connectors).
     Used by the Block Editor sidebar variant which keeps inline expand/collapse. */
@@ -56,43 +66,6 @@ const ADVANCED_SUB_NAV_ITEMS = Object.freeze([
 ]);
 
 const ADVANCED_ROUTE_PREFIXES = ['/patterns', '/template-parts', '/templates'];
-
-const DESIGN_NAV_ITEMS = [
-  { kind: 'back', id: 'back', icon: chevronLeft, label: 'Back', path: '/', tip: 'Back to admin' },
-  { kind: 'header', id: 'design-header', title: 'Design', description: 'Customize the styles of your whole site' },
-  {
-    kind: 'group',
-    id: 'styles-group',
-    items: [
-      { kind: 'item', id: 'styles', icon: styles, label: 'Styles', path: '/design/styles', tip: 'Site-wide styles' },
-    ],
-  },
-  {
-    kind: 'group',
-    id: 'style-elements-group',
-    items: [
-      { kind: 'item', id: 'colors', icon: color, label: 'Colors', path: '/design/styles/colors', tip: 'Colors' },
-      { kind: 'item', id: 'fonts', icon: typography, label: 'Fonts', path: '/design/styles/typography', tip: 'Fonts' },
-      { kind: 'item', id: 'background', icon: background, label: 'Background', path: '/design/styles/background', tip: 'Background' },
-      { kind: 'item', id: 'shadows', icon: shadow, label: 'Shadows', path: '/design/styles/shadows', tip: 'Shadows' },
-      { kind: 'item', id: 'layout', icon: layout, label: 'Layout', path: '/design/styles/layout', tip: 'Layout' },
-    ],
-  },
-];
-
-const ADVANCED_NAV_ITEMS = [
-  { kind: 'back', id: 'back', icon: chevronLeft, label: 'Back', path: '/', tip: 'Back to admin' },
-  { kind: 'header', id: 'advanced-header', title: 'Advanced', description: 'Configure advanced tools of your site' },
-  {
-    kind: 'group',
-    id: 'advanced-group',
-    items: [
-      { kind: 'item', id: 'patterns', icon: symbolFilled, label: 'Patterns', path: '/patterns', tip: 'Reusable sets of blocks for layouts and sections' },
-      { kind: 'item', id: 'template-parts', icon: layout, label: 'Template Parts', path: '/template-parts', tip: 'Reusable headers, footers, and template areas' },
-      { kind: 'item', id: 'templates', icon: addTemplate, label: 'Templates', path: '/templates', tip: 'Edit templates that control how your site renders' },
-    ],
-  },
-];
 
 const EDIT_ROUTE_PATTERN = /^\/(?:pages|page-designs|templates)\/[^/]+\/edit$/;
 
@@ -128,7 +101,16 @@ function Sidebar() {
   const [collapsedGroups, setCollapsedGroups] = useState({});
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
   const homePreviewResetCountRef = useRef(0);
-  const isAdvancedPaneOpen = isAdvancedSection || advancedExpanded;
+  // Root-sidebar drilldown: which Menu container's pane is open. Initialized
+  // from the route so a deep-link/reload opens the owning menu.
+  const [activeMenuId, setActiveMenuId] = useState(() =>
+    findMenuIdForPath(navLayout, location.pathname, homepageDisplayMode),
+  );
+  // A collapsed sidebar shows no drilldown (but remembers the selection).
+  const effectiveMenuId = sidebarCollapsed ? null : activeMenuId;
+  const activeMenu = navLayout.find(
+    (e) => e.kind === 'section' && e.type === 'menu' && e.id === effectiveMenuId,
+  );
 
   const sidebarNestedNavHidden = isEditCanvas
     ? sidebarCollapsed && !menuExpanded
@@ -156,13 +138,6 @@ function Sidebar() {
       return;
     }
     setAdvancedExpanded((prev) => !prev);
-  };
-
-  const handleAdvancedPaneActivate = () => {
-    if (sidebarCollapsed) {
-      setSidebarCollapsed(false);
-    }
-    setAdvancedExpanded(true);
   };
 
   const toggleGroup = (groupId) => {
@@ -384,6 +359,121 @@ function Sidebar() {
     );
   };
 
+  /** Resolve a container's visible member items to their full definitions. */
+  const visibleMemberItems = (entry) =>
+    (entry.items ?? [])
+      .filter((it) => !it.hidden)
+      .map((it) => getAdminNavItemById(it.id, homepageDisplayMode))
+      .filter(Boolean);
+
+  /** Render one top-level navLayout entry in the root pane (per container type). */
+  const renderRootEntry = (entry) => {
+    if (entry.kind !== 'section') {
+      if (entry.hidden) return null;
+      const item = getAdminNavItemById(entry.id, homepageDisplayMode);
+      if (!item) return null;
+      return <Fragment key={entry.id}>{renderItem(item)}</Fragment>;
+    }
+
+    const type = entry.type ?? 'folder';
+
+    // Menu — a drilldown row that opens the menu's pane. Shown even if empty.
+    if (type === 'menu') {
+      const name = entry.label || 'New Menu';
+      const items = visibleMemberItems(entry);
+      const isOn = items.some((it) => isItemActive(it.path));
+      return (
+        <Tooltip key={entry.id} text={name} placement="right">
+          <Button
+            tone="neutral"
+            variant="minimal"
+            size="compact"
+            aria-pressed={isOn}
+            aria-expanded={effectiveMenuId === entry.id}
+            className="ni ni-with-chevron"
+            onClick={() => {
+              if (sidebarCollapsed) setSidebarCollapsed(false);
+              setActiveMenuId(entry.id);
+            }}
+          >
+            <span className="ni-ico">{menu}</span>
+            <span className="ni-label">{name}</span>
+            <span className="ni-chevron">{chevronRight}</span>
+          </Button>
+        </Tooltip>
+      );
+    }
+
+    // Group / Folder — items rendered inline (Folder adds a heading).
+    const items = visibleMemberItems(entry);
+    if (items.length === 0) return null;
+    if (type === 'folder') {
+      const name = entry.label || 'New Folder';
+      return (
+        <div
+          key={entry.id}
+          className="sidebar-nav-section-group"
+          role="group"
+          aria-label={name}
+        >
+          <Text
+            variant="body-sm"
+            className="components-menu-group__label sidebar-nav-section-label"
+          >
+            <span className="sidebar-nav-section-icon" aria-hidden="true">
+              {file}
+            </span>
+            {name}
+          </Text>
+          {items.map((item) => (
+            <Fragment key={item.id}>{renderItem(item)}</Fragment>
+          ))}
+        </div>
+      );
+    }
+    return (
+      <div
+        key={entry.id}
+        className="sidebar-nav-section-group sidebar-nav-section-group--plain"
+        role="group"
+      >
+        {items.map((item) => (
+          <Fragment key={item.id}>{renderItem(item)}</Fragment>
+        ))}
+      </div>
+    );
+  };
+
+  /** Render the drilldown pane for the open Menu (Back row + title + items). */
+  const renderMenuPane = (menuEntry) => {
+    if (!menuEntry) return null;
+    const name = menuEntry.label || 'New Menu';
+    return (
+      <>
+        <Tooltip text="Back" placement="right">
+          <Button
+            tone="neutral"
+            variant="minimal"
+            size="compact"
+            className="ni"
+            onClick={() => setActiveMenuId(null)}
+          >
+            <span className="ni-ico">{chevronLeft}</span>
+            <span className="ni-label">Back</span>
+          </Button>
+        </Tooltip>
+        <Stack direction="column" gap="xs" className="ni-section-header">
+          <Text variant="heading-lg" className="ni-section-title">
+            {name}
+          </Text>
+        </Stack>
+        {visibleMemberItems(menuEntry).map((item) => (
+          <Fragment key={item.id}>{renderItem(item)}</Fragment>
+        ))}
+      </>
+    );
+  };
+
   // Inside the editor the sidebar shows three sections: a menu-toggle
   // button (top, 64px), the root nav (middle), and recent documents
   // (bottom, flex-grow). Reuses the same .sidebar / .sidebar.collapsed
@@ -507,81 +597,22 @@ function Sidebar() {
   return (
     <div
       className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${
-        isDesignSection ? 'is-design-section' : ''
-      } ${isAdvancedPaneOpen ? 'is-advanced-section' : ''}`}
+        effectiveMenuId ? 'is-menu-open' : ''
+      }`}
     >
-      <div
-        className={`sidebar-nav-slider ${isDesignSection ? 'is-design' : ''} ${
-          isAdvancedPaneOpen ? 'is-advanced' : ''
-        }`}
-      >
-        <nav className="admin-root-nav sidebar-nav-pane sidebar-nav-pane-admin">
-          {navLayout.map((entry) => {
-            if (entry.kind === 'section') {
-              const visibleItems = (entry.items ?? [])
-                .filter((it) => !it.hidden)
-                .map((it) => getAdminNavItemById(it.id, homepageDisplayMode))
-                .filter(Boolean);
-              if (visibleItems.length === 0) return null;
-              return (
-                <div
-                  key={entry.id}
-                  className="sidebar-nav-section-group"
-                  role="group"
-                  aria-label={entry.label}
-                >
-                  <Text
-                    variant="body-sm"
-                    className="components-menu-group__label sidebar-nav-section-label"
-                  >
-                    {entry.label}
-                  </Text>
-                  {visibleItems.map((item) => (
-                    <Fragment key={item.id}>{renderItem(item)}</Fragment>
-                  ))}
-                </div>
-              );
-            }
-            if (entry.hidden) return null;
-            const item = getAdminNavItemById(entry.id, homepageDisplayMode);
-            if (!item) return null;
-            return <Fragment key={entry.id}>{renderItem(item)}</Fragment>;
-          })}
-        </nav>
-        <nav className="admin-root-nav design-nav sidebar-nav-pane sidebar-nav-pane-design">
-          {DESIGN_NAV_ITEMS.map((item) => (
-            <Fragment key={item.id}>{renderItem(item)}</Fragment>
-          ))}
+      <div className={`sidebar-nav-slider ${effectiveMenuId ? 'is-menu' : ''}`}>
+        <nav className="admin-root-nav sidebar-nav-pane sidebar-nav-pane-root">
+          {navLayout.map(renderRootEntry)}
         </nav>
         <nav
-          className="admin-root-nav advanced-nav sidebar-nav-pane sidebar-nav-pane-advanced"
-          aria-label="Advanced"
+          className="admin-root-nav sidebar-nav-pane sidebar-nav-pane-menu"
+          aria-label={activeMenu ? activeMenu.label || 'Menu' : 'Menu'}
         >
-          {ADVANCED_NAV_ITEMS.map((item) => (
-            <Fragment key={item.id}>{renderItem(item)}</Fragment>
-          ))}
+          {renderMenuPane(activeMenu)}
         </nav>
       </div>
 
-      {!isDesignSection && !isAdvancedPaneOpen && (
-        <nav className="admin-root-nav sidebar-advanced-dock" aria-label="Advanced">
-          <Tooltip text="Configure advanced tools of your site" placement="right">
-            <Button
-              tone="neutral"
-              variant="minimal"
-              size="compact"
-              className="ni ni-with-chevron sb-advanced-parent"
-              onClick={handleAdvancedPaneActivate}
-            >
-              <span className="ni-ico">{tool}</span>
-              <span className="ni-label">Advanced</span>
-              <span className="ni-chevron">{chevronRight}</span>
-            </Button>
-          </Tooltip>
-        </nav>
-      )}
-
-      {/* WP Admin link + sidebar customization. Hidden in the design section. */}
+      {/* WP Admin link + sidebar customization. Hidden while a menu is open. */}
       <Stack
         direction="row"
         align="center"
