@@ -27,7 +27,6 @@ function ContentSuggestions() {
       id: 'add-page',
       title: 'Add a new page',
       description: 'Create a page from a layout or blank page.',
-      cta: 'Add page',
       icon: pageIcon,
       tone: 'page',
       onClick: handleAddPage,
@@ -36,7 +35,6 @@ function ContentSuggestions() {
       id: 'navigation',
       title: 'Set up navigation',
       description: 'Choose which pages appear in your main menu.',
-      cta: 'Set up menu',
       icon: navigation,
       tone: 'navigation',
       onClick: () => navigate('/navigation'),
@@ -45,7 +43,6 @@ function ContentSuggestions() {
       id: 'design',
       title: 'Change your site design',
       description: 'Update colors, fonts, and style variations.',
-      cta: 'Change design',
       icon: styles,
       tone: 'design',
       onClick: () => navigate('/design/styles'),
@@ -62,9 +59,19 @@ function ContentSuggestions() {
         justify="space-between"
         className="cs-head"
       >
-        <Text variant="body-md" className="cs-title">
-          Learn the basics
-        </Text>
+        {expanded ? (
+          <Text variant="body-md" className="cs-title">
+            Learn the basics
+          </Text>
+        ) : (
+          <button
+            type="button"
+            className="cs-title cs-title-button"
+            onClick={() => setExpanded(true)}
+          >
+            Learn the basics
+          </button>
+        )}
         <Stack direction="row" align="center" gap="md" className="cs-actions">
           <Button variant="link" className="cs-action" onClick={() => setExpanded(v => !v)}>
             {expanded ? 'Hide' : 'Show'}
@@ -85,7 +92,6 @@ function ContentSuggestions() {
                 onClick={s.onClick}
               >
                 <div className="cs-banner-visual" aria-hidden="true">
-                  <span className="cs-banner-icon">{s.icon}</span>
                   <div className="cs-banner-preview">
                     {s.tone === 'page' && (
                       <span className="cs-page-preview">
@@ -117,13 +123,15 @@ function ContentSuggestions() {
                   </div>
                 </div>
                 <div className="cs-banner-copy">
-                  <Text variant="body-md" className="cs-banner-title">
-                    {s.title}
-                  </Text>
+                  <span className="cs-banner-title-row">
+                    <span className="cs-banner-icon" aria-hidden="true">{s.icon}</span>
+                    <Text variant="body-md" className="cs-banner-title">
+                      {s.title}
+                    </Text>
+                  </span>
                   <Text variant="body-sm" className="cs-banner-description">
                     {s.description}
                   </Text>
-                  <span className="cs-banner-cta">{s.cta}</span>
                 </div>
               </button>
             ))}
