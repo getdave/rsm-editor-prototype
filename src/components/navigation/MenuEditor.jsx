@@ -6,6 +6,7 @@ import {
   MenuGroup,
   MenuItem,
   TextControl,
+  Tooltip,
 } from '@wordpress/components';
 import { Page } from '@wordpress/admin-ui';
 import {
@@ -14,6 +15,7 @@ import {
   chevronDown,
   chevronRight,
   customLink,
+  dragHandle,
   file,
   home,
   image,
@@ -88,16 +90,20 @@ function slugFromUrl(url) {
 }
 
 function typeLabelForPage(page) {
-  if (page?.isPostsPage) {
-    return 'Posts page';
-  }
-  if (page?.isShopPage) {
-    return 'Shop page';
-  }
   if (page?.isDynamic || page?.isCollection) {
     return page.collectionBadge || page.type || 'Archive';
   }
   return 'Page';
+}
+
+function roleLabelForPage(page) {
+  if (page?.isFrontPage) {
+    return 'Homepage';
+  }
+  if (page?.isPostsPage) {
+    return 'Posts page';
+  }
+  return null;
 }
 
 function sourceTypeForPage(page) {
@@ -126,8 +132,8 @@ function statusLabelForTarget(status) {
   return 'Published';
 }
 
-function isDraftTarget(status) {
-  return status === 'draft';
+function isLiveTarget(status) {
+  return status === 'live' || status === 'published';
 }
 
 function isExternalUrl(url) {
@@ -175,12 +181,15 @@ function resolveMenuItemTarget(item, pages, advancedTargetsByUrl) {
       typeLabel,
       icon: linkedPage.isFrontPage
         ? home
+        : linkedPage.isPostsPage
+        ? postList
         : SOURCE_TYPE_META[sourceType]?.icon ?? pageIcon,
+      roleLabel: item.roleLabel || roleLabelForPage(linkedPage),
       targetName: linkedPage.name,
       status,
       statusLabel: statusLabelForTarget(status),
       url,
-      isDraft: isDraftTarget(status),
+      isLive: isLiveTarget(status),
       canPreview: true,
       previewPage: linkedPage,
     };
@@ -202,11 +211,12 @@ function resolveMenuItemTarget(item, pages, advancedTargetsByUrl) {
     sourceType,
     typeLabel,
     icon: SOURCE_TYPE_META[sourceType]?.icon ?? linkIconGlyph,
+    roleLabel: item.roleLabel || advancedTarget?.roleLabel || null,
     targetName: item.targetName || advancedTarget?.name || item.label,
     status,
     statusLabel: statusLabelForTarget(status),
     url,
-    isDraft: isDraftTarget(status),
+    isLive: isLiveTarget(status),
     canPreview,
     previewPage: canPreview
       ? {
@@ -214,7 +224,7 @@ function resolveMenuItemTarget(item, pages, advancedTargetsByUrl) {
           slug: slugFromUrl(url),
           name: item.targetName || advancedTarget?.name || item.label,
           type: typeLabel,
-          isLive: !isDraftTarget(status),
+          isLive: isLiveTarget(status),
           isSystem: false,
           isDynamic: true,
           category: 'content',
@@ -463,6 +473,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack, onPreviewItem }) {
       didDragRef.current = true;
       dragStateRef.current.itemId = press.itemId;
       setSelectedItemId(null);
+      setDetailsAnchor(null);
       setDraggingItemId(press.itemId);
       setDragGhostPosition({ x: press.lastX, y: press.lastY });
       setDropTarget(null);
@@ -756,6 +767,24 @@ function MenuEditor({ menu, onUpdateMenu, onBack, onPreviewItem }) {
     window.addEventListener('pointercancel', press.handleCancel);
   };
 
+  const beginHandleDrag = (event, itemId) => {
+    if (event.button !== 0) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    clearPendingPress();
+    clickCancelledRef.current = true;
+    didDragRef.current = true;
+    dragStateRef.current.itemId = itemId;
+    setSelectedItemId(null);
+    setDetailsAnchor(null);
+    setDraggingItemId(itemId);
+    setDragGhostPosition({ x: event.clientX, y: event.clientY });
+    setDropTarget(null);
+  };
+
   const openItemDetails = (itemId, anchorElement) => {
     if (selectedItemId === itemId) {
       setSelectedItemId(null);
@@ -897,14 +926,25 @@ function MenuEditor({ menu, onUpdateMenu, onBack, onPreviewItem }) {
               {targetMeta.url}
             </div>
           ) : null}
-          <div className="nav-item-details-popover__chips">
-            <span className="nav-item-target-chip">
-              {targetMeta.typeLabel}
+          <div className="nav-item-details-popover__meta">
+            <span className="nav-item-details-popover__meta-row">
+              <span className="nav-item-details-popover__meta-label">
+                Type
+              </span>
+              <span>{targetMeta.typeLabel}</span>
             </span>
-            <span
-              className={`nav-item-status-badge${targetMeta.isDraft ? ' is-draft' : ''}`}
-            >
-              {targetMeta.statusLabel}
+            <span className="nav-item-details-popover__meta-row">
+              <span className="nav-item-details-popover__meta-label">
+                Status
+              </span>
+              <span className="nav-item-details-popover__status">
+                <span
+                  className={`url-dot${targetMeta.isLive ? '' : ' url-draft-dot'}`}
+                  role="status"
+                  aria-label={targetMeta.statusLabel}
+                />
+                {targetMeta.statusLabel}
+              </span>
             </span>
           </div>
         </button>
@@ -954,7 +994,6 @@ function MenuEditor({ menu, onUpdateMenu, onBack, onPreviewItem }) {
     const rowClasses = [
       'nav-menu-editor-item',
       isSelected ? 'is-selected' : '',
-      targetMeta.isDraft ? 'is-unpublished' : '',
       flashNavItemIdSet.has(item.id) ? 'flash-highlight' : '',
       draggingItemId === item.id ? 'is-dragging' : '',
       activeDropPosition ? `is-drop-${activeDropPosition}` : '',
@@ -986,12 +1025,31 @@ function MenuEditor({ menu, onUpdateMenu, onBack, onPreviewItem }) {
           )}
           {!hasChildren && <span className="nav-item-spacer" />}
 
+          <button
+            type="button"
+            className="nav-item-drag-handle"
+            aria-label={`Drag ${item.label}`}
+            onPointerDown={(event) => beginHandleDrag(event, item.id)}
+          >
+            {dragHandle}
+          </button>
           <span className="nav-item-icon">{rowIcon}</span>
           <span className="nav-item-main">
             <span className="nav-item-label">{item.label}</span>
-            <span className="nav-item-type-badge">
-              {targetMeta.typeLabel}
-            </span>
+            {targetMeta.roleLabel ? (
+              <span className="nav-item-role-label">
+                {targetMeta.roleLabel}
+              </span>
+            ) : null}
+            <Tooltip text={targetMeta.statusLabel} placement="top">
+              <span className="nav-item-status-dot">
+                <span
+                  className={`url-dot${targetMeta.isLive ? '' : ' url-draft-dot'}`}
+                  role="status"
+                  aria-label={targetMeta.statusLabel}
+                />
+              </span>
+            </Tooltip>
           </span>
 
           <div className="nav-item-actions">

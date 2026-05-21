@@ -86,7 +86,6 @@ export function PreviewSiteNavCluster({
   navEntries,
   onNavClick,
   mobileMenuInteractive = true,
-  spotlightNavigation = false,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const closeMobileMenu = () => setMobileMenuOpen(false);
@@ -94,7 +93,7 @@ export function PreviewSiteNavCluster({
   return (
     <>
       <span className="p-sitename">{siteTitle}</span>
-      <div className={`p-nav${spotlightNavigation ? ' is-spotlighted' : ''}`}>
+      <div className="p-nav">
         {navEntries.map((entry) => {
           const children = entry.children || [];
           const hasChildren = children.length > 0;
@@ -166,7 +165,6 @@ export function PreviewSiteChromeHeader({
   siteTitle,
   navEntries,
   onNavClick,
-  spotlightNavigation = false,
 }) {
   return (
     <div className="p-header">
@@ -174,7 +172,6 @@ export function PreviewSiteChromeHeader({
         siteTitle={siteTitle}
         navEntries={navEntries}
         onNavClick={onNavClick}
-        spotlightNavigation={spotlightNavigation}
       />
     </div>
   );
@@ -185,15 +182,11 @@ export function PreviewSiteChromeFooter({
   siteTitle,
   navEntries,
   onNavClick,
-  spotlightNavigation = false,
 }) {
   return (
     <div className="p-footer">
       <span className="p-ft p-footer-copyright">© 2026 {siteTitle}</span>
-      <nav
-        className={`p-footer-nav${spotlightNavigation ? ' is-spotlighted' : ''}`}
-        aria-label="Footer navigation"
-      >
+      <nav className="p-footer-nav" aria-label="Footer navigation">
         {navEntries.map((entry) => (
           <NavEntryControl
             key={entry.key}
@@ -218,7 +211,6 @@ export function PreviewTemplateFrame({
   children,
   header = null,
   footer = null,
-  spotlightHeaderNavigation = false,
 }) {
   return (
     <>
@@ -227,7 +219,6 @@ export function PreviewTemplateFrame({
           siteTitle={siteTitle}
           navEntries={navEntries}
           onNavClick={onNavClick}
-          spotlightNavigation={spotlightHeaderNavigation}
         />
       )}
       {children}
@@ -236,7 +227,6 @@ export function PreviewTemplateFrame({
           siteTitle={siteTitle}
           navEntries={navEntries}
           onNavClick={onNavClick}
-          spotlightNavigation={spotlightHeaderNavigation}
         />
       )}
     </>

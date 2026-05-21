@@ -56,8 +56,6 @@ function docTypeIcon(p) {
  * @param {HeaderNavItem[]|null|undefined} headerNavItems - Optional top-level nav links (pageId or custom url order). When omitted, uses pages with `inMenu`.
  * @param {{ label: string, icon?: object, onClick: function }[]} documentOptions - Optional document menu actions.
  * @param {{ canGoBack: boolean, canGoForward: boolean, onBack: function, onForward: function }|null} previewHistory - Optional in-preview navigation controls.
- * @param {boolean} spotlightHeaderNavigation - Highlights the preview header Navigation block while dimming surrounding preview regions.
- * @param {React.ReactNode} toolbarControls - Optional controls rendered in the preview toolbar.
  */
 function PreviewCanvas({
   page,
@@ -65,8 +63,6 @@ function PreviewCanvas({
   onPageChange = () => {},
   headerNavItems,
   editLabel,
-  spotlightHeaderNavigation = false,
-  toolbarControls = null,
   documentLabel,
   scopeNotice,
   documentOptions = [],
@@ -362,7 +358,6 @@ function PreviewCanvas({
       siteTitle={siteTitle}
       navEntries={navEntries}
       onNavClick={handleNavClick}
-      spotlightHeaderNavigation={spotlightHeaderNavigation}
     >
       {renderMain()}
     </PreviewTemplateFrame>
@@ -469,10 +464,6 @@ function PreviewCanvas({
           </Tooltip>
         </div>
         <div className="ct-space"></div>
-        {toolbarControls ? (
-          <div className="preview-bar-extra-controls">{toolbarControls}</div>
-        ) : null}
-
         <ToggleGroupControl
           className="ct-view-modes"
           label="Device preview"
@@ -489,9 +480,7 @@ function PreviewCanvas({
       </div>
       <div className="preview-canvas-area">
         <div className="preview-canvas-stack">
-          <div
-            className={`site-card preview-device-${selectedDevice}${spotlightHeaderNavigation ? ' site-card--nav-spotlight' : ''}`}
-          >
+          <div className={`site-card preview-device-${selectedDevice}`}>
             {renderContent()}
           </div>
         </div>

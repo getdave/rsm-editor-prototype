@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { Button, ToggleControl } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
 import { Page } from '@wordpress/admin-ui';
 import PreviewCanvas from '../shared/PreviewCanvas';
@@ -23,7 +23,6 @@ function NavigationView() {
   const [showAddMenuModal, setShowAddMenuModal] = useState(false);
   const [menuPendingRename, setMenuPendingRename] = useState(null);
   const [menuPendingDelete, setMenuPendingDelete] = useState(null);
-  const [highlightMenus, setHighlightMenus] = useState(true);
   const [previewPage, setPreviewPage] = useState(
     () => appPages.find((p) => p.isFrontPage) ?? appPages[0] ?? null,
   );
@@ -132,9 +131,6 @@ function NavigationView() {
     [menus, view, fields]
   );
 
-  const shouldSpotlightHeaderNavigation =
-    highlightMenus && (selectedMenu?.usedIn.includes('header-main') ?? false);
-
   /** Menu rows — matches editor order and labels; drives preview header nav. */
   const previewHeaderNavItems = useMemo(() => {
     const menuForPreview =
@@ -192,18 +188,6 @@ function NavigationView() {
       }
       onPageChange={setPreviewPage}
       headerNavItems={previewHeaderNavItems}
-      spotlightHeaderNavigation={shouldSpotlightHeaderNavigation}
-      toolbarControls={
-        selectedMenu ? (
-          <ToggleControl
-            __nextHasNoMarginBottom
-            className="nav-highlight-menus-toggle"
-            label="Highlight menus"
-            checked={highlightMenus}
-            onChange={setHighlightMenus}
-          />
-        ) : null
-      }
     />
   );
 
