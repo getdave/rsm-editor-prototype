@@ -88,6 +88,15 @@
   border-top: 0;
 }
 
+.adv-show-inactive-toggle.components-base-control,
+.adv-show-inactive-toggle .components-base-control__field {
+  margin-bottom: 0;
+}
+
+.adv-show-inactive-toggle .components-toggle-control__label {
+  font-size: 13px;
+}
+
 .advanced-catalog-scroll {
   padding-top: 0;
 }
@@ -470,6 +479,16 @@
 .adv-badge--area {
   background: rgba(56, 88, 233, 0.12);
   color: #3858e9;
+}
+
+.adv-badge--active {
+  background: rgba(0, 163, 42, 0.1);
+  color: #00a32a;
+}
+
+.adv-badge--inactive {
+  background: #f0f0f0;
+  color: #757575;
 }
 
 @media (max-width: 900px) {
