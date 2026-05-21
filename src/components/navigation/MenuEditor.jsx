@@ -100,9 +100,6 @@ function roleLabelForPage(page) {
   if (page?.isFrontPage) {
     return 'Homepage';
   }
-  if (page?.isPostsPage) {
-    return 'Posts page';
-  }
   return null;
 }
 
