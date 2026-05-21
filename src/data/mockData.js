@@ -241,7 +241,7 @@ export const pages = [
     collectionKind: "shop",
     viewKind: "listing",
     titleTooltip:
-      "Uses WooCommerce's Shop URL (/shop/) while the product listing template controls the store layout visitors see.",
+      "Uses WooCommerce's Shop URL (/shop/) while the Product listing template controls the store layout visitors see.",
   },
   {
     id: "404",
@@ -298,7 +298,7 @@ export const pages = [
     collectionKind: "product-single",
     viewKind: "single",
     titleTooltip:
-      "Controls the generated layout visitors see for individual product pages.",
+      "Controls the generated layout visitors see for individual Products.",
   },
   {
     id: "blog-list",
@@ -334,7 +334,7 @@ export const pages = [
     collectionKind: "post-single",
     viewKind: "single",
     titleTooltip:
-      "Controls the generated layout visitors see for individual post pages.",
+      "Controls the generated layout visitors see for individual Posts.",
   },
   {
     id: "event-list",
@@ -409,6 +409,21 @@ export const initialReadingSettings = {
   postsPageId: "blog",
 };
 
+export const pageTemplateOptions = [
+  {
+    value: "page-default",
+    label: "Page (default)",
+    description: "Includes the site header, page content, and footer.",
+    templateLabel: "Page",
+  },
+  {
+    value: "page-with-header",
+    label: "Page (with header)",
+    description: "Includes page title and featured image above the page content.",
+    templateLabel: "Page with header",
+  },
+];
+
 export const contentTypes = [
   {
     id: "posts",
@@ -418,7 +433,8 @@ export const contentTypes = [
     iconKey: "postList",
     count: 14,
     manageLabel: "Manage posts",
-    description: "Write and manage posts for your site.",
+    description: "Write posts and control how posts appear on the site.",
+    pageDesignIds: ["blog-list", "blog-single"],
   },
   {
     id: "products",
@@ -428,7 +444,8 @@ export const contentTypes = [
     iconKey: "products",
     count: 10,
     manageLabel: "Manage products",
-    description: "Manage product details, prices, stock, and status.",
+    description: "Manage products and control how shopping pages appear on the site.",
+    pageDesignIds: ["product-list", "product-single"],
   },
   {
     id: "events",
@@ -439,10 +456,49 @@ export const contentTypes = [
     count: 8,
     manageLabel: "Manage Events",
     description: "Manage Event details, dates, venues, and status.",
+    pageDesignIds: ["event-list", "event-single"],
   },
 ];
 
 export const pageDesigns = [
+  {
+    id: "page-default",
+    slug: "page",
+    name: "Page template",
+    shortName: "Page (default)",
+    type: "Template",
+    provider: "Theme",
+    status: "active",
+    templateState: "active",
+    isLive: true,
+    isPageDesign: true,
+    isPageTemplate: true,
+    layoutKind: "page",
+    actionLabel: "Edit",
+    description: "Includes the site header, page content, and footer.",
+    scopeNotice: "Changes apply to pages using the default Page template.",
+    previewLabel: "Page (default)",
+    templateLabel: "Page",
+  },
+  {
+    id: "page-with-header",
+    slug: "page-with-header",
+    name: "Page with header template",
+    shortName: "Page (with header)",
+    type: "Template",
+    provider: "Theme",
+    status: "active",
+    templateState: "active",
+    isLive: true,
+    isPageDesign: true,
+    isPageTemplate: true,
+    layoutKind: "page",
+    actionLabel: "Edit",
+    description: "Includes page title and featured image above the page content.",
+    scopeNotice: "Changes apply to pages using the Page with header template.",
+    previewLabel: "Page (with header)",
+    templateLabel: "Page with header",
+  },
   {
     id: "template-archive",
     slug: "archive",
@@ -482,8 +538,8 @@ export const pageDesigns = [
   {
     id: "blog-list",
     slug: "blog",
-    name: "Posts page design",
-    shortName: "Posts page",
+    name: "Posts listing design",
+    shortName: "Posts listing",
     type: "Page Design",
     contentTypeId: "posts",
     provider: "WordPress",
@@ -494,14 +550,14 @@ export const pageDesigns = [
     layoutKind: "listing",
     actionLabel: "Edit",
     description: "Change how your latest posts appear.",
-    scopeNotice: "Changes apply to the Posts page.",
-    previewLabel: "Posts page",
+    scopeNotice: "Changes apply to the Posts listing.",
+    previewLabel: "Posts listing",
   },
   {
     id: "blog-single",
     slug: "posts/example-post",
-    name: "Single post design",
-    shortName: "Single post",
+    name: "Single Post design",
+    shortName: "Single Post",
     type: "Page Design",
     contentTypeId: "posts",
     provider: "WordPress",
@@ -511,9 +567,9 @@ export const pageDesigns = [
     isPageDesign: true,
     layoutKind: "single",
     actionLabel: "Edit",
-    description: "Change how individual posts appear.",
-    scopeNotice: "Changes apply to all single posts.",
-    previewLabel: "Single post",
+    description: "Change how individual Posts appear.",
+    scopeNotice: "Changes apply to the Single Post template.",
+    previewLabel: "Single Post",
   },
   {
     id: "product-list",
@@ -529,15 +585,15 @@ export const pageDesigns = [
     isPageDesign: true,
     layoutKind: "listing",
     actionLabel: "Edit",
-    description: "Change how your shop or product listing appears.",
-    scopeNotice: "Changes apply to your product listing.",
+    description: "Change how your shop or Product listing appears.",
+    scopeNotice: "Changes apply to your Product listing.",
     previewLabel: "Product listing",
   },
   {
     id: "product-single",
     slug: "products/example-product",
-    name: "Product page design",
-    shortName: "Product page",
+    name: "Single Product design",
+    shortName: "Single Product",
     type: "Page Design",
     contentTypeId: "products",
     provider: "WooCommerce",
@@ -547,9 +603,9 @@ export const pageDesigns = [
     isPageDesign: true,
     layoutKind: "single",
     actionLabel: "Edit",
-    description: "Change how every individual product page looks.",
-    scopeNotice: "Changes apply to all product pages.",
-    previewLabel: "Product page",
+    description: "Change how every individual Product appears.",
+    scopeNotice: "Changes apply to the Single Product template.",
+    previewLabel: "Single Product",
   },
   {
     id: "event-list",
@@ -582,8 +638,8 @@ export const pageDesigns = [
   {
     id: "event-single",
     slug: "events/example-event",
-    name: "Single Event Page layout",
-    shortName: "Single Event Page",
+    name: "Single Event layout",
+    shortName: "Single Event",
     type: "Page Layout",
     contentTypeId: "events",
     provider: "Events plugin",
@@ -594,12 +650,12 @@ export const pageDesigns = [
     defaultTemplateId: "template-single",
     defaultTemplateLabel: "default single template",
     defaultTemplateRoute: "/templates?template=default-single&contentType=events",
-    sharedUsageLabels: ["Single Event Pages"],
+    sharedUsageLabels: ["Single Event"],
     layoutKind: "single",
     actionLabel: "Edit",
-    description: "Single Event Pages are currently shown with the default item layout.",
-    scopeNotice: "Single Event Pages currently use the default single template. Create a template to customize Events without changing other content types.",
-    previewLabel: "Single Event Page",
+    description: "Single Event is currently shown with the default item layout.",
+    scopeNotice: "Single Event currently uses the default single template. Create a template to customize Events without changing other content types.",
+    previewLabel: "Single Event",
   },
   {
     id: "blog-home-root",

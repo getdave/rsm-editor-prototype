@@ -340,6 +340,64 @@
   background: linear-gradient(135deg, #4facfe, #00f2fe);
 }
 
+.p-template-page-title {
+  align-items: flex-start;
+  padding-left: 60px;
+  padding-right: 60px;
+}
+
+.p-template-page-title h1 {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  color: #1e1e1e;
+  font-size: 48px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.p-template-featured-image {
+  padding-left: 60px;
+  padding-right: 60px;
+}
+
+.p-featured-image-placeholder {
+  width: 100%;
+  max-width: 1200px;
+  aspect-ratio: 16 / 7;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(30, 30, 30, 0.72), rgba(56, 88, 233, 0.42)),
+    linear-gradient(135deg, #dcdcde, #f6f7f7);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 18px var(--wp-content-font);
+}
+
+.p-template-page-content {
+  background: #fff;
+}
+
+.p-template-post-content-placeholder {
+  max-width: 1200px;
+  width: 100%;
+  padding-left: 60px;
+  padding-right: 60px;
+  color: #1e1e1e;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.p-template-post-content-placeholder p {
+  margin: 0 0 1em;
+}
+
+.p-template-post-content-placeholder p:last-child {
+  margin-bottom: 0;
+}
+
 .p-footer {
   background: #f8f8f8;
   padding: 32px 60px;

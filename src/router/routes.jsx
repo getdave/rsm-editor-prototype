@@ -28,9 +28,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <PreviewView /> },
       { path: 'pages', element: <PagesView /> },
-      { path: 'pages/static', element: <PagesView /> },
-      { path: 'pages/dynamic', element: <PagesView /> },
-      { path: 'pages/collections', element: <PagesView /> },
+      { path: 'pages/content', element: <PagesView /> },
+      { path: 'pages/templates', element: <PagesView /> },
       { path: 'pages/:legacySegment', element: <Navigate to="/pages" replace /> },
       { path: 'pages/:pageId/edit', element: <BlockEditor /> },
       { path: 'page-designs/:designId/edit', element: <BlockEditor /> },

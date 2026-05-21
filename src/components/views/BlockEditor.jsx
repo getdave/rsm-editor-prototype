@@ -411,6 +411,33 @@ function BlockEditor() {
             </div>
           </div>
         );
+
+      case 'page-title':
+        return (
+          <div className="p-section p-template-page-title">
+            <h1>{section.label || 'Page Title'}</h1>
+          </div>
+        );
+
+      case 'featured-image':
+        return (
+          <div className="p-section p-template-featured-image">
+            <div className="p-featured-image-placeholder">
+              {section.label || 'Featured Image'}
+            </div>
+          </div>
+        );
+
+      case 'page-content':
+        return (
+          <div className="p-section p-template-page-content">
+            <div className="wp-block-post-content p-template-post-content-placeholder">
+              {(section.placeholder || []).map((text) => (
+                <p key={text}>{text}</p>
+              ))}
+            </div>
+          </div>
+        );
       
       default:
         return <div className="p-section">Unknown section type</div>;
@@ -590,7 +617,9 @@ function BlockEditor() {
       }
       
       default:
-        return <div className="p-section">Template content</div>;
+        return content.sections.map((section, index) => (
+          <div key={index}>{renderSectionContent(section)}</div>
+        ));
     }
   };
 

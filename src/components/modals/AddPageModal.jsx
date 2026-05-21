@@ -5,6 +5,7 @@ import { Stack, Text } from '@wordpress/ui';
 import { createInterpolateElement } from '@wordpress/element';
 import { chevronDown, plus } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
+import { pageTemplateOptions } from '../../data/mockData';
 import DefinedTerm from '../shared/DefinedTerm';
 
 function AddPageModal() {
@@ -32,11 +33,6 @@ function AddPageModalContent() {
   const [showAllLayouts, setShowAllLayouts] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState('page-default');
   const generatedPageIdRef = useRef(0);
-
-  const pageTemplateOptions = [
-    { value: 'page-default', label: 'Page (default)' },
-    { value: 'page-with-header', label: 'Page (with header)' },
-  ];
 
   // Curated starter layouts (shown by default)
   const starterLayouts = [

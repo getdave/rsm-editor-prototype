@@ -15,6 +15,7 @@ import {
   tablet,
   mobile,
   home,
+  layout,
   page as pageIcon,
   postList,
   store,
@@ -25,7 +26,8 @@ import { getPageContent } from '../../services/pageContentService';
 import { getDocumentOptionsLabel } from '../../utils/documentOptionsLabel';
 import { PreviewTemplateFrame } from './PreviewSiteChrome';
 
-function docTypeIcon(p) {
+function docTypeIcon(p, isTemplatePreview = false) {
+  if (isTemplatePreview) return layout;
   if (p?.isFrontPage) return home;
   if (p?.isPostsPage) return postList;
   if (p?.isShopPage || p?.collectionKind === 'shop') return store;
@@ -192,6 +194,33 @@ function PreviewCanvas({
               <div style={{ padding: '20px', background: '#f5f5f5', borderRadius: '4px', textAlign: 'center' }}>
                 Contact Form
               </div>
+            </div>
+          </div>
+        );
+      }
+      if (section.type === 'page-title') {
+        return (
+          <div key={index} className="p-section p-template-page-title">
+            <h1>{section.label || 'Page Title'}</h1>
+          </div>
+        );
+      }
+      if (section.type === 'featured-image') {
+        return (
+          <div key={index} className="p-section p-template-featured-image">
+            <div className="p-featured-image-placeholder">
+              {section.label || 'Featured Image'}
+            </div>
+          </div>
+        );
+      }
+      if (section.type === 'page-content') {
+        return (
+          <div key={index} className="p-section p-template-page-content">
+            <div className="wp-block-post-content p-template-post-content-placeholder">
+              {(section.placeholder || []).map((text) => (
+                <p key={text}>{text}</p>
+              ))}
             </div>
           </div>
         );
@@ -364,7 +393,9 @@ function PreviewCanvas({
   );
 
   return (
-    <div className={`preview-canvas-root canvas${isTemplatePreview ? ' is-template-context preview-canvas-root--template' : ''}`}>
+    <div
+      className={`preview-canvas-root canvas${isTemplatePreview ? ' is-template-context preview-canvas-root--template' : ''}`}
+    >
       <div className="preview-bar">
         <Button variant="primary" onClick={onEdit}>
           {effectiveEditLabel}
@@ -392,11 +423,18 @@ function PreviewCanvas({
 
         <div className="ct-space"></div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          {isTemplatePreview && (
+            <span className="components-badge is-default">
+              <span className="components-badge__flex-wrapper">
+                <span className="components-badge__content">Template</span>
+              </span>
+            </span>
+          )}
           <span
+            className="preview-bar-doc-icon"
             aria-hidden="true"
-            style={{ display: 'inline-flex', width: 24, height: 24, color: 'var(--wp-gray-900)' }}
           >
-            {docTypeIcon(page)}
+            {docTypeIcon(page, isTemplatePreview)}
           </span>
           {scopeNotice ? (
             <Tooltip text={scopeNotice} placement="bottom">
@@ -438,30 +476,20 @@ function PreviewCanvas({
               />
             </span>
           )}
-          <Tooltip
-            text={documentStatusLabel}
-            placement="bottom"
-          >
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 16,
-                height: 16,
-                borderRadius: 2,
-                background: 'var(--wp-bg-card)',
-                flexShrink: 0,
-              }}
+          {!isTemplatePreview && (
+            <Tooltip
+              text={documentStatusLabel}
+              placement="bottom"
             >
+              <span className="preview-bar-doc-status">
               <span
                 className={`url-dot${page.isLive && !isInactiveTemplate ? '' : ' url-draft-dot'}`}
-                style={{ margin: 0 }}
                 role="status"
                 aria-label={documentStatusLabel}
               />
-            </span>
-          </Tooltip>
+              </span>
+            </Tooltip>
+          )}
         </div>
         <div className="ct-space"></div>
         <ToggleGroupControl
