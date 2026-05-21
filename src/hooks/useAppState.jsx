@@ -24,8 +24,11 @@ const AppStateContext = createContext(null);
 
 // navLayout is an ordered array of top-level entries:
 //   { kind: 'item', id, hidden }
-//   { kind: 'section', id, label, items: [ { kind: 'item', id, hidden }, ... ] }
+//   { kind: 'section', type, id, label, items: [ { kind: 'item', id, hidden }, ... ] }
 // Sections are containers that own their items; nesting sections is not allowed.
+// `type` is one of: 'group' (no icon/name, inline items), 'folder' (file icon +
+// name, inline items), 'menu' (menu icon + name, drilldown pane). All three keep
+// kind:'section' so the move/insert/reconcile helpers treat them uniformly.
 
 /** Collect every nav item id present in the layout (top level + inside sections). */
 function collectItemIds(layout) {
@@ -350,11 +353,15 @@ export function AppStateProvider({ children }) {
     setNavLayout((prev) => moveNavEntry(prev, draggedId, targetId, position));
   };
 
-  const addNavSection = () => {
+  const addNavContainer = (type) => {
     setNavLayout((prev) => [
       ...prev,
-      { kind: 'section', id: `section-${Date.now()}`, label: 'New section', items: [] },
+      { kind: 'section', type, id: `${type}-${Date.now()}`, label: '', items: [] },
     ]);
+  };
+
+  const resetNavLayout = () => {
+    setNavLayout(buildDefaultNavLayout(homepageDisplayMode));
   };
 
   const renameNavSection = (id, label) => {
@@ -583,7 +590,8 @@ export function AppStateProvider({ children }) {
     navLayout,
     toggleNavItemVisibility,
     moveNavLayoutEntry,
-    addNavSection,
+    addNavContainer,
+    resetNavLayout,
     renameNavSection,
     deleteNavSection,
 
