@@ -4,8 +4,8 @@
    <Modal> component, so we size its frame and let the body region scroll
    while the footer stays pinned. */
 .apm-modal.components-modal__frame {
-  width: 720px;
-  max-width: 90vw;
+  width: 960px;
+  max-width: 94vw;
   max-height: 85vh;
 }
 
@@ -216,7 +216,7 @@
 /* Layout grid */
 .apm-layouts-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--wpds-dimension-gap-lg);
   margin-bottom: var(--wpds-dimension-padding-xl);
 }
@@ -240,23 +240,28 @@
 .apm-modal .apm-layout-card.components-button {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   height: auto;
   white-space: normal;
-  padding: var(--wpds-dimension-gap-lg);
+  padding: 12px;
   border-radius: var(--wpds-border-radius-lg);
+}
+
+.apm-modal .apm-layout-card.apm-layout-scratch.components-button {
+  border-style: dashed;
 }
 
 .apm-layout-preview {
   width: 100%;
-  height: 80px;
+  height: 138px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--wpds-color-bg-surface-neutral-weak);
   border-radius: var(--wpds-border-radius-md);
   margin-bottom: 10px;
-  padding: 10px;
+  padding: 0;
+  overflow: hidden;
 }
 
 .apm-layout-pattern {
@@ -272,6 +277,19 @@
   font-weight: 500;
   color: var(--wpds-color-fg-content-neutral);
   text-align: center;
+  line-height: 1.25;
+}
+
+.apm-layout-preview .tt5-pattern-preview {
+  height: 100%;
+  min-height: 0;
+  border-radius: 6px;
+  font-size: 3.6px;
+}
+
+.apm-layout-scratch .apm-layout-preview {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  padding: 10px;
 }
 
 /* Pattern: Standard Page (heading + text) */
@@ -675,4 +693,17 @@
 /* Ensure WordPress button components inherit proper sizing in split button */
 .split-button .components-button {
   height: 36px;
+}
+
+@media (max-width: 860px) {
+  .apm-layouts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .apm-layouts-grid,
+  .apm-options {
+    grid-template-columns: 1fr;
+  }
 }

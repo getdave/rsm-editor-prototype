@@ -1,0 +1,838 @@
+.tt5-pattern-preview {
+  --tt5-bg: #dae7bd;
+  --tt5-bg-light: #e9f4cf;
+  --tt5-text: #516028;
+  --tt5-dark: #303d10;
+  --tt5-accent: #c7f642;
+  --tt5-rule: rgba(81, 96, 40, 0.22);
+
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: var(--tt5-bg);
+  color: var(--tt5-text);
+  font-family: "Ysabeau Office", sans-serif;
+  font-size: 8px;
+  line-height: 1.2;
+}
+
+.tt5-pattern-preview *,
+.tt5-pattern-preview *::before,
+.tt5-pattern-preview *::after {
+  box-sizing: border-box;
+}
+
+.tt5-pattern-preview h3,
+.tt5-pattern-preview p {
+  margin: 0;
+}
+
+.tt5-pattern-preview h3,
+.tt5-display-title,
+.tt5-product-title,
+.tt5-poster-title {
+  font-family: Platypi, serif;
+  letter-spacing: -0.02em;
+}
+
+.tt5-preview-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: cover;
+}
+
+.tt5-preview-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.75em;
+}
+
+.tt5-preview-copy h3 {
+  font-size: 2.3em;
+  line-height: 1.05;
+  color: var(--tt5-dark);
+}
+
+.tt5-preview-copy p {
+  font-size: 1.15em;
+}
+
+.tt5-eyebrow {
+  width: fit-content;
+  padding: 0.25em 0.65em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.9em;
+}
+
+.tt5-preview-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 6.6em;
+  min-height: 2.2em;
+  padding: 0.55em 1.1em;
+  background: var(--tt5-text);
+  color: var(--tt5-bg-light);
+  font-size: 0.8em;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bi-pattern-preview--tt5 {
+  height: 108px;
+  padding: 0;
+  background: transparent;
+}
+
+.bi-pattern-preview--tt5 .tt5-pattern-preview {
+  font-size: 3.2px;
+}
+
+.advanced-catalog .dataviews-view-grid__media .tt5-pattern-preview {
+  font-size: 8px;
+}
+
+.tt5-pattern-preview--cover-big-heading {
+  grid-template-rows: 2.35fr 1fr;
+  gap: 1.8em;
+  padding: 1.9em;
+  background: var(--tt5-accent);
+}
+
+.tt5-pattern-preview--cover-big-heading .tt5-preview-image {
+  border: 0.15em solid rgba(48, 61, 16, 0.15);
+}
+
+.tt5-display-title {
+  align-self: end;
+  color: var(--tt5-text);
+  font-size: 9em;
+  font-weight: 700;
+  line-height: 0.78;
+}
+
+.tt5-pattern-preview--poster {
+  align-items: stretch;
+  padding: 2.2em;
+  background: var(--tt5-dark);
+}
+
+.tt5-pattern-preview--poster .tt5-preview-image {
+  position: absolute;
+  inset: 0;
+  filter: grayscale(0.75) contrast(0.95);
+  opacity: 0.62;
+}
+
+.tt5-poster-title,
+.tt5-poster-meta {
+  position: relative;
+  z-index: 1;
+}
+
+.tt5-poster-title {
+  align-self: start;
+  width: 70%;
+  color: var(--tt5-accent);
+  font-size: 5.7em;
+  font-weight: 500;
+  line-height: 0.86;
+}
+
+.tt5-poster-meta {
+  justify-self: end;
+  align-self: start;
+  max-width: 22%;
+  color: var(--tt5-accent);
+  font-size: 1.1em;
+  text-align: right;
+}
+
+.tt5-pattern-preview--about-book {
+  grid-template-columns: 1fr 0.9fr;
+  gap: 3em;
+  align-items: center;
+  padding: 3em;
+}
+
+.tt5-pattern-preview--about-book .tt5-preview-image {
+  aspect-ratio: 1;
+  height: auto;
+  box-shadow: 1.2em 1.6em 2.5em rgba(48, 61, 16, 0.22);
+}
+
+.tt5-pattern-preview--description-images-grid {
+  grid-template-columns: 1fr 0.85fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2em;
+  padding: 2.4em;
+  background: var(--tt5-bg-light);
+}
+
+.tt5-pattern-preview--description-images-grid .tt5-preview-copy {
+  justify-content: space-between;
+}
+
+.tt5-pattern-preview--description-images-grid .tt5-preview-image:first-of-type {
+  align-self: end;
+  height: 82%;
+}
+
+.tt5-pattern-preview--description-images-grid .tt5-preview-image:last-of-type {
+  grid-column: 2;
+  grid-row: 1 / 3;
+}
+
+.tt5-pattern-preview--overlapped-images {
+  grid-template-columns: 1fr 1.08fr;
+  gap: 3em;
+  align-items: center;
+  padding: 3em;
+  background: var(--tt5-bg-light);
+}
+
+.tt5-overlap-stack {
+  position: relative;
+  min-height: 16em;
+}
+
+.tt5-overlap-stack .tt5-preview-image:first-child {
+  width: 78%;
+  height: 70%;
+}
+
+.tt5-overlap-stack .tt5-preview-image:last-child {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 42%;
+  height: 55%;
+  filter: grayscale(1);
+}
+
+.tt5-pattern-preview--instagram-grid {
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 1.2em;
+  padding: 2.2em;
+}
+
+.tt5-social-tile {
+  display: grid;
+  place-items: center;
+  background: var(--tt5-accent);
+  color: var(--tt5-text);
+  font-family: Platypi, serif;
+  font-size: 1.4em;
+  text-align: center;
+}
+
+.tt5-social-tile small {
+  display: block;
+  margin-top: 0.4em;
+  font-family: "Ysabeau Office", sans-serif;
+  font-size: 0.65em;
+  text-decoration: underline;
+}
+
+.tt5-pattern-preview--product-grid {
+  grid-template-rows: auto 1fr auto;
+  gap: 1.2em;
+  padding: 2em;
+}
+
+.tt5-product-title {
+  color: var(--tt5-text);
+  font-size: 5.5em;
+  font-weight: 700;
+  line-height: 0.9;
+}
+
+.tt5-product-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75em;
+  min-height: 0;
+}
+
+.tt5-product-cell {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--tt5-bg-light);
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.tt5-product-cell.is-dark {
+  background: var(--tt5-dark);
+}
+
+.tt5-product-cell.is-bright {
+  background: var(--tt5-accent);
+}
+
+.tt5-product-cell strong {
+  font-size: 1.7em;
+  font-weight: 400;
+}
+
+.tt5-pattern-preview--events-list {
+  align-content: start;
+  gap: 1.2em;
+  padding: 2.4em;
+}
+
+.tt5-pattern-preview--events-list h3,
+.tt5-pattern-preview--pricing h3,
+.tt5-pattern-preview--services h3 {
+  color: var(--tt5-dark);
+  font-family: Platypi, serif;
+  font-size: 2.2em;
+}
+
+.tt5-event-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1.2em;
+  align-items: center;
+  padding-top: 1em;
+  border-top: 1px solid var(--tt5-rule);
+}
+
+.tt5-event-row span:nth-child(2) {
+  text-transform: uppercase;
+}
+
+.tt5-pattern-preview--event-rsvp {
+  grid-template-rows: 1fr 1.1fr;
+}
+
+.tt5-rsvp-top {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1em;
+  align-items: start;
+  padding: 2em;
+}
+
+.tt5-rsvp-top span {
+  max-width: 70%;
+  font-family: Platypi, serif;
+  font-size: 3.5em;
+  line-height: 0.95;
+}
+
+.tt5-rsvp-top small {
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+}
+
+.tt5-rsvp-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr auto;
+  gap: 1.4em;
+  padding: 2em;
+  background: var(--tt5-dark);
+  color: var(--tt5-bg-light);
+}
+
+.tt5-rsvp-bottom strong {
+  align-self: end;
+  color: var(--tt5-accent);
+  font-family: Platypi, serif;
+  font-size: 2.1em;
+  text-decoration: underline;
+}
+
+.tt5-rsvp-bottom .tt5-preview-image {
+  grid-column: 2;
+  grid-row: 1 / 3;
+}
+
+.tt5-pattern-preview--pricing,
+.tt5-pattern-preview--services {
+  gap: 2em;
+  align-content: start;
+  padding: 2.4em;
+}
+
+.tt5-pricing-grid,
+.tt5-services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4em;
+}
+
+.tt5-price-card {
+  display: grid;
+  gap: 0.9em;
+  min-height: 12em;
+  padding: 1.4em;
+  border: 1px solid var(--tt5-rule);
+  border-radius: 0.7em;
+}
+
+.tt5-price-card strong,
+.tt5-price-card em {
+  font-style: normal;
+}
+
+.tt5-price-card em {
+  justify-self: end;
+}
+
+.tt5-service-card {
+  display: grid;
+  gap: 0.8em;
+}
+
+.tt5-service-card .tt5-preview-image {
+  aspect-ratio: 4 / 3;
+  height: auto;
+  filter: grayscale(0.55);
+}
+
+.tt5-service-card strong {
+  font-family: Platypi, serif;
+  font-size: 1.3em;
+}
+
+.tt5-service-card em {
+  font-size: 0.85em;
+  font-style: normal;
+}
+
+.tt5-pattern-preview--hero-podcast {
+  grid-template-columns: 0.75fr 1.25fr;
+  gap: 3em;
+  align-items: center;
+  padding: 2.4em;
+  background: var(--tt5-dark);
+  color: var(--tt5-accent);
+}
+
+.tt5-pattern-preview--hero-podcast .tt5-preview-image {
+  aspect-ratio: 1;
+  height: auto;
+  filter: grayscale(1);
+}
+
+.tt5-pattern-preview--hero-podcast h3 {
+  color: var(--tt5-accent);
+}
+
+.tt5-platforms {
+  font-size: 0.8em;
+  text-transform: uppercase;
+}
+
+.tt5-pattern-preview--contact-location {
+  grid-template-columns: 1fr 0.9fr;
+  gap: 2.4em;
+  align-items: start;
+  padding: 2.4em;
+  background: var(--tt5-accent);
+}
+
+.tt5-pattern-preview--contact-location p {
+  font-size: 2em;
+}
+
+.tt5-pattern-preview--contact-location span {
+  text-transform: uppercase;
+  text-decoration: underline;
+}
+
+.tt5-pattern-preview--contact-location .tt5-preview-image {
+  aspect-ratio: 1;
+  height: auto;
+  filter: grayscale(1);
+}
+
+.tt5-pattern-preview--contact-info {
+  align-content: start;
+  gap: 2em;
+  padding: 2.4em;
+}
+
+.tt5-pattern-preview--contact-info h3 {
+  padding-bottom: 0.8em;
+  border-bottom: 1px solid var(--tt5-rule);
+  color: var(--tt5-dark);
+  font-family: Platypi, serif;
+  font-size: 2em;
+}
+
+.tt5-contact-grid {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(3, 1fr);
+  gap: 1.4em;
+  font-size: 0.95em;
+}
+
+.tt5-pattern-preview--centered-heading {
+  place-content: center;
+  justify-items: center;
+  gap: 1.4em;
+  padding: 3em;
+  text-align: center;
+}
+
+.tt5-pattern-preview--centered-heading h3 {
+  color: var(--tt5-dark);
+  font-family: Platypi, serif;
+  font-size: 2.8em;
+}
+
+.tt5-pattern-preview--centered-heading p {
+  max-width: 28em;
+}
+
+.tt5-pattern-preview--page {
+  grid-auto-rows: minmax(0, auto);
+  background: var(--tt5-bg);
+}
+
+.tt5-pattern-preview--page h3,
+.tt5-page-hey {
+  color: var(--tt5-dark);
+  font-family: Platypi, serif;
+  line-height: 1;
+}
+
+.tt5-page-band {
+  display: grid;
+  gap: 1.2em;
+  padding: 2.2em;
+}
+
+.tt5-page-band.is-centered {
+  place-items: center;
+  text-align: center;
+}
+
+.tt5-page-band.is-centered h3 {
+  font-size: 2em;
+}
+
+.tt5-page-about {
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  background: var(--tt5-bg-light);
+}
+
+.tt5-page-overlap {
+  position: relative;
+  min-height: 10em;
+}
+
+.tt5-page-overlap .tt5-preview-image:first-child {
+  width: 78%;
+  height: 78%;
+}
+
+.tt5-page-overlap .tt5-preview-image:last-child {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 34%;
+  height: 58%;
+  filter: grayscale(1);
+}
+
+.tt5-page-services-strip {
+  grid-template-columns: repeat(3, 1fr);
+  padding-top: 1.6em;
+  background: color-mix(in srgb, var(--tt5-bg) 82%, var(--tt5-text));
+}
+
+.tt5-page-services-strip .tt5-preview-image {
+  aspect-ratio: 4 / 3;
+  height: auto;
+  filter: grayscale(1);
+}
+
+.tt5-pattern-preview--page-coming-soon {
+  place-items: center;
+  background: var(--tt5-dark);
+}
+
+.tt5-pattern-preview--page-coming-soon > .tt5-preview-image {
+  position: absolute;
+  inset: 0;
+  filter: blur(0.28em) saturate(0.8);
+  opacity: 0.72;
+}
+
+.tt5-page-cover-copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 1em;
+  max-width: 34em;
+  color: var(--tt5-accent);
+  text-align: center;
+}
+
+.tt5-page-cover-copy h3 {
+  color: var(--tt5-accent);
+  font-size: 2.6em;
+}
+
+.tt5-pattern-preview--page-cv,
+.tt5-pattern-preview--page-link-profile {
+  grid-template-columns: 1.5fr 0.8fr;
+  gap: 3em;
+  align-items: start;
+  padding: 3em;
+}
+
+.tt5-page-hey {
+  display: block;
+  font-size: 11em;
+  letter-spacing: -0.03em;
+}
+
+.tt5-pattern-preview--page-cv .tt5-preview-image {
+  aspect-ratio: 3 / 4;
+  height: auto;
+  filter: grayscale(1);
+}
+
+.tt5-pattern-preview--page-cv span:last-child {
+  display: block;
+  margin-top: 1em;
+  text-align: right;
+  text-decoration: underline;
+}
+
+.tt5-pattern-preview--page-book {
+  grid-template-rows: 1fr auto 0.34fr;
+}
+
+.tt5-page-book-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.tt5-page-book-hero > .tt5-preview-image {
+  padding: 3.2em;
+  background: #f3f3f3;
+  object-fit: contain;
+  filter: grayscale(1);
+}
+
+.tt5-page-book-hero > div {
+  display: grid;
+  gap: 1em;
+  padding: 3em;
+}
+
+.tt5-page-book-hero h3 {
+  font-size: 2.2em;
+}
+
+.tt5-page-book-links {
+  display: grid;
+  justify-items: center;
+  gap: 1.2em;
+  padding: 2em;
+}
+
+.tt5-page-book-links > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6em;
+}
+
+.tt5-page-faint-card {
+  justify-self: end;
+  width: 38%;
+  background: #f5f5f5;
+}
+
+.tt5-pattern-preview--page-event,
+.tt5-pattern-preview--page-podcast {
+  grid-template-rows: 1.1fr 1fr;
+  background: var(--tt5-dark);
+  color: var(--tt5-bg-light);
+}
+
+.tt5-page-event-hero,
+.tt5-page-event-about,
+.tt5-pattern-preview--page-podcast section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.tt5-page-event-hero {
+  position: relative;
+}
+
+.tt5-page-event-hero > .tt5-preview-image {
+  position: absolute;
+  inset: 0;
+  filter: sepia(0.3) saturate(0.75);
+  opacity: 0.72;
+}
+
+.tt5-page-event-hero > div {
+  position: relative;
+  z-index: 1;
+  grid-column: 1;
+  padding: 3em;
+}
+
+.tt5-page-event-hero h3,
+.tt5-pattern-preview--page-podcast h3 {
+  color: var(--tt5-accent);
+}
+
+.tt5-page-event-about,
+.tt5-pattern-preview--page-podcast section:last-child {
+  background: color-mix(in srgb, var(--tt5-dark) 78%, var(--tt5-bg));
+}
+
+.tt5-page-event-about > div,
+.tt5-pattern-preview--page-podcast section > div {
+  padding: 2.4em;
+}
+
+.tt5-page-event-about .tt5-preview-image,
+.tt5-pattern-preview--page-podcast .tt5-preview-image {
+  filter: grayscale(1);
+}
+
+.tt5-pattern-preview--page-podcast section:first-child {
+  background: var(--tt5-dark);
+}
+
+.tt5-pattern-preview--page-podcast section:first-child .tt5-preview-image {
+  width: 58%;
+  height: auto;
+  margin-left: 2.4em;
+  aspect-ratio: 1;
+}
+
+.tt5-pattern-preview--page-link-image,
+.tt5-pattern-preview--page-link-tight {
+  grid-template-columns: 1fr 0.75fr;
+  align-items: center;
+  padding-left: 3em;
+  background: var(--tt5-dark);
+  color: var(--tt5-bg-light);
+}
+
+.tt5-pattern-preview--page-link-image h3 {
+  color: var(--tt5-bg-light);
+  font-size: 1.8em;
+}
+
+.tt5-pattern-preview--page-link-image span {
+  text-decoration: underline;
+}
+
+.tt5-pattern-preview--page-link-image .tt5-preview-image,
+.tt5-pattern-preview--page-link-tight .tt5-preview-image {
+  filter: grayscale(1);
+}
+
+.tt5-pattern-preview--page-link-profile {
+  background: var(--tt5-bg-light);
+}
+
+.tt5-pattern-preview--page-link-profile .tt5-preview-image {
+  aspect-ratio: 1;
+  height: auto;
+  border-top-left-radius: 8em;
+  border-bottom-right-radius: 8em;
+  filter: grayscale(1);
+}
+
+.tt5-pattern-preview--page-link-tight {
+  grid-template-columns: 1fr 1fr;
+  gap: 2em;
+  padding: 1.8em;
+}
+
+.tt5-pattern-preview--page-link-tight p {
+  align-self: start;
+  color: var(--tt5-bg-light);
+}
+
+.tt5-pattern-preview--page-portfolio {
+  gap: 2.4em;
+  align-content: start;
+  padding: 3em;
+}
+
+.tt5-pattern-preview--page-portfolio h3 {
+  width: 48%;
+  font-size: 1.6em;
+}
+
+.tt5-page-query-grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 1.2em;
+}
+
+.tt5-page-query-grid span {
+  min-height: 5em;
+  padding: 1em;
+  background: color-mix(in srgb, var(--tt5-bg) 86%, var(--tt5-text));
+}
+
+.tt5-page-query-grid .is-large {
+  grid-row: span 2;
+  min-height: 14em;
+  background:
+    linear-gradient(to top right, transparent 49.5%, var(--tt5-rule) 50%, transparent 50.5%),
+    color-mix(in srgb, var(--tt5-bg) 82%, var(--tt5-text));
+}
+
+.tt5-pattern-preview--page-shop {
+  grid-template-rows: 1.1fr 1fr;
+  padding: 2.2em;
+  gap: 2.4em;
+}
+
+.tt5-pattern-preview--page-shop section {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 2em;
+  align-items: center;
+}
+
+.tt5-pattern-preview--page-shop section:last-child {
+  grid-template-columns: 0.75fr repeat(3, 1fr);
+}
+
+.tt5-pattern-preview--page-shop .tt5-preview-image {
+  aspect-ratio: 1;
+  height: auto;
+}
+
+@media (max-width: 900px) {
+  .advanced-catalog .dataviews-view-grid__media .tt5-pattern-preview {
+    font-size: 6.8px;
+  }
+}

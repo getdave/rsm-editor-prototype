@@ -7,6 +7,13 @@ import {
   typographyVariations,
 } from '../../../data/mockData';
 
+const STYLE_CHANGE_NOT_IMPLEMENTED_MESSAGE =
+  "Changing styles isn't implemented in this prototype.";
+
+function showStyleChangeNotImplementedAlert() {
+  window.alert(STYLE_CHANGE_NOT_IMPLEMENTED_MESSAGE);
+}
+
 /**
  * A single variation tile: large "Aa" preview with two color dots, used in
  * both the main variations grid and the Typography section.
@@ -67,9 +74,12 @@ function ColorPaletteTile({ palette, isActive, onClick }) {
 
 function VariationsPanel() {
   const defaultVariation = styleVariations.find((v) => v.isDefault) ?? styleVariations[0];
-  const [activeVariationId, setActiveVariationId] = useState(defaultVariation.id);
-  const [activeColorId, setActiveColorId] = useState(colorVariations[0].id);
-  const [activeTypoId, setActiveTypoId] = useState(typographyVariations[0].id);
+  const [activeVariationId] = useState(defaultVariation.id);
+  const [activeColorId] = useState(colorVariations[0].id);
+  const [activeTypoId] = useState(typographyVariations[0].id);
+  const handleUnavailableStyleChange = () => {
+    showStyleChangeNotImplementedAlert();
+  };
 
   return (
     <div className="styles-panel">
@@ -85,7 +95,7 @@ function VariationsPanel() {
             key={v.id}
             variation={v}
             isActive={v.id === activeVariationId}
-            onClick={() => setActiveVariationId(v.id)}
+            onClick={handleUnavailableStyleChange}
           />
         ))}
       </div>
@@ -100,7 +110,7 @@ function VariationsPanel() {
               key={p.id}
               palette={p}
               isActive={p.id === activeColorId}
-              onClick={() => setActiveColorId(p.id)}
+              onClick={handleUnavailableStyleChange}
             />
           ))}
         </div>
@@ -118,7 +128,7 @@ function VariationsPanel() {
               className={`styles-typo-tile ${
                 t.id === activeTypoId ? 'is-active' : ''
               }`}
-              onClick={() => setActiveTypoId(t.id)}
+              onClick={handleUnavailableStyleChange}
               aria-label={t.name}
             >
               <span

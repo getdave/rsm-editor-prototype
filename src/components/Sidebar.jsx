@@ -232,13 +232,10 @@ function Sidebar() {
   const renderItem = (item) => {
     if (item.kind === 'back') {
       const handleBack = () => {
-        if (advancedExpanded) {
-          setAdvancedExpanded(false);
+        setAdvancedExpanded(false);
+        if (isDesignSection || isAdvancedSection) {
+          navigateSmooth(item.path);
         }
-        if (!isAdvancedSection) {
-          return;
-        }
-        navigate(item.path);
       };
       return (
         <Tooltip text={item.tip} placement="right">

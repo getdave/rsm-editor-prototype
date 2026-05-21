@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, ToggleControl } from '@wordpress/components';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
@@ -18,6 +18,7 @@ import {
 } from '../../data/mockData';
 import { useAppState } from '../../hooks/useAppState';
 import PrototypeNotImplementedButton from '../shared/PrototypeNotImplemented';
+import TT5PatternPreview from '../shared/TT5PatternPreview';
 
 const GRID_PREVIEW_SIZE = 280;
 
@@ -65,6 +66,10 @@ function Bar({ wide, narrow, short }) {
 }
 
 function CatalogPreview({ item }) {
+  if (item.isTT5Pattern) {
+    return <TT5PatternPreview pattern={item} />;
+  }
+
   const kind = item.previewKind;
 
   if (kind === 'cover') {
@@ -469,6 +474,7 @@ function AdvancedCatalogView({
   onOpenItem,
   onAction,
 }) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [view, setView] = useState(() => ({
     ...DEFAULT_VIEW,
     ...initialView,
@@ -478,12 +484,16 @@ function AdvancedCatalogView({
       ...initialView?.layout,
     },
   }));
-  const [activeCategory, setActiveCategory] = useState('all');
   const fields = useMemo(() => createFields(), []);
   const categories = useMemo(
     () => buildCategories(items, categoryKey, categoryAllLabel),
     [items, categoryKey, categoryAllLabel],
   );
+  const requestedCategory = searchParams.get('category') ?? 'all';
+  const initialCategory = categories.some((category) => category.id === requestedCategory)
+    ? requestedCategory
+    : 'all';
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   const filteredItems = useMemo(() => {
     if (!categoryKey || activeCategory === 'all') {
       return items;
@@ -529,6 +539,13 @@ function AdvancedCatalogView({
 
   const handleCategoryChange = (categoryId) => {
     setActiveCategory(categoryId);
+    const next = new URLSearchParams(searchParams);
+    if (categoryId === 'all') {
+      next.delete('category');
+    } else {
+      next.set('category', categoryId);
+    }
+    setSearchParams(next);
     setView((current) => ({ ...current, page: 1 }));
   };
 
@@ -617,18 +634,10 @@ export function TemplatesView() {
 }
 
 export function PatternsView() {
-  const navigate = useNavigate();
-  const { pages, selectPage, showSnackbar } = useAppState();
+  const { showSnackbar } = useAppState();
 
-  const handleOpenItem = (item) => {
-    const targetPage =
-      pages.find((page) => page.isFrontPage) ??
-      pages.find((page) => page.id === 'home') ??
-      pages[0];
-    if (targetPage) {
-      selectPage(targetPage);
-      navigate(`/pages/${targetPage.id}/edit?inserter=patterns&pattern=${item.id}`);
-    }
+  const handleOpenItem = () => {
+    window.alert('Pattern preview is not implemented in this prototype.');
   };
 
   const handleAction = (action, item) => {

@@ -10,6 +10,7 @@ import {
   inserterBlockCategories,
   inserterPatterns,
 } from '../../data/mockData';
+import TT5PatternPreview from '../shared/TT5PatternPreview';
 
 const TABS = [
   { name: 'blocks', title: 'Blocks' },
@@ -95,9 +96,13 @@ function BlockCard({ block, onInsert }) {
 
 function PatternCard({ pattern, onInsert }) {
   return (
-    <button type="button" className="bi-pattern" onClick={onInsert}>
-      <div className="bi-pattern-preview">
-        <PatternPreview kind={pattern.previewKind} />
+    <button type="button" className="bi-pattern" onClick={() => onInsert(pattern)}>
+      <div className={`bi-pattern-preview${pattern.isTT5Pattern ? ' bi-pattern-preview--tt5' : ''}`}>
+        {pattern.isTT5Pattern ? (
+          <TT5PatternPreview pattern={pattern} />
+        ) : (
+          <PatternPreview kind={pattern.previewKind} />
+        )}
       </div>
       <Text variant="body-sm" className="bi-pattern-label">{pattern.name}</Text>
     </button>
@@ -199,7 +204,11 @@ export function BlockInserterContent() {
     setSearchParams(searchParams);
   };
 
-  const handleInsert = () => {};
+  const handleInsert = (item) => {
+    if (item) {
+      window.alert("Insertion of sections isn't implemented in this prototype.");
+    }
+  };
 
   const trimmedSearch = searchTerm.trim().toLowerCase();
   const isSearching = trimmedSearch.length > 0;
@@ -255,7 +264,17 @@ export function BlockInserterContent() {
               </div>
               {(activeTab.name === 'patterns' || activeTab.name === 'media') && (
                 <div className="bi-footer">
-                  <Button variant="secondary" className="bi-explore-btn">
+                  <Button
+                    variant="secondary"
+                    className="bi-explore-btn"
+                    onClick={
+                      activeTab.name === 'patterns'
+                        ? () => window.alert(
+                          'The display of all the patterns in a modal UI is not implemented in this prototype.',
+                        )
+                        : undefined
+                    }
+                  >
                     Explore all {activeTab.name}
                   </Button>
                 </div>
