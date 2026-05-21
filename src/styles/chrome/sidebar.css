@@ -317,6 +317,14 @@
 /* The unnamed main Group hugs the top (no heading, no extra block margin). */
 .sidebar-nav-section-group--plain { margin-block: 0; }
 
+/* Keep Advanced available but out of the way in the root sidebar. */
+.sidebar-nav-advanced-slot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 /* Hide sidebar-bottom while a Menu drilldown is open. */
 .sidebar-bottom { transition: opacity 0.3s ease; }
 .sidebar.is-menu-open .sidebar-bottom {
@@ -363,13 +371,12 @@
   overflow-y: auto;
 }
 
-/* Applied sidebar — a customized section groups its heading with its nav
-   items. Spacing uses @wordpress/theme design tokens. */
+/* Applied sidebar — sections use the same row rhythm as the root nav. */
 .sidebar-nav-section-group {
   display: flex;
   flex-direction: column;
   gap: var(--wpds-dimension-gap-xs); /* 4px */
-  margin-block: var(--wpds-dimension-gap-sm); /* 8px */
+  margin-block: 0;
 }
 
 /* ── SIDEBAR CUSTOMIZER (edit mode) ── */
@@ -616,21 +623,17 @@
 }
 .snc-delete-section.components-button svg { fill: currentColor; }
 
-/* Add — a dropdown (Group / Folder / Menu) below the nav items, centered. */
-.snc-add {
+/* Add — a single section action below the nav items, centered. */
+.snc-add.components-button {
   margin-top: 8px;
   width: 100%;
-}
-.snc-add .components-button,
-.snc-add .components-dropdown-menu__toggle {
   justify-content: center !important;
-  width: 100%;
 }
-.snc-add .components-button.is-secondary {
+.snc-add.components-button.is-secondary {
   color: #c5d0ff;
   box-shadow: inset 0 0 0 1px #3a3a3a;
 }
-.snc-add .components-button.is-secondary:hover:not(:disabled) {
+.snc-add.components-button.is-secondary:hover:not(:disabled) {
   box-shadow: inset 0 0 0 1px var(--wp-blue, #3858e9);
 }
 

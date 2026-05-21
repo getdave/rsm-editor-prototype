@@ -110,6 +110,10 @@ function Sidebar() {
   const activeMenu = navLayout.find(
     (e) => e.kind === 'section' && e.type === 'menu' && e.id === effectiveMenuId,
   );
+  const rootNavEntries = navLayout.filter(
+    (entry) => entry.id !== 'menu-advanced',
+  );
+  const advancedNavEntry = navLayout.find((entry) => entry.id === 'menu-advanced');
 
   const sidebarNestedNavHidden = isEditCanvas
     ? sidebarCollapsed && !menuExpanded
@@ -378,33 +382,29 @@ function Sidebar() {
 
     // Menu — a drilldown row that opens the menu's pane. Shown even if empty.
     if (type === 'menu') {
-      const name = entry.label || 'New Menu';
+      const name = entry.label || 'New section';
       const menuIcon = entry.icon ?? menu;
       const items = visibleMemberItems(entry);
       const isOn = items.some((it) => isItemActive(it.path));
-      // Wrap in the section-group container so a Menu gets the same block
-      // spacing as Group/Folder containers.
       return (
-        <div key={entry.id} className="sidebar-nav-section-group">
-          <Tooltip text={name} placement="right">
-            <Button
-              tone="neutral"
-              variant="minimal"
-              size="compact"
-              aria-pressed={isOn}
-              aria-expanded={effectiveMenuId === entry.id}
-              className="ni ni-with-chevron"
-              onClick={() => {
-                if (sidebarCollapsed) setSidebarCollapsed(false);
-                setActiveMenuId(entry.id);
-              }}
-            >
-              <span className="ni-ico">{menuIcon}</span>
-              <span className="ni-label">{name}</span>
-              <span className="ni-chevron">{chevronRight}</span>
-            </Button>
-          </Tooltip>
-        </div>
+        <Tooltip key={entry.id} text={name} placement="right">
+          <Button
+            tone="neutral"
+            variant="minimal"
+            size="compact"
+            aria-pressed={isOn}
+            aria-expanded={effectiveMenuId === entry.id}
+            className="ni ni-with-chevron"
+            onClick={() => {
+              if (sidebarCollapsed) setSidebarCollapsed(false);
+              setActiveMenuId(entry.id);
+            }}
+          >
+            <span className="ni-ico">{menuIcon}</span>
+            <span className="ni-label">{name}</span>
+            <span className="ni-chevron">{chevronRight}</span>
+          </Button>
+        </Tooltip>
       );
     }
 
@@ -448,7 +448,7 @@ function Sidebar() {
   /** Render the drilldown pane for the open Menu (Back row + title + items). */
   const renderMenuPane = (menuEntry) => {
     if (!menuEntry) return null;
-    const name = menuEntry.label || 'New Menu';
+    const name = menuEntry.label || 'New section';
     return (
       <>
         <Tooltip text="Back" placement="right">
@@ -603,7 +603,12 @@ function Sidebar() {
     >
       <div className={`sidebar-nav-slider ${effectiveMenuId ? 'is-menu' : ''}`}>
         <nav className="admin-root-nav sidebar-nav-pane sidebar-nav-pane-root">
-          {navLayout.map(renderRootEntry)}
+          {rootNavEntries.map(renderRootEntry)}
+          {advancedNavEntry && (
+            <div className="sidebar-nav-advanced-slot">
+              {renderRootEntry(advancedNavEntry)}
+            </div>
+          )}
         </nav>
         <nav
           className="admin-root-nav sidebar-nav-pane sidebar-nav-pane-menu"

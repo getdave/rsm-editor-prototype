@@ -1,23 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
-  DropdownMenu,
-  MenuGroup,
-  MenuItem,
   TextControl,
   ToggleControl,
   Tooltip,
 } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { dragHandle, plus, trash, file, menu, help } from '@wordpress/icons';
-
-const HOME_LOCKED_TIP =
-  "Home is always visible — it's the entry point to the editor, so it can't be turned off.";
 import { useAppState } from '../../hooks/useAppState';
 import { getAdminNavItemById } from '../../constants/adminNav';
 
+const HOME_LOCKED_TIP =
+  "Home is always visible — it's the entry point to the editor, so it can't be turned off.";
+const DEFAULT_SECTION_ID = 'group-main';
+
 /** Display label per container type. Groups are never named. */
-const TYPE_LABEL = { group: 'Group', folder: 'Folder', menu: 'Menu' };
+const TYPE_LABEL = { group: 'Group', folder: 'Folder', menu: 'Section' };
 /** Folders use the file icon; menus use their own icon (default menus keep
  *  their original icon), falling back to the generic menu icon. */
 const containerIconFor = (section) => {
@@ -80,8 +78,9 @@ function SidebarNavCustomizer() {
       const top = navLayout.find((e) => e.id === id);
       if (top) {
         if (top.kind === 'section') {
+          if (top.id === DEFAULT_SECTION_ID) return 'Default';
           if (top.type === 'group') return 'Group';
-          return top.label || `New ${TYPE_LABEL[top.type] ?? 'Folder'}`;
+          return top.label || `New ${TYPE_LABEL[top.type]?.toLowerCase() ?? 'section'}`;
         }
         return getAdminNavItemById(top.id, homepageDisplayMode)?.label ?? top.id;
       }
@@ -267,6 +266,7 @@ function SidebarNavCustomizer() {
   const renderContainer = (section) => {
     const items = section.items ?? [];
     const type = section.type ?? 'folder';
+    const isDefaultSection = section.id === DEFAULT_SECTION_ID;
     const typeLabel = TYPE_LABEL[type] ?? 'Folder';
     const icon = containerIconFor(section);
     const sectionClass = [
@@ -302,26 +302,28 @@ function SidebarNavCustomizer() {
           )}
           {type === 'group' ? (
             <Text variant="body-sm" className="snc-container-label">
-              Group
+              {isDefaultSection ? 'Default' : 'Group'}
             </Text>
           ) : (
             <TextControl
               className="snc-section-input"
-              label={`${typeLabel} name`}
+              label={`${typeLabel.toLowerCase()} name`}
               hideLabelFromVision
               value={section.label}
-              placeholder={`New ${typeLabel}`}
+              placeholder={`New ${typeLabel.toLowerCase()}`}
               onChange={(value) => renameNavSection(section.id, value)}
               __nextHasNoMarginBottom
             />
           )}
-          <Button
-            className="snc-delete-section"
-            icon={trash}
-            label={`Delete ${typeLabel.toLowerCase()}`}
-            size="small"
-            onClick={() => deleteNavSection(section.id)}
-          />
+          {!isDefaultSection && (
+            <Button
+              className="snc-delete-section"
+              icon={trash}
+              label="Delete section"
+              size="small"
+              onClick={() => deleteNavSection(section.id)}
+            />
+          )}
         </div>
         <div className="snc-section-body">
           {items.length === 0 ? (
@@ -355,43 +357,14 @@ function SidebarNavCustomizer() {
             ? renderContainer(entry)
             : renderItemRow(entry, { isTopLevel: true }),
         )}
-        <DropdownMenu
+        <Button
           className="snc-add"
           icon={plus}
-          text="Add"
-          label="Add a navigation group"
-          popoverProps={{ placement: 'top-start' }}
-          toggleProps={{ variant: 'secondary' }}
+          variant="secondary"
+          onClick={() => addNavContainer('menu')}
         >
-          {({ onClose }) => (
-            <MenuGroup>
-              <MenuItem
-                onClick={() => {
-                  addNavContainer('group');
-                  onClose();
-                }}
-              >
-                Group
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  addNavContainer('folder');
-                  onClose();
-                }}
-              >
-                Folder
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  addNavContainer('menu');
-                  onClose();
-                }}
-              >
-                Menu
-              </MenuItem>
-            </MenuGroup>
-          )}
-        </DropdownMenu>
+          Add section
+        </Button>
       </div>
 
       <Stack

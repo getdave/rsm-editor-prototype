@@ -21,6 +21,7 @@ export const READING_DISPLAY_LATEST = 'latest';
 export const READING_DISPLAY_STATIC = 'static';
 
 const AppStateContext = createContext(null);
+const DEFAULT_NAV_SECTION_ID = 'group-main';
 
 // navLayout is an ordered array of top-level entries:
 //   { kind: 'item', id, hidden }
@@ -394,6 +395,7 @@ export function AppStateProvider({ children }) {
   };
 
   const deleteNavSection = (id) => {
+    if (id === DEFAULT_NAV_SECTION_ID) return;
     setNavLayout((prev) => deleteSectionFromLayout(prev, id));
   };
 
