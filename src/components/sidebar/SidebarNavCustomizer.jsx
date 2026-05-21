@@ -1,9 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, TextControl, ToggleControl } from '@wordpress/components';
+import {
+  Button,
+  DropdownMenu,
+  MenuGroup,
+  MenuItem,
+  TextControl,
+  ToggleControl,
+} from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
-import { dragHandle, plus, trash } from '@wordpress/icons';
+import { dragHandle, plus, trash, file, menu } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { getAdminNavItemById } from '../../constants/adminNav';
+
+/** Display label per container type. Groups are never named. */
+const TYPE_LABEL = { group: 'Group', folder: 'Folder', menu: 'Menu' };
+const containerIconFor = (type) =>
+  type === 'folder' ? file : type === 'menu' ? menu : null;
 
 function SidebarNavCustomizer() {
   const {
@@ -11,7 +23,8 @@ function SidebarNavCustomizer() {
     homepageDisplayMode,
     toggleNavItemVisibility,
     moveNavLayoutEntry,
-    addNavSection,
+    addNavContainer,
+    resetNavLayout,
     renameNavSection,
     deleteNavSection,
     exitNavEditMode,
@@ -57,9 +70,11 @@ function SidebarNavCustomizer() {
     (id) => {
       const top = navLayout.find((e) => e.id === id);
       if (top) {
-        return top.kind === 'section'
-          ? top.label
-          : getAdminNavItemById(top.id, homepageDisplayMode)?.label ?? top.id;
+        if (top.kind === 'section') {
+          if (top.type === 'group') return 'Group';
+          return top.label || `New ${TYPE_LABEL[top.type] ?? 'Folder'}`;
+        }
+        return getAdminNavItemById(top.id, homepageDisplayMode)?.label ?? top.id;
       }
       return getAdminNavItemById(id, homepageDisplayMode)?.label ?? id;
     },
@@ -221,10 +236,14 @@ function SidebarNavCustomizer() {
     );
   };
 
-  const renderSection = (section) => {
+  const renderContainer = (section) => {
     const items = section.items ?? [];
+    const type = section.type ?? 'folder';
+    const typeLabel = TYPE_LABEL[type] ?? 'Folder';
+    const icon = containerIconFor(type);
     const sectionClass = [
       'snc-section',
+      `snc-section--${type}`,
       draggingId === section.id ? 'is-dragging' : '',
       dropTarget?.sectionId === section.id && !isDraggingSection
         ? 'is-drop-into'
@@ -248,19 +267,30 @@ function SidebarNavCustomizer() {
           data-section-header=""
         >
           {dragHandleFor(section.id)}
-          <TextControl
-            className="snc-section-input"
-            label="Section name"
-            hideLabelFromVision
-            value={section.label}
-            placeholder="Section name"
-            onChange={(value) => renameNavSection(section.id, value)}
-            __nextHasNoMarginBottom
-          />
+          {icon && (
+            <span className="snc-container-icon" aria-hidden="true">
+              {icon}
+            </span>
+          )}
+          {type === 'group' ? (
+            <Text variant="body-sm" className="snc-container-label">
+              Group
+            </Text>
+          ) : (
+            <TextControl
+              className="snc-section-input"
+              label={`${typeLabel} name`}
+              hideLabelFromVision
+              value={section.label}
+              placeholder={`New ${typeLabel}`}
+              onChange={(value) => renameNavSection(section.id, value)}
+              __nextHasNoMarginBottom
+            />
+          )}
           <Button
             className="snc-delete-section"
             icon={trash}
-            label="Delete section"
+            label={`Delete ${typeLabel.toLowerCase()}`}
             size="small"
             onClick={() => deleteNavSection(section.id)}
           />
@@ -294,20 +324,56 @@ function SidebarNavCustomizer() {
       <div className="snc-list">
         {navLayout.map((entry) =>
           entry.kind === 'section'
-            ? renderSection(entry)
+            ? renderContainer(entry)
             : renderItemRow(entry, { isTopLevel: true }),
         )}
-        <Button
-          className="snc-add-section"
+        <DropdownMenu
+          className="snc-add"
           icon={plus}
-          variant="secondary"
-          onClick={addNavSection}
+          text="Add"
+          label="Add a navigation group"
+          popoverProps={{ placement: 'top-start' }}
+          toggleProps={{ variant: 'secondary' }}
         >
-          Add section
-        </Button>
+          {({ onClose }) => (
+            <MenuGroup>
+              <MenuItem
+                onClick={() => {
+                  addNavContainer('group');
+                  onClose();
+                }}
+              >
+                Group
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  addNavContainer('folder');
+                  onClose();
+                }}
+              >
+                Folder
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  addNavContainer('menu');
+                  onClose();
+                }}
+              >
+                Menu
+              </MenuItem>
+            </MenuGroup>
+          )}
+        </DropdownMenu>
       </div>
 
       <Stack direction="column" gap="sm" className="snc-footer">
+        <Button
+          className="snc-reset"
+          variant="tertiary"
+          onClick={resetNavLayout}
+        >
+          Reset sidebar
+        </Button>
         <Button
           className="snc-done"
           variant="primary"
