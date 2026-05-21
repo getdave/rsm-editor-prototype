@@ -317,8 +317,8 @@ function rowForNavigationTarget(target, { fallbackIcon, pageUrlById, pagesList, 
     navPageId,
     navUrl,
     previewPage,
-    status: archivePage?.status ?? 'live',
-    isLive: archivePage?.isLive ?? true,
+    status: archivePage?.status ?? target.status ?? 'live',
+    isLive: archivePage?.isLive ?? (target.status !== 'draft'),
     isFrontPage: archivePage?.isFrontPage ?? false,
     isPostsPage: archivePage?.isPostsPage ?? false,
     isShopPage: archivePage?.isShopPage ?? false,
@@ -836,9 +836,14 @@ function AddPagesToMenuModal({ onClose, pages, menuItems, onConfirm }) {
     onConfirm([
       {
         id: `custom-url-${Date.now()}`,
+        name: label,
         navLabel: label,
         navUrl: url,
         sourceType: 'custom-url',
+        typeLabel: 'Custom link',
+        status: 'live',
+        isLive: true,
+        linkLabel: url,
       },
     ]);
   };

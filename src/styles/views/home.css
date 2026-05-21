@@ -340,10 +340,70 @@
   background: linear-gradient(135deg, #4facfe, #00f2fe);
 }
 
+.p-template-page-title {
+  align-items: flex-start;
+  padding-left: 60px;
+  padding-right: 60px;
+}
+
+.p-template-page-title h1 {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  color: #1e1e1e;
+  font-size: 48px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.p-template-featured-image {
+  padding-left: 60px;
+  padding-right: 60px;
+}
+
+.p-featured-image-placeholder {
+  width: 100%;
+  max-width: 1200px;
+  aspect-ratio: 16 / 7;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(30, 30, 30, 0.72), rgba(56, 88, 233, 0.42)),
+    linear-gradient(135deg, #dcdcde, #f6f7f7);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 18px var(--wp-content-font);
+}
+
+.p-template-page-content {
+  background: #fff;
+}
+
+.p-template-post-content-placeholder {
+  max-width: 1200px;
+  width: 100%;
+  padding-left: 60px;
+  padding-right: 60px;
+  color: #1e1e1e;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.p-template-post-content-placeholder p {
+  margin: 0 0 1em;
+}
+
+.p-template-post-content-placeholder p:last-child {
+  margin-bottom: 0;
+}
+
 .p-footer {
   background: #f8f8f8;
   padding: 32px 60px;
   display: flex;
+  align-items: center;
+  gap: 24px;
   justify-content: space-between;
   font-family: var(--wp-content-font);
 }
@@ -352,6 +412,26 @@
   font-size: 14px;
   color: #888;
   font-weight: 400;
+}
+
+.p-footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px 18px;
+}
+
+.p-footer-nav-link {
+  color: #666;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.p-footer-nav-link:hover {
+  color: #1e1e1e;
+  text-decoration: underline;
 }
 
 /* ── Content suggestion area (home view) ── */
@@ -373,10 +453,19 @@
 
 .cs-area {
   flex-shrink: 0;
-  background: #1e1e1e;
-  padding: 16px;
-  border-top: 1px solid #2a2a2a;
-  transition: padding .15s ease;
+  background: #242424;
+  padding: 16px 18px 18px;
+  border: 1px solid #3c3c3c;
+  border-radius: 8px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 10px 24px rgba(0, 0, 0, 0.22);
+  margin-top: 12px;
+  transition:
+    background-color .15s ease,
+    border-color .15s ease,
+    box-shadow .15s ease,
+    padding .15s ease;
 }
 
 .cs-head {
@@ -413,20 +502,322 @@
 
 .cs-banners {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
   margin-top: 16px;
 }
 
 .cs-banner {
-  background: #252525;
+  /* Card palette — dark for now. A future light variant overrides these
+     tokens via a scoping selector (e.g. .cs-banner.is-light). */
+  --cs-card-bg: #2a2d36;
+  --cs-card-bg-hover: #32353f;
+  --cs-card-text: #e8e8eb;
+  --cs-card-text-muted: #a7abb4;
+  --cs-card-link: #6b86f5;
+  /* Lighter sibling of the .cs-area border (--wp-gray-600 / #3c3c3c),
+     mixed toward white so each card edge stays visible on the dark area. */
+  --cs-card-border: color-mix(in srgb, var(--wp-gray-600, #3c3c3c) 95%, #fff);
+
+  appearance: none;
+  border: 1px solid var(--cs-card-border);
+  background: var(--cs-card-bg);
+  border-radius: 6px;
+  color: var(--cs-card-text);
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 14px;
+  min-height: 148px;
+  padding: 14px;
+  text-align: left;
+  transition:
+    background-color .15s ease,
+    border-color .15s ease,
+    box-shadow .15s ease,
+    transform .15s ease;
+}
+
+.cs-banner:hover {
+  background: var(--cs-card-bg-hover);
+  border-color: #3858e9;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.cs-banner:focus-visible {
+  outline: 2px solid #3858e9;
+  outline-offset: 2px;
+}
+
+.cs-banner-visual {
+  /* Visual palette — dark for now. A future light variant overrides these
+     tokens via a scoping selector (e.g. .cs-banner-visual.is-light). */
+  --cs-vis-surface: #2a2d36;            /* inner preview card surface */
+  --cs-vis-border: rgba(255, 255, 255, 0.12);
+  --cs-vis-line: rgba(255, 255, 255, 0.22);
+  --cs-vis-text: #e8e8eb;
+  --cs-vis-icon-bg: rgba(255, 255, 255, 0.14);
+  --cs-vis-icon-fg: #fff;
+  --cs-vis-blue: #6b86f5;               /* brighter blue for dark surfaces */
+  --cs-vis-blue-strong: #3858e9;        /* accent badge keeps brand blue */
+  --cs-vis-blue-soft: #2c3563;          /* page content block */
+  --cs-vis-green: #4ab866;              /* brighter green for dark surfaces */
+  --cs-vis-green-soft: #2d4a3a;         /* inactive nav rows */
+  --cs-vis-amber: #f0b849;
+
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 112px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--cs-vis-grad, linear-gradient(180deg, #23262e 0%, #1c1e24 60%));
+  border: 1px solid var(--cs-vis-border);
+}
+
+.cs-banner-icon {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   border-radius: 4px;
-  padding: 12px;
-  height: 88px;
+  background: var(--cs-vis-icon-bg);
+  color: var(--cs-vis-icon-fg);
+}
+
+.cs-banner-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.cs-banner-preview {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 44px 12px 12px;
+}
+
+.cs-banner--page .cs-banner-visual {
+  --cs-vis-grad: linear-gradient(180deg, #1d2547 0%, #1b1d24 58%);
+}
+
+.cs-banner--navigation .cs-banner-visual {
+  --cs-vis-grad: linear-gradient(180deg, #16382a 0%, #1b1d24 58%);
+}
+
+.cs-banner--design .cs-banner-visual {
+  --cs-vis-grad: linear-gradient(180deg, #3a2c14 0%, #1b1d24 58%);
+}
+
+.cs-page-preview,
+.cs-nav-preview,
+.cs-design-preview {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.cs-page-preview {
+  gap: 7px;
+  padding: 10px;
+  border-radius: 4px 4px 0 0;
+  background: var(--cs-vis-surface);
+  border: 1px solid var(--cs-vis-border);
+  border-bottom: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.cs-page-plus {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--cs-vis-blue-strong);
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.cs-page-line,
+.cs-page-block {
+  display: block;
+  border-radius: 2px;
+  background: var(--cs-vis-line);
+}
+
+.cs-page-line { height: 5px; width: 100%; }
+.cs-page-line--title { width: 72%; height: 7px; background: var(--cs-vis-blue); }
+.cs-page-line--short { width: 54%; }
+.cs-page-block { height: 22px; background: var(--cs-vis-blue-soft); }
+
+.cs-nav-preview {
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.cs-nav-row {
+  display: block;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--cs-vis-green-soft);
+}
+
+.cs-nav-row:nth-child(2) { width: 78%; }
+.cs-nav-row:nth-child(3) { width: 62%; }
+.cs-nav-row.is-active { width: 88%; background: var(--cs-vis-green); }
+
+.cs-nav-route {
+  position: absolute;
+  right: 2px;
+  bottom: 0;
+  width: 28px;
+  height: 42px;
+  border-right: 2px solid var(--cs-vis-green);
+  border-bottom: 2px solid var(--cs-vis-green);
+  border-radius: 0 0 12px 0;
+}
+
+.cs-design-preview {
+  justify-content: space-between;
+}
+
+.cs-design-aa {
+  display: block;
+  color: var(--cs-vis-text);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.cs-design-swatches {
+  display: flex;
+  gap: 6px;
+}
+
+.cs-design-swatches span {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--cs-vis-border);
+}
+
+.cs-design-swatches span:nth-child(1) { background: #e0e0e2; }
+.cs-design-swatches span:nth-child(2) { background: var(--cs-vis-amber); }
+.cs-design-swatches span:nth-child(3) { background: var(--cs-vis-blue-strong); }
+
+.cs-banner-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  align-self: stretch;
+}
+
+.cs-banner-title {
+  color: var(--cs-card-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.cs-banner-description {
+  color: var(--cs-card-text-muted);
   font-size: 13px;
-  color: #e0e0e0;
+  line-height: 1.4;
+}
+
+.cs-banner-cta {
+  display: inline-flex;
+  align-items: center;
+  margin-top: auto;
+  color: var(--cs-card-link);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.cs-learn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 12px;
+  color: #c3c4c7;
+  font-size: 13px;
+  line-height: 20px;
+  text-decoration: none;
+}
+
+.cs-learn-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.cs-learn-link:focus-visible {
+  outline: 2px solid #f6f7f7;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.cs-learn-link-icon,
+.cs-learn-link-external {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: currentColor;
+}
+
+.cs-learn-link-icon svg,
+.cs-learn-link-external svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 .cs-area.collapsed .cs-banners {
   display: none;
+}
+
+@media (max-width: 1180px) {
+  .cs-banner {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .cs-banner-visual {
+    min-height: 86px;
+  }
+}
+
+@media (max-width: 760px) {
+  .cs-head {
+    align-items: flex-start;
+    height: auto;
+    gap: 12px;
+  }
+
+  .cs-banners {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-banner {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
 }

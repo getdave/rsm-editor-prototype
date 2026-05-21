@@ -14,6 +14,11 @@ import LayoutPanel from '../components/views/styles/LayoutPanel';
 import ThemesInstalledView from '../components/views/ThemesInstalledView';
 import ThemesBrowseView from '../components/views/ThemesBrowseView';
 import NavigationView from '../components/views/NavigationView';
+import {
+  PatternsView,
+  TemplatePartsView,
+  TemplatesView,
+} from '../components/views/AdvancedCatalogViews';
 import PlaceholderAdminView from '../components/views/PlaceholderAdminView';
 
 export const router = createBrowserRouter([
@@ -23,35 +28,19 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <PreviewView /> },
       { path: 'pages', element: <PagesView /> },
-      { path: 'pages/static', element: <PagesView /> },
-      { path: 'pages/dynamic', element: <PagesView /> },
-      { path: 'pages/collections', element: <PagesView /> },
+      { path: 'pages/content', element: <PagesView /> },
+      { path: 'pages/templates', element: <PagesView /> },
       { path: 'pages/:legacySegment', element: <Navigate to="/pages" replace /> },
       { path: 'pages/:pageId/edit', element: <BlockEditor /> },
       { path: 'page-designs/:designId/edit', element: <BlockEditor /> },
       { path: 'templates/:templateId/edit', element: <BlockEditor /> },
-      {
-        path: 'templates',
-        element: (
-          <PlaceholderAdminView
-            title="Templates"
-            description="Templates view coming soon."
-          />
-        ),
-      },
+      { path: 'templates', element: <TemplatesView /> },
       { path: 'content', element: <ContentView /> },
       { path: 'content/:contentTypeId', element: <ContentView /> },
       { path: 'posts', element: <Navigate to="/content" replace /> },
       { path: 'navigation', element: <NavigationView /> },
-      {
-        path: 'patterns',
-        element: (
-          <PlaceholderAdminView
-            title="Patterns"
-            description="Patterns view coming soon."
-          />
-        ),
-      },
+      { path: 'patterns', element: <PatternsView /> },
+      { path: 'template-parts', element: <TemplatePartsView /> },
       {
         path: 'media',
         element: (

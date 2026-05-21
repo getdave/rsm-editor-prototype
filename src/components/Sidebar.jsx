@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppState } from '../hooks/useAppState';
 import { Tooltip } from '@wordpress/components';
@@ -33,22 +33,29 @@ import SidebarNavCustomizer from './sidebar/SidebarNavCustomizer';
     Used by the Block Editor sidebar variant which keeps inline expand/collapse. */
 const ADVANCED_SUB_NAV_ITEMS = Object.freeze([
   {
-    id: 'advanced-templates',
-    label: 'Templates',
-    path: '/templates',
-    tip: 'Edit templates that control how your site renders',
-    icon: addTemplate,
-  },
-  {
     id: 'advanced-patterns',
     label: 'Patterns',
     path: '/patterns',
     tip: 'Reusable sets of blocks for layouts and sections',
     icon: symbolFilled,
   },
+  {
+    id: 'advanced-template-parts',
+    label: 'Template Parts',
+    path: '/template-parts',
+    tip: 'Reusable headers, footers, and template areas',
+    icon: layout,
+  },
+  {
+    id: 'advanced-templates',
+    label: 'Templates',
+    path: '/templates',
+    tip: 'Edit templates that control how your site renders',
+    icon: addTemplate,
+  },
 ]);
 
-const ADVANCED_ROUTE_PREFIXES = ['/templates', '/patterns'];
+const ADVANCED_ROUTE_PREFIXES = ['/patterns', '/template-parts', '/templates'];
 
 const DESIGN_NAV_ITEMS = [
   { kind: 'back', id: 'back', icon: chevronLeft, label: 'Back', path: '/', tip: 'Back to admin' },
@@ -80,8 +87,9 @@ const ADVANCED_NAV_ITEMS = [
     kind: 'group',
     id: 'advanced-group',
     items: [
-      { kind: 'item', id: 'templates', icon: addTemplate, label: 'Templates', path: '/templates', tip: 'Edit templates that control how your site renders' },
       { kind: 'item', id: 'patterns', icon: symbolFilled, label: 'Patterns', path: '/patterns', tip: 'Reusable sets of blocks for layouts and sections' },
+      { kind: 'item', id: 'template-parts', icon: layout, label: 'Template Parts', path: '/template-parts', tip: 'Reusable headers, footers, and template areas' },
+      { kind: 'item', id: 'templates', icon: addTemplate, label: 'Templates', path: '/templates', tip: 'Edit templates that control how your site renders' },
     ],
   },
 ];
@@ -119,6 +127,8 @@ function Sidebar() {
     isEditCanvas && editorReferrer ? editorReferrer : location.pathname;
   const [collapsedGroups, setCollapsedGroups] = useState({});
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
+  const homePreviewResetCountRef = useRef(0);
+  const isAdvancedPaneOpen = isAdvancedSection || advancedExpanded;
 
   const sidebarNestedNavHidden = isEditCanvas
     ? sidebarCollapsed && !menuExpanded
@@ -148,12 +158,26 @@ function Sidebar() {
     setAdvancedExpanded((prev) => !prev);
   };
 
+  const handleAdvancedPaneActivate = () => {
+    if (sidebarCollapsed) {
+      setSidebarCollapsed(false);
+    }
+    setAdvancedExpanded(true);
+  };
+
   const toggleGroup = (groupId) => {
     setCollapsedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
   };
 
   // Direct navigation. RootLayout's route effect resets menuExpanded.
   const navigateSmooth = (target) => {
+    if (target === '/') {
+      homePreviewResetCountRef.current += 1;
+      navigate('/', {
+        state: { homePreviewResetCount: homePreviewResetCountRef.current },
+      });
+      return;
+    }
     navigate(target);
   };
 
@@ -181,6 +205,15 @@ function Sidebar() {
 
   const renderItem = (item) => {
     if (item.kind === 'back') {
+      const handleBack = () => {
+        if (advancedExpanded) {
+          setAdvancedExpanded(false);
+        }
+        if (!isAdvancedSection) {
+          return;
+        }
+        navigate(item.path);
+      };
       return (
         <Tooltip text={item.tip} placement="right">
           <Button
@@ -188,7 +221,7 @@ function Sidebar() {
             variant="minimal"
             size="compact"
             className="ni"
-            onClick={() => navigate(item.path)}
+            onClick={handleBack}
           >
             <span className="ni-ico">{item.icon}</span>
             <span className="ni-label">{item.label}</span>
@@ -232,7 +265,7 @@ function Sidebar() {
             size="compact"
             aria-pressed={isItemActive(item.path)}
             className={`ni ${item.chevron ? 'ni-with-chevron' : ''}`}
-            onClick={() => navigate(item.path)}
+            onClick={() => navigateSmooth(item.path)}
           >
             <span className="ni-ico">{item.icon}</span>
             <span className="ni-label">{item.label}</span>
@@ -475,11 +508,11 @@ function Sidebar() {
     <div
       className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${
         isDesignSection ? 'is-design-section' : ''
-      } ${isAdvancedSection ? 'is-advanced-section' : ''}`}
+      } ${isAdvancedPaneOpen ? 'is-advanced-section' : ''}`}
     >
       <div
         className={`sidebar-nav-slider ${isDesignSection ? 'is-design' : ''} ${
-          isAdvancedSection ? 'is-advanced' : ''
+          isAdvancedPaneOpen ? 'is-advanced' : ''
         }`}
       >
         <nav className="admin-root-nav sidebar-nav-pane sidebar-nav-pane-admin">
@@ -530,7 +563,7 @@ function Sidebar() {
         </nav>
       </div>
 
-      {!isDesignSection && !isAdvancedSection && (
+      {!isDesignSection && !isAdvancedPaneOpen && (
         <nav className="admin-root-nav sidebar-advanced-dock" aria-label="Advanced">
           <Tooltip text="Configure advanced tools of your site" placement="right">
             <Button
@@ -538,7 +571,7 @@ function Sidebar() {
               variant="minimal"
               size="compact"
               className="ni ni-with-chevron sb-advanced-parent"
-              onClick={() => navigate('/templates')}
+              onClick={handleAdvancedPaneActivate}
             >
               <span className="ni-ico">{tool}</span>
               <span className="ni-label">Advanced</span>

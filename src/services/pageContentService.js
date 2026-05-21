@@ -9,6 +9,12 @@
  * architecture (templates, template hierarchy) is not exposed to beginners.
  */
 
+const PAGE_CONTENT_PLACEHOLDER = [
+  'This is the Content block, it will display all the blocks in any single post or page.',
+  'That might be a simple arrangement like consecutive paragraphs in a blog post, or a more elaborate composition that includes image galleries, videos, tables, columns, and any other block types.',
+  'If there are any Custom Post Types registered at your site, the Content block can display the contents of those entries as well.',
+];
+
 /**
  * Get mock content for a page based on WordPress content model
  * 
@@ -41,6 +47,8 @@ export const getPageContent = (page) => {
     'gallery': getGalleryContent(),
     'blog': getDefaultContent(page),
     'contact': getContactContent(),
+    'page-default': getPageTemplateContent(page),
+    'page-with-header': getPageWithHeaderTemplateContent(page),
     
     // System Pages (Special-purpose Templates)
     '404': get404Content(),
@@ -190,6 +198,49 @@ function getContactContent() {
       {
         type: 'form',
         title: 'Send a Message'
+      }
+    ]
+  };
+}
+
+function getPageTemplateContent(page = null) {
+  return {
+    layout: 'default',
+    title: page?.templateLabel ?? 'Page',
+    subtitle: null,
+    wordpressContext: {
+      type: 'template',
+      templateFile: 'page.html'
+    },
+    sections: [
+      {
+        type: 'page-content',
+        placeholder: PAGE_CONTENT_PLACEHOLDER
+      }
+    ]
+  };
+}
+
+function getPageWithHeaderTemplateContent(page = null) {
+  return {
+    ...getPageTemplateContent(page),
+    title: page?.templateLabel ?? 'Page with header',
+    wordpressContext: {
+      type: 'template',
+      templateFile: 'page-with-header.html'
+    },
+    sections: [
+      {
+        type: 'page-title',
+        label: 'Page Title'
+      },
+      {
+        type: 'featured-image',
+        label: 'Featured Image'
+      },
+      {
+        type: 'page-content',
+        placeholder: PAGE_CONTENT_PLACEHOLDER
       }
     ]
   };
@@ -693,7 +744,7 @@ function getPlaceholderTitle(pageOrId, layout) {
   if (pageId === 'shop') return 'Store page title';
   if (pageId === 'product-catalog-template') return 'Product listing title';
   if (pageId === 'blog') return 'Blog page title';
-  if (pageId === 'blog-home-root') return 'Latest Posts Homepage';
+  if (pageId === 'blog-home-root') return 'Latest posts title';
   if (pageId === 'blog-list') return 'Posts Page Title';
   if (pageId === 'posts-index-template') {
     return pageName === 'Latest posts'

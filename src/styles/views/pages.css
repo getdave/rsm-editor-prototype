@@ -343,8 +343,8 @@
   min-height: 0;
 }
 
-/* Dynamic Pages tab — no row-level DataViews actions; hide … menu slot (including disabled mobile trigger). */
-.pp-dataviews.pp-dataviews--dynamic-pages .dataviews-item-actions {
+/* Page Templates tab — no row-level DataViews actions; hide … menu slot (including disabled mobile trigger). */
+.pp-dataviews.pp-dataviews--template-pages .dataviews-item-actions {
   display: none;
 }
 
@@ -1063,6 +1063,7 @@
 }
 
 .ch-reading-intro {
+  display: block;
   margin: 0 0 14px;
   font-size: 13px;
   line-height: 1.45;
@@ -1111,6 +1112,7 @@
 }
 
 .ch-reading-radio.components-base-control {
+  margin-top: 8px;
   margin-bottom: 0;
 }
 
