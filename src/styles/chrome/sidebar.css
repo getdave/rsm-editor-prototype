@@ -488,6 +488,9 @@
 .snc-locked-name {
   color: #bbb;
   white-space: nowrap;
+  /* Match the WP ToggleControl label so Home reads like the other rows. */
+  font-size: 13px;
+  line-height: 16px;
 }
 .snc-help.components-button {
   flex: 0 0 auto;
