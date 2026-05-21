@@ -14,7 +14,7 @@
   align-self: stretch;
 }
 
-.sidebar:not(.is-design-section) {
+.sidebar:not(.is-menu-open) {
   overflow: visible;
 }
 
@@ -268,19 +268,9 @@
   color: #fff;
 }
 
-/* Design sidebar grouping: 24px between groups, 8px within a group. */
-.admin-root-nav.design-nav,
-.admin-root-nav.advanced-nav { gap: 24px; }
-.admin-root-nav.design-nav .ni-group,
-.admin-root-nav.advanced-nav .ni-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Sidebar nav slider — admin nav slides out to the left, design nav slides
-   in from the right. Both panes always render; .sidebar's overflow:hidden
-   clips off-screen content so it never bleeds outside the sidebar. */
+/* Sidebar nav slider — the root pane slides out to the left while the active
+   Menu's drilldown pane slides in from the right. Both panes always render;
+   .sidebar's overflow:hidden clips the off-screen pane. */
 .sidebar-nav-slider {
   flex: 1;
   position: relative;
@@ -291,27 +281,53 @@
   inset: 0;
   transition: transform 0.3s ease;
 }
-.sidebar-nav-pane-admin { transform: translateX(0); }
-.sidebar-nav-pane-design { transform: translateX(100%); }
-.sidebar-nav-pane-advanced { transform: translateX(100%); }
-.sidebar-nav-slider.is-design .sidebar-nav-pane-admin { transform: translateX(-100%); }
-.sidebar-nav-slider.is-design .sidebar-nav-pane-design { transform: translateX(0); }
-.sidebar-nav-slider.is-advanced .sidebar-nav-pane-admin { transform: translateX(-100%); }
-.sidebar-nav-slider.is-advanced .sidebar-nav-pane-advanced { transform: translateX(0); }
-.sidebar:not(.is-design-section) .sidebar-nav-pane-design {
+.sidebar-nav-pane-root { transform: translateX(0); }
+.sidebar-nav-pane-menu {
+  transform: translateX(100%);
   visibility: hidden;
   pointer-events: none;
 }
-.sidebar:not(.is-advanced-section) .sidebar-nav-pane-advanced {
-  visibility: hidden;
-  pointer-events: none;
+.sidebar-nav-slider.is-menu .sidebar-nav-pane-root { transform: translateX(-100%); }
+.sidebar-nav-slider.is-menu .sidebar-nav-pane-menu {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
 }
 
-/* Hide sidebar-bottom when the design or advanced section is active. Fade
-   matches the nav slider's 0.3s timing for a cohesive transition. */
+/* Menu drilldown pane title gets breathing room above/below. */
+.sidebar-nav-pane-menu .ni-section-title {
+  margin-block: var(--wpds-dimension-gap-lg); /* 16px */
+}
+
+/* Folder heading: type icon next to the section label. */
+.sidebar-nav-section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sidebar-nav-section-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: #777;
+}
+.sidebar-nav-section-icon svg { width: 16px; height: 16px; fill: currentColor; }
+
+/* The unnamed main Group hugs the top (no heading, no extra block margin). */
+.sidebar-nav-section-group--plain { margin-block: 0; }
+
+/* Keep Advanced available but out of the way in the root sidebar. */
+.sidebar-nav-advanced-slot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Hide sidebar-bottom while a Menu drilldown is open. */
 .sidebar-bottom { transition: opacity 0.3s ease; }
-.sidebar.is-design-section .sidebar-bottom,
-.sidebar.is-advanced-section .sidebar-bottom {
+.sidebar.is-menu-open .sidebar-bottom {
   opacity: 0;
   pointer-events: none;
 }
@@ -353,4 +369,334 @@
 .editor-sidebar-recent-list {
   flex: 1 0 0;
   overflow-y: auto;
+}
+
+/* Applied sidebar — sections use the same row rhythm as the root nav. */
+.sidebar-nav-section-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wpds-dimension-gap-xs); /* 4px */
+  margin-block: 0;
+}
+
+/* ── SIDEBAR CUSTOMIZER (edit mode) ── */
+/* In-place editor for the main admin nav. Lives on the dark chrome surface,
+   so all colors mirror the .ni treatment above (#bbb idle, #fff active,
+   #2a2a2a hover/divider) rather than the light --wpds surfaces. */
+.sidebar-customizing {
+  overflow: visible;
+}
+
+.snc {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.snc-header {
+  flex: 0 0 auto;
+  padding: 16px 16px 8px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.snc-title.snc-title {
+  margin: 0;
+  color: #fff;
+  font-weight: 600;
+}
+
+.snc-list {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.snc-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.snc-row:hover {
+  background: #2a2a2a;
+}
+
+.snc-row.is-dragging {
+  opacity: 0.4;
+}
+
+/* Insertion line marking the drop position. */
+.snc-row.is-drop-above::before,
+.snc-row.is-drop-below::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: var(--wp-blue, #3858e9);
+  border-radius: 2px;
+}
+.snc-row.is-drop-above::before { top: -1px; }
+.snc-row.is-drop-below::after { bottom: -1px; }
+
+.snc-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  color: #777;
+  cursor: grab;
+  touch-action: none;
+}
+.snc-drag-handle:hover { color: #bbb; }
+.snc-row.is-dragging .snc-drag-handle { cursor: grabbing; }
+.snc-drag-handle svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* Item rows: drag handle + ToggleControl. ToggleControl lays out
+   [switch][label] inside an inner HStack; reverse it so the label sits on the
+   left and the switch is pinned to the right edge of the row. */
+.snc-item-toggle.components-base-control {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.snc-item-toggle .components-base-control__field {
+  width: 100%;
+  margin: 0;
+}
+.snc-item-toggle .components-h-stack {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  width: 100%;
+}
+.snc-item-toggle .components-toggle-control__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: #bbb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Locked "Home" row: label + help "?" on the left, switch pinned right. */
+.snc-locked-name {
+  color: #bbb;
+  white-space: nowrap;
+  /* Match the WP ToggleControl label so Home reads like the other rows. */
+  font-size: 13px;
+  line-height: 16px;
+}
+.snc-help.components-button {
+  flex: 0 0 auto;
+  min-width: 24px;
+  height: 24px;
+  padding: 0;
+  color: #777;
+}
+.snc-help.components-button:hover:not(:disabled) {
+  color: #bbb;
+}
+.snc-help.components-button svg { fill: currentColor; }
+.snc-item-toggle--end.components-base-control {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+.snc-item-toggle--end .components-h-stack { width: auto; }
+/* The locked row renders its own "Home" label, so hide the control's. */
+.snc-item-toggle--end .components-toggle-control__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Section container — a soft-bordered box that holds the heading row and its
+   member items. The whole box is a drop zone for dragging items in. */
+.snc-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0;
+  padding: 4px;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+/* Dragging an item over the section: subtle blueberry (theme color) tint. */
+.snc-section.is-drop-into {
+  background: color-mix(in srgb, var(--wp-blue, #3858e9) 16%, transparent);
+  border-color: color-mix(in srgb, var(--wp-blue, #3858e9) 50%, #3a3a3a);
+}
+
+/* Dragging the section itself dims the whole box (heading + items move together). */
+.snc-section.is-dragging {
+  opacity: 0.4;
+}
+
+.snc-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Empty-section hint — does nothing, replaced by the first dropped item. */
+.snc-section-placeholder.snc-section-placeholder {
+  margin: 0;
+  padding: 8px 4px 8px 32px;
+  color: #777;
+  font-style: italic;
+}
+
+/* Member rows sit indented under the heading. */
+.snc-row--member {
+  padding-left: 4px;
+}
+
+/* Container header: type icon (Folder/Menu) + static label (Group). */
+.snc-container-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  color: #777;
+}
+.snc-container-icon svg { width: 20px; height: 20px; fill: currentColor; }
+.snc-container-label.snc-container-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: #bbb;
+  font-weight: 500;
+}
+
+/* Section rows: editable heading input + delete action. */
+.snc-section-input.components-base-control {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.snc-section-input .components-base-control__field { margin: 0; }
+.snc-section-input .components-text-control__input {
+  background: #2a2a2a;
+  color: #fff;
+  border: 1px solid #3a3a3a;
+  box-shadow: none;
+  min-height: 32px;
+}
+.snc-section-input .components-text-control__input::placeholder {
+  color: #777;
+}
+.snc-section-input .components-text-control__input:focus {
+  border-color: var(--wp-blue, #3858e9);
+  box-shadow: 0 0 0 1px var(--wp-blue, #3858e9);
+}
+
+.snc-delete-section.components-button {
+  flex: 0 0 auto;
+  color: #bbb;
+}
+.snc-delete-section.components-button:hover:not(:disabled) {
+  color: var(--wp-red, #f87171);
+  background: #2a2a2a;
+}
+.snc-delete-section.components-button svg { fill: currentColor; }
+
+/* Add — a single section action below the nav items, centered. */
+.snc-add.components-button {
+  margin-top: 8px;
+  width: 100%;
+  justify-content: center !important;
+}
+.snc-add.components-button.is-secondary {
+  color: #c5d0ff;
+  box-shadow: inset 0 0 0 1px #3a3a3a;
+}
+.snc-add.components-button.is-secondary:hover:not(:disabled) {
+  box-shadow: inset 0 0 0 1px var(--wp-blue, #3858e9);
+}
+
+/* Footer: Reset (left) + Done (right), pinned below the scrolling list. */
+.snc-footer {
+  flex: 0 0 auto;
+  padding: 12px;
+  border-top: 1px solid #2a2a2a;
+}
+.snc-footer .components-button {
+  justify-content: center;
+  width: auto;
+}
+.snc-footer .snc-reset.components-button {
+  color: #bbb;
+}
+.snc-footer .snc-reset.components-button:hover:not(:disabled) {
+  color: #fff;
+  background: #2a2a2a;
+}
+
+/* Locked "Home" toggle — keep an on-theme look (brand track, slightly muted)
+   instead of the washed-out default disabled grey. Forced because the WP
+   FormToggle disabled styling isn't tokenized for this dark surface. */
+.snc .components-form-toggle.is-checked.is-disabled {
+  opacity: 1;
+}
+.snc .components-form-toggle.is-checked.is-disabled .components-form-toggle__track {
+  background-color: var(--wp-blue, #3858e9);
+  opacity: 0.55;
+  border-color: transparent;
+}
+.snc .components-form-toggle.is-checked.is-disabled .components-form-toggle__thumb {
+  background-color: #fff;
+  opacity: 0.9;
+}
+
+/* Drag ghost — dark pill following the cursor. */
+.snc-drag-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 200px;
+  padding: 6px 10px;
+  background: #2a2a2a;
+  color: #fff;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+.snc-drag-ghost__icon {
+  display: inline-flex;
+  color: #777;
+}
+.snc-drag-ghost__icon svg { width: 18px; height: 18px; fill: currentColor; }
+.snc-drag-ghost__label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
 }

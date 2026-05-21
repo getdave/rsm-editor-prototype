@@ -7,6 +7,10 @@ import {
 } from '../data/mockData';
 import { MAIN_MENU_ID } from '../constants/navigation';
 import {
+  buildDefaultNavLayout,
+  buildVisibleAdminNavItems,
+} from '../constants/adminNav';
+import {
   appendTopLevelPageIfMissing,
   removeItemsByPageId,
   removePageFromAllMenus,
@@ -17,10 +21,220 @@ export const READING_DISPLAY_LATEST = 'latest';
 export const READING_DISPLAY_STATIC = 'static';
 
 const AppStateContext = createContext(null);
+const DEFAULT_NAV_SECTION_ID = 'group-main';
+
+// navLayout is an ordered array of top-level entries:
+//   { kind: 'item', id, hidden }
+//   { kind: 'section', type, id, label, items: [ { kind: 'item', id, hidden }, ... ] }
+// Sections are containers that own their items; nesting sections is not allowed.
+// `type` is one of: 'group' (no icon/name, inline items), 'folder' (file icon +
+// name, inline items), 'menu' (menu icon + name, drilldown pane). All three keep
+// kind:'section' so the move/insert/reconcile helpers treat them uniformly.
+
+/** Collect every nav item id present in the layout (top level + inside sections). */
+function collectItemIds(layout) {
+  const ids = new Set();
+  for (const entry of layout) {
+    if (entry.kind === 'item') {
+      ids.add(entry.id);
+    } else if (entry.kind === 'section') {
+      for (const item of entry.items ?? []) {
+        ids.add(item.id);
+      }
+    }
+  }
+  return ids;
+}
+
+/** Index of the container missing items should land in (prefer a Group). */
+function mainContainerIndex(layout) {
+  const groupIdx = layout.findIndex(
+    (e) => e.kind === 'section' && e.type === 'group',
+  );
+  if (groupIdx >= 0) return groupIdx;
+  return layout.findIndex((e) => e.kind === 'section');
+}
+
+/**
+ * Reconcile a nav layout against the current base item set: drop item entries
+ * no longer in the base set, and add base items missing from the layout into
+ * the main Group (items never live outside a container). Sections are preserved.
+ */
+function reconcileNavLayout(layout, baseIds) {
+  const present = collectItemIds(layout);
+  const filtered = layout
+    .map((entry) =>
+      entry.kind === 'section'
+        ? { ...entry, items: (entry.items ?? []).filter((it) => baseIds.has(it.id)) }
+        : entry,
+    )
+    .filter((entry) => entry.kind === 'section' || baseIds.has(entry.id));
+  const missing = [...baseIds].filter((id) => !present.has(id));
+  if (missing.length === 0 && filtered.length === layout.length) {
+    return layout;
+  }
+  const missingItems = missing.map((id) => ({ kind: 'item', id, hidden: false }));
+  if (missingItems.length === 0) {
+    return filtered;
+  }
+  const destIdx = mainContainerIndex(filtered);
+  if (destIdx === -1) {
+    // No container to hold them — wrap in a fresh Group (defensive).
+    return [
+      { kind: 'section', type: 'group', id: `group-${Date.now()}`, label: '', items: missingItems },
+      ...filtered,
+    ];
+  }
+  return filtered.map((entry, i) =>
+    i === destIdx
+      ? { ...entry, items: [...(entry.items ?? []), ...missingItems] }
+      : entry,
+  );
+}
+
+/** Remove an entry (item or section) from anywhere in the layout. */
+function removeEntryDeep(layout, id) {
+  const topIdx = layout.findIndex((entry) => entry.id === id);
+  if (topIdx >= 0) {
+    return {
+      removed: layout[topIdx],
+      layout: [...layout.slice(0, topIdx), ...layout.slice(topIdx + 1)],
+    };
+  }
+  let removed = null;
+  const next = layout.map((entry) => {
+    if (
+      entry.kind === 'section' &&
+      (entry.items ?? []).some((it) => it.id === id)
+    ) {
+      removed = entry.items.find((it) => it.id === id);
+      return { ...entry, items: entry.items.filter((it) => it.id !== id) };
+    }
+    return entry;
+  });
+  return { removed, layout: removed ? next : layout };
+}
+
+/** Append an item entry to a section's items. */
+function insertIntoSection(layout, sectionId, entry) {
+  let inserted = false;
+  const next = layout.map((e) => {
+    if (e.kind === 'section' && e.id === sectionId) {
+      inserted = true;
+      return { ...e, items: [...(e.items ?? []), entry] };
+    }
+    return e;
+  });
+  return { layout: next, inserted };
+}
+
+/** Insert an entry above/below a target that may live at top level or in a section. */
+function insertRelativeDeep(layout, targetId, entry, position) {
+  const topIdx = layout.findIndex((e) => e.id === targetId);
+  if (topIdx >= 0) {
+    const at = position === 'below' ? topIdx + 1 : topIdx;
+    const next = [...layout];
+    next.splice(at, 0, entry);
+    return { layout: next, inserted: true };
+  }
+  let inserted = false;
+  const next = layout.map((e) => {
+    if (
+      e.kind === 'section' &&
+      (e.items ?? []).some((it) => it.id === targetId)
+    ) {
+      const idx = e.items.findIndex((it) => it.id === targetId);
+      const at = position === 'below' ? idx + 1 : idx;
+      const items = [...e.items];
+      items.splice(at, 0, entry);
+      inserted = true;
+      return { ...e, items };
+    }
+    return e;
+  });
+  return { layout: next, inserted };
+}
+
+/**
+ * Move an entry relative to a target. `position` is 'above' | 'below' | 'inside'
+ * ('inside' drops an item into the section identified by targetId). Sections can
+ * only be reordered at the top level and never nested.
+ */
+function moveNavEntry(layout, draggedId, targetId, position) {
+  if (!draggedId || !targetId || draggedId === targetId) {
+    return layout;
+  }
+  const { removed, layout: pruned } = removeEntryDeep(layout, draggedId);
+  if (!removed) {
+    return layout;
+  }
+
+  if (position === 'inside') {
+    if (removed.kind === 'section') {
+      return layout;
+    }
+    const result = insertIntoSection(pruned, targetId, removed);
+    return result.inserted ? result.layout : layout;
+  }
+
+  if (removed.kind === 'section') {
+    const topIdx = pruned.findIndex((e) => e.id === targetId);
+    if (topIdx === -1) {
+      return layout;
+    }
+    const at = position === 'below' ? topIdx + 1 : topIdx;
+    const next = [...pruned];
+    next.splice(at, 0, removed);
+    return next;
+  }
+
+  const result = insertRelativeDeep(pruned, targetId, removed, position);
+  return result.inserted ? result.layout : layout;
+}
+
+/**
+ * Delete a section. Its member items move into the main container (the first
+ * Group, else the first remaining container) so items never become orphaned at
+ * the top level. If nothing remains, the section is kept (can't orphan items).
+ */
+function deleteSectionFromLayout(layout, sectionId) {
+  const idx = layout.findIndex(
+    (entry) => entry.kind === 'section' && entry.id === sectionId,
+  );
+  if (idx === -1) {
+    return layout;
+  }
+  const members = layout[idx].items ?? [];
+  const without = [...layout.slice(0, idx), ...layout.slice(idx + 1)];
+
+  if (members.length === 0) {
+    return without;
+  }
+  const destIdx = mainContainerIndex(without);
+  if (destIdx === -1) {
+    // Deleting the only container would orphan its items — keep it instead.
+    return layout;
+  }
+  return without.map((entry, i) =>
+    i === destIdx
+      ? { ...entry, items: [...(entry.items ?? []), ...members] }
+      : entry,
+  );
+}
 
 export function AppStateProvider({ children }) {
   // Sidebar state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Sidebar customizer — in-place edit mode for the main admin nav. `navLayout`
+  // is an ordered array of { kind: 'item', id, hidden } and
+  // { kind: 'section', id, label, items: [...] } entries (sections are
+  // containers that own their items). Drives both the normal sidebar render and
+  // the editor. In-memory only (resets on reload).
+  const [navEditMode, setNavEditMode] = useState(false);
+  const [navLayout, setNavLayout] = useState(() =>
+    buildDefaultNavLayout(initialReadingSettings.homepageDisplayMode),
+  );
 
   // Pages state (mutable for adding new pages and renames in the editor)
   const [pages, setPages] = useState(pagesData);
@@ -36,7 +250,7 @@ export function AppStateProvider({ children }) {
 
   // Homepage configuration. Kept global so Home, Pages, and Content all resolve
   // the same front-page/posts-page state.
-  const [homepageDisplayMode, setHomepageDisplayMode] = useState(
+  const [homepageDisplayMode, setHomepageDisplayModeRaw] = useState(
     initialReadingSettings.homepageDisplayMode,
   );
   const [frontPageId, setFrontPageId] = useState(
@@ -115,6 +329,74 @@ export function AppStateProvider({ children }) {
 
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => !prev);
+  };
+
+  // Setting the homepage display mode can change the base nav set (Posts
+  // appears/disappears), so reconcile navLayout in the same handler: drop
+  // entries no longer in the base set and append newly-available base items.
+  // Sections are always preserved. Done at event time (not in an effect).
+  const setHomepageDisplayMode = useCallback((next) => {
+    setHomepageDisplayModeRaw(next);
+    const resolved = typeof next === 'function' ? null : next;
+    if (resolved == null) {
+      return;
+    }
+    const baseIds = new Set(
+      buildVisibleAdminNavItems(resolved).map((item) => item.id),
+    );
+    setNavLayout((prev) => reconcileNavLayout(prev, baseIds));
+  }, []);
+
+  const enterNavEditMode = () => setNavEditMode(true);
+  const exitNavEditMode = () => setNavEditMode(false);
+
+  const toggleNavItemVisibility = (id) => {
+    setNavLayout((prev) =>
+      prev.map((entry) => {
+        if (entry.kind === 'item' && entry.id === id) {
+          return { ...entry, hidden: !entry.hidden };
+        }
+        if (entry.kind === 'section') {
+          return {
+            ...entry,
+            items: (entry.items ?? []).map((it) =>
+              it.id === id ? { ...it, hidden: !it.hidden } : it,
+            ),
+          };
+        }
+        return entry;
+      }),
+    );
+  };
+
+  const moveNavLayoutEntry = (draggedId, targetId, position) => {
+    setNavLayout((prev) => moveNavEntry(prev, draggedId, targetId, position));
+  };
+
+  const addNavContainer = (type) => {
+    setNavLayout((prev) => [
+      ...prev,
+      { kind: 'section', type, id: `${type}-${Date.now()}`, label: '', items: [] },
+    ]);
+  };
+
+  const resetNavLayout = () => {
+    setNavLayout(buildDefaultNavLayout(homepageDisplayMode));
+  };
+
+  const renameNavSection = (id, label) => {
+    setNavLayout((prev) =>
+      prev.map((entry) =>
+        entry.kind === 'section' && entry.id === id
+          ? { ...entry, label }
+          : entry,
+      ),
+    );
+  };
+
+  const deleteNavSection = (id) => {
+    if (id === DEFAULT_NAV_SECTION_ID) return;
+    setNavLayout((prev) => deleteSectionFromLayout(prev, id));
   };
 
   const openSiteIdentityModal = () => {
@@ -315,6 +597,18 @@ export function AppStateProvider({ children }) {
     sidebarCollapsed,
     setSidebarCollapsed,
     toggleSidebar,
+
+    // Sidebar customizer
+    navEditMode,
+    enterNavEditMode,
+    exitNavEditMode,
+    navLayout,
+    toggleNavItemVisibility,
+    moveNavLayoutEntry,
+    addNavContainer,
+    resetNavLayout,
+    renameNavSection,
+    deleteNavSection,
 
     // Pages state
     pages,
