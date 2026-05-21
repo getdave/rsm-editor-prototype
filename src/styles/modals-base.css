@@ -254,90 +254,25 @@
   padding: 16px 18px;
 }
 
-.m-field {
-  margin-bottom: 14px;
+/* ── SITE IDENTITY MODAL ── */
+.site-identity-modal.components-modal__frame {
+  width: 520px;
+  max-width: 90vw;
 }
 
-.m-lbl {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: #999;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 5px;
-}
-
-.m-input {
-  width: 100%;
-  padding: 7px 9px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font: 13px var(--wp-font-family);
-  color: #1e1e1e;
-  outline: none;
-}
-
-.m-input:focus {
-  border-color: #3858e9;
-}
-
-.m-logo-area {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.m-logo-preview {
+.site-identity-modal__logo-preview {
   width: 120px;
   height: 120px;
-  background: linear-gradient(135deg, #3858e9, #764ba2);
-  border-radius: 8px;
+  background: linear-gradient(135deg, var(--wpds-color-bg-interactive-brand-strong), #764ba2);
+  border-radius: var(--wpds-border-radius-lg);
   display: flex;
   align-items: center;
-  justify-content: center;
-  align-self: center;
-}
-
-.m-logo-placeholder {
-  font-size: 48px;
-  font-weight: 700;
-  color: #fff;
-}
-
-.m-logo-actions {
-  display: flex;
-  gap: 8px;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.m-logo-btn {
-  padding: 8px 16px;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 4px;
-  font: 500 13px var(--wp-font-family);
-  cursor: pointer;
-  color: #1e1e1e;
-  transition: all 0.15s ease;
-}
-
-.m-logo-btn:hover {
-  border-color: #3858e9;
-  color: #3858e9;
-}
-
-.m-logo-btn.primary {
-  background: #3858e9;
-  border-color: #3858e9;
-  color: #fff;
-}
-
-.m-logo-btn.primary:hover {
-  background: #2a47d1;
-  border-color: #2a47d1;
-  color: #fff;
+.site-identity-modal__actions {
+  margin-top: var(--wpds-dimension-gap-lg);
 }
 
 .modal-footer {
@@ -346,34 +281,6 @@
   gap: 8px;
   padding: 12px 18px 16px;
   border-top: 1px solid #eee;
-}
-
-.m-cancel {
-  padding: 7px 14px;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 4px;
-  font: 500 12px var(--wp-font-family);
-  cursor: pointer;
-  color: #555;
-}
-
-.m-cancel:hover {
-  background: #f5f5f5;
-}
-
-.m-ok {
-  padding: 7px 14px;
-  border: none;
-  background: #3858e9;
-  color: #fff;
-  border-radius: 4px;
-  font: 500 12px var(--wp-font-family);
-  cursor: pointer;
-}
-
-.m-ok:hover {
-  background: #2a47d4;
 }
 
 /* ── UNSAVED CHANGES MODAL ── */

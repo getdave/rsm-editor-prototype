@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, DropdownMenu, MenuItem, CheckboxControl, Tooltip, PanelBody, SelectControl } from '@wordpress/components';
-import { Stack, Text } from '@wordpress/ui';
+import { Modal, Button, TextControl, DropdownMenu, MenuItem, CheckboxControl, Tooltip, SelectControl } from '@wordpress/components';
+import { Text, CollapsibleCard, Card } from '@wordpress/ui';
 import { createInterpolateElement } from '@wordpress/element';
 import { chevronDown, plus } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
@@ -58,12 +58,6 @@ function AddPageModalContent() {
   ];
 
   const layouts = showAllLayouts ? allLayouts : starterLayouts;
-
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      closeAddPageModal();
-    }
-  };
 
   const handleSelectPath = (path) => {
     setSelectedPath(path);
@@ -156,39 +150,30 @@ function AddPageModalContent() {
   const canCreate = pageTitle.trim().length > 0;
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-box apm-modal" onClick={(e) => e.stopPropagation()}>
-        <Stack
-          direction="row"
-          align="flex-start"
-          justify="space-between"
-          className="modal-hd"
-        >
-          <Stack direction="column" gap="xs">
-            <Text variant="heading-md" className="modal-title">Add a new page</Text>
-            {selectedPath === 'layout' && !selectedLayout && (
-              <Text variant="body-sm" className="modal-subtitle">
-                {createInterpolateElement(
-                  'Choose from predefined layouts built using <term>patterns</term> that you can customize.',
-                  {
-                    term: (
-                      <DefinedTerm definition="Reusable design blocks you can combine and customize to build pages." />
-                    ),
-                  },
-                )}
-              </Text>
+    <Modal
+      title="Add a new page"
+      onRequestClose={closeAddPageModal}
+      className="apm-modal"
+      size="large"
+    >
+      <div className="apm-modal-body">
+        {selectedPath === 'layout' && !selectedLayout && (
+          <Text variant="body-sm" className="modal-subtitle apm-modal-subtitle">
+            {createInterpolateElement(
+              'Choose from predefined layouts built using <term>patterns</term> that you can customize.',
+              {
+                term: (
+                  <DefinedTerm definition="Reusable design blocks you can combine and customize to build pages." />
+                ),
+              },
             )}
-          </Stack>
-          <button className="modal-close" onClick={closeAddPageModal}>
-            ✕
-          </button>
-        </Stack>
-
-        <div className="modal-body">
-          {!selectedPath ? (
+          </Text>
+        )}
+        {!selectedPath ? (
             <>
               <div className="apm-options">
-                <button
+                <Button
+                  variant="secondary"
                   className="apm-option-card"
                   onClick={() => handleSelectPath('layout')}
                 >
@@ -205,9 +190,10 @@ function AddPageModalContent() {
                   <Text variant="body-sm" className="apm-option-desc">
                     Start with a pre-designed page layout
                   </Text>
-                </button>
+                </Button>
 
-                <button
+                <Button
+                  variant="secondary"
                   className="apm-option-card"
                   onClick={() => handleSelectPath('scratch')}
                 >
@@ -218,7 +204,7 @@ function AddPageModalContent() {
                   <Text variant="body-sm" className="apm-option-desc">
                     Create a blank page and add sections as you go
                   </Text>
-                </button>
+                </Button>
               </div>
 
               <Text variant="body-sm" className="apm-tutorial-hint">
@@ -239,7 +225,8 @@ function AddPageModalContent() {
                   <div className="apm-layouts-grid">
                     {layouts.map((layout) => (
                       <Tooltip key={layout.id} text={layout.tooltip}>
-                        <button
+                        <Button
+                          variant="secondary"
                           className={`apm-layout-card ${layout.pattern === 'scratch' ? 'apm-layout-scratch' : ''}`}
                           onClick={() => handleSelectLayout(layout)}
                         >
@@ -358,15 +345,15 @@ function AddPageModalContent() {
                           </div>
                           </div>
                           <Text variant="body-sm" className="apm-layout-name">{layout.name}</Text>
-                        </button>
+                        </Button>
                       </Tooltip>
                     ))}
                   </div>
                   
                   {!showAllLayouts && (
                     <div className="apm-load-more">
-                      <Button 
-                        variant="tertiary" 
+                      <Button
+                        variant="secondary"
                         className="apm-load-more-btn"
                         onClick={() => setShowAllLayouts(true)}
                       >
@@ -378,20 +365,16 @@ function AddPageModalContent() {
               ) : (
                 <>
                   <div className="apm-form">
-                    <div className="m-field">
-                      <label className="m-lbl" htmlFor="page-title">
-                        Page title *
-                      </label>
-                      <input
-                        id="page-title"
-                        type="text"
-                        className="m-input"
-                        value={pageTitle}
-                        onChange={(e) => setPageTitle(e.target.value)}
-                        placeholder="Enter page title"
-                        autoFocus
-                      />
-                    </div>
+                    <TextControl
+                      label="Page title"
+                      value={pageTitle}
+                      onChange={setPageTitle}
+                      placeholder="Enter page title"
+                      required
+                      __next40pxDefaultSize
+                      className="apm-page-title"
+                      autoFocus
+                    />
 
                     <div className="apm-checkbox-group">
                       <div className="apm-checkbox-item">
@@ -416,33 +399,36 @@ function AddPageModalContent() {
                       </div>
                     </div>
 
-                    <PanelBody title="Advanced" initialOpen={false} className="apm-panel">
-                      <SelectControl
-                        label="Page Template"
-                        value={selectedTemplate}
-                        options={pageTemplateOptions}
-                        onChange={setSelectedTemplate}
-                        help="Choose a template to control the layout and structure of this page"
-                        className="apm-page-template-select"
-                      />
-                    </PanelBody>
+                    <CollapsibleCard.Root defaultOpen={false} className="apm-panel">
+                      <CollapsibleCard.Header>
+                        <Card.Title>Advanced</Card.Title>
+                      </CollapsibleCard.Header>
+                      <CollapsibleCard.Content>
+                        <SelectControl
+                          label="Page Template"
+                          value={selectedTemplate}
+                          options={pageTemplateOptions.map(({ value, label }) => ({ value, label }))}
+                          onChange={setSelectedTemplate}
+                          help="Choose a template to control the layout and structure of this page"
+                          className="apm-page-template-select"
+                        />
+                      </CollapsibleCard.Content>
+                    </CollapsibleCard.Root>
                   </div>
                 </>
               )}
             </>
           )}
-        </div>
+      </div>
 
-        {selectedPath && (
-          <div className="modal-footer apm-modal-footer">
-            <Button variant="tertiary" onClick={handleFooterBack}>
-              ← Back to options
-            </Button>
-            <div className="apm-modal-footer-actions">
-              <Button variant="secondary" onClick={closeAddPageModal}>
-                Cancel
+      <div className="modal-footer apm-modal-footer">
+            {selectedPath && (
+              <Button variant="tertiary" onClick={handleFooterBack}>
+                ← Back to options
               </Button>
-              {(selectedPath !== 'layout' || selectedLayout) && (
+            )}
+            <div className="apm-modal-footer-actions">
+              {selectedPath && (selectedPath !== 'layout' || selectedLayout) && (
                 <div className="split-button">
                   <Button
                     variant="primary"
@@ -480,10 +466,8 @@ function AddPageModalContent() {
                 </div>
               )}
             </div>
-          </div>
-        )}
       </div>
-    </div>
+    </Modal>
   );
 }
 
