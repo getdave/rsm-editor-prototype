@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Modal, Button, TextControl, Flex, FlexItem } from '@wordpress/components';
-import { Stack, Text } from '@wordpress/ui';
+import { Modal, Button, TextControl, BaseControl, Flex, FlexItem } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useAppState } from '../../hooks/useAppState';
 
 function SiteIdentityModal() {
@@ -52,18 +52,21 @@ function SiteIdentityModalContent() {
           __next40pxDefaultSize
           autoFocus
         />
-        <Stack direction="column" gap="sm">
-          <Text variant="body-sm" className="site-identity-modal__logo-label">Site logo</Text>
-          <Stack direction="row" align="center" gap="md" className="site-identity-modal__logo-area">
+        <BaseControl
+          __nextHasNoMarginBottom
+          id="site-identity-logo"
+          label="Site logo"
+        >
+          <Stack direction="row" align="flex-start" gap="md" className="site-identity-modal__logo-area">
             <div className="site-identity-modal__logo-preview">
               <div className="site-identity-modal__logo-placeholder" />
             </div>
-            <Stack direction="column" gap="sm">
-              <Button variant="primary">Upload image</Button>
+            <Stack direction="column" align="flex-start" gap="sm">
+              <Button variant="secondary">Upload image</Button>
               <Button variant="secondary">Choose from library</Button>
             </Stack>
           </Stack>
-        </Stack>
+        </BaseControl>
       </Stack>
       <Flex justify="flex-end" gap={2} className="site-identity-modal__actions">
         <FlexItem>

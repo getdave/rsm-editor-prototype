@@ -6,6 +6,7 @@
 .apm-modal.components-modal__frame {
   width: 720px;
   max-width: 90vw;
+  max-height: 85vh;
 }
 
 .apm-modal .components-modal__content {
@@ -16,20 +17,26 @@
 }
 
 .apm-modal-body {
-  flex: 1;
+  flex: 1 1 auto;
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
 }
 
 .apm-modal-subtitle {
-  margin: 0 0 var(--wpds-dimension-gap-lg);
+  margin: 0 0 var(--wpds-dimension-padding-xl);
 }
 
+/* Footer sits inside the WordPress modal content padding, so it adds no
+   horizontal padding of its own — keeping its edges aligned with the body. */
 .apm-modal .modal-footer.apm-modal-footer {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--wpds-dimension-gap-md);
+  flex: 0 0 auto;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .apm-modal-footer-actions {
@@ -48,23 +55,18 @@
   margin-bottom: var(--wpds-dimension-padding-xl);
 }
 
-.apm-option-card {
+/* The option cards are WordPress <Button variant="secondary"> elements, so the
+   border, hover, focus, and active states come from the design system. We only
+   override layout so the button can host a multi-line card with a preview. */
+.apm-modal .apm-option-card.components-button {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  height: auto;
+  white-space: normal;
   padding: var(--wpds-dimension-gap-xl) var(--wpds-dimension-padding-xl);
-  background: var(--wpds-color-bg-surface-neutral-strong);
-  border: var(--wpds-border-width-sm) solid var(--wpds-color-stroke-surface-neutral-weak);
   border-radius: var(--wpds-border-radius-lg);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: inherit;
-}
-
-.apm-option-card:hover {
-  border-color: var(--wpds-color-fg-interactive-brand);
-  box-shadow: 0 2px 8px rgba(56, 88, 233, 0.15);
 }
 
 .apm-option-preview {
@@ -212,31 +214,16 @@
   border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
-.apm-load-more-btn.components-button {
-  font-size: 13px;
-  color: var(--wpds-color-fg-content-neutral-weak);
-}
-
-.apm-layout-card {
+/* Layout cards are WordPress <Button variant="secondary"> elements; we only
+   override layout so each can host a preview thumbnail above its label. */
+.apm-modal .apm-layout-card.components-button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: auto;
+  white-space: normal;
   padding: var(--wpds-dimension-gap-lg);
-  background: var(--wpds-color-bg-surface-neutral-strong);
-  border: var(--wpds-border-width-sm) solid var(--wpds-color-stroke-surface-neutral-weak);
   border-radius: var(--wpds-border-radius-lg);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: inherit;
-}
-
-.apm-layout-card.apm-layout-scratch {
-  border-style: dashed;
-}
-
-.apm-layout-card:hover {
-  border-color: var(--wpds-color-fg-interactive-brand);
-  box-shadow: 0 2px 8px rgba(56, 88, 233, 0.15);
 }
 
 .apm-layout-preview {
@@ -600,22 +587,13 @@
   line-height: 1.4;
 }
 
-/* Advanced panel + page options */
-.apm-panel.components-panel__body {
-  border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
-  border-radius: var(--wpds-border-radius-sm);
-  margin: 0;
-}
-
-.apm-panel .components-panel__body-toggle {
-  padding: 11px var(--wpds-dimension-gap-lg);
-}
-
-.apm-panel .apm-page-template-select.components-base-control {
+/* Advanced section — CollapsibleCard from @wordpress/ui handles its own
+   card chrome, so we only normalize the select control inside it. */
+.apm-page-template-select.components-base-control {
   margin-bottom: 0;
 }
 
-.apm-panel .apm-page-template-select .components-select-control__input {
+.apm-page-template-select .components-select-control__input {
   width: 100%;
   max-width: 100%;
 }

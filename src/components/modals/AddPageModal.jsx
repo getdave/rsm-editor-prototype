@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Modal, Button, TextControl, DropdownMenu, MenuItem, CheckboxControl, Tooltip, PanelBody, SelectControl } from '@wordpress/components';
-import { Text } from '@wordpress/ui';
+import { Modal, Button, TextControl, DropdownMenu, MenuItem, CheckboxControl, Tooltip, SelectControl } from '@wordpress/components';
+import { Text, CollapsibleCard } from '@wordpress/ui';
 import { createInterpolateElement } from '@wordpress/element';
 import { chevronDown, plus } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
@@ -172,7 +172,8 @@ function AddPageModalContent() {
         {!selectedPath ? (
             <>
               <div className="apm-options">
-                <button
+                <Button
+                  variant="secondary"
                   className="apm-option-card"
                   onClick={() => handleSelectPath('layout')}
                 >
@@ -189,9 +190,10 @@ function AddPageModalContent() {
                   <Text variant="body-sm" className="apm-option-desc">
                     Start with a pre-designed page layout
                   </Text>
-                </button>
+                </Button>
 
-                <button
+                <Button
+                  variant="secondary"
                   className="apm-option-card"
                   onClick={() => handleSelectPath('scratch')}
                 >
@@ -202,7 +204,7 @@ function AddPageModalContent() {
                   <Text variant="body-sm" className="apm-option-desc">
                     Create a blank page and add sections as you go
                   </Text>
-                </button>
+                </Button>
               </div>
 
               <Text variant="body-sm" className="apm-tutorial-hint">
@@ -223,7 +225,8 @@ function AddPageModalContent() {
                   <div className="apm-layouts-grid">
                     {layouts.map((layout) => (
                       <Tooltip key={layout.id} text={layout.tooltip}>
-                        <button
+                        <Button
+                          variant="secondary"
                           className={`apm-layout-card ${layout.pattern === 'scratch' ? 'apm-layout-scratch' : ''}`}
                           onClick={() => handleSelectLayout(layout)}
                         >
@@ -342,15 +345,15 @@ function AddPageModalContent() {
                           </div>
                           </div>
                           <Text variant="body-sm" className="apm-layout-name">{layout.name}</Text>
-                        </button>
+                        </Button>
                       </Tooltip>
                     ))}
                   </div>
                   
                   {!showAllLayouts && (
                     <div className="apm-load-more">
-                      <Button 
-                        variant="tertiary" 
+                      <Button
+                        variant="secondary"
                         className="apm-load-more-btn"
                         onClick={() => setShowAllLayouts(true)}
                       >
@@ -396,16 +399,19 @@ function AddPageModalContent() {
                       </div>
                     </div>
 
-                    <PanelBody title="Advanced" initialOpen={false} className="apm-panel">
-                      <SelectControl
-                        label="Page Template"
-                        value={selectedTemplate}
-                        options={pageTemplateOptions}
-                        onChange={setSelectedTemplate}
-                        help="Choose a template to control the layout and structure of this page"
-                        className="apm-page-template-select"
-                      />
-                    </PanelBody>
+                    <CollapsibleCard.Root defaultOpen={false} className="apm-panel">
+                      <CollapsibleCard.Header>Advanced</CollapsibleCard.Header>
+                      <CollapsibleCard.Content>
+                        <SelectControl
+                          label="Page Template"
+                          value={selectedTemplate}
+                          options={pageTemplateOptions.map(({ value, label }) => ({ value, label }))}
+                          onChange={setSelectedTemplate}
+                          help="Choose a template to control the layout and structure of this page"
+                          className="apm-page-template-select"
+                        />
+                      </CollapsibleCard.Content>
+                    </CollapsibleCard.Root>
                   </div>
                 </>
               )}

@@ -255,11 +255,6 @@
 }
 
 /* ── SITE IDENTITY MODAL ── */
-.site-identity-modal__logo-label {
-  display: block;
-  color: var(--wpds-color-fg-content-neutral);
-}
-
 .site-identity-modal__logo-preview {
   width: 120px;
   height: 120px;
