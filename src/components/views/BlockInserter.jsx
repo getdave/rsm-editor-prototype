@@ -96,7 +96,7 @@ function BlockCard({ block, onInsert }) {
 
 function PatternCard({ pattern, onInsert }) {
   return (
-    <button type="button" className="bi-pattern" onClick={onInsert}>
+    <button type="button" className="bi-pattern" onClick={() => onInsert(pattern)}>
       <div className={`bi-pattern-preview${pattern.isTT5Pattern ? ' bi-pattern-preview--tt5' : ''}`}>
         {pattern.isTT5Pattern ? (
           <TT5PatternPreview pattern={pattern} />
@@ -204,7 +204,11 @@ export function BlockInserterContent() {
     setSearchParams(searchParams);
   };
 
-  const handleInsert = () => {};
+  const handleInsert = (item) => {
+    if (item) {
+      window.alert("Insertion of sections isn't implemented in this prototype.");
+    }
+  };
 
   const trimmedSearch = searchTerm.trim().toLowerCase();
   const isSearching = trimmedSearch.length > 0;

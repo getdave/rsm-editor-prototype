@@ -622,18 +622,10 @@ export function TemplatesView() {
 }
 
 export function PatternsView() {
-  const navigate = useNavigate();
-  const { pages, selectPage, showSnackbar } = useAppState();
+  const { showSnackbar } = useAppState();
 
-  const handleOpenItem = (item) => {
-    const targetPage =
-      pages.find((page) => page.isFrontPage) ??
-      pages.find((page) => page.id === 'home') ??
-      pages[0];
-    if (targetPage) {
-      selectPage(targetPage);
-      navigate(`/pages/${targetPage.id}/edit?inserter=patterns&pattern=${item.id}`);
-    }
+  const handleOpenItem = () => {
+    window.alert('Pattern preview is not implemented in this prototype.');
   };
 
   const handleAction = (action, item) => {
