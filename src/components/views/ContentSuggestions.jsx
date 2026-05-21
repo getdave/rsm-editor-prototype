@@ -9,17 +9,50 @@ import {
   page as pageIcon,
   styles,
 } from '@wordpress/icons';
-import { useAppState } from '../../hooks/useAppState';
+import { useSpotlightHelp } from '../../hooks/useSpotlightHelp';
 
 function ContentSuggestions() {
   const navigate = useNavigate();
-  const { openAddPageModal } = useAppState();
+  const { requestSpotlightHelp } = useSpotlightHelp();
   const [expanded, setExpanded] = useState(true);
   const [dismissed, setDismissed] = useState(false);
 
   const handleAddPage = () => {
     navigate('/pages');
-    openAddPageModal();
+    requestSpotlightHelp({
+      id: 'learn-basics-add-page',
+      target: '[data-help-target="pages-add-page"]',
+      title: 'Add pages from here',
+      description:
+        'Create a new page from a layout or a blank page. After you dismiss this, choose Add page to start.',
+      persist: true,
+    });
+  };
+
+  const handleNavigation = () => {
+    navigate('/navigation', {
+      state: { spotlightHelpTarget: 'navigation-add-to-menu' },
+    });
+    requestSpotlightHelp({
+      id: 'learn-basics-navigation',
+      target: '[data-help-target="navigation-add-to-menu"]',
+      title: 'Add pages to your menu',
+      description:
+        'Use this control to choose which pages appear in the site menu.',
+      persist: true,
+    });
+  };
+
+  const handleDesign = () => {
+    navigate('/design/styles');
+    requestSpotlightHelp({
+      id: 'learn-basics-design',
+      target: '[data-help-target="styles-variations-grid"]',
+      title: 'Start with a style variation',
+      description:
+        'Style variations change the overall look of the site first. More specific colors, fonts, and layout controls stay nearby when you need them.',
+      persist: true,
+    });
   };
 
   const suggestions = [
@@ -37,7 +70,7 @@ function ContentSuggestions() {
       description: 'Choose which pages appear in your main menu.',
       icon: navigation,
       tone: 'navigation',
-      onClick: () => navigate('/navigation'),
+      onClick: handleNavigation,
     },
     {
       id: 'design',
@@ -45,7 +78,7 @@ function ContentSuggestions() {
       description: 'Update colors, fonts, and style variations.',
       icon: styles,
       tone: 'design',
-      onClick: () => navigate('/design/styles'),
+      onClick: handleDesign,
     },
   ];
 

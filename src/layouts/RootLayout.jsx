@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Snackbar } from '@wordpress/components';
 import { useAppState } from '../hooks/useAppState';
+import { SpotlightHelpProvider } from '../hooks/useSpotlightHelp';
 import Sidebar from '../components/Sidebar';
 import SiteEditorHeader from '../components/SiteEditorHeader';
 import CommandPalette from '../components/CommandPalette';
@@ -65,7 +66,7 @@ function RootLayout() {
   }, [currentFullPath, location.pathname, markDirty, setEditorReferrer]);
 
   return (
-    <>
+    <SpotlightHelpProvider>
       <div className={`app-shell ${isEditCanvas ? 'is-edit-canvas' : ''} ${menuExpanded ? 'is-menu-expanded' : ''}`}>
         <SiteEditorHeader />
         <div className="body">
@@ -89,7 +90,7 @@ function RootLayout() {
         </Snackbar>
       )}
       <DevBranchIndicator />
-    </>
+    </SpotlightHelpProvider>
   );
 }
 
