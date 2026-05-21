@@ -109,6 +109,60 @@
   border-bottom-color: #3858e9;
 }
 
+.defined-term-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.defined-term-wrap::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: -10px;
+  left: -10px;
+  height: 10px;
+}
+
+.defined-term-popover {
+  position: absolute;
+  z-index: 100000;
+  top: calc(100% + 6px);
+  left: 50%;
+  display: none;
+  width: 260px;
+  padding: 10px 12px;
+  background: #1e1e1e;
+  border-radius: 2px;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.defined-term-popover::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  border: 5px solid transparent;
+  border-bottom-color: #1e1e1e;
+  transform: translateX(-50%);
+}
+
+.defined-term-popover a {
+  display: inline-block;
+  margin-top: 8px;
+  color: #9ec2ff;
+  text-decoration: underline;
+}
+
+.defined-term-wrap:hover .defined-term-popover,
+.defined-term-wrap:focus-within .defined-term-popover {
+  display: block;
+}
+
 /* ── SNACKBAR STYLING ── */
 
 /* Position snackbar - bottom left with spacing */

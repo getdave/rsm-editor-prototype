@@ -150,10 +150,15 @@ function AddPageModalContent() {
         {selectedPath === 'layout' && !selectedLayout && (
           <Text variant="body-sm" className="modal-subtitle apm-modal-subtitle">
             {createInterpolateElement(
-              'Choose from predefined layouts built using <term>patterns</term> that you can customize.',
+              'Choose from predefined layouts built using <term>Patterns</term> that you can customize.',
               {
                 term: (
-                  <DefinedTerm definition="Reusable design blocks you can combine and customize to build pages." />
+                  <DefinedTerm
+                    definition="Reusable design blocks you can combine and customize to build pages."
+                    linkTo="/patterns?category=Page"
+                    linkText="View Page Patterns"
+                    onLinkClick={closeAddPageModal}
+                  />
                 ),
               },
             )}
