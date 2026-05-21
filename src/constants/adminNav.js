@@ -11,6 +11,7 @@ import {
   layout,
   symbolFilled,
   addTemplate,
+  tool,
 } from '@wordpress/icons';
 import { HOMEPAGE_DISPLAY_LATEST } from '../data/mockData';
 
@@ -101,6 +102,7 @@ export function buildDefaultNavLayout(homepageDisplayMode) {
       type: 'menu',
       id: 'menu-design',
       label: 'Design',
+      icon: styles,
       items: idsToLayoutItems(DESIGN_MENU_ITEM_IDS),
     },
     {
@@ -108,6 +110,7 @@ export function buildDefaultNavLayout(homepageDisplayMode) {
       type: 'menu',
       id: 'menu-advanced',
       label: 'Advanced',
+      icon: tool,
       items: idsToLayoutItems(ADVANCED_MENU_ITEM_IDS),
     },
   ];
