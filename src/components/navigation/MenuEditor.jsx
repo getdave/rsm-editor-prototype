@@ -429,6 +429,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack, onPreviewItem }) {
   const didDragRef = useRef(false);
   const pendingPressRef = useRef(null);
   const clickCancelledRef = useRef(false);
+  const detailsPopoverRef = useRef(null);
 
   const advancedTargetsByUrl = useMemo(() => {
     const entries = navigationAdvancedTargets
@@ -690,6 +691,44 @@ function MenuEditor({ menu, onUpdateMenu, onBack, onPreviewItem }) {
 
   useEffect(() => () => clearPendingPress(), [clearPendingPress]);
 
+  useEffect(() => {
+    if (!selectedItemId) {
+      return undefined;
+    }
+
+    const closeDetailsOnOutsidePointerDown = (event) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (detailsPopoverRef.current?.contains(target)) {
+        return;
+      }
+
+      if (target.closest('[data-nav-menu-item-id]')) {
+        return;
+      }
+
+      setSelectedItemId(null);
+      setDetailsAnchor(null);
+    };
+
+    document.addEventListener(
+      'pointerdown',
+      closeDetailsOnOutsidePointerDown,
+      true,
+    );
+
+    return () => {
+      document.removeEventListener(
+        'pointerdown',
+        closeDetailsOnOutsidePointerDown,
+        true,
+      );
+    };
+  }, [selectedItemId]);
+
   const beginItemPress = (event, itemId) => {
     if (event.button !== 0) {
       return;
@@ -887,6 +926,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack, onPreviewItem }) {
 
   const renderTargetDetailsPopover = (item, targetMeta) => (
     <div
+      ref={detailsPopoverRef}
       className="nav-item-details-popover"
       role="dialog"
       aria-label={`${item.label} link details`}
