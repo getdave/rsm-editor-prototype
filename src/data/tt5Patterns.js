@@ -20,6 +20,14 @@ import heroPodcast from '../assets/images/twentytwentyfive/hero-podcast.webp';
 import campanulaFlower from '../assets/images/twentytwentyfive/campanula-alliariifolia-flower.webp';
 import delphiniumFlowers from '../assets/images/twentytwentyfive/delphinium-flowers.webp';
 import botanyFlowersCloseup from '../assets/images/twentytwentyfive/botany-flowers-closeup.webp';
+import womanSplashingWater from '../assets/images/twentytwentyfive/woman-splashing-water.webp';
+import linkInBioBackground from '../assets/images/twentytwentyfive/link-in-bio-background.webp';
+import linkInBioImage from '../assets/images/twentytwentyfive/link-in-bio-image.webp';
+import northernButtercupsFlowers from '../assets/images/twentytwentyfive/northern-buttercups-flowers.webp';
+import categoryAnthuriums from '../assets/images/twentytwentyfive/category-anthuriums.webp';
+import categoryCactus from '../assets/images/twentytwentyfive/category-cactus.webp';
+import categorySunflowers from '../assets/images/twentytwentyfive/category-sunflowers.webp';
+import ruinsImage from '../assets/images/twentytwentyfive/ruins-image.webp';
 
 const SOURCE = 'Twenty Twenty-Five';
 const SYNC_STATUS = 'Not synced';
@@ -190,4 +198,134 @@ export const tt5InserterPatterns = tt5PatternItems.map((pattern) => ({
   isTT5Pattern: true,
 }));
 
-export const tt5AdvancedPatterns = tt5PatternItems;
+export const tt5PagePatternItems = [
+  {
+    id: 'tt5-page-business-home',
+    slug: 'twentytwentyfive/page-business-home',
+    name: 'Business homepage',
+    category: 'Page',
+    description: 'A business homepage pattern assembled from TT5 sections.',
+    previewKind: 'tt5-page-business-home',
+    suggestedTitle: 'Home',
+    images: {
+      flower: redHibiscusCloseup,
+      detail: gridFlower2,
+      campanula: campanulaFlower,
+      delphinium: delphiniumFlowers,
+      thristle: starThristleFlower,
+    },
+  },
+  {
+    id: 'tt5-page-coming-soon',
+    slug: 'twentytwentyfive/page-coming-soon',
+    name: 'Coming soon',
+    category: 'Page',
+    description: 'A full-page coming soon cover with centered subscription call to action.',
+    previewKind: 'tt5-page-coming-soon',
+    suggestedTitle: 'Coming Soon',
+    images: { hero: comingSoonBgImage },
+  },
+  {
+    id: 'tt5-page-cv-bio',
+    slug: 'twentytwentyfive/page-cv-bio',
+    name: 'CV/bio',
+    category: 'Page',
+    description: 'A large typographic CV or biography page with portrait and profile links.',
+    previewKind: 'tt5-page-cv-bio',
+    suggestedTitle: 'About',
+    images: { portrait: womanSplashingWater },
+  },
+  {
+    id: 'tt5-page-landing-book',
+    slug: 'twentytwentyfive/page-landing-book',
+    name: 'Landing page for book',
+    category: 'Page',
+    description: 'A book landing page with hero, retailer links, book details, FAQs, and newsletter signup.',
+    previewKind: 'tt5-page-landing-book',
+    suggestedTitle: 'Book',
+    images: { book: bookImageLanding },
+  },
+  {
+    id: 'tt5-page-landing-event',
+    slug: 'twentytwentyfive/page-landing-event',
+    name: 'Landing page for event',
+    category: 'Page',
+    description: 'An event landing page with hero image, description, FAQs, and contact call to action.',
+    previewKind: 'tt5-page-landing-event',
+    suggestedTitle: 'Event',
+    images: { hero: northernButtercupsFlowers, ruins: ruinsImage },
+  },
+  {
+    id: 'tt5-page-landing-podcast',
+    slug: 'twentytwentyfive/page-landing-podcast',
+    name: 'Landing page for podcast',
+    category: 'Page',
+    description: 'A podcast landing page with hero, about section, sponsor logos, episodes, and newsletter signup.',
+    previewKind: 'tt5-page-landing-podcast',
+    suggestedTitle: 'Podcast',
+    images: { host: heroPodcast, ruins: ruinsImage },
+  },
+  {
+    id: 'tt5-page-link-in-bio-heading-paragraph-links-image',
+    slug: 'twentytwentyfive/page-link-in-bio-heading-paragraph-links-image',
+    name: 'Link in bio heading, paragraph, links and full-height image',
+    category: 'Page',
+    description: 'A link in bio landing page with text links and a full-height image column.',
+    previewKind: 'tt5-page-link-bio-image',
+    suggestedTitle: 'Links',
+    images: { hero: linkInBioBackground },
+  },
+  {
+    id: 'tt5-page-link-in-bio-wide-margins',
+    slug: 'twentytwentyfive/page-link-in-bio-wide-margins',
+    name: 'Link in bio with profile, links and wide margins',
+    category: 'Page',
+    description: 'A spacious link in bio page with profile photo, short bio, and social links.',
+    previewKind: 'tt5-page-link-bio-profile',
+    suggestedTitle: 'Links',
+    images: { portrait: womanSplashingWater },
+  },
+  {
+    id: 'tt5-page-link-in-bio-with-tight-margins',
+    slug: 'twentytwentyfive/page-link-in-bio-with-tight-margins',
+    name: 'Link in bio with tight margins',
+    category: 'Page',
+    description: 'A compact full-height link in bio page with image, biography copy, and links.',
+    previewKind: 'tt5-page-link-bio-tight',
+    suggestedTitle: 'Links',
+    images: { hero: linkInBioImage },
+  },
+  {
+    id: 'tt5-page-portfolio-home',
+    slug: 'twentytwentyfive/page-portfolio-home',
+    name: 'Portfolio homepage',
+    category: 'Page',
+    description: 'A portfolio homepage pattern with project intro and query layout placeholders.',
+    previewKind: 'tt5-page-portfolio-home',
+    suggestedTitle: 'Portfolio',
+  },
+  {
+    id: 'tt5-page-shop-home',
+    slug: 'twentytwentyfive/page-shop-home',
+    name: 'Shop homepage',
+    category: 'Page',
+    description: 'A shop homepage with intro banner, product categories, and media grid.',
+    previewKind: 'tt5-page-shop-home',
+    suggestedTitle: 'Shop',
+    images: {
+      hero: botanyFlowers,
+      anthuriums: categoryAnthuriums,
+      cactus: categoryCactus,
+      sunflowers: categorySunflowers,
+    },
+  },
+].map((pattern) => ({
+  ...pattern,
+  source: SOURCE,
+  syncStatus: SYNC_STATUS,
+  isLocked: true,
+  isTT5Pattern: true,
+  isTT5PagePattern: true,
+}));
+
+export const tt5AdvancedPatterns = [...tt5PatternItems, ...tt5PagePatternItems];

@@ -6,7 +6,26 @@ import { createInterpolateElement } from '@wordpress/element';
 import { chevronDown, plus } from '@wordpress/icons';
 import { useAppState } from '../../hooks/useAppState';
 import { pageTemplateOptions } from '../../data/mockData';
+import { tt5PagePatternItems } from '../../data/tt5Patterns';
 import DefinedTerm from '../shared/DefinedTerm';
+import TT5PatternPreview from '../shared/TT5PatternPreview';
+
+const SCRATCH_LAYOUT = {
+  id: '_scratch',
+  name: 'Start from scratch',
+  suggestedTitle: '',
+  tooltip: 'Create a blank page and add content as you go',
+};
+
+const PAGE_PATTERN_LAYOUTS = tt5PagePatternItems.map((pattern) => ({
+  id: pattern.id,
+  name: pattern.name,
+  suggestedTitle: pattern.suggestedTitle,
+  tooltip: pattern.description,
+  pattern,
+}));
+
+const PAGE_LAYOUTS = [...PAGE_PATTERN_LAYOUTS, SCRATCH_LAYOUT];
 
 function AddPageModal() {
   const { addPageModalOpen } = useAppState();
@@ -30,53 +49,24 @@ function AddPageModalContent() {
   const [pageTitle, setPageTitle] = useState('');
   const [showLive, setShowLive] = useState(true);
   const [addToMenu, setAddToMenu] = useState(false);
-  const [showAllLayouts, setShowAllLayouts] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState('page-default');
   const generatedPageIdRef = useRef(0);
-
-  // Curated starter layouts (shown by default)
-  const starterLayouts = [
-    { id: 'text-based', name: 'Text-based Page', suggestedTitle: 'New Page', pattern: 'standard', tooltip: 'Simple page with heading and text content' },
-    { id: 'business-home', name: 'Business homepage', suggestedTitle: 'Home', pattern: 'business', tooltip: 'Professional homepage for businesses' },
-    { id: 'portfolio-home', name: 'Portfolio homepage', suggestedTitle: 'Portfolio', pattern: 'gallery', tooltip: 'Showcase your work and projects' },
-    { id: 'event-landing', name: 'Landing page for event', suggestedTitle: 'Event', pattern: 'landing', tooltip: 'Promote and provide details for events' },
-    { id: 'cv-bio', name: 'CV/bio', suggestedTitle: 'About', pattern: 'cv', tooltip: 'Professional biography or resume' },
-    { id: 'coming-soon', name: 'Coming soon', suggestedTitle: 'Coming Soon', pattern: 'centered', tooltip: 'Temporary page for upcoming launches' },
-  ];
-
-  // All WordPress patterns (shown when "Load more" is clicked)
-  const allLayouts = [
-    ...starterLayouts,
-    { id: 'event-rsvp', name: 'Event RSVP', suggestedTitle: 'RSVP', pattern: 'form', tooltip: 'Collect RSVPs for your event' },
-    { id: 'book-landing', name: 'Landing page for book', suggestedTitle: 'Book', pattern: 'book', tooltip: 'Promote and sell your book' },
-    { id: 'podcast-landing', name: 'Landing page for podcast', suggestedTitle: 'Podcast', pattern: 'list', tooltip: 'Share your podcast episodes' },
-    { id: 'link-bio-heading', name: 'Link in bio', suggestedTitle: 'Links', pattern: 'links', tooltip: 'Social media link collection page' },
-    { id: 'link-bio-profile', name: 'Link in bio (profile)', suggestedTitle: 'Links', pattern: 'links', tooltip: 'Link collection with profile header' },
-    { id: 'link-bio-tight', name: 'Link in bio (compact)', suggestedTitle: 'Links', pattern: 'links', tooltip: 'Compact link collection layout' },
-    { id: 'shop-home', name: 'Shop homepage', suggestedTitle: 'Shop', pattern: 'grid', tooltip: 'E-commerce store homepage' },
-    { id: '_scratch', name: 'Start from scratch', suggestedTitle: '', pattern: 'scratch', tooltip: 'Create a blank page and add content as you go' },
-  ];
-
-  const layouts = showAllLayouts ? allLayouts : starterLayouts;
 
   const handleSelectPath = (path) => {
     setSelectedPath(path);
     setSelectedLayout(null);
     setPageTitle('');
-    setShowAllLayouts(false); // Reset to curated view
     setSelectedTemplate('page-default');
   };
 
   const handleFooterBack = () => {
     if (selectedPath === 'layout' && !selectedLayout) {
       setSelectedPath(null);
-      setShowAllLayouts(false);
       return;
     }
     setSelectedPath(null);
     setSelectedLayout(null);
     setPageTitle('');
-    setShowAllLayouts(false);
     setSelectedTemplate('page-default');
   };
 
@@ -223,144 +213,25 @@ function AddPageModalContent() {
               {selectedPath === 'layout' && !selectedLayout ? (
                 <>
                   <div className="apm-layouts-grid">
-                    {layouts.map((layout) => (
+                    {PAGE_LAYOUTS.map((layout) => (
                       <Tooltip key={layout.id} text={layout.tooltip}>
                         <Button
                           variant="secondary"
-                          className={`apm-layout-card ${layout.pattern === 'scratch' ? 'apm-layout-scratch' : ''}`}
+                          className={`apm-layout-card ${layout.id === '_scratch' ? 'apm-layout-scratch' : ''}`}
                           onClick={() => handleSelectLayout(layout)}
                         >
                           <div className="apm-layout-preview">
-                          <div className={`apm-layout-pattern apm-pattern-${layout.pattern}`}>
-                            {layout.pattern === 'standard' && (
-                              <>
-                                <div className="pattern-heading"></div>
-                                <div className="pattern-text-line"></div>
-                                <div className="pattern-text-line"></div>
-                                <div className="pattern-text-line short"></div>
-                              </>
-                            )}
-                            {layout.pattern === 'business' && (
-                              <>
-                                <div className="pattern-hero"></div>
-                                <div className="pattern-features">
-                                  <div className="pattern-feature-box"></div>
-                                  <div className="pattern-feature-box"></div>
-                                  <div className="pattern-feature-box"></div>
-                                </div>
-                              </>
-                            )}
-                            {layout.pattern === 'landing' && (
-                              <>
-                                <div className="pattern-hero-small"></div>
-                                <div className="pattern-content-block"></div>
-                                <div className="pattern-cta"></div>
-                              </>
-                            )}
-                            {layout.pattern === 'cv' && (
-                              <>
-                                <div className="pattern-profile"></div>
-                                <div className="pattern-section"></div>
-                                <div className="pattern-section"></div>
-                              </>
-                            )}
-                            {layout.pattern === 'centered' && (
-                              <>
-                                <div className="pattern-centered-content">
-                                  <div className="pattern-logo"></div>
-                                  <div className="pattern-text-short"></div>
-                                </div>
-                              </>
-                            )}
-                            {layout.pattern === 'book' && (
-                              <>
-                                <div className="pattern-book-layout">
-                                  <div className="pattern-book-cover"></div>
-                                  <div className="pattern-book-info">
-                                    <div className="pattern-book-title"></div>
-                                    <div className="pattern-book-desc"></div>
-                                    <div className="pattern-book-cta"></div>
-                                  </div>
-                                </div>
-                              </>
-                            )}
-                            {layout.pattern === 'links' && (
-                              <>
-                                <div className="pattern-link-btn"></div>
-                                <div className="pattern-link-btn"></div>
-                                <div className="pattern-link-btn"></div>
-                                <div className="pattern-link-btn"></div>
-                              </>
-                            )}
-                            {layout.pattern === 'scratch' && (
+                            {layout.pattern ? (
+                              <TT5PatternPreview pattern={layout.pattern} />
+                            ) : (
                               <div className="pattern-scratch-icon">{plus}</div>
                             )}
-                            {layout.pattern === 'hero-text' && (
-                              <>
-                                <div className="pattern-block tall"></div>
-                                <div className="pattern-block short"></div>
-                                <div className="pattern-block short"></div>
-                              </>
-                            )}
-                            {layout.pattern === 'grid' && (
-                              <>
-                                <div className="pattern-block"></div>
-                                <div className="pattern-block"></div>
-                                <div className="pattern-block"></div>
-                                <div className="pattern-block"></div>
-                              </>
-                            )}
-                            {layout.pattern === 'form' && (
-                              <>
-                                <div className="pattern-block"></div>
-                                <div className="pattern-form-field"></div>
-                                <div className="pattern-form-field"></div>
-                                <div className="pattern-block short"></div>
-                              </>
-                            )}
-                            {layout.pattern === 'gallery' && (
-                              <>
-                                <div className="pattern-block wide"></div>
-                                <div className="pattern-gallery">
-                                  <div className="pattern-gallery-item"></div>
-                                  <div className="pattern-gallery-item"></div>
-                                  <div className="pattern-gallery-item"></div>
-                                </div>
-                              </>
-                            )}
-                            {layout.pattern === 'columns' && (
-                              <>
-                                <div className="pattern-column"></div>
-                                <div className="pattern-column"></div>
-                                <div className="pattern-column"></div>
-                              </>
-                            )}
-                            {layout.pattern === 'list' && (
-                              <>
-                                <div className="pattern-list-item"></div>
-                                <div className="pattern-list-item"></div>
-                                <div className="pattern-list-item"></div>
-                              </>
-                            )}
-                          </div>
                           </div>
                           <Text variant="body-sm" className="apm-layout-name">{layout.name}</Text>
                         </Button>
                       </Tooltip>
                     ))}
                   </div>
-                  
-                  {!showAllLayouts && (
-                    <div className="apm-load-more">
-                      <Button
-                        variant="secondary"
-                        className="apm-load-more-btn"
-                        onClick={() => setShowAllLayouts(true)}
-                      >
-                        Load more layouts
-                      </Button>
-                    </div>
-                  )}
                 </>
               ) : (
                 <>
