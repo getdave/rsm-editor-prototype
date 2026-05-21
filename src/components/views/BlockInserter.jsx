@@ -264,7 +264,17 @@ export function BlockInserterContent() {
               </div>
               {(activeTab.name === 'patterns' || activeTab.name === 'media') && (
                 <div className="bi-footer">
-                  <Button variant="secondary" className="bi-explore-btn">
+                  <Button
+                    variant="secondary"
+                    className="bi-explore-btn"
+                    onClick={
+                      activeTab.name === 'patterns'
+                        ? () => window.alert(
+                          'The display of all the patterns in a modal UI is not implemented in this prototype.',
+                        )
+                        : undefined
+                    }
+                  >
                     Explore all {activeTab.name}
                   </Button>
                 </div>
