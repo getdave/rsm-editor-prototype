@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@wordpress/components';
+import { Button, ToggleControl } from '@wordpress/components';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
 import { Text } from '@wordpress/ui';
@@ -44,12 +44,16 @@ const TEMPLATE_TABLE_VIEW = {
 
 const DEFAULT_LAYOUTS = {
   grid: {
-    badgeFields: ['statusLabel'],
+    badgeFields: ['statusLabel', 'activeStatus'],
     layout: { previewSize: GRID_PREVIEW_SIZE },
   },
   list: { layout: { density: 'compact' } },
   table: {},
 };
+
+function isTemplatePartActive(item) {
+  return Boolean(item.usedIn?.length);
+}
 
 function Bar({ wide, narrow, short }) {
   return (
@@ -407,6 +411,25 @@ function createFields() {
       ),
     },
     {
+      id: 'activeStatus',
+      type: 'text',
+      label: 'Status',
+      enableSorting: true,
+      enableHiding: true,
+      enableGlobalSearch: false,
+      getValue: ({ item }) => (isTemplatePartActive(item) ? 'Active' : 'Inactive'),
+      render: ({ item }) => {
+        const active = isTemplatePartActive(item);
+        return (
+          <span className="adv-status-cell">
+            <Badge variant={active ? 'active' : 'inactive'}>
+              {active ? 'Active' : 'Inactive'}
+            </Badge>
+          </span>
+        );
+      },
+    },
+    {
       id: 'category',
       type: 'text',
       label: 'Category',
@@ -442,6 +465,7 @@ function AdvancedCatalogView({
   categoryTitle,
   fields: visibleFields,
   initialView,
+  toolbarControls,
   onOpenItem,
   onAction,
 }) {
@@ -545,6 +569,7 @@ function AdvancedCatalogView({
                 <div className="pp-toolbar-row-options">
                   <DataViews.Search />
                   <DataViews.LayoutSwitcher />
+                  {toolbarControls}
                   <Button
                     variant="tertiary"
                     icon={settings}
@@ -633,6 +658,14 @@ export function PatternsView() {
 export function TemplatePartsView() {
   const navigate = useNavigate();
   const { showSnackbar } = useAppState();
+  const [showInactive, setShowInactive] = useState(false);
+  const visibleTemplateParts = useMemo(
+    () =>
+      showInactive
+        ? templateParts
+        : templateParts.filter((item) => isTemplatePartActive(item)),
+    [showInactive],
+  );
 
   const handleAction = (action, item) => {
     showSnackbar(
@@ -646,12 +679,21 @@ export function TemplatePartsView() {
     <AdvancedCatalogView
       title="Template Parts"
       description="Includes every template part defined for any area."
-      items={templateParts}
+      items={visibleTemplateParts}
       actionLabel="Add Template Part"
       categoryKey="areaLabel"
       categoryAllLabel="All parts"
       categoryTitle="Areas"
-      fields={['description', 'usedIn', 'area', 'theme']}
+      fields={['activeStatus', 'description', 'usedIn', 'theme']}
+      toolbarControls={
+        <ToggleControl
+          __nextHasNoMarginBottom
+          className="adv-show-inactive-toggle"
+          label="Show inactive"
+          checked={showInactive}
+          onChange={setShowInactive}
+        />
+      }
       onOpenItem={(item) =>
         navigate(`/templates/${item.editTemplateId ?? 'index'}/edit?part=${item.id}`)
       }
