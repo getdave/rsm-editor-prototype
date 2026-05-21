@@ -419,16 +419,17 @@ function AddPageModalContent() {
           )}
       </div>
 
-      {selectedPath && (
-        <div className="modal-footer apm-modal-footer">
-            <Button variant="tertiary" onClick={handleFooterBack}>
-              ← Back to options
-            </Button>
+      <div className="modal-footer apm-modal-footer">
+            {selectedPath && (
+              <Button variant="tertiary" onClick={handleFooterBack}>
+                ← Back to options
+              </Button>
+            )}
             <div className="apm-modal-footer-actions">
               <Button variant="secondary" onClick={closeAddPageModal}>
                 Cancel
               </Button>
-              {(selectedPath !== 'layout' || selectedLayout) && (
+              {selectedPath && (selectedPath !== 'layout' || selectedLayout) && (
                 <div className="split-button">
                   <Button
                     variant="primary"
@@ -466,8 +467,7 @@ function AddPageModalContent() {
                 </div>
               )}
             </div>
-          </div>
-        )}
+      </div>
     </Modal>
   );
 }
