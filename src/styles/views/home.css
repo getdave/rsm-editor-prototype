@@ -318,11 +318,19 @@
 }
 
 .cs-banner {
+  /* Card palette — dark for now. A future light variant overrides these
+     tokens via a scoping selector (e.g. .cs-banner.is-light). */
+  --cs-card-bg: #2a2d36;
+  --cs-card-bg-hover: #32353f;
+  --cs-card-text: #e8e8eb;
+  --cs-card-text-muted: #a7abb4;
+  --cs-card-link: #6b86f5;
+
   appearance: none;
   border: 1px solid #c3c4c7;
-  background: #f6f7f7;
+  background: var(--cs-card-bg);
   border-radius: 6px;
-  color: #1e1e1e;
+  color: var(--cs-card-text);
   cursor: pointer;
   display: grid;
   grid-template-columns: 92px minmax(0, 1fr);
@@ -338,7 +346,7 @@
 }
 
 .cs-banner:hover {
-  background: #fff;
+  background: var(--cs-card-bg-hover);
   border-color: #3858e9;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
   transform: translateY(-1px);
@@ -529,14 +537,14 @@
 }
 
 .cs-banner-title {
-  color: #1e1e1e;
+  color: var(--cs-card-text);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.35;
 }
 
 .cs-banner-description {
-  color: #555;
+  color: var(--cs-card-text-muted);
   font-size: 13px;
   line-height: 1.4;
 }
@@ -545,7 +553,7 @@
   display: inline-flex;
   align-items: center;
   margin-top: auto;
-  color: #3858e9;
+  color: var(--cs-card-link);
   font-size: 13px;
   font-weight: 500;
 }
