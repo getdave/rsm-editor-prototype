@@ -59,6 +59,120 @@
   min-width: 0;
 }
 
+.modal-overlay.prototype-intro-overlay {
+  background: rgba(0, 0, 0, 0.72);
+  z-index: 10000;
+  padding: 24px;
+}
+
+.prototype-intro-modal {
+  width: min(520px, 100%);
+  min-height: 340px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.34);
+  color: #1e1e1e;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.prototype-intro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.prototype-intro-kicker {
+  margin: 0 0 6px;
+  color: #757575;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.prototype-intro-title {
+  margin: 0;
+  color: #1e1e1e;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.prototype-intro-message {
+  margin: 0;
+  color: #3c434a;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.prototype-intro-message p {
+  margin: 0;
+}
+
+.prototype-intro-message p + p {
+  margin-top: 12px;
+}
+
+.prototype-intro-message a {
+  color: #3858e9;
+}
+
+.prototype-intro-message a:hover {
+  color: #2a47d4;
+}
+
+.prototype-intro-progress {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 28px;
+}
+
+.prototype-intro-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #dcdcde;
+}
+
+.prototype-intro-dot.is-active {
+  background: #3858e9;
+}
+
+.prototype-intro-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+  .modal-overlay.prototype-intro-overlay {
+    align-items: flex-end;
+    padding: 16px;
+  }
+
+  .prototype-intro-modal {
+    min-height: 360px;
+    padding: 20px;
+  }
+
+  .prototype-intro-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .prototype-intro-actions .components-button {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;

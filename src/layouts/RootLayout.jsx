@@ -11,6 +11,7 @@ import AddPageModal from '../components/modals/AddPageModal';
 import ConfigureHomepageModal from '../components/modals/ConfigureHomepageModal';
 import PagesFloatingPanel from '../components/modals/PagesFloatingPanel';
 import UnsavedChangesModal from '../components/modals/UnsavedChangesModal';
+import PrototypeIntroModal from '../components/modals/PrototypeIntroModal';
 import DevBranchIndicator from '../components/shared/DevBranchIndicator';
 
 const EDIT_ROUTE_PATTERN = /^\/(?:pages|page-designs|templates)\/[^/]+\/edit$/;
@@ -74,6 +75,7 @@ function RootLayout() {
       <ConfigureHomepageModal />
       <PagesFloatingPanel />
       <UnsavedChangesModal />
+      <PrototypeIntroModal />
       <CommandPalette />
       {snackbarMessage && (
         <Snackbar onDismiss={dismissSnackbar}>
