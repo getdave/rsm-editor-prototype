@@ -166,30 +166,31 @@ export default function PrototypeIntroModal() {
         </div>
 
         <div className="prototype-intro-actions">
-          {stepIndex > 0 && (
+          {stepIndex > 0 ? (
             <Button
               variant="tertiary"
               onClick={() => setStepIndex((current) => current - 1)}
             >
               Back
             </Button>
+          ) : (
+            step.secondaryAction?.skip && (
+              <Button variant="tertiary" onClick={completeIntro}>
+                {step.secondaryAction.label}
+              </Button>
+            )
           )}
           <div className="prototype-intro-actions-primary">
-            {step.secondaryAction &&
-              (step.secondaryAction.skip ? (
-                <Button variant="secondary" onClick={completeIntro}>
-                  {step.secondaryAction.label}
-                </Button>
-              ) : (
-                <Button
-                  variant="secondary"
-                  href={step.secondaryAction.url}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {step.secondaryAction.label}
-                </Button>
-              ))}
+            {step.secondaryAction && !step.secondaryAction.skip && (
+              <Button
+                variant="secondary"
+                href={step.secondaryAction.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {step.secondaryAction.label}
+              </Button>
+            )}
             <Button
               variant="primary"
               onClick={() => {
