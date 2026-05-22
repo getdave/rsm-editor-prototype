@@ -517,6 +517,236 @@
   color: var(--tt5-afternoon-accent-3);
 }
 
+.site-card.preview-device-tablet,
+.edit-card.preview-device-tablet {
+  font-size: 1rem;
+}
+
+.site-card.preview-device-tablet .p-header,
+.edit-card.preview-device-tablet .p-header {
+  padding: 24px 0;
+}
+
+.site-card.preview-device-tablet .p-sitename,
+.edit-card.preview-device-tablet .p-sitename {
+  font-size: 1.2rem;
+  padding-left: 32px;
+}
+
+.site-card.preview-device-tablet .p-nav,
+.edit-card.preview-device-tablet .p-nav {
+  padding-right: 32px;
+}
+
+.site-card.preview-device-tablet .p-hero,
+.edit-card.preview-device-tablet .p-hero {
+  min-height: 420px;
+  padding: 72px 0 88px;
+}
+
+.site-card.preview-device-tablet .p-hero > div,
+.edit-card.preview-device-tablet .p-hero > div {
+  box-sizing: border-box;
+  max-width: none;
+  padding-left: 48px;
+  padding-right: 48px;
+  width: 100%;
+}
+
+.site-card.preview-device-tablet .p-hero h1,
+.edit-card.preview-device-tablet .p-hero h1 {
+  font-size: 4.6rem;
+  line-height: 1.08;
+  max-width: 8ch;
+}
+
+.site-card.preview-device-tablet .p-hero p,
+.edit-card.preview-device-tablet .p-hero p {
+  font-size: 1.35rem;
+  max-width: 26rem;
+}
+
+.site-card.preview-device-tablet .p-section,
+.edit-card.preview-device-tablet .p-section {
+  padding: 72px 0;
+}
+
+.site-card.preview-device-tablet .p-st,
+.site-card.preview-device-tablet .p-body,
+.site-card.preview-device-tablet .p-template-post-content-placeholder,
+.edit-card.preview-device-tablet .p-st,
+.edit-card.preview-device-tablet .p-body,
+.edit-card.preview-device-tablet .p-template-post-content-placeholder {
+  width: min(var(--tt5-afternoon-content-size), calc(100% - 96px));
+}
+
+.site-card.preview-device-tablet .p-st,
+.edit-card.preview-device-tablet .p-st {
+  font-size: 3rem;
+}
+
+.site-card.preview-device-tablet .p-body,
+.site-card.preview-device-tablet .p-template-post-content-placeholder,
+.edit-card.preview-device-tablet .p-body,
+.edit-card.preview-device-tablet .p-template-post-content-placeholder {
+  font-size: 1.45rem;
+}
+
+.site-card.preview-device-tablet .p-grid,
+.edit-card.preview-device-tablet .p-grid {
+  box-sizing: border-box;
+  padding-left: 48px;
+  padding-right: 48px;
+  width: 100%;
+}
+
+.site-card.preview-device-tablet .p-template-page-title,
+.site-card.preview-device-tablet .p-template-featured-image,
+.edit-card.preview-device-tablet .p-template-page-title,
+.edit-card.preview-device-tablet .p-template-featured-image {
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
+.site-card.preview-device-tablet .p-template-page-title h1,
+.site-card.preview-device-tablet .p-post-content h1,
+.site-card.preview-device-tablet .p-archive-header h1,
+.site-card.preview-device-tablet .p-ecommerce-header h1,
+.site-card.preview-device-tablet .p-product-detail-content h1,
+.site-card.preview-device-tablet .p-error-title,
+.edit-card.preview-device-tablet .p-template-page-title h1,
+.edit-card.preview-device-tablet .p-post-content h1,
+.edit-card.preview-device-tablet .p-archive-header h1,
+.edit-card.preview-device-tablet .p-ecommerce-header h1,
+.edit-card.preview-device-tablet .p-product-detail-content h1,
+.edit-card.preview-device-tablet .p-error-title {
+  font-size: 4.2rem;
+  line-height: 1.08;
+}
+
+.site-card.preview-device-mobile,
+.edit-card.preview-device-mobile {
+  font-size: 0.95rem;
+}
+
+.site-card.preview-device-mobile .p-header,
+.edit-card.preview-device-mobile .p-header {
+  padding: 20px 0;
+}
+
+.site-card.preview-device-mobile .p-sitename,
+.edit-card.preview-device-mobile .p-sitename {
+  font-size: 1rem;
+  letter-spacing: 1.1px;
+  padding-left: 24px;
+}
+
+.site-card.preview-device-mobile .p-mobile-nav,
+.edit-card.preview-device-mobile .p-mobile-nav {
+  padding-right: 18px;
+}
+
+.site-card.preview-device-mobile .p-mobile-nav-overlay,
+.edit-card.preview-device-mobile .p-mobile-nav-overlay {
+  max-width: calc(100% - 36px);
+  right: 18px;
+}
+
+.site-card.preview-device-mobile .p-hero,
+.edit-card.preview-device-mobile .p-hero {
+  min-height: 340px;
+  padding: 52px 0 64px;
+}
+
+.site-card.preview-device-mobile .p-hero > div,
+.edit-card.preview-device-mobile .p-hero > div {
+  box-sizing: border-box;
+  max-width: none;
+  padding-left: 32px;
+  padding-right: 32px;
+  width: 100%;
+}
+
+.site-card.preview-device-mobile .p-hero h1,
+.edit-card.preview-device-mobile .p-hero h1 {
+  font-size: 3.45rem;
+  line-height: 1.08;
+  max-width: 7.25ch;
+}
+
+.site-card.preview-device-mobile .p-hero p,
+.edit-card.preview-device-mobile .p-hero p {
+  font-size: 1.1rem;
+  max-width: 18rem;
+}
+
+.site-card.preview-device-mobile .p-section,
+.edit-card.preview-device-mobile .p-section {
+  padding: 52px 0;
+}
+
+.site-card.preview-device-mobile .p-st,
+.site-card.preview-device-mobile .p-body,
+.site-card.preview-device-mobile .p-template-post-content-placeholder,
+.edit-card.preview-device-mobile .p-st,
+.edit-card.preview-device-mobile .p-body,
+.edit-card.preview-device-mobile .p-template-post-content-placeholder {
+  width: calc(100% - 64px);
+}
+
+.site-card.preview-device-mobile .p-st,
+.edit-card.preview-device-mobile .p-st {
+  font-size: 2.35rem;
+  line-height: 1.12;
+}
+
+.site-card.preview-device-mobile .p-body,
+.site-card.preview-device-mobile .p-template-post-content-placeholder,
+.edit-card.preview-device-mobile .p-body,
+.edit-card.preview-device-mobile .p-template-post-content-placeholder {
+  font-size: 1.1rem;
+  line-height: 1.58;
+}
+
+.site-card.preview-device-mobile .p-grid,
+.edit-card.preview-device-mobile .p-grid {
+  box-sizing: border-box;
+  gap: 16px;
+  grid-template-columns: 1fr;
+  padding-left: 32px;
+  padding-right: 32px;
+  width: 100%;
+}
+
+.site-card.preview-device-mobile .p-template-page-title,
+.site-card.preview-device-mobile .p-template-featured-image,
+.edit-card.preview-device-mobile .p-template-page-title,
+.edit-card.preview-device-mobile .p-template-featured-image {
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.site-card.preview-device-mobile .p-template-page-title h1,
+.site-card.preview-device-mobile .p-post-content h1,
+.site-card.preview-device-mobile .p-archive-header h1,
+.site-card.preview-device-mobile .p-ecommerce-header h1,
+.site-card.preview-device-mobile .p-product-detail-content h1,
+.site-card.preview-device-mobile .p-error-title,
+.edit-card.preview-device-mobile .p-template-page-title h1,
+.edit-card.preview-device-mobile .p-post-content h1,
+.edit-card.preview-device-mobile .p-archive-header h1,
+.edit-card.preview-device-mobile .p-ecommerce-header h1,
+.edit-card.preview-device-mobile .p-product-detail-content h1,
+.edit-card.preview-device-mobile .p-error-title {
+  font-size: 3.1rem;
+  line-height: 1.08;
+}
+
+.site-card.preview-device-mobile .p-footer,
+.edit-card.preview-device-mobile .p-footer {
+  padding: 32px;
+}
+
 @media (max-width: 640px) {
   .site-card .p-st,
   .site-card .p-body,
