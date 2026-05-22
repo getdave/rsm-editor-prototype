@@ -37,6 +37,10 @@ const STEPS = [
       'It is still grounded in WordPress patterns and components, but reframes the experience around creating pages, shaping a site, and making visible progress sooner.',
     ],
     primaryLabel: 'Next',
+    secondaryAction: {
+      label: 'Skip Intro',
+      skip: true,
+    },
   },
   {
     eyebrow: 'Why this prototype exists',
@@ -171,16 +175,21 @@ export default function PrototypeIntroModal() {
             </Button>
           )}
           <div className="prototype-intro-actions-primary">
-            {step.secondaryAction && (
-              <Button
-                variant="secondary"
-                href={step.secondaryAction.url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {step.secondaryAction.label}
-              </Button>
-            )}
+            {step.secondaryAction &&
+              (step.secondaryAction.skip ? (
+                <Button variant="secondary" onClick={completeIntro}>
+                  {step.secondaryAction.label}
+                </Button>
+              ) : (
+                <Button
+                  variant="secondary"
+                  href={step.secondaryAction.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {step.secondaryAction.label}
+                </Button>
+              ))}
             <Button
               variant="primary"
               onClick={() => {
