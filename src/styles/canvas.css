@@ -1681,7 +1681,7 @@
 }
 
 /* ── Block inserter (bi-*) ──
-   Modeled on the Figma reference (jhpyWGZm6ZpXOtoxdaeFkz @ 211:14332).
+   Modeled on the current design reference.
    Search row sits flush against the TabPanel below (no divider); the
    close button is a sibling of the SearchControl rather than absolutely
    positioned (the List View shares the shell but keeps its own .lv-close

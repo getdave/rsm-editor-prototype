@@ -294,9 +294,9 @@ export function AppStateProvider({ children }) {
   const [siteSettings, setSiteSettings] = useState({
     tagline: '',
     siteIcon: '',
-    wpAddress: 'https://pistachio-paradise.mystagingwebsite.com',
-    siteAddress: 'https://pistachio-paradise.mystagingwebsite.com',
-    adminEmail: 'francisco.vera@automattic.com',
+    wpAddress: 'https://example.com',
+    siteAddress: 'https://example.com',
+    adminEmail: 'site-owner@example.com',
     membership: false,
     defaultRole: 'subscriber',
     siteLanguage: 'en_US',
