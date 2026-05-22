@@ -282,12 +282,18 @@
 .site-identity-modal__logo-preview {
   width: 120px;
   height: 120px;
-  background: linear-gradient(135deg, var(--wpds-color-bg-interactive-brand-strong), #764ba2);
   border-radius: var(--wpds-border-radius-lg);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.site-identity-modal__logo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .site-identity-modal__actions {
