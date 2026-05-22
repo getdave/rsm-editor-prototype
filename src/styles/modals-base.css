@@ -107,6 +107,16 @@
   line-height: 1.35;
 }
 
+.prototype-intro-step {
+  flex-shrink: 0;
+  margin: 0;
+  color: #757575;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
 .prototype-intro-title {
   margin: 0;
   color: #1e1e1e;
@@ -146,31 +156,13 @@
   border-radius: 8px;
 }
 
-.prototype-intro-progress {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-top: auto;
-  padding-top: 28px;
-}
-
-.prototype-intro-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #dcdcde;
-}
-
-.prototype-intro-dot.is-active {
-  background: #3858e9;
-}
-
 .prototype-intro-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  margin-top: 20px;
+  margin-top: auto;
+  padding-top: 28px;
 }
 
 .prototype-intro-actions-primary {

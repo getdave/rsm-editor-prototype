@@ -146,6 +146,9 @@ export default function PrototypeIntroModal() {
               {step.title}
             </h2>
           </div>
+          <p className="prototype-intro-step">
+            {`Step ${stepIndex + 1} of ${STEPS.length}`}
+          </p>
         </div>
 
         <div id="prototype-intro-message" className="prototype-intro-message">
@@ -155,15 +158,6 @@ export default function PrototypeIntroModal() {
         </div>
 
         <div className="prototype-intro-media" aria-hidden="true" />
-
-        <div className="prototype-intro-progress" aria-label={`Step ${stepIndex + 1} of ${STEPS.length}`}>
-          {STEPS.map((item, index) => (
-            <span
-              key={item.title}
-              className={`prototype-intro-dot ${index === stepIndex ? 'is-active' : ''}`}
-            />
-          ))}
-        </div>
 
         <div className="prototype-intro-actions">
           {stepIndex > 0 ? (
