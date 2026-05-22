@@ -157,8 +157,6 @@ export default function PrototypeIntroModal() {
           ))}
         </div>
 
-        <div className="prototype-intro-media" aria-hidden="true" />
-
         <div className="prototype-intro-actions">
           {stepIndex > 0 ? (
             <Button
