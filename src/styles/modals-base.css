@@ -85,7 +85,7 @@
   margin-bottom: 18px;
 }
 
-.prototype-intro-kicker {
+.prototype-intro-eyebrow {
   margin: 0 0 6px;
   color: #757575;
   font-size: 12px;
@@ -124,6 +124,14 @@
   color: #2a47d4;
 }
 
+.prototype-intro-media {
+  width: 450px;
+  height: 150px;
+  margin-top: 20px;
+  background: #f0f0f0;
+  border-radius: 8px;
+}
+
 .prototype-intro-progress {
   display: flex;
   align-items: center;
@@ -145,10 +153,17 @@
 
 .prototype-intro-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   gap: 8px;
   margin-top: 20px;
+}
+
+.prototype-intro-actions-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
 }
 
 @media (max-width: 600px) {
@@ -162,9 +177,19 @@
     padding: 20px;
   }
 
+  .prototype-intro-media {
+    width: 100%;
+  }
+
   .prototype-intro-actions {
     flex-direction: column-reverse;
     align-items: stretch;
+  }
+
+  .prototype-intro-actions-primary {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    margin-left: 0;
   }
 
   .prototype-intro-actions .components-button {
