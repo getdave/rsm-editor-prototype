@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@wordpress/components';
+import step1Visual from '../../assets/images/onboarding/step-1.png';
+import step2Visual from '../../assets/images/onboarding/step-2.png';
+import step3Visual from '../../assets/images/onboarding/step-3.png';
 
 const STORAGE_KEY = 'rsm-prototype-intro-dismissed';
 const RESET_QUERY_PARAM = 'resetIntro';
@@ -32,6 +35,7 @@ const STEPS = [
   {
     eyebrow: 'Prototype preview',
     title: 'Create, Not Learn',
+    image: step1Visual,
     paragraphs: [
       'This prototype explores a different way into the WordPress Site Editor: one organized around what people want to make, not the concepts they need to understand first.',
       'It is still grounded in WordPress patterns and components, but reframes the experience around creating pages, shaping a site, and making visible progress sooner.',
@@ -45,6 +49,7 @@ const STEPS = [
   {
     eyebrow: 'Why this prototype exists',
     title: 'A response to real Site Editor friction',
+    image: step2Visual,
     paragraphs: [
       'Many people in the WordPress community have shared that the Site Editor can feel powerful but difficult to approach, especially for newer users. The goal is to explore a more guided, outcome-first editing model.',
       'Watch the short walkthrough for more context on the thinking behind the prototype.',
@@ -58,6 +63,7 @@ const STEPS = [
   {
     eyebrow: 'How to review it',
     title: 'Review the model, then tell us what breaks',
+    image: step3Visual,
     paragraphs: [
       'This is an interactive prototype primarily for desktop, with some corners intentionally incomplete. As you explore, focus on the information architecture, language, navigation, and whether the experience helps people understand what to do next.',
       'You are welcome to share feedback on GitHub.',
@@ -156,6 +162,10 @@ export default function PrototypeIntroModal() {
             <p key={paragraph}>{paragraph}</p>
           ))}
         </div>
+
+        {step.image && (
+          <img className="prototype-intro-media" src={step.image} alt="" />
+        )}
 
         <div className="prototype-intro-actions">
           {stepIndex > 0 ? (
