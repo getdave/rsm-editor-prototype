@@ -19,7 +19,7 @@ const WP_TEMPLATE_TERM_DEFINITION =
   'A design WordPress applies automatically to a type of content - e.g. all blog posts, all search results. You edit the template once; WordPress uses it everywhere that type appears.';
 
 const POSTS_PAGE_SELECT_HELP_TOOLTIP =
-  'Optional. The Page you pick here sets the URL for your Posts listing (e.g. /blog). Its own content is never shown - WordPress displays Posts there using your Posts Template.';
+  'Optional. The Page you pick here sets the URL for your latest posts (e.g. /blog). Its own content is never shown - WordPress displays Posts there using your Blog Home template.';
 
 function readingPageOptionLabel(page) {
   const prefix = page.level > 0 ? `${'- '.repeat(page.level)}` : '';

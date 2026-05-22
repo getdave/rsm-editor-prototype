@@ -36,7 +36,8 @@ import PreviewCanvas from "../shared/PreviewCanvas";
 import DeleteHomepagePageModal from "../modals/DeleteHomepagePageModal";
 import DeletePostsPageModal from "../modals/DeletePostsPageModal";
 import DeletePageConfirmModal from "../modals/DeletePageConfirmModal";
-import { pageTemplateOptions } from "../../data/mockData";
+import { advancedTemplates, pageTemplateOptions } from "../../data/mockData";
+import { HOMEPAGE_LATEST_POSTS_DESIGN_ID } from "../../utils/homepagePreviewTarget";
 
 const BADGE_STYLES = {
   WordPress: { background: "rgba(33,117,155,.12)", color: "#21759b" },
@@ -153,6 +154,7 @@ function applyPageTypeToView(view, pageType) {
 
 /** Synthetic posts index row ID — excludes template-backed rows from content-only row actions. */
 const BLOG_HOMEPAGE_ROOT_TEMPLATE_ID = "posts-index-template";
+const LATEST_POSTS_HOMEPAGE_TEMPLATE_ID = "blog-home";
 
 function createPostsCollectionRow(postsPage) {
   if (!postsPage) {
@@ -174,10 +176,42 @@ function createPostsCollectionRow(postsPage) {
     viewKind: "listing",
     status: "live",
     authorDisplay: "WordPress",
-    templateLabel: "Posts listing",
+    templateLabel: "Blog Home",
     titleTooltip:
-      "Uses the selected Posts page URL while home.html controls the layout visitors see.",
+      "Uses the selected Posts page URL while Blog Home controls the layout visitors see.",
     isPostsPage: true,
+  };
+}
+
+function createLatestPostsHomepageRow(homepageDesign, hierarchyTemplate) {
+  if (!homepageDesign) {
+    return null;
+  }
+  const templateName = hierarchyTemplate?.name ?? "Blog Home";
+  const templateEditId = hierarchyTemplate?.editPageId ?? "blog-list";
+  return {
+    ...homepageDesign,
+    id: HOMEPAGE_LATEST_POSTS_DESIGN_ID,
+    slug: "",
+    name: templateName,
+    shortName: templateName,
+    type: "Template",
+    isLive: true,
+    inMenu: false,
+    isSystem: false,
+    isPageDesign: true,
+    isHomepageDesign: true,
+    isHomepageTemplateRow: true,
+    isFrontPage: true,
+    category: "homepage-template",
+    status: "live",
+    authorDisplay: homepageDesign.provider ?? "WordPress",
+    templateLabel: templateName,
+    templateEditPath: `/templates/${templateEditId}/edit`,
+    titleTooltip:
+      hierarchyTemplate?.description ??
+      homepageDesign.description ??
+      "Change how latest posts appear when they are used as your homepage.",
   };
 }
 
@@ -195,7 +229,12 @@ function getPageIcon(item) {
 }
 
 function isSyncedPageRow(item) {
-  return Boolean(item?.isCollection || item?.isPostsPage || item?.isPageTemplate);
+  return Boolean(
+    item?.isCollection ||
+      item?.isPostsPage ||
+      item?.isPageTemplate ||
+      item?.isHomepageTemplateRow,
+  );
 }
 
 function getCustomTemplatePageLabel(item) {
@@ -312,6 +351,7 @@ function PagesView() {
     pagesViewMode,
     setPagesViewMode,
     pages,
+    pageDesigns,
     openAddPageModal,
     deletePage,
     homepageDisplayMode,
@@ -547,7 +587,9 @@ function PagesView() {
         render: ({ item }) =>
           item.collectionState === "inactive" ? (
             <span className="pp-badge pp-inactive">Inactive</span>
-          ) : item.isCollection || item.isPageTemplate ? (
+          ) : item.isCollection ||
+            item.isPageTemplate ||
+            item.isHomepageTemplateRow ? (
             <span className="pp-badge pp-live">Active</span>
           ) : item.status === "draft" ? (
             <span className="pp-badge pp-draft">Draft</span>
@@ -577,7 +619,7 @@ function PagesView() {
         render: ({ item }) =>
           item.isFrontPage ? (
             <span className="pp-badge pp-page-role pp-page-role--front">
-              Front page
+              Homepage
             </span>
           ) : item.collectionBadge ? (
             <span className="pp-badge pp-page-role pp-collection-marker">
@@ -654,6 +696,10 @@ function PagesView() {
       if (!item) return;
       if (item.isPageTemplate) {
         navigate(`/page-designs/${item.id}/edit?inserter=patterns`);
+        return;
+      }
+      if (item.isHomepageTemplateRow) {
+        navigate(item.templateEditPath ?? `/templates/blog-list/edit`);
         return;
       }
       if (item.collectionState === "inactive") {
@@ -767,6 +813,13 @@ function PagesView() {
         callback: () => {},
       },
       {
+        id: "set-as-homepage-latest-current",
+        label: "Set as Homepage",
+        isEligible: (item) => item.isHomepageTemplateRow,
+        disabled: true,
+        callback: () => {},
+      },
+      {
         id: "set-as-homepage-posts-page",
         label: "Set as Homepage",
         isEligible: (item) =>
@@ -875,6 +928,29 @@ function PagesView() {
     return rows.filter(Boolean);
   }, [pagesWithRoles, postsPageId, homepageDisplayMode]);
 
+  const homepageRow = useMemo(() => {
+    if (homepageDisplayMode === READING_DISPLAY_LATEST) {
+      return createLatestPostsHomepageRow(
+        pageDesigns.find(
+          (design) => design.id === HOMEPAGE_LATEST_POSTS_DESIGN_ID,
+        ),
+        advancedTemplates.find(
+          (template) => template.id === LATEST_POSTS_HOMEPAGE_TEMPLATE_ID,
+        ),
+      );
+    }
+
+    if (homepageDisplayMode === READING_DISPLAY_STATIC && frontPageId) {
+      return (
+        pagesWithRoles.find(
+          (p) => p.category === "content" && p.id === frontPageId,
+        ) ?? null
+      );
+    }
+
+    return null;
+  }, [frontPageId, homepageDisplayMode, pageDesigns, pagesWithRoles]);
+
   const pageTemplateRows = useMemo(
     () => pageTemplateOptions.map(asPageTemplateRow),
     [],
@@ -886,18 +962,25 @@ function PagesView() {
         if (p.category !== "content") {
           return false;
         }
+        if (homepageRow && p.id === homepageRow.id) {
+          return false;
+        }
         if (p.isPostsPage) {
           return false;
         }
         return showDrafts ? true : p.status === "live";
       });
-      return [...staticPages, ...staticHybridRows];
+      const rows = [...staticPages, ...staticHybridRows].filter(
+        (p) => !homepageRow || p.id !== homepageRow.id,
+      );
+      return homepageRow ? [homepageRow, ...rows] : rows;
     }
 
     return pageTemplateRows;
   }, [
     activePageType,
     pagesWithRoles,
+    homepageRow,
     showDrafts,
     staticHybridRows,
     pageTemplateRows,
@@ -987,10 +1070,20 @@ function PagesView() {
     navigate(`/pages/${item.id}/edit?inserter=patterns`);
   };
 
-  const { data: processedData, paginationInfo } = useMemo(
+  const { data: filteredProcessedData, paginationInfo } = useMemo(
     () => filterSortAndPaginate(categoryPages, activeView, fields),
     [categoryPages, activeView, fields],
   );
+
+  const processedData = useMemo(() => {
+    if (activePageType !== "content" || !homepageRow) {
+      return filteredProcessedData;
+    }
+    return [
+      homepageRow,
+      ...filteredProcessedData.filter((item) => item.id !== homepageRow.id),
+    ];
+  }, [activePageType, filteredProcessedData, homepageRow]);
 
   const handleChangeView = (newView) => {
     const layoutChanged = newView.type !== activeView.type;
@@ -1098,8 +1191,19 @@ function PagesView() {
       {activePageType === "content" &&
         homepageDisplayMode === READING_DISPLAY_LATEST && (
           <div className="pp-static-homepage-notice" role="status">
-            Homepage is currently set to latest posts. WordPress generates the
-            posts listing for visitors automatically.
+            Your homepage is currently set to show your latest posts. WordPress
+            generates the posts listing using your{" "}
+            <button
+              type="button"
+              className="pp-desc-link"
+              onClick={() =>
+                navigate(homepageRow?.templateEditPath ?? "/templates/blog-list/edit")
+              }
+            >
+              {homepageRow?.templateLabel ?? homepageRow?.name ?? "Blog Home"}{" "}
+              template
+            </button>
+            .
           </div>
         )}
       <div className="pp-tab-description-row">

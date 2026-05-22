@@ -308,7 +308,7 @@ export const pages = [
   {
     id: "blog-list",
     slug: "blog-list",
-    name: "Posts List (Archive)",
+    name: "Blog Home",
     type: "Dynamic Page",
     isLive: true,
     inMenu: false,
@@ -319,7 +319,7 @@ export const pages = [
     status: "live",
     authorDisplay: "WordPress",
     titleTooltip:
-      "Displays grouped posts on your website unless narrower archive templates apply, or a dedicated template overrides.",
+      "Displays your latest posts using the Blog Home template.",
   },
   {
     id: "blog-single",
@@ -543,9 +543,9 @@ export const pageDesigns = [
   {
     id: "blog-list",
     slug: "blog",
-    name: "Posts listing design",
-    shortName: "Posts listing",
-    type: "Page Design",
+    name: "Blog Home",
+    shortName: "Blog Home",
+    type: "Template",
     contentTypeId: "posts",
     provider: "WordPress",
     status: "active",
@@ -554,9 +554,10 @@ export const pageDesigns = [
     isPageDesign: true,
     layoutKind: "listing",
     actionLabel: "Edit",
-    description: "Change how your latest posts appear.",
-    scopeNotice: "Changes apply to the Posts listing.",
-    previewLabel: "Posts listing",
+    description: "Controls the Blog Home template WordPress uses to show your latest posts.",
+    scopeNotice: "Changes apply to the Blog Home template.",
+    previewLabel: "Blog Home",
+    templateLabel: "Blog Home",
   },
   {
     id: "blog-single",
