@@ -21,6 +21,11 @@ import {
 } from '../components/views/AdvancedCatalogViews';
 import PlaceholderAdminView from '../components/views/PlaceholderAdminView';
 
+const basename =
+  import.meta.env.BASE_URL === '/'
+    ? '/'
+    : import.meta.env.BASE_URL.replace(/\/$/, '');
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -88,4 +93,6 @@ export const router = createBrowserRouter([
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
-]);
+], {
+  basename,
+});
