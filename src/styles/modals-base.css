@@ -60,12 +60,26 @@
 }
 
 .modal-overlay.prototype-intro-overlay {
-  background: rgba(0, 0, 0, 0.72);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
   z-index: 10000;
   padding: 24px;
 }
 
+.modal-overlay.prototype-intro-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
 .prototype-intro-modal {
+  position: relative;
+  z-index: 1;
   width: min(520px, 100%);
   min-height: 340px;
   background: #fff;
@@ -85,12 +99,22 @@
   margin-bottom: 18px;
 }
 
-.prototype-intro-kicker {
+.prototype-intro-eyebrow {
   margin: 0 0 6px;
   color: #757575;
   font-size: 12px;
   font-weight: 500;
   line-height: 1.35;
+}
+
+.prototype-intro-step {
+  flex-shrink: 0;
+  margin: 0;
+  color: #757575;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: nowrap;
 }
 
 .prototype-intro-title {
@@ -124,31 +148,20 @@
   color: #2a47d4;
 }
 
-.prototype-intro-progress {
+.prototype-intro-actions {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   margin-top: auto;
   padding-top: 28px;
 }
 
-.prototype-intro-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #dcdcde;
-}
-
-.prototype-intro-dot.is-active {
-  background: #3858e9;
-}
-
-.prototype-intro-actions {
+.prototype-intro-actions-primary {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
   gap: 8px;
-  margin-top: 20px;
+  margin-left: auto;
 }
 
 @media (max-width: 600px) {
@@ -165,6 +178,12 @@
   .prototype-intro-actions {
     flex-direction: column-reverse;
     align-items: stretch;
+  }
+
+  .prototype-intro-actions-primary {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    margin-left: 0;
   }
 
   .prototype-intro-actions .components-button {

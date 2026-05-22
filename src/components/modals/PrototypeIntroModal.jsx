@@ -3,10 +3,9 @@ import { Button } from '@wordpress/components';
 
 const STORAGE_KEY = 'rsm-prototype-intro-dismissed';
 const RESET_QUERY_PARAM = 'resetIntro';
-const README_URL = 'https://github.com/getdave/rsm-editor-prototype#readme';
 const ISSUES_URL = 'https://github.com/getdave/rsm-editor-prototype/issues';
-const AUTOMATTIC_URL = 'https://automattic.com/';
-const CALYPSO_URL = 'https://github.com/Automattic/wp-calypso';
+// TODO: replace with real walkthrough URL when available
+const WALKTHROUGH_URL = '#';
 
 function clearIntroStorage() {
   try {
@@ -31,54 +30,43 @@ function consumeResetOverride() {
 
 const STEPS = [
   {
+    eyebrow: 'Prototype preview',
     title: 'Create, Not Learn',
-    message:
-      'This interactive prototype showcases a vision for how the WordPress Site Editor could be reframed around what people want to do, not how WordPress is structured. It stays grounded in WordPress concepts and is built with standard WordPress components.',
+    paragraphs: [
+      'This prototype explores a different way into the WordPress Site Editor: one organized around what people want to make, not the concepts they need to understand first.',
+      'It is still grounded in WordPress patterns and components, but reframes the experience around creating pages, shaping a site, and making visible progress sooner.',
+    ],
+    primaryLabel: 'Next',
+    secondaryAction: {
+      label: 'Skip Intro',
+      skip: true,
+    },
   },
   {
-    title: 'Why are we doing this?',
-    message: (
-      <>
-        We recognise that many people feel the Site Editor is too complex for most
-        users. This is exploratory work from{' '}
-        <a href={AUTOMATTIC_URL} target="_blank" rel="noreferrer">
-          Automattic
-        </a>
-        , and we are curious whether this prototype starts to address any of those
-        concerns. It is not scheduled for an upcoming WordPress release. Feedback is
-        welcome as the idea develops.
-      </>
-    ),
-    readmeLink: true,
+    eyebrow: 'Why this prototype exists',
+    title: 'A response to real Site Editor friction',
+    paragraphs: [
+      'Many people in the WordPress community have shared that the Site Editor can feel powerful but difficult to approach, especially for newer users. The goal is to explore a more guided, outcome-first editing model.',
+      'Watch the short walkthrough for more context on the thinking behind the prototype.',
+    ],
+    primaryLabel: 'Next',
+    secondaryAction: {
+      label: 'Watch the walkthrough ↗',
+      url: WALKTHROUGH_URL,
+    },
   },
   {
-    title: 'Reframing, not rebuilding',
-    message: (
-      <>
-        This is not a new{' '}
-        <a href={CALYPSO_URL} target="_blank" rel="noreferrer">
-          Calypso
-        </a>
-        , a real block editor, or a pull request for WordPress Core. The idea is not to
-        rebuild the Site Editor from scratch, but to reorganise the existing architecture
-        so it is easier for beginner users to approach.
-      </>
-    ),
-  },
-  {
-    title: 'How to review it',
-    message: (
-      <>
-        Focus on the information architecture, language, navigation, and overall editing
-        model. As a prototype, it is best viewed on a desktop computer rather than a
-        mobile phone, and some editing interactions are intentionally incomplete.
-        Feedback is best left on{' '}
-        <a href={ISSUES_URL} target="_blank" rel="noreferrer">
-          GitHub Issues
-        </a>
-        .
-      </>
-    ),
+    eyebrow: 'How to review it',
+    title: 'Review the model, then tell us what breaks',
+    paragraphs: [
+      'This is an interactive prototype primarily for desktop, with some corners intentionally incomplete. As you explore, focus on the information architecture, language, navigation, and whether the experience helps people understand what to do next.',
+      'You are welcome to share feedback on GitHub.',
+    ],
+    primaryLabel: 'Explore the prototype',
+    secondaryAction: {
+      label: 'Share feedback on GitHub ↗',
+      url: ISSUES_URL,
+    },
   },
 ];
 
@@ -151,57 +139,63 @@ export default function PrototypeIntroModal() {
       >
         <div className="prototype-intro-header">
           <div>
-            <p className="prototype-intro-kicker">
-              Prototype context
+            <p className="prototype-intro-eyebrow">
+              {step.eyebrow}
             </p>
             <h2 id="prototype-intro-title" className="prototype-intro-title">
               {step.title}
             </h2>
           </div>
+          <p className="prototype-intro-step">
+            {`Step ${stepIndex + 1} of ${STEPS.length}`}
+          </p>
         </div>
 
         <div id="prototype-intro-message" className="prototype-intro-message">
-          <p>{step.message}</p>
-          {step.readmeLink && (
-            <p>
-              For more information, background, and context, see the{' '}
-              <a href={README_URL} target="_blank" rel="noreferrer">
-                project README on GitHub
-              </a>.
-            </p>
-          )}
-        </div>
-
-        <div className="prototype-intro-progress" aria-label={`Step ${stepIndex + 1} of ${STEPS.length}`}>
-          {STEPS.map((item, index) => (
-            <span
-              key={item.title}
-              className={`prototype-intro-dot ${index === stepIndex ? 'is-active' : ''}`}
-            />
+          {step.paragraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
           ))}
         </div>
 
         <div className="prototype-intro-actions">
-          {stepIndex > 0 && (
+          {stepIndex > 0 ? (
             <Button
-              variant="secondary"
+              variant="tertiary"
               onClick={() => setStepIndex((current) => current - 1)}
             >
               Back
             </Button>
+          ) : (
+            step.secondaryAction?.skip && (
+              <Button variant="tertiary" onClick={completeIntro}>
+                {step.secondaryAction.label}
+              </Button>
+            )
           )}
-          <Button
-            variant="primary"
-            onClick={() => {
-              if (isFinalStep) {
-                completeIntro();
-              } else {
-                setStepIndex((current) => current + 1);
-              }
-            }}
-          >
-            {isFinalStep ? 'View prototype' : 'Next'}
-          </Button>
+          <div className="prototype-intro-actions-primary">
+            {step.secondaryAction && !step.secondaryAction.skip && (
+              <Button
+                variant="secondary"
+                href={step.secondaryAction.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {step.secondaryAction.label}
+              </Button>
+            )}
+            <Button
+              variant="primary"
+              onClick={() => {
+                if (isFinalStep) {
+                  completeIntro();
+                } else {
+                  setStepIndex((current) => current + 1);
+                }
+              }}
+            >
+              {step.primaryLabel}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
