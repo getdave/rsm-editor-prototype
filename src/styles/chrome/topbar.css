@@ -52,18 +52,9 @@
 .seh-logo {
   width: 32px;
   height: 32px;
-  background: #3858e9;
   border-radius: 4px;
   flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font: 700 13px var(--wp-font-family);
-}
-
-.seh-logo::before {
-  content: 'W';
+  object-fit: cover;
 }
 
 .seh-title {

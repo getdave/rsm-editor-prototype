@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Modal, Button, TextControl, BaseControl, Flex, FlexItem } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useAppState } from '../../hooks/useAppState';
+import siteLogo from '../../assets/site-logo.png';
 
 function SiteIdentityModal() {
   const { siteIdentityModalOpen } = useAppState();
@@ -59,7 +60,7 @@ function SiteIdentityModalContent() {
         >
           <Stack direction="row" align="flex-start" gap="md" className="site-identity-modal__logo-area">
             <div className="site-identity-modal__logo-preview">
-              <div className="site-identity-modal__logo-placeholder" />
+              <img className="site-identity-modal__logo-image" src={siteLogo} alt="Site logo" />
             </div>
             <Stack direction="column" align="flex-start" gap="sm">
               <Button variant="secondary">Upload image</Button>

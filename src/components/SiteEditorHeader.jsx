@@ -2,6 +2,7 @@ import { Tooltip } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { search, pencil } from '@wordpress/icons';
 import { useAppState } from '../hooks/useAppState';
+import siteLogo from '../assets/site-logo.png';
 
 function SiteEditorHeader() {
   const {
@@ -29,7 +30,7 @@ function SiteEditorHeader() {
             aria-label="Edit site identity"
           >
             <Stack direction="row" align="center" gap="sm">
-              <span className="seh-logo" aria-hidden="true" />
+              <img className="seh-logo" src={siteLogo} alt="" aria-hidden="true" />
               <Text variant="body-md" className="seh-title">{siteTitle}</Text>
               <span className="seh-pencil" aria-hidden="true">{pencil}</span>
             </Stack>
