@@ -487,7 +487,7 @@ function getBlogCollectionContent(page = null) {
 
 function getPostsIndexTemplateContent(page = null) {
   const archive = getBlogListContent();
-  const title = page?.name ?? 'Posts listing';
+  const title = page?.name ?? 'Blog Home';
   return {
     ...archive,
     title,
@@ -745,11 +745,11 @@ function getPlaceholderTitle(pageOrId, layout) {
   if (pageId === 'product-catalog-template') return 'Product listing title';
   if (pageId === 'blog') return 'Blog page title';
   if (pageId === 'blog-home-root') return 'Latest posts title';
-  if (pageId === 'blog-list') return 'Posts Page Title';
+  if (pageId === 'blog-list') return 'Blog Home title';
   if (pageId === 'posts-index-template') {
     return pageName === 'Latest posts'
       ? 'Latest posts title'
-      : 'Posts listing title';
+      : 'Blog Home title';
   }
   if (pageId === 'template-archive') return 'Archive Title';
   if (pageId === 'product-single') return 'Product Title';

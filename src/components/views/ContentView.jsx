@@ -17,7 +17,10 @@ import {
   contentRecords,
   contentTypes,
 } from '../../data/mockData';
-import { useAppState } from '../../hooks/useAppState';
+import {
+  READING_DISPLAY_LATEST,
+  useAppState,
+} from '../../hooks/useAppState';
 import { resolveHomepagePreviewTarget } from '../../utils/homepagePreviewTarget';
 import { showPrototypeNotImplementedAlert } from '../../utils/prototypeNotImplemented';
 import PreviewCanvas from '../shared/PreviewCanvas';
@@ -383,6 +386,46 @@ function isInactiveTemplate(design) {
   return getTemplateState(design) === 'inactive';
 }
 
+function getBlogHomeTemplateCopy({ homepageDisplayMode, postsPageId }) {
+  if (homepageDisplayMode === READING_DISPLAY_LATEST) {
+    return {
+      description:
+        'Controls the Blog Home template WordPress uses to show latest posts on your homepage.',
+      scopeNotice:
+        'Your homepage is set to show latest posts, so changes apply to the homepage posts listing.',
+    };
+  }
+
+  if (postsPageId) {
+    return {
+      description:
+        'Controls the Blog Home template WordPress uses to show latest posts on the selected Posts page.',
+      scopeNotice: 'Changes apply to the selected Posts page listing.',
+    };
+  }
+
+  return {
+    description:
+      'Controls the Blog Home template WordPress uses to show your latest posts.',
+    scopeNotice: 'Changes apply to the Blog Home template.',
+  };
+}
+
+function normalizeContentTemplateDesign(design, context) {
+  if (design.id !== 'blog-list') {
+    return design;
+  }
+
+  return {
+    ...design,
+    name: 'Blog Home',
+    shortName: 'Blog Home',
+    previewLabel: 'Blog Home',
+    templateLabel: 'Blog Home',
+    ...getBlogHomeTemplateCopy(context),
+  };
+}
+
 function getTemplateStateLabel(design) {
   return TEMPLATE_STATE_LABELS[getTemplateState(design)];
 }
@@ -583,6 +626,7 @@ function ContentView() {
     homepageDisplayMode,
     pageDesigns,
     pages,
+    postsPageId,
   } = useAppState();
   const selectedContentType = contentTypes.find(
     (type) => type.id === contentTypeId,
@@ -597,13 +641,24 @@ function ContentView() {
   const visibleDesigns = useMemo(
     () =>
       isDrilldown
-        ? pageDesigns.filter(
-            (design) =>
-              design.contentTypeId === selectedContentType.id &&
-              !design.isHomepageDesign,
-          )
+        ? pageDesigns
+            .filter((design) => {
+              if (design.isHomepageDesign) {
+                return false;
+              }
+              if (selectedContentType.pageDesignIds?.length) {
+                return selectedContentType.pageDesignIds.includes(design.id);
+              }
+              return design.contentTypeId === selectedContentType.id;
+            })
+            .map((design) =>
+              normalizeContentTemplateDesign(design, {
+                homepageDisplayMode,
+                postsPageId,
+              }),
+            )
         : [],
-    [isDrilldown, pageDesigns, selectedContentType],
+    [homepageDisplayMode, isDrilldown, pageDesigns, postsPageId, selectedContentType],
   );
   const [selectedDesignId, setSelectedDesignId] = useState(null);
   const [customizeTemplateDesign, setCustomizeTemplateDesign] = useState(null);
