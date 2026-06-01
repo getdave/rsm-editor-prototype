@@ -7,8 +7,7 @@ import step3Visual from '../../assets/images/onboarding/step-3.png';
 const STORAGE_KEY = 'rsm-prototype-intro-dismissed';
 const RESET_QUERY_PARAM = 'resetIntro';
 const ISSUES_URL = 'https://github.com/getdave/rsm-editor-prototype/issues';
-// TODO: replace with real walkthrough URL when available
-const WALKTHROUGH_URL = '#';
+const WALKTHROUGH_URL = 'https://youtu.be/TdsQe9oi8mg?si=2ViqNveOXa-Xo-0S';
 
 function clearIntroStorage() {
   try {
