@@ -89,7 +89,7 @@ function VariationsPanel() {
         Choose a variation to change the look of the site.
       </Text>
 
-      <div className="styles-variation-grid">
+      <div className="styles-variation-grid" data-help-target="styles-variations-grid">
         {styleVariations.map((v) => (
           <VariationTile
             key={v.id}

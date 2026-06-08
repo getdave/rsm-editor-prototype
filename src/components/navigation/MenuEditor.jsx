@@ -1226,6 +1226,7 @@ function MenuEditor({ menu, onUpdateMenu, onBack, onPreviewItem }) {
         className="nav-add-page-btn"
         onClick={openAddPagesModal}
         aria-haspopup="dialog"
+        data-help-target="navigation-add-to-menu"
       />
     </div>
   );

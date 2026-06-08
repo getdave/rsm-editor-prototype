@@ -1264,6 +1264,7 @@ function PagesView() {
           icon={plus}
           iconSize={16}
           onClick={openAddPageModal}
+          data-help-target="pages-add-page"
         >
           Add page
         </Button>

@@ -14,6 +14,116 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* Programmatic spotlight help */
+.spotlight-help {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: auto;
+  font-family: var(--wp-font-family);
+}
+
+.spotlight-help__scrim,
+.spotlight-help__target-blocker {
+  position: fixed;
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  appearance: none;
+  cursor: default;
+}
+
+.spotlight-help__scrim {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.spotlight-help__target-blocker {
+  z-index: 1;
+  background: transparent;
+}
+
+.spotlight-help__target-ring {
+  position: fixed;
+  z-index: 2;
+  border: 2px solid #72aee6;
+  border-radius: 6px;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 4px rgba(114, 174, 230, 0.22),
+    0 10px 32px rgba(0, 0, 0, 0.28);
+}
+
+.spotlight-help__panel {
+  position: fixed;
+  z-index: 3;
+  width: min(320px, calc(100vw - 32px));
+  padding: 18px;
+  border: 1px solid #dcdcde;
+  border-radius: 6px;
+  background: #fff;
+  color: #1e1e1e;
+  text-align: left;
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.3),
+    0 3px 12px rgba(0, 0, 0, 0.18);
+}
+
+.spotlight-help__close.components-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: 32px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.spotlight-help__kicker {
+  margin: 0 32px 6px 0;
+  color: #757575;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.spotlight-help__title {
+  margin: 0 32px 8px 0;
+  color: #1e1e1e;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.spotlight-help__description {
+  margin: 0;
+  color: #50575e;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.spotlight-help__persist.components-base-control {
+  margin: 14px 0 0;
+}
+
+.spotlight-help__persist .components-base-control__field {
+  margin-bottom: 0;
+}
+
+.spotlight-help__persist .components-checkbox-control__label {
+  color: #50575e;
+  font-size: 13px;
+}
+
+.spotlight-help__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
 /* Floating sidebar toggle */
 .sidebar-toggle {
   position: absolute;

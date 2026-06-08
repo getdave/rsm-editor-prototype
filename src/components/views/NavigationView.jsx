@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
@@ -13,13 +13,19 @@ import { useAppState } from '../../hooks/useAppState';
 import { MAIN_MENU_ID } from '../../constants/navigation';
 
 function NavigationView() {
+  const location = useLocation();
   const navigate = useNavigate();
   const {
     navigationMenus: menus,
     setNavigationMenus,
     pages: appPages,
   } = useAppState();
-  const [selectedMenuId, setSelectedMenuId] = useState(null);
+  const [selectedMenuId, setSelectedMenuId] = useState(() => {
+    if (location.state?.spotlightHelpTarget !== 'navigation-add-to-menu') {
+      return null;
+    }
+    return menus.find((menu) => menu.id === MAIN_MENU_ID)?.id ?? menus[0]?.id ?? null;
+  });
   const [showAddMenuModal, setShowAddMenuModal] = useState(false);
   const [menuPendingRename, setMenuPendingRename] = useState(null);
   const [menuPendingDelete, setMenuPendingDelete] = useState(null);
