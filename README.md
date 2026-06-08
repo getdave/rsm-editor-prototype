@@ -4,6 +4,8 @@
 
 [![Watch the project video](https://img.youtube.com/vi/TdsQe9oi8mg/maxresdefault.jpg)](https://www.youtube.com/watch?v=TdsQe9oi8mg&feature=youtu.be)
 
+[Watch the project video on YouTube](https://www.youtube.com/watch?v=TdsQe9oi8mg&feature=youtu.be)
+
 <!-- Screenshot: replace the line below with an actual screenshot once one is available -->
 <!-- ![Prototype screenshot showing the simplified Site Editor](./docs/screenshot.png) -->
 
